@@ -9,16 +9,17 @@ TopTagger::TopTagger()
     topTaggerResults_ = nullptr;
 }
 
-void TopTagger::registerModule(TTModule * module)
+void TopTagger::registerModule(std::unique_ptr<TTModule>& module)
 {
-    topTaggerModules_.emplace_back(module);
+    topTaggerModules_.push_back(std::move(module));
 }
 
 void TopTagger::runTagger(const std::vector<const Constituent> * constituents)
 {
+    if(topTaggerResults_) delete topTaggerResults_;
     topTaggerResults_ = new TopTaggerResults();
 
-    for(TTModule * const module : topTaggerModules_)
+    for(std::unique_ptr<TTModule>& module : topTaggerModules_)
     {
         module->run(*topTaggerResults_);
     }

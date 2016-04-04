@@ -22,11 +22,12 @@ public:
     
     void addConstituent(Constituent const *  constituent);
 
-    const TLorentzVector& p() { return p_; }
-    const TLorentzVector& P() { return p(); }
+    const TLorentzVector& p() const { return p_; }
+    const TLorentzVector& P() const { return p(); }
+    double getDRmax() const { return dRmax_; }
 
-    const std::vector<Constituent const *>& getConstituents() { return constituents_; }
-    int getNConstituents() { return constituents_.size(); }
+    const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
+    int getNConstituents() const { return constituents_.size(); }
 };
 
 #endif

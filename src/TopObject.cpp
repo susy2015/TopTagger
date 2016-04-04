@@ -23,6 +23,6 @@ void TopObject::updateVariables()
 
 void TopObject::addConstituent(Constituent const * constituent)
 {
-    constituents_.emplace_back(constituent);
+    constituents_.push_back(constituent);
     updateVariables();
 }
