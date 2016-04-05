@@ -1,7 +1,7 @@
 #ifndef TTMLAZYCLUSTERALGO_H
 #define TTMLAZYCLUSTERALGO_H
 
-#include "TTModule.h"
+#include "TopTagger/TopTagger/include/TTModule.h"
 
 class TopTaggerResults;
 

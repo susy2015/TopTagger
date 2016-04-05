@@ -1,8 +1,8 @@
 #ifndef TOPTAGGERRESULTS_H
 #define TOPTAGGERRESULTS_H
 
-#include "TopObject.h"
-#include "Constituent.h"
+#include "TopTagger/TopTagger/include/TopObject.h"
+#include "TopTagger/TopTagger/include/Constituent.h"
 
 class TopTaggerResults
 {
@@ -19,7 +19,9 @@ private:
 
 public:
     
-    TopTaggerResults();
+    TopTaggerResults(const std::vector<Constituent> * constituents) : constituents_(constituents) {}
+
+    ~TopTaggerResults() {}
 
     //Setters
     void setConstituents(const std::vector<Constituent> * constituents) {constituents_ = constituents;}

@@ -1,4 +1,4 @@
-#include "TopObject.h"
+#include "TopTagger/TopTagger/include/TopObject.h"
 
 #include "Math/VectorUtil.h"
 
@@ -9,6 +9,9 @@ TopObject::TopObject(std::vector<Constituent const *> constituents) : constituen
 
 void TopObject::updateVariables()
 {
+    //reset sum p vector
+    p_.SetPtEtaPhiM(0.0, 0.0, 0.0, 0.0);
+
     // calculate the total 4-vector 
     for(const auto& jet : constituents_) p_ += jet->p();
 

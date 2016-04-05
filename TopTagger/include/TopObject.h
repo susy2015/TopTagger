@@ -5,7 +5,7 @@
 
 #include "TLorentzVector.h"
 
-#include "Constituent.h"
+#include "TopTagger/TopTagger/include/Constituent.h"
 
 class TopObject 
 {

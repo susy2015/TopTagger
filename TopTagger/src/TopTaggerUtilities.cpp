@@ -1,10 +1,10 @@
-#include "TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 
-#include "Constituent.h"
+#include "TopTagger/TopTagger/include/Constituent.h"
 
 namespace ttUtility
 {
-    const std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors)
+    std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors)
     {
         //vector holding constituents to be created
         std::vector<Constituent> constituents;
@@ -16,7 +16,7 @@ namespace ttUtility
         }
         
         //Construct constituents in place in the vector
-        for(int iJet = 0; iJet < jetsLVec.size(); ++iJet)
+        for(unsigned int iJet = 0; iJet < jetsLVec.size(); ++iJet)
         {
             constituents.emplace_back(jetsLVec[iJet], btagFactors[iJet]);
         }

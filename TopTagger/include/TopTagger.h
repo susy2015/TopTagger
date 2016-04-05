@@ -4,8 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "Constituent.h"
-
+class Constituent;
 class TTModule;
 class TopTaggerResults;
 
@@ -22,11 +21,13 @@ private:
 public:
     TopTagger();
 
+    ~TopTagger();
+
     //Adds new module to the end of the module vector 
     void registerModule(std::unique_ptr<TTModule>&);
 
     //Runs the top tagger modules specified.  Runs once per event
-    void runTagger(const std::vector<const Constituent>*);
+    void runTagger(const std::vector<Constituent>*);
 
     //Getters
     const TopTaggerResults& getResults();

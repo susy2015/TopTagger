@@ -16,7 +16,7 @@ public:
 
     ~TopTaggerFactory();
 
-    std::unique_ptr<TopTagger> makeTopTagger(std::string = "default");
+    TopTagger* makeTopTagger(std::string = "default");
 };
 
 #endif

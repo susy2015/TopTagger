@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "TopTaggerResults.h"
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
 void TTMHEPRequirements::run(TopTaggerResults& ttResults)
 {

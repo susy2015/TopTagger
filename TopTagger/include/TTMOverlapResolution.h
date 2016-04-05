@@ -1,7 +1,7 @@
 #ifndef TTMOVERLAPRESOLUTION_H
 #define TTMOVERLAPRESOLUTION_H
 
-#include "TTModule.h"
+#include "TopTagger/TopTagger/include/TTModule.h"
 
 class TopTaggerResults;
 

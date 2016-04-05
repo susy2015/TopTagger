@@ -1,8 +1,8 @@
-#include "TTMHEPRequirements.h"
+#include "TopTagger/TopTagger/include/TTMHEPRequirements.h"
 
 #include <cmath>
 
-#include "TopTaggerResults.h"
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
 void TTMHEPRequirements::run(TopTaggerResults& ttResults)
 {

@@ -1,22 +1,23 @@
-#include "TopTaggerFactory.h"
+#include "TopTagger/TopTagger/include/TopTaggerFactory.h"
 
-#include "TTModule.h"
-#include "TTMLazyClusterAlgo.h"
-#include "TTMHEPRequirements.h"
-#include "TTMOverlapResolution.h"
-#include "TopTagger.h"
+#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/include/TTMLazyClusterAlgo.h"
+#include "TopTagger/TopTagger/include/TTMHEPRequirements.h"
+#include "TopTagger/TopTagger/include/TTMOverlapResolution.h"
+#include "TopTagger/TopTagger/include/TopTagger.h"
 
 TopTaggerFactory::~TopTaggerFactory()
 {
 }
 
-std::unique_ptr<TopTagger> TopTaggerFactory::makeTopTagger(std::string tagger)
+TopTagger* TopTaggerFactory::makeTopTagger(std::string tagger)
 {
     //Eventually will have a if-else tree of doom to select tagger varients
     //For now we just have the one terrible top tagger 
     
     //Create empty top tagger
-    std::unique_ptr<TopTagger> tt(new TopTagger());
+
+    TopTagger *tt = new TopTagger();
 
     //Create necessary modules 
     std::unique_ptr<TTModule> ttmLCA(new TTMLazyClusterAlgo());

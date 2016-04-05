@@ -1,7 +1,7 @@
 #ifndef TTMHEPREQUIREMENTS_H
 #define TTMHEPREQUIREMENTS_H
 
-#include "TTModule.h"
+#include "TopTagger/TopTagger/include/TTModule.h"
 
 class TopTaggerResults;
 

@@ -12,7 +12,7 @@ class Constituent;
 
 namespace ttUtility
 {
-    const std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
+    std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
 }
 
 #endif
