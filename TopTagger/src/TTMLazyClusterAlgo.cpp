@@ -9,8 +9,34 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
 
     for(unsigned int i = 0; i < constituents.size(); ++i)
     {
+        //singlet tops
+        if(constituents[i].p().M() > 110 && constituents[i].p().M() < 250)
+        {
+            TopObject topCand({&constituents[i]});
+
+            topCandidates.push_back(topCand);
+        }
+
+        //singlet w-bosons
+        if(constituents[i].p().M() > 70 && constituents[i].p().M() < 110)
+        {
+            //doublet combinations
+            for(unsigned int j = 0; j < constituents.size(); ++j)
+            {
+                if(i == j) continue;
+
+                TopObject topCand({&constituents[i], &constituents[j]});
+                
+                if(topCand.getDRmax() < 1.5)
+                {
+                    topCandidates.push_back(topCand);
+                }
+            }
+        }
+
         for(unsigned int j = 0; j < i; ++j)
         {
+            //Triplet jet combinations 
             for(unsigned int k = 0; k < j; ++k)
             {
                 TopObject topCand({&constituents[i], &constituents[j], &constituents[k]});

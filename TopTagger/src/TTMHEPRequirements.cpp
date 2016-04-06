@@ -14,36 +14,56 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
     {
         const std::vector<Constituent const *>& jets = topCand.getConstituents();
 
-        if(jets.size() < 3) continue;
-        
+        //HEP tagger requirements
+        bool passHEPRequirments = true;
+
         const double mW = 80.4;
         const double mt = 173.4;
         const double Rmin = 0.85*mW/mt;
         const double Rmax = 1.25*mW/mt;
 
-        double m12  = (jets[0]->p() + jets[1]->p()).M();
-        double m23  = (jets[1]->p() + jets[2]->p()).M();
-        double m13  = (jets[0]->p() + jets[2]->p()).M();
         double m123 = topCand.p().M();
 
-        //Implement HEP mass ratio requirements here
-        bool criterionA = 0.2 < atan(m13/m12) &&
-            atan(m13/m12) < 1.3 &&
-            Rmin < m23/m123 &&
-            m23/m123 < Rmax;
+        if(jets.size() == 3)
+        {
+            double m12  = (jets[0]->p() + jets[1]->p()).M();
+            double m23  = (jets[1]->p() + jets[2]->p()).M();
+            double m13  = (jets[0]->p() + jets[2]->p()).M();
 
-        bool criterionB = (pow(Rmin, 2)*(1+pow(m13/m12, 2)) < (1 - pow(m23/m123, 2))) &&
-            ((1 - pow(m23/m123, 2)) < pow(Rmax, 2)*(1 + pow(m13/m12, 2))) &&
-            (m23/m123 > 0.35);
+            //Implement HEP mass ratio requirements here
+            bool criterionA = 0.2 < atan(m13/m12) &&
+                atan(m13/m12) < 1.3 &&
+                Rmin < m23/m123 &&
+                m23/m123 < Rmax;
 
-        bool criterionC = (pow(Rmin, 2)*(1+pow(m12/m13, 2)) < (1 - pow(m23/m123, 2))) &&
-            ((1 - pow(m23/m123, 2)) < pow(Rmax, 2)*(1 + pow(m12/m13, 2))) &&
-            (m23/m123 > 0.35);
+            bool criterionB = (pow(Rmin, 2)*(1+pow(m13/m12, 2)) < (1 - pow(m23/m123, 2))) &&
+                ((1 - pow(m23/m123, 2)) < pow(Rmax, 2)*(1 + pow(m13/m12, 2)));// &&
+            //(m23/m123 > 0.35);
 
-        bool passHEPRequirments = criterionA || criterionB || criterionC;
+            bool criterionC = (pow(Rmin, 2)*(1+pow(m12/m13, 2)) < (1 - pow(m23/m123, 2))) &&
+                ((1 - pow(m23/m123, 2)) < pow(Rmax, 2)*(1 + pow(m12/m13, 2)));// &&
+            //(m23/m123 > 0.35);
 
+            passHEPRequirments = criterionA || criterionB || criterionC;
+        }
+        else if(jets.size() == 2)
+        {
+            double m23  = jets[0]->p().M();
+            double m123 = topCand.p().M();
+
+            //Implement HEP mass ratio requirements here
+            passHEPRequirments = Rmin < m23/m123 && m23/m123 < Rmax;
+        }
+
+        //mass window on the top candidate mass
         bool passMassWindow = 100 < m123 && m123 < 250;
 
-        if(passHEPRequirments && passMassWindow) tops.push_back(&topCand);
+        //Requirements on b-quarks
+        //TERRIBLE HARDCODED CSV THRESHOLD HERE
+        int Nb = 0;
+        for(const auto& jet : jets) if(jet->getBTagDisc() > 0.81) ++Nb;
+        bool bassBrequirements = (Nb <= 1);
+
+        if(passHEPRequirments && passMassWindow && bassBrequirements) tops.push_back(&topCand);
     }
 }
