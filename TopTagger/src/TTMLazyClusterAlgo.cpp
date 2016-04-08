@@ -10,7 +10,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
     for(unsigned int i = 0; i < constituents.size(); ++i)
     {
         //singlet tops
-        if(constituents[i].p().M() > 110 && constituents[i].p().M() < 250)
+        if(constituents[i].p().M() >= 110 && constituents[i].p().M() <= 220)
         {
             TopObject topCand({&constituents[i]});
 
@@ -18,9 +18,9 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
         }
 
         //singlet w-bosons
-        if(constituents[i].p().M() > 70 && constituents[i].p().M() < 110)
+        if(constituents[i].p().M() >= 70 && constituents[i].p().M() <= 110)
         {
-            //doublet combinations
+            //dijet combinations
             for(unsigned int j = 0; j < constituents.size(); ++j)
             {
                 if(i == j) continue;
@@ -36,10 +36,10 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
 
         for(unsigned int j = 0; j < i; ++j)
         {
-            //Triplet jet combinations 
+            //Trijet combinations 
             for(unsigned int k = 0; k < j; ++k)
             {
-                TopObject topCand({&constituents[i], &constituents[j], &constituents[k]});
+                TopObject topCand({&constituents[k], &constituents[j], &constituents[i]});
 
                 if(topCand.getDRmax() < 1.5)
                 {

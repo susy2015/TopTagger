@@ -18,7 +18,7 @@ private:
     std::vector<TopObject*> tops_;
 
 public:
-    
+
     TopTaggerResults(const std::vector<Constituent> * constituents) : constituents_(constituents) {}
 
     ~TopTaggerResults() {}
