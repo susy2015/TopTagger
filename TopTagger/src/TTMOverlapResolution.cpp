@@ -1,11 +1,11 @@
 #include "TopTagger/TopTagger/include/TTMOverlapResolution.h"
 
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+
 #include <set>
 #include <algorithm>
 #include <vector>
 #include <cmath>
-
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
 void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 {
@@ -17,7 +17,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     const double mt = 173.5;
     std::sort(tops.begin(), tops.end(), [mt](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - mt) < fabs(t2->p().M() - mt);});
 
-    //This variable is necessary to account for but in Hongxuan's code
+    //This variable is necessary to account for bug in Hongxuan's code
     int nTops = 0;
 
     //This container will kep trach of which jets have been included in final tops

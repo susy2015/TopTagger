@@ -1,0 +1,63 @@
+#include "Defs.h"
+
+COMPILER HcalCfg
+
+CfgBuilder m_builder;
+
+
+CHARACTERS
+  digit = "0123456789".
+  hexDigit = digit + "ABCDEFabcdef".
+  letter = 'A'..'Z' + 'a'..'z'.
+  cr        = '\r'.
+  lf        = '\n'.
+  tab       = '\t'.
+  stringCh  = ANY - '"' - '\\' - cr - lf.
+  printable =  '\u0020' .. '\u007e'.
+  other = '\'' + '\\' + "${}".
+
+TOKENS
+  integer = digit {digit} 
+            | "-" digit {digit} 
+            | "0x" hexDigit{hexDigit}.
+  esc = "\\n".
+  string = '"' {stringCh | '\\' printable} '"'.
+  ident = letter {letter|digit|'_'|'.'}.
+  trueval = "true".
+  falseval = "false".
+  op = "==" | ">" | "<" | "!=" | ">=" | "<=". 
+
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+COMMENTS FROM "#" TO lf
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+  HcalCfg = Line {Line}.
+  Line = GlobalConditional | GroupDef.
+  GlobalConditional = ident (. m_builder.setNamespace(CfgBuilder::toString(t->val)); .) (CompoundIC | SimpleIC).
+  CompoundIC = "{" AssignOrCond {AssignOrCond} SYNC "}".
+  SimpleIC = "::" Assign.
+  AssignOrCond = Assign | ConditionalAssign.
+  Item = ident (. m_builder.theItemName=CfgBuilder::toString(t->val); m_builder.theItemIndex=-1; .) { "[" integer (. m_builder.theItemIndex=CfgBuilder::toInt(t->val); .) SYNC "]" }.
+  Assign = Item '=' Literal (. m_builder.assign(); .).
+  ConditionalAssign = "if" "(" (. hcal::cfg::TermAnd* terms=new hcal::cfg::TermAnd(); .) 
+			CompoundTerm<*terms> SYNC ")" (. m_builder.newCondition()->set(terms); .)
+	 "{" AssignOrCond {AssignOrCond} "}" (. m_builder.popCondition(); .) .
+  CompoundTerm<hcal::cfg::TermAnd& at> = (. hcal::cfg::SimpleTerm* term=0; .)
+	Term<term> (. if (term!=0) { at.And(term); term=0; } .) 
+	{ "&&" Term<term> (. if (term!=0) { at.And(term); term=0; } .) }.
+  Literal = integer (. m_builder.iLiteral(t->val);  .) 
+	| trueval (. m_builder.bLiteral(true); .) 
+	| falseval (. m_builder.bLiteral(false); .) 
+	| string(. m_builder.sLiteral(t->val); .).
+  List = "("  Literal { "," Literal} ")". 
+  Term<hcal::cfg::SimpleTerm*& term> = ident (. std::string item(CfgBuilder::toString(t->val)); .)
+	(op (. std::string ops(CfgBuilder::toString(t->val)); .)
+	Literal (. term=m_builder.simpleTerm(item, ops); .) | 
+	"in" List (. term=m_builder.listTerm(item,"in"); .) ) | "is" ident.
+  GroupDef = "group" ident "=" (. hcal::cfg::TermAnd terms; .)
+	CompoundTerm<terms>.
+  
+END HcalCfg.

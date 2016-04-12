@@ -8,6 +8,15 @@ class Constituent;
 class TTModule;
 class TopTaggerResults;
 
+namespace hcal
+{
+    namespace cfg
+    {
+        class CfgDocument;
+        class Record;
+    }
+}
+
 class TopTagger
 {
 private:
@@ -18,6 +27,10 @@ private:
     //List of modules to be run, all are based upon the TTModule base class
     std::vector<std::unique_ptr<TTModule>> topTaggerModules_;
 
+    //hcal config parser 
+    hcal::cfg::CfgDocument *cfgDoc_;
+    hcal::cfg::Record *cfgRecord_;
+
 public:
     TopTagger();
 
@@ -27,7 +40,7 @@ public:
     void registerModule(std::unique_ptr<TTModule>&);
 
     //Runs the top tagger modules specified.  Runs once per event
-    void runTagger(const std::vector<Constituent>*);
+    void runTagger(const std::vector<Constituent>&);
 
     //Getters
     const TopTaggerResults& getResults();

@@ -7,7 +7,7 @@
 class TopTaggerResults
 {
 private:
-    //List of input onjects which can be included in a resolved top
+    //List of input objects which can be included in a resolved top
     //Will never be modified or changed by modules 
     const std::vector<Constituent> * constituents_;
 
@@ -19,12 +19,12 @@ private:
 
 public:
 
-    TopTaggerResults(const std::vector<Constituent> * constituents) : constituents_(constituents) {}
+    TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(&constituents) {}
 
     ~TopTaggerResults() {}
 
     //Setters
-    void setConstituents(const std::vector<Constituent> * constituents) {constituents_ = constituents;}
+    void setConstituents(const std::vector<Constituent>& constituents) {constituents_ = &constituents;}
 
     //non-const getters (for modules)
     decltype(topCandidates_)& getTopCandidates() { return topCandidates_; }
