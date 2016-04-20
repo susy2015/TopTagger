@@ -1,12 +1,9 @@
-
-
 #if !defined(hcalcfg_COCO_PARSER_H__)
 #define hcalcfg_COCO_PARSER_H__
 
 #include "Defs.h"
 
-
-#include "TopTagger/TopTagger/src/cfg/Scanner.h"
+#include "TopTagger/CfgParser/include/Scanner.h"
 
 namespace hcalcfg {
 
@@ -76,8 +73,8 @@ CfgBuilder m_builder;
 	void ConditionalAssign();
 	void Item();
 	void Literal();
-	void CompoundTerm(hcal::cfg::TermAnd& at);
-	void Term(hcal::cfg::SimpleTerm*& term);
+	void CompoundTerm(cfg::TermAnd& at);
+	void Term(cfg::SimpleTerm*& term);
 	void List();
 
 	void Parse();

@@ -1,5 +1,3 @@
-
-
 #if !defined(hcalcfg_COCO_SCANNER_H__)
 #define hcalcfg_COCO_SCANNER_H__
 
@@ -119,9 +117,11 @@ public:
 //-----------------------------------------------------------------------------------
 // StartStates  -- maps characters to start states of tokens
 //-----------------------------------------------------------------------------------
-class StartStates {
+class StartStates 
+{
 private:
-	class Elem {
+	class Elem 
+        {
 	public:
 		int key, val;
 		Elem *next;
@@ -131,79 +131,109 @@ private:
 	Elem **tab;
 
 public:
-	StartStates() { tab = new Elem*[128]; memset(tab, 0, 128 * sizeof(Elem*)); }
-	virtual ~StartStates() {
-		for (int i = 0; i < 128; ++i) {
-			Elem *e = tab[i];
-			while (e != NULL) {
-				Elem *next = e->next;
-				delete e;
-				e = next;
-			}
-		}
-		delete [] tab;
+	StartStates()
+        {
+            tab = new Elem*[128];
+            memset(tab, 0, 128 * sizeof(Elem*)); 
+        }
+
+	virtual ~StartStates()
+        {
+            for (int i = 0; i < 128; ++i) 
+            { 
+                Elem *e = tab[i];
+                while (e != NULL) 
+                {
+                    Elem *next = e->next;
+                    delete e;
+                    e = next;
+                }
+            }
+            delete [] tab;
 	}
 
-	void set(int key, int val) {
-		Elem *e = new Elem(key, val);
-		int k = ((unsigned int) key) % 128;
-		e->next = tab[k]; tab[k] = e;
+	void set(int key, int val) 
+        {
+            Elem *e = new Elem(key, val);
+            int k = ((unsigned int) key) % 128;
+            e->next = tab[k];
+            tab[k] = e;
 	}
 
-	int state(int key) {
-		Elem *e = tab[((unsigned int) key) % 128];
-		while (e != NULL && e->key != key) e = e->next;
-		return e == NULL ? 0 : e->val;
+	int state(int key)
+        {
+            Elem *e = tab[((unsigned int) key) % 128];
+            while (e != NULL && e->key != key) e = e->next;
+            return e == NULL ? 0 : e->val;
 	}
 };
 
 //-------------------------------------------------------------------------------------------
 // KeywordMap  -- maps strings to integers (identifiers to keyword kinds)
 //-------------------------------------------------------------------------------------------
-class KeywordMap {
+class KeywordMap 
+{
 private:
-	class Elem {
-	public:
-		wchar_t *key;
-		int val;
-		Elem *next;
-		Elem(const wchar_t *key, int val) { this->key = coco_string_create(key); this->val = val; next = NULL; }
-		virtual ~Elem() { coco_string_delete(key); }
-	};
+    class Elem 
+    {
+    public:
+        wchar_t *key;
+        int val;
+        Elem *next;
+        Elem(const wchar_t *key, int val) 
+        { 
+            this->key = coco_string_create(key);
+            this->val = val; 
+            next = NULL;
+        }
+        virtual ~Elem()
+        {
+            coco_string_delete(key); 
+        }
+    };
 
-	Elem **tab;
+    Elem **tab;
 
 public:
-	KeywordMap() { tab = new Elem*[128]; memset(tab, 0, 128 * sizeof(Elem*)); }
-	virtual ~KeywordMap() {
-		for (int i = 0; i < 128; ++i) {
-			Elem *e = tab[i];
-			while (e != NULL) {
-				Elem *next = e->next;
-				delete e;
-				e = next;
-			}
-		}
-		delete [] tab;
-	}
+    KeywordMap()
+    {
+        tab = new Elem*[128];
+        memset(tab, 0, 128 * sizeof(Elem*)); 
+    }
+    virtual ~KeywordMap()
+    {
+        for (int i = 0; i < 128; ++i)
+        {
+            Elem *e = tab[i];
+            while (e != NULL)
+            {
+                Elem *next = e->next;
+                delete e;
+                e = next;
+            }
+        }
+        delete [] tab;
+    }
 
-	void set(const wchar_t *key, int val) {
-		Elem *e = new Elem(key, val);
-		int k = coco_string_hash(key) % 128;
-		e->next = tab[k]; tab[k] = e;
-	}
+    void set(const wchar_t *key, int val) 
+    {
+        Elem *e = new Elem(key, val);
+        int k = coco_string_hash(key) % 128;
+        e->next = tab[k]; tab[k] = e;
+    }
 
-	int get(const wchar_t *key, int defaultVal) {
-		Elem *e = tab[coco_string_hash(key) % 128];
-		while (e != NULL && !coco_string_equal(e->key, key)) e = e->next;
-		return e == NULL ? defaultVal : e->val;
-	}
+    int get(const wchar_t *key, int defaultVal) 
+    {
+        Elem *e = tab[coco_string_hash(key) % 128];
+        while (e != NULL && !coco_string_equal(e->key, key)) e = e->next;
+        return e == NULL ? defaultVal : e->val;
+    }
 };
 
 class Scanner {
 private:
-	void *firstHeap;
-	void *heap;
+    void *firstHeap;
+    void *heap;
 	void *heapTop;
 	void **heapEnd;
 

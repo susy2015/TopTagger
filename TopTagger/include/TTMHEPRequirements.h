@@ -12,5 +12,6 @@ private:
 public:
     void run(TopTaggerResults&);
 };
+REGESTER_TTMODULE(TTMHEPRequirements);
 
 #endif

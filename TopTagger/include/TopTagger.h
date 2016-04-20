@@ -8,13 +8,10 @@ class Constituent;
 class TTModule;
 class TopTaggerResults;
 
-namespace hcal
+namespace cfg
 {
-    namespace cfg
-    {
-        class CfgDocument;
-        class Record;
-    }
+    class CfgDocument;
+    class Record;
 }
 
 class TopTagger
@@ -27,14 +24,20 @@ private:
     //List of modules to be run, all are based upon the TTModule base class
     std::vector<std::unique_ptr<TTModule>> topTaggerModules_;
 
-    //hcal config parser 
-    hcal::cfg::CfgDocument *cfgDoc_;
-    hcal::cfg::Record *cfgRecord_;
+    //config parser 
+    std::unique_ptr<cfg::CfgDocument> cfgDoc_;
+    //cfg::Record *cfgRecord_;
+
+    void getParameters();
 
 public:
     TopTagger();
+    TopTagger(const std::string&);
 
     ~TopTagger();
+
+    void setCfgFile(const std::string&);
+    void setCfgFileDirect(const std::string&);
 
     //Adds new module to the end of the module vector 
     void registerModule(std::unique_ptr<TTModule>&);
