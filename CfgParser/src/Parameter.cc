@@ -1,6 +1,7 @@
 #include "TopTagger/CfgParser/include/Parameter.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
-#include <iostream>
+#include "TopTagger/CfgParser/include/TTException.h"
+//#include <iostream>
 #include <string>
 
 namespace cfg
@@ -27,7 +28,7 @@ namespace cfg
                 if (i->condition.test(cxt)) return i->value;
             }
             //catch (hcal::exception::CfgMissingFeatureException& e)
-            catch (const std::string e)
+            catch (const TTException e)
             {
                 if (exceptMissing) throw e;
             }

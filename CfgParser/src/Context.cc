@@ -1,5 +1,6 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 #include <ctype.h>
 
 namespace cfg {
@@ -57,7 +58,9 @@ namespace cfg {
         std::map<std::string,Literal>::const_iterator i=m_features.find(name);
         if (i==m_features.end()) {
             //XCEPT_RAISE(hcal::exception::CfgMissingFeatureException,std::string("Feature not found: ")+name);
-            throw "CfgMissingFeatureException: Feature not found:" + name;
+            //throw "CfgMissingFeatureException: Feature not found:" + name;
+            THROW_TTEXCEPTION("CfgMissingFeatureException: Feature not found:" + name);
+            
         }
         return i->second;
     }    

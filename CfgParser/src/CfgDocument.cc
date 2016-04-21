@@ -1,6 +1,7 @@
 #include "TopTagger/CfgParser/include/Record.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 #include "TopTagger/CfgParser/include/Scanner.h"
 #include "TopTagger/CfgParser/include/Parser.h"
 
@@ -81,7 +82,8 @@ namespace cfg {
         if (l.flavor()!=Literal::fl_Integer) 
         {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected int)");
-            throw "CfgLanguageException: Type mismatch (expected int)";
+            //throw "CfgLanguageException: Type mismatch (expected int)";
+            THROW_TTEXCEPTION("CfgLanguageException: Type mismatch (expected int)");
         }
         return l.intValue();
     }
@@ -101,7 +103,8 @@ namespace cfg {
         else
         {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected int)");
-            throw "CfgLanguageException: Type mismatch (expected float)";
+            //throw "CfgLanguageException: Type mismatch (expected float)";
+            THROW_TTEXCEPTION("CfgLanguageException: Type mismatch (expected float)");
         }
         
     }
@@ -110,7 +113,8 @@ namespace cfg {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_Boolean) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected bool)");
-            throw "CfgLanguageException: Type mismatch (expected bool)";
+            //throw "CfgLanguageException: Type mismatch (expected bool)";
+            THROW_TTEXCEPTION("CfgLanguageException: Type mismatch (expected bool)");
         }
         return l.boolValue();
     }
@@ -118,7 +122,8 @@ namespace cfg {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_String) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected string)");
-            throw "CfgLanguageException: Type mismatch (expected string)";
+            //throw "CfgLanguageException: Type mismatch (expected string)";
+            THROW_TTEXCEPTION("CfgLanguageException: Type mismatch (expected string)");
         }
         return l.strValue();
     }
@@ -126,7 +131,8 @@ namespace cfg {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_String) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected string)");
-            throw "CfgLanguageException: Type mismatch (expected string)";
+            //throw "CfgLanguageException: Type mismatch (expected string)";
+            THROW_TTEXCEPTION("CfgLanguageException: Type mismatch (expected string)");
         }
         return l.strValue();
     }

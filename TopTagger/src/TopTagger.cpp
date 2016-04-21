@@ -4,22 +4,20 @@
 #include "TopTagger/TopTagger/include/TTModule.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
+#include "TopTagger/CfgParser/include/TTException.h"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 #include "TopTagger/CfgParser/include/Record.hh"
 #include "TopTagger/CfgParser/include/Context.hh"
 
-#include <iostream>
-#include <cstdio>
-
 TopTagger::TopTagger()
 {
     topTaggerResults_ = nullptr;
+    verbosity_ = 1;
+    reThrow_ = true;
 }
 
-TopTagger::TopTagger(const std::string& cfgFileName)
+TopTagger::TopTagger(const std::string& cfgFileName) : TopTagger()
 {
-    topTaggerResults_ = nullptr;
-
     setCfgFile(cfgFileName);
 }
 
@@ -30,48 +28,66 @@ TopTagger::~TopTagger()
 
 void TopTagger::setCfgFile(const std::string& cfgFileName)
 {
-    //Read cfg file text
-
-    //Check that filename exists
-    if(cfgFileName.size() < 1)
+    //try-catch the entire function - exceptions rethrown by default
+    try
     {
-        throw "TopTagger::setCfgFile(...) : No configuration file name given";
-    }
+        //Read cfg file text
 
-    //buffer to hold file contents 
-    std::string cfgText;
-
-    //Read text from file
-    FILE *f = fopen(cfgFileName.c_str(), "r");
-    if(f)
-    {
-        char buff[1024];
-        for(; !feof(f) && fgets(buff, 1023, f);)
+        //Check that filename exists
+        if(cfgFileName.size() < 1)
         {
-            cfgText += buff;
+            //throw "TopTagger::setCfgFile(...) : No configuration file name given";
+            THROW_TTEXCEPTION("No configuration file name given");
         }
+
+        //buffer to hold file contents 
+        std::string cfgText;
+
+        //Read text from file
+        FILE *f = fopen(cfgFileName.c_str(), "r");
+        if(f)
+        {
+            char buff[1024];
+            for(; !feof(f) && fgets(buff, 1023, f);)
+            {
+                cfgText += buff;
+            }
         
-        fclose(f);
+            fclose(f);
+        }
+        else
+        {
+            //throw "TopTagger::setCfgFile(...) : Invalid configuration file name \"" + cfgFileName + "\"";
+            THROW_TTEXCEPTION("Invalid configuration file name \"" + cfgFileName + "\"");
+        }
+
+        //pass raw text to cfg parser, to return parsed document
+        cfgDoc_ =  cfg::CfgDocument::parseDocument(cfgText);
+
+        //Get TopTagger parameters
+        getParameters();
     }
-    else
+    catch(const TTException& e)
     {
-        throw "TopTagger::setCfgFile(...) : Invalid configuration file name \"" + cfgFileName + "\"";
+        handelException(e);
     }
-
-    //pass raw text to cfg parser, to return parsed document
-    cfgDoc_ =  cfg::CfgDocument::parseDocument(cfgText);
-
-    //Get TopTagger parameters
-    getParameters();
 }
 
 void TopTagger::setCfgFileDirect(const std::string& cfgText)
 {
-    //pass raw text to cfg parser, to return parsed document
-    cfgDoc_ =  cfg::CfgDocument::parseDocument(cfgText);
+    //try-catch the entire function - exceptions rethrown by default
+    try
+    {
+        //pass raw text to cfg parser, to return parsed document
+        cfgDoc_ =  cfg::CfgDocument::parseDocument(cfgText);
 
-    //Get TopTagger parameters
-    getParameters();
+        //Get TopTagger parameters
+        getParameters();
+    }
+    catch(const TTException& e)
+    {
+        handelException(e);
+    }
 }
 
 void TopTagger::getParameters()
@@ -105,7 +121,8 @@ void TopTagger::getParameters()
             }
             else
             {
-                throw "TopTagger::getParameters() : No module named \"" + moduleName + "\" exists"; 
+                //throw "TopTagger::getParameters() : No module named \"" + moduleName + "\" exists"; 
+                THROW_TTEXCEPTION("No module named \"" + moduleName + "\" exists");
             }
         }
         ++iModule;
@@ -115,25 +132,58 @@ void TopTagger::getParameters()
 
 void TopTagger::registerModule(std::unique_ptr<TTModule>& module)
 {
-    topTaggerModules_.push_back(std::move(module));
+    //try-catch the entire function - exceptions rethrown by default
+    try
+    {
+        topTaggerModules_.push_back(std::move(module));
+    }
+    catch(const TTException& e)
+    {
+        handelException(e);
+    }
 }
 
 void TopTagger::runTagger(const std::vector<Constituent>& constituents)
 {
-    if(topTaggerResults_) delete topTaggerResults_;
-    topTaggerResults_ = new TopTaggerResults(constituents);
-
-   for(std::unique_ptr<TTModule>& module : topTaggerModules_)
+    //try-catch the entire function - exceptions rethrown by default
+    try
     {
-        module->run(*topTaggerResults_);
+        if(topTaggerResults_) delete topTaggerResults_;
+        topTaggerResults_ = new TopTaggerResults(constituents);
+
+        for(std::unique_ptr<TTModule>& module : topTaggerModules_)
+        {
+            module->run(*topTaggerResults_);
+        }
+    }
+    catch(const TTException& e)
+    {
+        handelException(e);
     }
 }
 
-const TopTaggerResults& TopTagger::getResults()
+const TopTaggerResults& TopTagger::getResults() const
 {
-    if(topTaggerResults_) return *topTaggerResults_;
-    else
+    //try-catch the entire function - exceptions rethrown by default
+    try
     {
-        throw "const TopTaggerResults& TopTagger::getResults() : Invalid TopTaggerResults ptr";
+        if(topTaggerResults_) return *topTaggerResults_;
+        else
+        {
+            //throw "const TopTaggerResults& TopTagger::getResults() : Invalid TopTaggerResults ptr";
+            THROW_TTEXCEPTION("Invalid TopTaggerResults ptr");
+        }
     }
+    catch(const TTException& e)
+    {
+        handelException(e);
+    }
+
+    return *static_cast<TopTaggerResults*>(nullptr);
+}
+
+void TopTagger::handelException(const TTException& e) const
+{
+    if(verbosity_ >= 1) e.print();
+    if(reThrow_) throw e;
 }

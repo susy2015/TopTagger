@@ -2,6 +2,8 @@
 
 #include "TopTagger/TopTagger/include/Constituent.h"
 
+#include "TopTagger/CfgParser/include/TTException.h"
+
 namespace ttUtility
 {
     std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors)
@@ -12,7 +14,8 @@ namespace ttUtility
         //Safety check that jet and b-tag vectors are the same length
         if(jetsLVec.size() != btagFactors.size())
         {
-            throw "ttUtility::packageCandidates(...) : Unequal vector size!!!!!!!";
+            //throw "ttUtility::packageCandidates(...) : Unequal vector size!!!!!!!";
+            THROW_TTEXCEPTION("Unequal vector size!!!!!!!");
         }
         
         //Construct constituents in place in the vector
