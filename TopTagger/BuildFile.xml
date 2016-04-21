@@ -1,3 +1,4 @@
 <use name="PhysicsTools/Utilities"/>
+<use name="TopTagger/CfgParser"/>
 <Flags CXXFLAGS="-g"/>
 <flags EDM_PLUGIN="0"/>
