@@ -6,19 +6,22 @@
 #include <functional>
 
 class TopTaggerResults;
-class CfgDocument;
+
+namespace cfg
+{
+    class CfgDocument;
+}
 
 //Base Object for Top Taggger Modules
 class TTModule
 {
 private:
-    CfgDocument* cfgDoc_;
+
+protected:
     
 public:    
 
-    void setCfgDoc(CfgDocument* cfgDoc) { cfgDoc_ = cfgDoc; }
-
-    //virtual void getParameters() = 0;
+    virtual void getParameters(const cfg::CfgDocument*) = 0;
     virtual void run(TopTaggerResults&) = 0;
 };
 

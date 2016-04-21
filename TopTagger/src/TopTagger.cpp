@@ -100,6 +100,8 @@ void TopTagger::getParameters()
 
                 //Create module and add to module to vector
                 topTaggerModules_.emplace_back(TTMFactory::createModule(moduleName));
+                //configure the new module from the config document
+                topTaggerModules_.back()->getParameters(cfgDoc_.get());
             }
             else
             {
