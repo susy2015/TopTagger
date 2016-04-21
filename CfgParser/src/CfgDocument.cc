@@ -53,7 +53,7 @@ namespace cfg {
         i->second->addAssignment(cc,l);
     }
 
-    Literal CfgDocument::get(const std::string& name, const Context& cxt, const Literal& defl)
+    Literal CfgDocument::get(const std::string& name, const Context& cxt, const Literal& defl) const
     {
         std::string key=makeKey(cxt.ns(),name);
         std::map<std::string, Parameter*>::const_iterator i=m_parameters.find(key);
@@ -75,7 +75,7 @@ namespace cfg {
         }
     }
 
-    int CfgDocument::get(const std::string& name, const Context& cxt, int defl)
+    int CfgDocument::get(const std::string& name, const Context& cxt, int defl) const
     {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_Integer) 
@@ -86,7 +86,7 @@ namespace cfg {
         return l.intValue();
     }
     
-    double CfgDocument::get(const std::string& name, const Context& cxt, double defl) 
+    double CfgDocument::get(const std::string& name, const Context& cxt, double defl) const
     {
         Literal l=get(name,cxt,Literal(defl));
         
@@ -106,7 +106,7 @@ namespace cfg {
         
     }
 
-    bool CfgDocument::get(const std::string& name, const Context& cxt, bool defl) {
+    bool CfgDocument::get(const std::string& name, const Context& cxt, bool defl) const {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_Boolean) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected bool)");
@@ -114,7 +114,7 @@ namespace cfg {
         }
         return l.boolValue();
     }
-    std::string CfgDocument::get(const std::string& name, const Context& cxt, const std::string& defl) {
+    std::string CfgDocument::get(const std::string& name, const Context& cxt, const std::string& defl) const {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_String) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected string)");
@@ -122,7 +122,7 @@ namespace cfg {
         }
         return l.strValue();
     }
-    std::string CfgDocument::get(const std::string& name, const Context& cxt, const char* defl) {
+    std::string CfgDocument::get(const std::string& name, const Context& cxt, const char* defl) const {
         Literal l=get(name,cxt,Literal(defl));
         if (l.flavor()!=Literal::fl_String) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Type mismatch (expected string)");
@@ -131,7 +131,7 @@ namespace cfg {
         return l.strValue();
     }
 
-    int CfgDocument::get(const std::string& name, int index, const Context& cxt, int defl) {
+    int CfgDocument::get(const std::string& name, int index, const Context& cxt, int defl) const {
         std::string fullName(name);
         char text[20];
         snprintf(text,20,"[%d]",index);
@@ -139,7 +139,7 @@ namespace cfg {
         return get(fullName,cxt,defl);
     }
 
-    double CfgDocument::get(const std::string& name, int index, const Context& cxt, double defl) {
+    double CfgDocument::get(const std::string& name, int index, const Context& cxt, double defl) const {
         std::string fullName(name);
         char text[20];
         snprintf(text,20,"[%d]",index);
@@ -147,7 +147,7 @@ namespace cfg {
         return get(fullName,cxt,defl);
     }
 
-    std::string CfgDocument::get(const std::string& name, int index, const Context& cxt, const std::string& defl) {
+    std::string CfgDocument::get(const std::string& name, int index, const Context& cxt, const std::string& defl) const {
         std::string fullName(name);
         char text[20];
         snprintf(text,20,"[%d]",index);
@@ -155,7 +155,7 @@ namespace cfg {
         return get(fullName,cxt,defl);
     }
 
-    std::string CfgDocument::get(const std::string& name, int index, const Context& cxt, const char* defl) {
+    std::string CfgDocument::get(const std::string& name, int index, const Context& cxt, const char* defl) const {
         std::string fullName(name);
         char text[20];
         snprintf(text,20,"[%d]",index);
@@ -163,7 +163,7 @@ namespace cfg {
         return get(fullName,cxt,defl);
     }
 
-    bool CfgDocument::get(const std::string& name, int index, const Context& cxt, bool defl) {
+    bool CfgDocument::get(const std::string& name, int index, const Context& cxt, bool defl) const {
         std::string fullName(name);
         char text[20];
         snprintf(text,20,"[%d]",index);

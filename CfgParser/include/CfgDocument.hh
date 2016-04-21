@@ -23,16 +23,16 @@ namespace cfg {
 
         Condition* addCondition();
         void assignParameter(const std::string& ns, const std::string& name, const ConditionChain& cc, const Literal& l);
-        int         get(const std::string& name, const Context& cxt, int defl);
-        double      get(const std::string& name, const Context& cxt, double defl);
-        bool        get(const std::string& name, const Context& cxt, bool defl);
-        std::string get(const std::string& name, const Context& cxt, const char* defl);
-        std::string get(const std::string& name, const Context& cxt, const std::string& defl);
-        int         get(const std::string& name, int index, const Context& cxt, int defl);
-        double      get(const std::string& name, int index, const Context& cxt, double defl);
-        bool        get(const std::string& name, int index, const Context& cxt, bool defl);
-        std::string get(const std::string& name, int index, const Context& cxt, const char* defl);
-        std::string get(const std::string& name, int index, const Context& cxt, const std::string& defl);
+        int         get(const std::string& name, const Context& cxt, int defl) const;
+        double      get(const std::string& name, const Context& cxt, double defl) const;
+        bool        get(const std::string& name, const Context& cxt, bool defl) const;
+        std::string get(const std::string& name, const Context& cxt, const char* defl) const;
+        std::string get(const std::string& name, const Context& cxt, const std::string& defl) const;
+        int         get(const std::string& name, int index, const Context& cxt, int defl) const;
+        double      get(const std::string& name, int index, const Context& cxt, double defl) const;
+        bool        get(const std::string& name, int index, const Context& cxt, bool defl) const;
+        std::string get(const std::string& name, int index, const Context& cxt, const char* defl) const;
+        std::string get(const std::string& name, int index, const Context& cxt, const std::string& defl) const;
 
         // access internal values (as needed)
         typedef std::map<std::string, Parameter*>::const_iterator param_itr;
@@ -44,7 +44,7 @@ namespace cfg {
         void postValueUsed(const std::string& name, const Context& cxt, const std::string& value);
         void postValueUsed(const std::string& name, const Context& cxt, bool value);
     private:      
-        Literal get(const std::string& name, const Context& cxt, const Literal& defl);
+        Literal get(const std::string& name, const Context& cxt, const Literal& defl) const;
         std::string makeKey(const std::string& ns, const std::string& name) const;
         std::map<std::string, Parameter*> m_parameters;
         std::vector<Condition*> m_conditions; // owner of all conditions

@@ -1,5 +1,3 @@
-
-
 #include <memory.h>
 #include <string.h>
 #include <string>
@@ -860,6 +858,11 @@ namespace hcalcfg {
             {
                 AddCh();
                 goto case_4;
+            }
+            else if (ch == L'.')  //this is a float
+            {
+                AddCh();
+                goto case_3;
             }
             else  //boring single 0
             {
