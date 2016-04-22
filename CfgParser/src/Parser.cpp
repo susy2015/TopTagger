@@ -2,6 +2,7 @@
 #include "TopTagger/CfgParser/include/Parser.h"
 #include "TopTagger/CfgParser/include/Scanner.h"
 //#include "hcal/exception/Exception.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 #include <cstdio>
 #include <string>
@@ -527,7 +528,8 @@ namespace hcalcfg {
         //LOG4CPLUS_FATAL(log4cplus::Logger::getInstance("Hcal.CfgScriptParser"),cbuffer);
         printf("CfgScriptParser: %s\n", cbuffer);
         //XCEPT_RAISE(hcal::exception::Exception,cbuffer);
-        throw std::string(cbuffer);
+        //throw std::string(cbuffer);
+        THROW_TTEXCEPTION(cbuffer);
     }
 
 } // namespace

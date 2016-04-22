@@ -1,5 +1,6 @@
 #include "TopTagger/CfgParser/include/Condition.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 #include <sstream>
 
 std::ostream& operator<<(std::ostream& o, const cfg::ConditionChain& c) {
@@ -116,7 +117,8 @@ namespace cfg
             m_op!=opGT && m_op!=opLT)
         {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,std::string("Unknown operator: ")+m_op);
-            throw "CfgLanguageException: Unknown operator: "+m_op;
+            //throw "CfgLanguageException: Unknown operator: "+m_op;
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown operator: "+m_op);
         }
     }
 
@@ -125,7 +127,8 @@ namespace cfg
         if (m_op!=opIN) 
 	{
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,std::string("Unknown operator: ")+m_op);
-            throw "CfgLanguageException: Unknown operator: "+m_op;
+            //throw "CfgLanguageException: Unknown operator: "+m_op;
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown operator: "+m_op);
 	}
     }
     std::set<std::string> SimpleTerm::queriedItems() const {
@@ -139,7 +142,8 @@ namespace cfg
             std::ostringstream ss;
             ss << val << " (" << m_item << ") not same flavor as " << m_values.front();
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,ss.str());
-            throw "CfgLanguageException: " + ss.str();
+            //throw "CfgLanguageException: " + ss.str();
+            THROW_TTEXCEPTION("CfgLanguageException: " + ss.str());
         }
 
         if (m_op==opEQ) return val==m_values.front();

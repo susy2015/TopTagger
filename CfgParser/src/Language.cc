@@ -1,6 +1,7 @@
 #include "TopTagger/CfgParser/include/Language.hh"
 #include <stdlib.h>
 //#include "hcal/exception/CfgLanguageException.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 namespace cfg {
 
@@ -50,7 +51,8 @@ namespace cfg {
     bool Literal::operator==(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_Null) : return true; // all NULL are the same
@@ -59,14 +61,16 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b==l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
 
     bool Literal::operator!=(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_Null) : return false; // all NULL are the same
@@ -75,14 +79,16 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b!=l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
 
     bool Literal::operator>=(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_String) : return m_value.s>=l.m_value.s;
@@ -90,14 +96,16 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b>=l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
 
     bool Literal::operator<=(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_String) : return m_value.s<=l.m_value.s;
@@ -105,14 +113,16 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b<=l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
 
     bool Literal::operator>(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_String) : return m_value.s>l.m_value.s;
@@ -120,13 +130,15 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b>l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
     bool Literal::operator<(const Literal& l) const {
         if (l.m_flavor!=m_flavor) {
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Flavor mismatch");
-            throw "CfgLanguageException: Flavor mismatch";
+            //throw "CfgLanguageException: Flavor mismatch";
+            THROW_TTEXCEPTION("CfgLanguageException: Flavor mismatch");
         }
         switch (m_flavor) {
         case (fl_String) : return m_value.s<l.m_value.s;
@@ -134,7 +146,8 @@ namespace cfg {
         case (fl_Boolean) : return m_value.b<l.m_value.b;
         default : return false;
             //XCEPT_RAISE(hcal::exception::CfgLanguageException,"Unknown flavor");
-            throw "CfgLanguageException: Unknown flavor";
+            //throw "CfgLanguageException: Unknown flavor";
+            THROW_TTEXCEPTION("CfgLanguageException: Unknown flavor");
         }
     }
 

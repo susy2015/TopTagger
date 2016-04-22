@@ -7,6 +7,7 @@
 class Constituent;
 class TTModule;
 class TopTaggerResults;
+class TTException;
 
 namespace cfg
 {
@@ -28,13 +29,21 @@ private:
     std::unique_ptr<cfg::CfgDocument> cfgDoc_;
     //cfg::Record *cfgRecord_;
 
+    //tagger configuration parameters
+    int verbosity_;
+    bool reThrow_;
+
     void getParameters();
+    void handelException(const TTException& e) const;
 
 public:
     TopTagger();
     TopTagger(const std::string&);
 
     ~TopTagger();
+
+    void setVerbosity(const int verbosity) { verbosity_ = verbosity; }
+    void setRethrow(const bool reThrow) { reThrow_ = reThrow; }
 
     void setCfgFile(const std::string&);
     void setCfgFileDirect(const std::string&);
@@ -46,7 +55,7 @@ public:
     void runTagger(const std::vector<Constituent>&);
 
     //Getters
-    const TopTaggerResults& getResults();
+    const TopTaggerResults& getResults() const;
 
 };
 
