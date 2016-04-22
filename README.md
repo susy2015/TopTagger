@@ -1,5 +1,9 @@
 # TopTagger
 
+##Compiling the tagger
+
+The code is provided with full support for usage in CMSSW as well as with standalone root.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.  To compile the standaline library in a root aware terminal go to TopTagger/TopTagger/test and run "make".
+
 ##Top tagger structure 
 
 The top tagger code is written to take modules which act on a central object to produce the final collection of top objects.  The tagger framework consists of the following classes (found in TopTagger/TopTagger/)
@@ -58,13 +62,13 @@ int main()
     for(auto& event : file)
     {
         //get jet vector
-        vector<TLorentzVector> jets;
+        vector<TLorentzVector> jets; // = jet vector
 
         //get b-tag info
-        vector<double> btaginfo;
+        vector<double> btaginfo; // = b-tag vector
 
         //construct vector of constituents 
-        vector<Constituent> constituents = ttUtility::packageCandidates(jetsLVec_forTagger, recoJetsBtag_forTagger);
+        vector<Constituent> constituents = ttUtility::packageCandidates(jets, btaginfo);
 
         //run tagger
         tt.runTagger(constituents);
