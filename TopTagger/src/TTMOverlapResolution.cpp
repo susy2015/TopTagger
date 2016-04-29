@@ -28,19 +28,19 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     //Get vector of final tops to prune
     std::vector<TopObject*>& tops = ttResults.getTops();
 
+    //This container will kep trach of which jets have been included in final tops
+    //This is not the ideal method to track this, maybe have candidates?
+    std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
+
     //Sort the top vector by fabs(candMass - trueTopMass)
     std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_);});
 
     //This variable is necessary to account for bug in Hongxuan's code
     int nTops = 0;
 
-    //This container will kep trach of which jets have been included in final tops
-    //This is not the ideal method to track this, maybe have candidates?
-    std::set<Constituent const *> usedJets;
-
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
-        //Get cinstituent jets for this top
+        //Get constituent jets for this top
         const std::vector<Constituent const *>& jets = (*iTop)->getConstituents();
 
         //mass window on the top candidate mass
@@ -49,7 +49,6 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
         bool passLooseMassWindow = (minTopCandMassLoose_ < m123) && (m123 < maxTopCandMassLoose_);
 
         //Requirement on top eta here
-        //MORE TERRIBLE HARDCODING 
         bool passTopEta = (fabs((*iTop)->p().Eta()) < maxTopEta_);
 
         //Check if the candidates have been used in another top with better top mass
@@ -76,7 +75,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
         ++nTops;
 
-        //Add the good tops constituents to the set traching which constituents have been used
+        //Add the good tops constituents to the set tracking which constituents have been used
         for(const auto& jet : jets)
         {
             usedJets.insert(jet);

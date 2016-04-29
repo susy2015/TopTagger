@@ -26,7 +26,7 @@ public:
 };
 
 //magic macro for registering classes with the factory object
-#define REGESTER_TTMODULE( _module ) \
+#define REGISTER_TTMODULE( _module ) \
     static bool _module ## _module_created = TTMFactory::registerModule( #_module, []()->TTModule*{ return new _module(); } )
 
 #endif
