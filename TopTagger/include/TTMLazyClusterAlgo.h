@@ -15,6 +15,6 @@ public:
     void getParameters(const cfg::CfgDocument*);
     void run(TopTaggerResults&);
 };
-REGESTER_TTMODULE(TTMLazyClusterAlgo);
+REGISTER_TTMODULE(TTMLazyClusterAlgo);
 
 #endif

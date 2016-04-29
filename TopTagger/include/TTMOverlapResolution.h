@@ -14,6 +14,6 @@ public:
     void getParameters(const cfg::CfgDocument*);
     void run(TopTaggerResults&);
 };
-REGESTER_TTMODULE(TTMOverlapResolution);
+REGISTER_TTMODULE(TTMOverlapResolution);
 
 #endif
