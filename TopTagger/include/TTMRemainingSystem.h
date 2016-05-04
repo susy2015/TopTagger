@@ -6,7 +6,8 @@
 class TTMRemainingSystem : public TTModule
 {
 private:
-    double CSVThresh_, lowRsysMass_, highRsysMass_;
+    double CSVThresh_, lowRsysMass_, highRsysMass_, dRMax_;
+    bool useSecondJet_;
 
 public:
     void getParameters(const cfg::CfgDocument*);
