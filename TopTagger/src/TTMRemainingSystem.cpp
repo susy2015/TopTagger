@@ -10,6 +10,12 @@ void TTMRemainingSystem::getParameters(const cfg::CfgDocument* cfgDoc)
     cfg::Context commonCxt("Common");
     cfg::Context localCxt("TTMRemainingSystem");
 
+    CSVThresh_    = cfgDoc->get("csvThreshold", commonCxt, -999.9);
+    lowRsysMass_  = cfgDoc->get("lowRsysMass",  localCxt, -999.9);
+    highRsysMass_ = cfgDoc->get("highRsysMass", localCxt, -999.9);
+    dRMax_        = cfgDoc->get("dRMaxRsys",    localCxt, -999.9);
+
+    useSecondJet_= cfgDoc->get("useSecondJet",    localCxt, true);
 }
 
 void TTMRemainingSystem::run(TopTaggerResults& ttResults)
@@ -26,7 +32,7 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
     //The seed is ideally a b-jet, if no b-jet is found
     //the highest pt jet not included in a top will be chosen
     //If multiple b-jets exist, that with the highest pt
-    //is chosen 
+    //is chosen
 
     Constituent const * seed = nullptr;
 
@@ -52,25 +58,31 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
     //if no seed is found, abort calculation
     if(seed == nullptr) return;
 
+    //pointer to hold second jet if found
     Constituent const * secondJet = nullptr;
-    double mindR = 999.9;
 
-    //Look for a companion jet to form the remaining system with the seed
-    //The closest jet to the seed is chosen provided the seed + second jet mass 
-    //is in the specified range 
-    for(auto& jet : consituents)
+    if(useSecondJet_)
     {
-        //check if jet is used in a top or is the seed
-        if(usedJets.count(&jet) || &jet == seed) continue;
-
-        double dR = seed->p().DeltaR(jet.p());
-        double mdijet = (seed->p() + jet.p()).M();
-
-        //select second jet based upon dR and dijet mass
-        if(dR < mindR && lowRsysMass_ < mdijet && mdijet < highRsysMass_)
+        //Look for a companion jet to form the remaining system with the seed
+        //The closest jet to the seed is chosen provided the seed + second jet mass
+        //is in the specified range
+        double mindR = 999.9;
+        for(auto& jet : consituents)
         {
-            mindR = dR;
-            secondJet = &jet;
+            //check if jet is used in a top or is the seed
+            if(usedJets.count(&jet) || &jet == seed) continue;
+
+            double dR = seed->p().DeltaR(jet.p());
+            double mdijet = (seed->p() + jet.p()).M();
+
+            //select second jet based upon dR and dijet mass
+            if(dR < mindR
+               && (dRMax_  < 0 || dR < dRMax_)  //disable dR entirely if dRMax is less than 0
+               && lowRsysMass_ < mdijet && mdijet < highRsysMass_)
+            {
+                mindR = dR;
+                secondJet = &jet;
+            }
         }
     }
 

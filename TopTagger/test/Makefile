@@ -1,14 +1,14 @@
 ODIR       = obj
 
-TTIDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/include
-TPIDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/include
+TTIDIR     = ../../TopTagger/include
+TPIDIR     = ../../CfgParser/include
 
-TTSDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/src
-TPSDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/src
+TTSDIR     = ../../TopTagger/src
+TPSDIR     = ../../CfgParser/src
 
 CXX        = g++
 
-CXXFLAGS  += -I$(CMSSW_BASE)/src -std=c++0x
+CXXFLAGS  += -I../../../ -std=c++0x
 ## Optimization/debug flag
 CXXFLAGS += -g #-O3
 ## Enable for maximum warning
@@ -55,6 +55,6 @@ TopTagger : $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cp
 	gcc -shared -o lib$@.so $^
 
 clean:
-	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) $(LIBRARIES) core 
+	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
 
 -include $(ODIR)/*.d
