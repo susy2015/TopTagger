@@ -6,7 +6,7 @@
 
 namespace ttUtility
 {
-    std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors)
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors)
     {
         //vector holding constituents to be created
         std::vector<Constituent> constituents;
@@ -26,5 +26,10 @@ namespace ttUtility
 
         //This will proceed as a move, not a deep copy
         return constituents;
+    }
+
+    double calculateMT2(const TopTaggerResult& ttr)
+    {
+        return 0.0;
     }
 }
