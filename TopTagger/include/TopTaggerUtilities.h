@@ -4,6 +4,7 @@
 #include <vector>
 
 class Constituent;
+class TopTaggerResults;
 
 #include "TLorentzVector.h"
 
@@ -12,7 +13,9 @@ class Constituent;
 
 namespace ttUtility
 {
-    std::vector<Constituent> packageCandidates(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
+
+    double calculateMT2(const TopTaggerResults& ttr);
 }
 
 #endif
