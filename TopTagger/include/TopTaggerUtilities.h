@@ -15,7 +15,7 @@ namespace ttUtility
 {
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
 
-    double calculateMT2(const TopTaggerResult& ttr);
+    double calculateMT2(const TopTaggerResults& ttr);
 }
 
 #endif

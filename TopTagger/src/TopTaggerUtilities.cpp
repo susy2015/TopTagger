@@ -1,6 +1,7 @@
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 
 #include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
 #include "TopTagger/CfgParser/include/TTException.h"
 
@@ -28,7 +29,7 @@ namespace ttUtility
         return constituents;
     }
 
-    double calculateMT2(const TopTaggerResult& ttr)
+    double calculateMT2(const TopTaggerResults& ttr)
     {
         return 0.0;
     }
