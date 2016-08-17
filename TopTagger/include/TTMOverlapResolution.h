@@ -8,7 +8,7 @@ class TopTaggerResults;
 class TTMOverlapResolution : public TTModule
 {
 private:
-    double mt_, minTopCandMass_, maxTopCandMass_, minTopCandMassLoose_, maxTopCandMassLoose_, maxTopEta_;
+    double mt_, maxTopEta_;
 
 public:
     void getParameters(const cfg::CfgDocument*);

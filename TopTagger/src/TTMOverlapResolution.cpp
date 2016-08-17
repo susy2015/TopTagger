@@ -16,10 +16,6 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc)
     cfg::Context localCxt("TTMOverlapResolution");
 
     mt_                  = cfgDoc->get("mt",                  commonCxt, -999.9);
-    minTopCandMass_      = cfgDoc->get("minTopCandMass",      localCxt,  -999.9);
-    maxTopCandMass_      = cfgDoc->get("maxTopCandMass",      localCxt,  -999.9);
-    minTopCandMassLoose_ = cfgDoc->get("minTopCandMassLoose", localCxt,  -999.9);
-    maxTopCandMassLoose_ = cfgDoc->get("maxTopCandMassLoose", localCxt,  -999.9);
     maxTopEta_           = cfgDoc->get("maxTopEta",           localCxt,  -999.9);
 }
 
@@ -43,11 +39,6 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
         //Get constituent jets for this top
         const std::vector<Constituent const *>& jets = (*iTop)->getConstituents();
 
-        //mass window on the top candidate mass
-        double m123 = (*iTop)->p().M();
-        bool passMassWindow      = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
-        bool passLooseMassWindow = (minTopCandMassLoose_ < m123) && (m123 < maxTopCandMassLoose_);
-
         //Requirement on top eta here
         bool passTopEta = (fabs((*iTop)->p().Eta()) < maxTopEta_);
 
@@ -63,8 +54,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
         }
 
         //Prune top from final top collection if it fails the following requirements
-        //Note the terrible hack with nTops >= 3 to try to match Hongxuan's code
-        if(overlaps || ((nTops < 3)?(!passMassWindow || !passTopEta):(!passLooseMassWindow)) )
+        if(overlaps || !passTopEta)
         {
             //This is inefficient and dumb
             iTop = tops.erase(iTop);
