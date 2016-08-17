@@ -10,14 +10,16 @@ void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc)
     cfg::Context commonCxt("Common");
     cfg::Context localCxt("TTMLazyClusterAlgo");
     
-    lowWMassCut_  = cfgDoc->get("lowWJetMassCut",  commonCxt, -999.9);
-    highWMassCut_ = cfgDoc->get("highWJetMassCut", commonCxt, -999.9);
-    lowtMassCut_  = cfgDoc->get("lowtJetMassCut",  commonCxt, -999.9);
-    hightMassCut_ = cfgDoc->get("hightJetMassCut", commonCxt, -999.9);
+    lowWMassCut_    = cfgDoc->get("lowWJetMassCut",  commonCxt, -999.9);
+    highWMassCut_   = cfgDoc->get("highWJetMassCut", commonCxt, -999.9);
+    lowtMassCut_    = cfgDoc->get("lowtJetMassCut",  commonCxt, -999.9);
+    hightMassCut_   = cfgDoc->get("hightJetMassCut", commonCxt, -999.9);
+    minTopCandMass_ = cfgDoc->get("minTopCandMass",  commonCxt, -999.9);
+    maxTopCandMass_ = cfgDoc->get("maxTopCandMass",  commonCxt, -999.9);
 
-    doMonojet_ = cfgDoc->get("doMonojet", localCxt, false);
-    doDijet_   = cfgDoc->get("doDijet",   localCxt, false);
-    doTrijet_  = cfgDoc->get("doTrijet",  localCxt, false);
+    doMonojet_      = cfgDoc->get("doMonojet",      localCxt,  false);
+    doDijet_        = cfgDoc->get("doDijet",        localCxt,  false);
+    doTrijet_       = cfgDoc->get("doTrijet",       localCxt,  false);
 }
 
 void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
@@ -67,7 +69,11 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
                 {
                     TopObject topCand({&constituents[k], &constituents[j], &constituents[i]});
 
-                    if(topCand.getDRmax() < 1.5)
+                    //mass window on the top candidate mass
+                    double m123 = topCand.p().M();
+                    bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
+
+                    if(topCand.getDRmax() < 1.5 && passMassWindow)
                     {
                         topCandidates.push_back(topCand);
                     }
