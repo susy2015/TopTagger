@@ -29,7 +29,8 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
 
     //Sort the top vector by fabs(candMass - trueTopMass)
-    std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_);});
+    auto topMassSort = [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_);};
+    std::sort(tops.begin(), tops.end(), topMassSort);
 
     //This variable is necessary to account for bug in Hongxuan's code
     int nTops = 0;
