@@ -1,4 +1,4 @@
-#include "TaggerTest/include/TaggerUtility.h"
+#include "TaggerUtility.h"
 
 using namespace std;
 
@@ -159,4 +159,36 @@ int TopCat::GetMatchedTopConst(vector<Constituent const *> topconst, vector<TLor
   }
   return match;
 
+}
+
+vector<int> TopCat::TopConst(vector<TopObject>Ntop, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec){
+  vector<int>topconstmatch;
+  vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+  vector<TLorentzVector> MatchGentop;
+  vector<TopObject> MatchNtop;
+  bool topmatch = GetMatchedTop(Ntop, MatchNtop, hadtopLVec, MatchGentop);//final top match 
+  vector<bool> monojetmatch(MatchNtop.size(),false);
+  vector<bool> dijet2match(MatchNtop.size(),false);
+  vector<bool> trijet3match(MatchNtop.size(),false);
+  if(topmatch){
+    for(unsigned tc = 0; tc<MatchNtop.size(); tc++){
+      vector<Constituent const*> topconst = MatchNtop[tc].getConstituents();
+      vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentop[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+      if(topconst.size()==1){
+	monojetmatch[tc]=true;
+	topconstmatch.push_back(1);
+      }
+      else if(topconst.size()==2){
+	int dimatch = GetMatchedTopConst(topconst, gentopdauLVec);
+	topconstmatch.push_back(dimatch);
+	if(dimatch==2)dijet2match[tc] = true;
+      }
+      else if(topconst.size()==3){
+	int trimatch = GetMatchedTopConst(topconst, gentopdauLVec);
+	topconstmatch.push_back(trimatch);
+	if(trimatch==3)trijet3match[tc] = true;
+      }
+    }
+  }
+  return topconstmatch;
 }
