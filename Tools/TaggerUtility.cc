@@ -161,34 +161,48 @@ int TopCat::GetMatchedTopConst(vector<Constituent const *> topconst, vector<TLor
 
 }
 
-vector<int> TopCat::TopConst(vector<TopObject>Ntop, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec){
-  vector<int>topconstmatch;
-  vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-  vector<TLorentzVector> MatchGentop;
-  vector<TopObject> MatchNtop;
-  bool topmatch = GetMatchedTop(Ntop, MatchNtop, hadtopLVec, MatchGentop);//final top match 
-  vector<bool> monojetmatch(MatchNtop.size(),false);
-  vector<bool> dijet2match(MatchNtop.size(),false);
-  vector<bool> trijet3match(MatchNtop.size(),false);
-  if(topmatch){
-    for(unsigned tc = 0; tc<MatchNtop.size(); tc++){
-      vector<Constituent const*> topconst = MatchNtop[tc].getConstituents();
-      vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentop[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-      if(topconst.size()==1){
-	monojetmatch[tc]=true;
-	topconstmatch.push_back(1);
-      }
-      else if(topconst.size()==2){
-	int dimatch = GetMatchedTopConst(topconst, gentopdauLVec);
-	topconstmatch.push_back(dimatch);
-	if(dimatch==2)dijet2match[tc] = true;
-      }
-      else if(topconst.size()==3){
-	int trimatch = GetMatchedTopConst(topconst, gentopdauLVec);
-	topconstmatch.push_back(trimatch);
-	if(trimatch==3)trijet3match[tc] = true;
-      }
+std::pair<std::vector<int>*, std::vector<int>*> TopCat::TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec)
+{
+    //Check matching between top candidates and gen top
+    vector<int>* topMatch = new vector<int>();
+    vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+    vector<TLorentzVector> MatchGentop;
+    vector<TopObject> matchTops;
+    bool topmatch = GetMatchedTop(tops, matchTops, hadtopLVec, MatchGentop);//final top match 
+
+    //check matching between reco top constituents and top gen decay daughters 
+    vector<int>* topConstMatch = new vector<int>();
+    int iMatch = 0;
+    for(const auto& top : tops)
+    {
+        const vector<Constituent const*>& topConst = top.getConstituents();
+
+        //horrible terrible bad inefficient hack to set reco top to gen top matching vector, please replace me!
+        if(topConst.size() && iMatch < matchTops.size() && matchTops[iMatch].getConstituents().size() && (topConst[0] == (matchTops[iMatch].getConstituents())[0]))
+        {
+            topMatch->push_back(1);
+            ++iMatch;
+        }
+        else topMatch->push_back(0);
+
+        for(const auto& genTop : hadtopLVec)
+        {
+            vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+            if(topConst.size()==1)
+            {
+                topConstMatch->push_back(1);
+            }
+            else if(topConst.size()==2)
+            {
+                int dimatch = GetMatchedTopConst(topConst, gentopdauLVec);
+                topConstMatch->push_back(dimatch);
+            }
+            else if(topConst.size()==3)
+            {
+                int trimatch = GetMatchedTopConst(topConst, gentopdauLVec);
+                topConstMatch->push_back(trimatch);
+            }
+        }
     }
-  }
-  return topconstmatch;
+    return std::make_pair(topMatch, topConstMatch);
 }

@@ -53,7 +53,7 @@ $(ODIR)/%.o : $(RSDIR)/%.cc
 $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
-makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/makeTrainingTuples.o $(ODIR)/MiniTupleMaker.o 
+makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o $(ODIR)/samples.o $(ODIR)/makeTrainingTuples.o $(ODIR)/MiniTupleMaker.o 
 	$(LD) $^ $(LIBS) $(MT2LIB) -o $@
 
 clean:
