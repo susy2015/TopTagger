@@ -7,6 +7,7 @@
 #include "TopTagger/TopTagger/include/TopTagger.h"
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TaggerUtility.h"
 
 #include "TTree.h"
 #include "TFile.h"
@@ -31,12 +32,12 @@ private:
         std::map<std::string, std::vector<T>*> variables_;
         std::set<std::string> allowedVars_;
 
-        VariableHolder(NTupleReader& tr, std::set<std::string> vars) : tr_(&tr), allowedVars_(vars)
+        VariableHolder(NTupleReader& tr, const std::set<std::string>& vars) : tr_(&tr), allowedVars_(vars)
         {
             for(const auto& var : allowedVars_) variables_[var] = nullptr;
         }
 
-        void add(std::string key, T var)
+        void add(const std::string& key, const T& var)
         {
             if(variables_.find(key) != variables_.end() || variables_[key] == nullptr)
             {
@@ -69,12 +70,18 @@ private:
     };
 
     TopTagger* topTagger_;
-    std::set<std::string> allowedVars_;
+    TopCat topMatcher_;
+    std::set<std::string> allowedVarsD_, allowedVarsI_;
 
     void prepVariables(NTupleReader& tr)
     {
         const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
         const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
+
+        const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
+        const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
+        const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
+        const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("genDecayMomIdxVec");
 
         std::vector<TLorentzVector> jetsLVec_forTagger;
         std::vector<double> recoJetsBtag_forTagger;
@@ -91,11 +98,13 @@ private:
         const TopTaggerResults& ttr = topTagger_->getResults();
         const std::vector<TopObject>& topCands = ttr.getTopCandidates();
 
+        //Get gen matching results
+        std::pair<std::vector<int>*, std::vector<int>*> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+
         //Class which holds and registers vectors of variables
         //Annoyingly this list of variables to expect is necessary
-        VariableHolder<double> vh(tr, allowedVars_);
+        VariableHolder<double> vh(tr, allowedVarsD_);
 
-        //std::cout << "cand vec size: " << topCands.size() << std::endl;
         for(const TopObject& topCand : topCands)
         {
             //Get top candidate variables
@@ -135,6 +144,10 @@ private:
 
         vh.registerFunctions();
 
+        //register matching vectors
+        tr.registerDerivedVec("genTopMatchesVec",        genMatches.first);
+        tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second);
+
         //Generate basic MVA selection 
         //for now I just require that there is at least 1 top candidate 
         bool passMVABaseline = topCands.size() >= 1;
@@ -147,12 +160,18 @@ public:
         topTagger_ = new TopTagger();
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
-        allowedVars_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23"};
+        //double variables list here
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23"};
+        //integer valuse list here
+        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec"};
     }
 
     std::set<std::string> getVarSet()
     {
-        return allowedVars_;
+        //this is dumb
+        std::set<std::string> allowedVars = allowedVarsD_;
+        for(const auto& var : allowedVarsI_) allowedVars.insert(var);
+        return allowedVars;
     }
 
     void operator()(NTupleReader& tr)

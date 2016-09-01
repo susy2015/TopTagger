@@ -1,4 +1,4 @@
-#include "TaggerTest/include/PlotUtility.h"
+#include "PlotUtility.h"
 
 using namespace std;
 
@@ -64,27 +64,34 @@ vector<TLorentzVector>GetHadTopLVec(vector<TLorentzVector>genDecayLVec, vector<i
     return tLVec;
   }
 
-  vector<TLorentzVector> GetTopdauLVec(TLorentzVector top, vector<TLorentzVector>genDecayLVec, vector<int>genDecayPdgIdVec, vector<int>genDecayIdxVec, vector<int>genDecayMomIdxVec){
-    vector<TLorentzVector>topdauLVec;
-    for(unsigned it=0; it<genDecayLVec.size(); it++){
-      if(genDecayLVec[it]==top){
-	for(unsigned ig=0; ig<genDecayLVec.size(); ig++){
-	  if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) ){
-	    int pdgId = genDecayPdgIdVec.at(ig);
-	    if(abs(pdgId)==5)topdauLVec.push_back(genDecayLVec[ig]);
-	    if(abs(pdgId)==24){
-	      topdauLVec.push_back(genDecayLVec[ig]);	 
-	      for(unsigned iq=0; iq<genDecayLVec.size(); iq++){
-		if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) {
-		  int pdgid = genDecayPdgIdVec.at(iq);
-		  if(abs(pdgid)!= 11 && abs(pdgid)!= 13 && abs(pdgid)!= 15) topdauLVec.push_back(genDecayLVec[iq]);
-		}
-	      }
-	    }
-	  }
-	}//dau. loop
-      }//top cand.
-    }//gen loop
-    return topdauLVec;
-  }
+    vector<TLorentzVector> GetTopdauLVec(TLorentzVector top, vector<TLorentzVector>genDecayLVec, vector<int>genDecayPdgIdVec, vector<int>genDecayIdxVec, vector<int>genDecayMomIdxVec)
+    {
+        vector<TLorentzVector>topdauLVec;
+        for(unsigned it=0; it<genDecayLVec.size(); it++)
+        {
+            if(genDecayLVec[it]==top){
+                for(unsigned ig=0; ig<genDecayLVec.size(); ig++)
+                {
+                    if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) )
+                    {
+                        int pdgId = genDecayPdgIdVec.at(ig);
+                        if(abs(pdgId)==5)topdauLVec.push_back(genDecayLVec[ig]);
+                        if(abs(pdgId)==24)
+                        {
+                            topdauLVec.push_back(genDecayLVec[ig]);	 
+                            for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
+                            {
+                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 
+                                {
+                                    int pdgid = genDecayPdgIdVec.at(iq);
+                                    if(abs(pdgid)!= 11 && abs(pdgid)!= 13 && abs(pdgid)!= 15) topdauLVec.push_back(genDecayLVec[iq]);
+                                }
+                            }
+                        }
+                    }
+                }//dau. loop
+            }//top cand.
+        }//gen loop
+        return topdauLVec;
+    }
 }
