@@ -161,7 +161,7 @@ int TopCat::GetMatchedTopConst(vector<Constituent const *> topconst, vector<TLor
 
 }
 
-std::pair<std::vector<int>*, std::vector<int>*> TopCat::TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec)
+std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> TopCat::TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec)
 {
     //Check matching between top candidates and gen top
     vector<int>* topMatch = new vector<int>();
@@ -172,12 +172,13 @@ std::pair<std::vector<int>*, std::vector<int>*> TopCat::TopConst(std::vector<Top
 
     //check matching between reco top constituents and top gen decay daughters 
     vector<int>* topConstMatch = new vector<int>();
+    vector<double>* constMatchGenPt = new vector<double>();
     int iMatch = 0;
     for(const auto& top : tops)
     {
         const vector<Constituent const*>& topConst = top.getConstituents();
 
-        //horrible terrible bad inefficient hack to set reco top to gen top matching vector, please replace me!
+        //wrong horrible terrible bad inefficient hack to set reco top to gen top matching vector, please replace me!
         if(topConst.size() && iMatch < matchTops.size() && matchTops[iMatch].getConstituents().size() && (topConst[0] == (matchTops[iMatch].getConstituents())[0]))
         {
             topMatch->push_back(1);
@@ -185,24 +186,37 @@ std::pair<std::vector<int>*, std::vector<int>*> TopCat::TopConst(std::vector<Top
         }
         else topMatch->push_back(0);
 
+        int matches = 0;
+        double genPt = 0;
         for(const auto& genTop : hadtopLVec)
         {
             vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
             if(topConst.size()==1)
             {
-                topConstMatch->push_back(1);
+                matches = std::max(1, matches);
+                genPt = genTop.P();
             }
             else if(topConst.size()==2)
             {
                 int dimatch = GetMatchedTopConst(topConst, gentopdauLVec);
-                topConstMatch->push_back(dimatch);
+                if(dimatch > matches)
+                {
+                    matches = dimatch;
+                    genPt = genTop.P();
+                }
             }
             else if(topConst.size()==3)
             {
                 int trimatch = GetMatchedTopConst(topConst, gentopdauLVec);
-                topConstMatch->push_back(trimatch);
+                if(trimatch > matches)
+                {
+                    matches = trimatch;
+                    genPt = genTop.P();
+                }
             }
         }
+        topConstMatch->push_back(matches);
+        constMatchGenPt->push_back(genPt);
     }
-    return std::make_pair(topMatch, topConstMatch);
+    return std::make_pair(topMatch, std::make_pair(topConstMatch, constMatchGenPt));
 }

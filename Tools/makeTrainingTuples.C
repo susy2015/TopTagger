@@ -8,6 +8,7 @@
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 #include "TaggerUtility.h"
+#include "PlotUtility.h"
 
 #include "TTree.h"
 #include "TFile.h"
@@ -99,7 +100,10 @@ private:
         const std::vector<TopObject>& topCands = ttr.getTopCandidates();
 
         //Get gen matching results
-        std::pair<std::vector<int>*, std::vector<int>*> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+
+        std::vector<TLorentzVector> genTops = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+
+        std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 
         //Class which holds and registers vectors of variables
         //Annoyingly this list of variables to expect is necessary
@@ -149,11 +153,12 @@ private:
 
         //register matching vectors
         tr.registerDerivedVec("genTopMatchesVec",        genMatches.first);
-        tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second);
+        tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second.first);
+        tr.registerDerivedVec("genConstMatchGenPtVec", genMatches.second.second);
 
         //Generate basic MVA selection 
         //for now I just require that there is at least 1 top candidate 
-        bool passMVABaseline = topCands.size() >= 1;
+        bool passMVABaseline = (topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
     }
 
