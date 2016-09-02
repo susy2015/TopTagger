@@ -43,7 +43,7 @@ class TopCat
   bool GetMatchedTop(std::vector<TLorentzVector> TopCand, std::vector<TLorentzVector> &MachedTopCand, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
   int GetMatchedTopConst(std::vector<Constituent const *> topconst, std::vector<TLorentzVector>gentopdau);
 
-  std::pair<std::vector<int>*, std::vector<int>*> TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec);
+  std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec);
 };
 
 

@@ -5,9 +5,10 @@ from sklearn.ensemble import RandomForestRegressor
 import sklearn.tree as tree
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
+from sklearn import svm
 
 def getData(event, i):
-    return [event.cand_pt[i], event.cand_dRMax[i], event.j12_m[i]/event.cand_m[i], event.j13_m[i]/event.cand_m[i], event.j23_m[i]/event.cand_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i]]
+    return [event.cand_pt[i], event.cand_dRMax[i], event.j12_m[i]/event.cand_m[i], event.j13_m[i]/event.cand_m[i], event.j23_m[i]/event.cand_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.dPhi12[i], event.dPhi23[i], event.dPhi13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i]]
 
 file = ROOT.TFile.Open("trainingTuple_division_0.root")
 
@@ -34,10 +35,16 @@ for event in file.TTbarSingleLep:
         inputData.append(getData(event, i))
         nmatch = event.genConstiuentMatchesVec[i]
         inputAnswer.append((nmatch == 3))
-        if nmatch == 3:
-            inputWgts.append((NSig+NBg)/NSig)
+        if event.cand_pt < 200:
+            if nmatch == 3:
+                inputWgts.append((NSig+NBg)/NSig / 3)
+            else:
+                inputWgts.append((NSig+NBg)/NBg / 3)
         else:
-            inputWgts.append((NSig+NBg)/NBg)
+            if nmatch == 3:
+                inputWgts.append((NSig+NBg)/NSig)
+            else:
+                inputWgts.append((NSig+NBg)/NBg)
     
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
@@ -49,6 +56,7 @@ print "TRAINING MVA"
 clf = RandomForestRegressor(n_estimators=10)
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
+#clf = svm.SVC()
 clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1.root")
