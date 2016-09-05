@@ -194,7 +194,7 @@ std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>>
             if(topConst.size()==1)
             {
                 matches = std::max(1, matches);
-                genPt = genTop.P();
+                genPt = genTop.Pt();
             }
             else if(topConst.size()==2)
             {
@@ -202,7 +202,7 @@ std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>>
                 if(dimatch > matches)
                 {
                     matches = dimatch;
-                    genPt = genTop.P();
+                    genPt = genTop.Pt();
                 }
             }
             else if(topConst.size()==3)
@@ -211,7 +211,7 @@ std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>>
                 if(trimatch > matches)
                 {
                     matches = trimatch;
-                    genPt = genTop.P();
+                    genPt = genTop.Pt();
                 }
             }
         }

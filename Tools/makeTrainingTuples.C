@@ -109,6 +109,10 @@ private:
         //Annoyingly this list of variables to expect is necessary
         VariableHolder<double> vh(tr, allowedVarsD_);
 
+        //prepare a vector of get top pt
+        for(auto& genTop : genTops) vh.add("genTopPt", genTop.Pt());
+
+        //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
             //Get top candidate variables
@@ -169,9 +173,9 @@ public:
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
         //double variables list here
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "genTopPt"};
         //integer valuse list here
-        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec"};
+        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec"};
     }
 
     std::set<std::string> getVarSet()
@@ -282,8 +286,8 @@ int main(int argc, char* argv[])
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
     {
         int splitNum = stoi(sampleRatios.substr((pos)?(pos + 1):(0)));
-        string ofname = outFile + "_division_" + to_string(iter) + ".root";
-        mtmVec.emplace_back(new MiniTupleMaker(ofname, dataSets), splitNum);
+        string ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
+        mtmVec.emplace_back(new MiniTupleMaker(ofname, "slimmedTuple"), splitNum);
     }
 
     for(auto& fileVec : fileMap)
