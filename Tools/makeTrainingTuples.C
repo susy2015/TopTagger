@@ -149,7 +149,11 @@ private:
                 vh.add("dEta" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dEta);
 
                 //calculate pair masses
-                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", (constituents[i]->p() + constituents[iNext]->p()).M());
+                int iNNext = (iNext + 1) % constituents.size();
+                auto jetPair = constituents[i]->p() + constituents[iNext]->p();
+                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", jetPair.M());
+                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_pt", jetPair.Pt());
+                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, constituents[iNNext]->p()));
             }
         }
 
@@ -173,8 +177,8 @@ public:
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
         //double variables list here
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "genTopPt"};
-        //integer valuse list here
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt"};
+        //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec"};
     }
 

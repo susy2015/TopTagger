@@ -11,8 +11,46 @@ from sklearn import svm
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
-def getData(event, i):
-    return [event.cand_m[i], event.cand_pt[i], event.j12_m[i], event.j13_m[i], event.j23_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i]]
+dicrionary = {}
+
+
+
+
+
+class DataGetter:
+
+    def __init__(self):
+        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        self.list2 = ["event." + v + "[i]" for v in self.list]
+        self.theStrCommand = "[" + ", ".join(self.list2) + "]"
+
+    def getData(self, event, i):
+        return eval(self.theStrCommand)
+
+    def getList(self):
+        return self.list
+
+#def getData(event, i):
+#    return [event.cand_m[i], event.cand_dRMax[i], event.cand_pt[i], event.j12_m[i], event.j13_m[i], event.j23_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_m[i], event.j2_m[i], event.j3_m[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i], event.j12j3_dR[i], event.j13j2_dR[i], event.j23j1_dR[i]]
+
+#Example code for koushik 
+#dg = DataGetter()
+#
+#ranges = {"cand_m":[10, 160, 250], 
+#          "cand_dRMax":[100000,12,17]}
+#
+#inputVars = dg.getData(event, i)
+#
+#vars = dg.getList()
+#
+#for i in xrange(len(vars)):
+#    name = vars[i]
+#    val = inputVars[i]
+#
+#    dictionary[name].Fill(val)
+
+for var in dg.getList():
+    dicrionary[var] = ROOT.TH1D(var, var, ranges[var][0], ranges[var][1], ranges[var][2])
 
 def HEPReqs(event, i):
     Rmin_ = 0.85
@@ -70,7 +108,7 @@ inputAnswer = []
 inputWgts = []
 for event in file.slimmedTuple:
     for i in xrange(len(event.cand_m)):
-        inputData.append(getData(event, i))
+        inputData.append(dg.getData(event, i))
         nmatch = event.genConstiuentMatchesVec[i]
         inputAnswer.append((nmatch == 3))
         if event.cand_pt < ptThreshold:
@@ -125,7 +163,7 @@ for event in fileValidation.slimmedTuple:
         hEffHEPDen.Fill(pt)
     for i in xrange(len(event.cand_m)):
         recoPt.append(event.cand_pt[i])
-        inputList.append(getData(event, i))
+        inputList.append(dg.getData(event, i))
         truth.append(event.genConstiuentMatchesVec[i])
         genPt.append(event.genConstMatchGenPtVec[i])
         passHEP.append(HEPReqs(event, i))
