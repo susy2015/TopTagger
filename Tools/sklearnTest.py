@@ -11,7 +11,7 @@ from sklearn import svm
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
-dicrionary = {}
+
 
 
 
@@ -33,24 +33,31 @@ class DataGetter:
 #def getData(event, i):
 #    return [event.cand_m[i], event.cand_dRMax[i], event.cand_pt[i], event.j12_m[i], event.j13_m[i], event.j23_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_m[i], event.j2_m[i], event.j3_m[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i], event.j12j3_dR[i], event.j13j2_dR[i], event.j23j1_dR[i]]
 
+
 #Example code for koushik 
-#dg = DataGetter()
-#
-#ranges = {"cand_m":[10, 160, 250], 
-#          "cand_dRMax":[100000,12,17]}
-#
-#inputVars = dg.getData(event, i)
-#
-#vars = dg.getList()
-#
-#for i in xrange(len(vars)):
-#    name = vars[i]
-#    val = inputVars[i]
-#
-#    dictionary[name].Fill(val)
+dg = DataGetter()
+
+histranges = {"cand_m":[10, 100, 250], 
+          "cand_dRMax":[30,0,1.5],
+          "cand_pt":[50,0,1000],
+          "j1_m":[10, 100, 250],
+          "j23_m":[10, 100, 250],
+          "j23j1_dR":[30,0,1.5]}
+
+hist_tag = {}
 
 for var in dg.getList():
-    dicrionary[var] = ROOT.TH1D(var, var, ranges[var][0], ranges[var][1], ranges[var][2])
+    if(histranges.has_key(var)) : hist_tag[var] = ROOT.TH1D(var+"_tag", var+"_tag", histranges[var][0], histranges[var][1], histranges[var][2])
+
+hist_notag = {}
+
+for var in dg.getList():
+    if(histranges.has_key(var)) : hist_notag[var] = ROOT.TH1D(var+"_notag", var+"_notag", histranges[var][0], histranges[var][1], histranges[var][2])
+
+varsname = dg.getList()
+varsmap = {}
+varsmap = varsmap.fromkeys(varsname,[])
+
 
 def HEPReqs(event, i):
     Rmin_ = 0.85
@@ -167,6 +174,9 @@ for event in fileValidation.slimmedTuple:
         truth.append(event.genConstiuentMatchesVec[i])
         genPt.append(event.genConstMatchGenPtVec[i])
         passHEP.append(HEPReqs(event, i))
+        Varsval = dg.getData(event, i)
+        for j in xrange(len(Varsval)):
+            varsmap[varsname[j]].append(Varsval[j])
 
 print "CALCULATING DISCRIMINATORS"
 
@@ -204,8 +214,12 @@ for i in xrange(len(output)):
     if(output[i] > discCut):
         hPurityDen.Fill(recoPt[i])
         hNConstMatchTag.Fill(truth[i])
+        for j in xrange(len(varsname)):
+            if(histranges.has_key(varsname[j])) : hist_tag[varsname[j]].Fill(varsmap[varsname[j]][i])
     else:
         hNConstMatchNoTag.Fill(truth[i])
+        #for k in xrange(len(varsname)):
+            #if(histranges.has_key(varsname[k])) : hist_notag[varsname[k]].Fill(varsmap[varsname[k]][i])
     if(passHEP[i]):
         hPurityHEPDen.Fill(recoPt[i])
         hNConstMatchTagHEP.Fill(truth[i])
@@ -287,6 +301,22 @@ hNConstMatchTagHEP.Draw("same")
 hNConstMatchNoTagHEP.Draw("same")
 leg.Draw("same")
 c.Print("nConstMatched.png")
+
+#draw variables
+for h in hist_tag:
+    leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+    leg.AddEntry(hist_tag[h], h+" for top like object")
+    #leg.AddEntry(hist_notag[h], h+" for not top like object")
+    hist_tag[h].SetStats(0)
+    hist_tag[h].SetTitle(h)
+    hist_tag[h].Scale(1/hist_tag[h].Integral())
+    #hist_notag[h].Scale(1/hist_notag[h].Integral())
+    hist_tag[h].SetLineColor(ROOT.kRed)
+    #hist_notag[h].SetLineColor(ROOT.kBlue)
+    hist_tag[h].Draw()
+    #hist_notag[h].Draw("same")
+    leg.Draw("same")
+    c.Print(h+".png")
 
 #draw efficiency
 
