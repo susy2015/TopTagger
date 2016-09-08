@@ -211,8 +211,8 @@ for i in xrange(len(output)):
             if(histranges.has_key(vname)) : hist_tag[vname].Fill(varsmap[vname][i])
     else:
         hNConstMatchNoTag.Fill(truth[i])
-        for k in xrange(len(varsname)):
-            if(histranges.has_key(varsname[k])) : hist_notag[varsname[k]].Fill(varsmap[varsname[k]][i])
+        for vname in varsname:
+            if(histranges.has_key(vname)) : hist_notag[vname].Fill(varsmap[vname][i])
     if(passHEP[i]):
         hPurityHEPDen.Fill(recoPt[i])
         hNConstMatchTagHEP.Fill(truth[i])
