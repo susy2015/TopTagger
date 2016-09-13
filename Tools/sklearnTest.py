@@ -20,7 +20,7 @@ dicrionary = {}
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -34,7 +34,7 @@ class DataGetter:
 #    return [event.cand_m[i], event.cand_dRMax[i], event.cand_pt[i], event.j12_m[i], event.j13_m[i], event.j23_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_m[i], event.j2_m[i], event.j3_m[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i], event.j12j3_dR[i], event.j13j2_dR[i], event.j23j1_dR[i]]
 
 #Example code for koushik 
-#dg = DataGetter()
+dg = DataGetter()
 #
 #ranges = {"cand_m":[10, 160, 250], 
 #          "cand_dRMax":[100000,12,17]}
@@ -49,8 +49,8 @@ class DataGetter:
 #
 #    dictionary[name].Fill(val)
 
-for var in dg.getList():
-    dicrionary[var] = ROOT.TH1D(var, var, ranges[var][0], ranges[var][1], ranges[var][2])
+#for var in dg.getList():
+#    dicrionary[var] = ROOT.TH1D(var, var, ranges[var][0], ranges[var][1], ranges[var][2])
 
 def HEPReqs(event, i):
     Rmin_ = 0.85

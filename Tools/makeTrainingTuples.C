@@ -7,6 +7,7 @@
 #include "TopTagger/TopTagger/include/TopTagger.h"
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/CfgParser/include/TTException.h"
 #include "TaggerUtility.h"
 #include "PlotUtility.h"
 
@@ -78,6 +79,7 @@ private:
     {
         const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
         const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
+        const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
 
         const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
         const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
@@ -86,11 +88,12 @@ private:
 
         std::vector<TLorentzVector> jetsLVec_forTagger;
         std::vector<double> recoJetsBtag_forTagger;
-        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger);
+        std::vector<double> qgLikelihood_forTagger;
+        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger);
 
         //New Tagger starts here
         //prep input object (constituent) vector
-        std::vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger);
+        std::vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger);
 
         //run tagger
         topTagger_->runTagger(constituents);
@@ -129,11 +132,12 @@ private:
             //std::cout << "\tconst vec size: " << constituents.size() << std::endl;
             for(int i = 0; i < constituents.size(); ++i)
             {
-                vh.add("j" + std::to_string(i + 1) + "_pt",    constituents[i]->p().Pt()      );
-                vh.add("j" + std::to_string(i + 1) + "_eta",   constituents[i]->p().Eta()     );
-                vh.add("j" + std::to_string(i + 1) + "_phi",   constituents[i]->p().Phi()     );
-                vh.add("j" + std::to_string(i + 1) + "_m",     constituents[i]->p().M()       );
-                vh.add("j" + std::to_string(i + 1) + "_CSV",   constituents[i]->getBTagDisc() );
+                vh.add("j" + std::to_string(i + 1) + "_pt",    constituents[i]->p().Pt()          );
+                vh.add("j" + std::to_string(i + 1) + "_eta",   constituents[i]->p().Eta()         );
+                vh.add("j" + std::to_string(i + 1) + "_phi",   constituents[i]->p().Phi()         );
+                vh.add("j" + std::to_string(i + 1) + "_m",     constituents[i]->p().M()           );
+                vh.add("j" + std::to_string(i + 1) + "_CSV",   constituents[i]->getBTagDisc()     );
+                vh.add("j" + std::to_string(i + 1) + "_QGL",   constituents[i]->getQGLikelihood() );
 
                 //index of next jet (assumes < 4 jets)
                 int iNext = (i + 1) % constituents.size();
@@ -177,7 +181,7 @@ public:
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
         //double variables list here
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec"};
     }
@@ -373,12 +377,17 @@ int main(int argc, char* argv[])
                         ++NEvtsTotal;
                     }
                 }
-                catch(const SATException e)
+                catch(const SATException& e)
                 {
                     cout << e << endl;
                     throw;
                 }
-                catch(const string e)
+                catch(const TTException& e)
+                {
+                    cout << e << endl;
+                    throw;
+                }
+                catch(const string& e)
                 {
                     cout << e << endl;
                     throw;
