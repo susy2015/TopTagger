@@ -13,7 +13,7 @@ class TopTaggerResults;
 
 namespace ttUtility
 {
-    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
 
     double calculateMT2(const TopTaggerResults& ttr);
 }
