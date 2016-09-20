@@ -330,7 +330,6 @@ for h in hist_tag:
     c.Print(h+".png")
 
 #draw efficiency
-
 hEffNum.SetStats(0)
 hEffNum.SetTitle("")
 hEffNum.GetXaxis().SetTitle("gen top Pt [GeV]")
@@ -406,3 +405,28 @@ if isinstance(clf, GradientBoostingRegressor):
     print sorted_idx
 
 print "DONE!"
+
+#Writing histograms in a root file.
+hEff = hEffNum.Clone("hEff")
+hEffHEP = hEffHEPNum.Clone("hEffHEP")
+hPurity = hPurityNum.Clone("hPurity")
+hPurityHEP = hPurityHEPNum.Clone("hPurityHEP")
+
+mf = ROOT.TFile('MVAOutput.root','RECREATE')
+hDiscMatch.Write()
+hDiscNoMatch.Write()
+hDiscMatchPt.Write()
+hDiscNoMatchPt.Write()
+hNConstMatchTag.Write()
+hNConstMatchNoTag.Write()
+hNConstMatchTagHEP.Write()
+hNConstMatchNoTagHEP.Write()
+for h in hist_tag:
+    hist_tag[h].Write()
+    hist_notag[h].Write()
+hEff.Write()
+hEffHEP.Write()
+hPurity.Write()
+hPurityHEP.Write()
+mf.Write()
+mf.Close()
