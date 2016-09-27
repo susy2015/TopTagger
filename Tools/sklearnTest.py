@@ -154,6 +154,9 @@ clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_stat
 
 clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
 
+
+
+
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep.root")
 
 print "PROCESSING VALIDATION DATA"
@@ -173,6 +176,7 @@ truth = []
 genPt = []
 recoPt = []
 passHEP = []
+rocScore = []
 
 for event in fileValidation.slimmedTuple:
     for pt in event.genTopPt:
@@ -182,15 +186,42 @@ for event in fileValidation.slimmedTuple:
         recoPt.append(event.cand_pt[i])
         inputList.append(dg.getData(event, i))
         truth.append(event.genConstiuentMatchesVec[i])
+        rocScore.append((event.genConstiuentMatchesVec[i]==3))
         genPt.append(event.genConstMatchGenPtVec[i])
         passHEP.append(HEPReqs(event, i))
         Varsval = dg.getData(event, i)
         for j in xrange(len(Varsval)):
             varsmap[varsname[j]].append(Varsval[j])
-   
+            
+
+#FakeRate
+fileFakeRate = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu.root")
+hFakeNum = ROOT.TH1D("hFakeNum", "hFakeNum", 25, 0.0, 1000.0)
+hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
+
+ZinvInput = []
+Zinvmet = []
+
+for event in fileFakeRate.slimmedTuple:
+    hFakeDen.Fill(event.MET)
+    for i in xrange(len(event.cand_m)):
+        ZinvInput.append(dg.getData(event, i))
+        Zinvmet.append(event.MET)
+
+Zinvoutput = clf.predict(ZinvInput)
+for i in xrange(len(Zinvoutput)):
+    if(Zinvoutput[i] > 0.75):
+        hFakeNum.Fill(Zinvmet[i])
+
 print "CALCULATING DISCRIMINATORS"
 
 output = clf.predict(inputList)
+
+print "ROC Calculation"
+from sklearn.metrics import roc_curve
+rocScoreInput = numpy.array(rocScore, numpy.float32)
+print "rocScore: ", rocScoreInput
+fpr, tpr, thresholds = roc_curve(rocScoreInput, output, pos_label=2)
 
 print "FILLING HISTOGRAMS"
 
@@ -380,6 +411,18 @@ hPurityNum.Draw()
 hPurityHEPNum.Draw("same")
 leg.Draw("same")
 c.Print("purity.png")
+
+#FakeRate
+hFakeNum.SetStats(0)
+hFakeNum.SetTitle("")
+hFakeNum.GetXaxis().SetTitle("met [GeV]")
+hFakeNum.GetYaxis().SetTitle("FakeRate")
+hFakeNum.SetLineColor(ROOT.kRed)
+#hFakeNum.Divide(hFakeDen)
+#hFakeNum.GetYaxis().SetRangeUser(0, 1)
+hFakeDen.Draw()
+hFakeNum.Draw("same")
+c.Print("FakeRate.png")
 
 #with open("iris.dot", 'w') as f:
 #    f = tree.export_graphviz(clf, out_file=f,
