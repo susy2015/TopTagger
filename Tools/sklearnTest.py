@@ -198,20 +198,26 @@ for event in fileValidation.slimmedTuple:
 fileFakeRate = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu.root")
 hFakeNum = ROOT.TH1D("hFakeNum", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
+hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
+hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
 
 ZinvInput = []
 Zinvmet = []
-
+ZinvpassHEP = []
 for event in fileFakeRate.slimmedTuple:
     hFakeDen.Fill(event.MET)
+    hFakeDenHEP.Fill(event.MET)
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
         Zinvmet.append(event.MET)
+        ZinvpassHEP.append(HEPReqs(event, i))
 
 Zinvoutput = clf.predict(ZinvInput)
 for i in xrange(len(Zinvoutput)):
     if(Zinvoutput[i] > 0.75):
         hFakeNum.Fill(Zinvmet[i])
+    if(ZinvpassHEP[i]):
+        hFakeNumHEP.Fill(Zinvmet[i])
 
 print "CALCULATING DISCRIMINATORS"
 
@@ -417,11 +423,14 @@ hFakeNum.SetStats(0)
 hFakeNum.SetTitle("")
 hFakeNum.GetXaxis().SetTitle("met [GeV]")
 hFakeNum.GetYaxis().SetTitle("FakeRate")
+hFakeNum.Divide(hFakeDen)
+hFakeNum.GetYaxis().SetRangeUser(0, 1)
+hFakeNumHEP.Divide(hFakeDenHEP)
+hFakeNumHEP.GetYaxis().SetRangeUser(0, 1)
 hFakeNum.SetLineColor(ROOT.kRed)
-#hFakeNum.Divide(hFakeDen)
-#hFakeNum.GetYaxis().SetRangeUser(0, 1)
-hFakeDen.Draw()
-hFakeNum.Draw("same")
+hFakeNumHEP.SetLineColor(ROOT.kBlue)
+hFakeNum.Draw()
+hFakeNumHEP.Draw("same")
 c.Print("FakeRate.png")
 
 #with open("iris.dot", 'w') as f:
