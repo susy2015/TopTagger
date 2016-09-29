@@ -69,8 +69,10 @@ varsname = dg.getList()
 varsmap = {k:[] for k in varsname}
 
 def HEPReqs(event, i):
-    Rmin_ = 0.85
-    Rmax_ = 1.15
+    Mw = 80.385
+    Mt = 173.5
+    Rmin_ = 0.85 *(Mw/Mt)
+    Rmax_ = 1.25 *(Mw/Mt)
     CSV_ = 0.800
 
     #HEP tagger requirements
@@ -261,8 +263,14 @@ hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
 hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
 
+Zevt =0
+ZevtwidCand =0
+ZtotCand =0
+ZpasHEPcand =0
+ZevtpasHEP =0
 
 for event in fileFakeRate.slimmedTuple:
+    Zevt = Zevt+1
     ZinvInput = []
     Zinvmet = []
     ZinvpassHEP = []
@@ -275,64 +283,100 @@ for event in fileFakeRate.slimmedTuple:
         Zinvmet.append(event.MET)
         ZinvpassHEP.append(HEPReqs(event, i))
     if(len(ZinvInput)):
+        ZevtwidCand = ZevtwidCand+1
         Zinvoutput = clf.predict(ZinvInput)
         for i in xrange(len(Zinvoutput)):
+            ZtotCand = ZtotCand+1
             if(Zinvoutput[i] > discCut):
                 numflag = True
             if(ZinvpassHEP[i]):
+                ZpasHEPcand = ZpasHEPcand+1
                 numflagHEP = True
     if(numflag):hFakeNum.Fill(Zinvmet[i])
-    if(numflagHEP):hFakeNumHEP.Fill(Zinvmet[i])
-
-
+    if(numflagHEP):
+        hFakeNumHEP.Fill(Zinvmet[i])
+        ZevtpasHEP = ZevtpasHEP+1
 
 print "ROC Calculation"
-#from sklearn.metrics import roc_curve
-#rocScoreInput = numpy.array(rocScore, numpy.float32)
-#print "rocScore: ", rocScoreInput
-#fpr, tpr, thresholds = roc_curve(rocScoreInput, output, pos_label=2)
+#ttbar
 hroc = ROOT.TProfile("hroc", "hroc", 20, 0, 1, 0, 1)
-hroc_cut = ROOT.TProfile("hroc_cut", "hroc_cut", 20, 0, 1, 0, 1)
+hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 20, 0, 1, 0, 1)
 cut =[]
 TP = []
 FP = []
 TPR =[]
 FPR =[]
-TPRcut =[]
-FPRcut=[]
+Nmatch = 0
+Nnomatch = 0
+TPHEP =0
+FPHEP =0
 for j in range(19):
     cut.append(round(j*0.05+0.05, 2))
     TP.append(0)
     FP.append(0)
     TPR.append(0)
     FPR.append(0)
-    TPRcut.append(0)
-    FPRcut.append(0)
 print "cut:", cut
 rocInput = []
 rocScore = []
+rocHEP = []
 for event in fileValidation.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         rocInput.append(dg.getData(event, i))
         rocScore.append((event.genConstiuentMatchesVec[i]==3))
+        rocHEP.append(HEPReqs(event, i))
 rocOutput = clf.predict(rocInput)
 for i in xrange(len(rocOutput)):
+    if(rocScore[i]):
+        Nmatch= Nmatch+1
+        if(rocHEP[i]):TPHEP = TPHEP+1
+    else:
+        Nnomatch = Nnomatch+1
+        if(rocHEP[i]):FPHEP = FPHEP+1
     for j in xrange(len(cut)):
         if(rocOutput[i]>cut[j]):
             if(rocScore[i]):TP[j] = TP[j]+1
             else:FP[j] = FP[j]+1
 
 for j in xrange(len(cut)):
-    TPR[j] = float(TP[j])/len(rocOutput)
-    FPR[j] = float(FP[j])/len(rocOutput)
-    TPRcut[j] = float(TP[j])/(TP[j]+FP[j])
-    FPRcut[j] = float(FP[j])/(TP[j]+FP[j])
+    TPR[j] = float(TP[j])/Nmatch
+    FPR[j] = float(FP[j])/Nnomatch
     hroc.Fill(FPR[j],TPR[j])
-    hroc_cut.Fill(FPRcut[j],TPRcut[j])
-print "TP:", TP
-print "FP:", FP
-print "PLOTTING"
+TPRHEP = float(TPHEP)/Nmatch
+FPRHEP = float(FPHEP)/Nnomatch
+hroc_HEP.Fill(FPRHEP,TPRHEP)
 
+#Zinv
+hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 20, 0, 1, 0, 1)
+hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 20, 0, 1, 0, 1)
+FPZ = []
+FPRZ =[]
+NnomatchZ = 0
+FPHEPZ =0
+FPRHEPZ =0
+rocInputZ = []
+rocHEPZ = []
+for j in range(19):
+    FPZ.append(0)
+    FPRZ.append(0)
+for event in fileFakeRate.slimmedTuple:
+    for i in xrange(len(event.cand_m)):
+        rocInputZ.append(dg.getData(event, i))
+        rocHEPZ.append(HEPReqs(event, i))
+rocOutputZ = clf.predict(rocInputZ)
+for i in xrange(len(rocOutputZ)):
+    NnomatchZ = NnomatchZ+1
+    if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+    for j in xrange(len(cut)):
+        if(rocOutputZ[i]>cut[j]):
+            FPZ[j] = FPZ[j]+1
+for j in xrange(len(cut)):
+    FPRZ[j] = float(FPZ[j])/NnomatchZ
+    hrocZ.Fill(FPRZ[j],TPR[j])
+FPRHEPZ = float(FPHEPZ)/NnomatchZ
+hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
+
+print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
 
 #Draw discriminator plot
@@ -490,14 +534,26 @@ c.Print("FakeRate_v2.png")
 hroc.SetStats(0)
 hroc.SetXTitle("FPR")
 hroc.SetYTitle("TPR")
+hroc_HEP.SetStats(0)
+hroc_HEP.SetLineColor(ROOT.kRed)
+hroc_HEP.SetMarkerColor(ROOT.kRed)
+hroc_HEP.SetMarkerStyle(20)
+hroc_HEP.SetMarkerSize(1)
 hroc.Draw()
+hroc_HEP.Draw("samePE")
 c.Print("roc_v2.png")
-hroc_cut.SetStats(0)
-hroc_cut.SetAxisRange(0, 1, "Y")
-hroc_cut.SetXTitle("FPR_cut")
-hroc_cut.SetYTitle("TPR_cut")
-hroc_cut.Draw()
-c.Print("roc_cut_v2.png")
+
+hrocZ.SetStats(0)
+hrocZ.SetXTitle("FPR")
+hrocZ.SetYTitle("TPR")
+hroc_HEPZ.SetStats(0)
+hroc_HEPZ.SetLineColor(ROOT.kRed)
+hroc_HEPZ.SetMarkerColor(ROOT.kRed)
+hroc_HEPZ.SetMarkerStyle(20)
+hroc_HEPZ.SetMarkerSize(1)
+hrocZ.Draw()
+hroc_HEPZ.Draw("samePE")
+c.Print("rocZ_v2.png")
 
 #with open("iris.dot", 'w') as f:
 #    f = tree.export_graphviz(clf, out_file=f,
@@ -546,5 +602,9 @@ hEff.Write()
 hEffHEP.Write()
 hPurity.Write()
 hPurityHEP.Write()
+hroc.Write()
+hroc_HEP.Write()
+hrocZ.Write()
+hroc_HEPZ.Write()
 mf.Write()
 mf.Close()
