@@ -192,42 +192,10 @@ for event in fileValidation.slimmedTuple:
         Varsval = dg.getData(event, i)
         for j in xrange(len(Varsval)):
             varsmap[varsname[j]].append(Varsval[j])
-            
-
-#FakeRate
-fileFakeRate = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu.root")
-hFakeNum = ROOT.TH1D("hFakeNum", "hFakeNum", 25, 0.0, 1000.0)
-hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
-hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
-hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
-
-ZinvInput = []
-Zinvmet = []
-ZinvpassHEP = []
-for event in fileFakeRate.slimmedTuple:
-    hFakeDen.Fill(event.MET)
-    hFakeDenHEP.Fill(event.MET)
-    for i in xrange(len(event.cand_m)):
-        ZinvInput.append(dg.getData(event, i))
-        Zinvmet.append(event.MET)
-        ZinvpassHEP.append(HEPReqs(event, i))
-
-Zinvoutput = clf.predict(ZinvInput)
-for i in xrange(len(Zinvoutput)):
-    if(Zinvoutput[i] > 0.75):
-        hFakeNum.Fill(Zinvmet[i])
-    if(ZinvpassHEP[i]):
-        hFakeNumHEP.Fill(Zinvmet[i])
 
 print "CALCULATING DISCRIMINATORS"
 
 output = clf.predict(inputList)
-
-print "ROC Calculation"
-from sklearn.metrics import roc_curve
-rocScoreInput = numpy.array(rocScore, numpy.float32)
-print "rocScore: ", rocScoreInput
-fpr, tpr, thresholds = roc_curve(rocScoreInput, output, pos_label=2)
 
 print "FILLING HISTOGRAMS"
 
@@ -417,21 +385,6 @@ hPurityNum.Draw()
 hPurityHEPNum.Draw("same")
 leg.Draw("same")
 c.Print("purity.png")
-
-#FakeRate
-hFakeNum.SetStats(0)
-hFakeNum.SetTitle("")
-hFakeNum.GetXaxis().SetTitle("met [GeV]")
-hFakeNum.GetYaxis().SetTitle("FakeRate")
-hFakeNum.Divide(hFakeDen)
-hFakeNum.GetYaxis().SetRangeUser(0, 1)
-hFakeNumHEP.Divide(hFakeDenHEP)
-hFakeNumHEP.GetYaxis().SetRangeUser(0, 1)
-hFakeNum.SetLineColor(ROOT.kRed)
-hFakeNumHEP.SetLineColor(ROOT.kBlue)
-hFakeNum.Draw()
-hFakeNumHEP.Draw("same")
-c.Print("FakeRate.png")
 
 #with open("iris.dot", 'w') as f:
 #    f = tree.export_graphviz(clf, out_file=f,
