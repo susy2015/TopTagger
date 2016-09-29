@@ -94,7 +94,7 @@ comming soon
 
 ## Running MVA code
 
-Please go to TopTagger/Tool directory and find instruction in README
+Please go to TopTagger/Tools directory and find instruction in README
 
 
 
