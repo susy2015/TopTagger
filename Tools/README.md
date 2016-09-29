@@ -1,6 +1,6 @@
 We use scikit package for MVA based tagger. Its python based.
 
-1. Samples for training and validation
+I. Samples for training and validation
 
 Root files cantaining only relavant variables.
 makeTrainingTuples.C produces this root file;
@@ -13,7 +13,7 @@ make
 
 You can change the sample name, #events and ratio (training sample to validation sample)
 
-2. Running mva code
+II. Running mva code
 
 Its a python file: sklearnTest.py, Lates version is sklearnTest_v2.py (later it will be merged in one)
 
