@@ -103,43 +103,65 @@ print "PROCESSING TRAINING DATA"
 
 file = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep.root")
 
-ptThreshold = 150.0
-lowPtDownWeight = 10.0
+hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
+hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 
-NBg = 0.0
-NSig = 0.0
 for event in file.slimmedTuple:
     for i in xrange(len(event.genConstiuentMatchesVec)):
-        if event.cand_pt < ptThreshold:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0/lowPtDownWeight
-            else:
-                NBg += 1.0/lowPtDownWeight
+        if event.genConstiuentMatchesVec[i] == 3:
+            hPtMatch.Fill(event.cand_pt[i])
         else:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0
-            else:
-                NBg += 1.0
+            hPtNoMatch.Fill(event.cand_pt[i])
 
 inputData = []
 inputAnswer = []
 inputWgts = []
 for event in file.slimmedTuple:
     for i in xrange(len(event.cand_m)):
-        inputData.append(dg.getData(event, i))
-        nmatch = event.genConstiuentMatchesVec[i]
-        inputAnswer.append((nmatch == 3))
-        if event.cand_pt < ptThreshold:
+        #if(event.cand_pt[i] > 150):
+            inputData.append(dg.getData(event, i))
+            nmatch = event.genConstiuentMatchesVec[i]
+            inputAnswer.append(int(nmatch == 3))
             if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig / lowPtDownWeight)
+                inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
             else:
-                inputWgts.append((NSig+NBg)/NBg / lowPtDownWeight)
-        else:
-            if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig)
-            else:
-                inputWgts.append((NSig+NBg)/NBg)
+                inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
     
+
+#NBg = 0.0
+#NSig = 0.0
+#for event in file.slimmedTuple:
+#    for i in xrange(len(event.genConstiuentMatchesVec)):
+#        if event.cand_pt < ptThreshold:
+#            if event.genConstiuentMatchesVec[i] == 3:
+#                NSig += 1.0/lowPtDownWeight
+#            else:
+#                NBg += 1.0/lowPtDownWeight
+#        else:
+#            if event.genConstiuentMatchesVec[i] == 3:
+#                NSig += 1.0
+#            else:
+#                NBg += 1.0
+#
+#inputData = []
+#inputAnswer = []
+#inputWgts = []
+#for event in file.slimmedTuple:
+#    for i in xrange(len(event.cand_m)):
+#        inputData.append(dg.getData(event, i))
+#        nmatch = event.genConstiuentMatchesVec[i]
+#        inputAnswer.append((nmatch == 3))
+#        if event.cand_pt < ptThreshold:
+#            if nmatch == 3:
+#                inputWgts.append((NSig+NBg)/NSig / lowPtDownWeight)
+#            else:
+#                inputWgts.append((NSig+NBg)/NBg / lowPtDownWeight)
+#        else:
+#            if nmatch == 3:
+#                inputWgts.append((NSig+NBg)/NSig)
+#            else:
+#                inputWgts.append((NSig+NBg)/NBg)
+#    
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
@@ -147,9 +169,9 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 print "TRAINING MVA"
 
 #clf = RandomForestClassifier(n_estimators=10)
-#clf = RandomForestRegressor(n_estimators=10)
+clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
+#clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
 #clf = svm.SVC()
@@ -199,62 +221,94 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
 discCut = 0.75
-print "CALCULATING DISCRIMINATORS"
+
+inputList = []
+truth = []
+genPt = []
+recoPt = []
+passHEP = []
+varsmap = {}
 for event in fileValidation.slimmedTuple:
-    inputList = []
-    truth = []
-    genPt = []
-    recoPt = []
-    passHEP = []
+    tmp_truth = []
+    tmp_genPt = []
+    tmp_recoPt = []
+    tmp_passHEP = []
+    tmp_varsmap = {}
     for pt in event.genTopPt:
         hEffDen.Fill(pt)
         hEffHEPDen.Fill(pt)
     for i in xrange(len(event.cand_m)):
-        recoPt.append(event.cand_pt[i])
+        tmp_recoPt.append(event.cand_pt[i])
         inputList.append(dg.getData(event, i))
-        truth.append(event.genConstiuentMatchesVec[i])
-        genPt.append(event.genConstMatchGenPtVec[i])
-        passHEP.append(HEPReqs(event, i))
+        tmp_truth.append(event.genConstiuentMatchesVec[i])
+        tmp_genPt.append(event.genConstMatchGenPtVec[i])
+        tmp_passHEP.append(HEPReqs(event, i))
         Varsval = dg.getData(event, i)
         for j in xrange(len(Varsval)):
-            varsmap[varsname[j]].append(Varsval[j])
-    if(len(inputList)):
-        output = clf.predict(inputList)            
-        for i in xrange(len(output)):
-            hDisc.Fill(output[i])
-            hmatchGenPt.Fill(genPt[i])
-            if(output[i] > discCut):
-                hPurityDen.Fill(recoPt[i])
-                hNConstMatchTag.Fill(truth[i])
-                for vname in varsname:
-                    if(histranges.has_key(vname)) : hist_tag[vname].Fill(varsmap[vname][i])
+            if varsname[j] in tmp_varsmap:
+                tmp_varsmap[varsname[j]].append(Varsval[j])
             else:
-                hNConstMatchNoTag.Fill(truth[i])
-                for vname in varsname:
-                    if(histranges.has_key(vname)) : hist_notag[vname].Fill(varsmap[vname][i])
-            if(passHEP[i]):
-                hPurityHEPDen.Fill(recoPt[i])
-                hNConstMatchTagHEP.Fill(truth[i])
-            else:
-                hNConstMatchNoTagHEP.Fill(truth[i])
-            #Truth matched candidates
-            if(truth[i] == 3):
-                #pass reco discriminator threshold 
-                if(output[i] > discCut):
-                    hEffNum.Fill(genPt[i])
-                    hPurityNum.Fill(recoPt[i])
-                if(passHEP[i]):
-                    hEffHEPNum.Fill(genPt[i])
-                    hPurityHEPNum.Fill(recoPt[i])
-                    hDiscMatch.Fill(output[i])
-                if(recoPt[i] > 250):
-                    hDiscMatchPt.Fill(output[i])
-            #not truth matched 
-            else:
-                hDiscNoMatch.Fill(output[i])
-                if(recoPt[i] > 250):
-                    hDiscNoMatchPt.Fill(output[i])
-                                                    
+                tmp_varsmap[varsname[j]] = [Varsval[j]]
+    truth.append(tmp_truth)
+    genPt.append(tmp_genPt)
+    recoPt.append(tmp_recoPt)
+    passHEP.append(tmp_passHEP)
+    for key in tmp_varsmap.keys():
+        if key in varsmap:
+            varsmap[key].append(tmp_varsmap[key])
+        else:
+            varsmap[key] = [tmp_varsmap[key]]
+
+print "CALCULATING DISCRIMINATORS"
+npInputList = numpy.array(inputList, numpy.float32)
+output = clf.predict(npInputList)
+
+print "FILLING HISTOGRAMS"
+
+outputCount = 0;
+for i in xrange(len(truth)):
+    #prep output
+    nCands = len(truth[i])
+    tmp_output = []
+    for j in xrange(nCands):
+        tmp_output.append(output[outputCount])
+        outputCount += 1
+    for j in xrange(nCands):
+        hDisc.Fill(tmp_output[j])
+        hmatchGenPt.Fill(genPt[i][j])
+        if(tmp_output[j] > discCut):
+            hPurityDen.Fill(recoPt[i][j])
+            hNConstMatchTag.Fill(truth[i][j])
+            for vname in varsname:
+                if(histranges.has_key(vname)) : hist_tag[vname].Fill(varsmap[vname][i][j])
+        else:
+            hNConstMatchNoTag.Fill(truth[i][j])
+            for vname in varsname:
+                if(histranges.has_key(vname)) : hist_notag[vname].Fill(varsmap[vname][i][j])
+        if(passHEP[i][j]):
+            hPurityHEPDen.Fill(recoPt[i][j])
+            hNConstMatchTagHEP.Fill(truth[i][j])
+        else:
+            hNConstMatchNoTagHEP.Fill(truth[i][j])
+        #Truth matched candidates
+        if(truth[i][j] == 3):
+            #pass reco discriminator threshold 
+            if(tmp_output[j] > discCut):
+                hEffNum.Fill(genPt[i][j])
+                hPurityNum.Fill(recoPt[i][j])
+            if(passHEP[i][j]):
+                hEffHEPNum.Fill(genPt[i][j])
+                hPurityHEPNum.Fill(recoPt[i][j])
+                hDiscMatch.Fill(tmp_output[j])
+            if(recoPt[i][j] > 250):
+                hDiscMatchPt.Fill(tmp_output[j])
+        #not truth matched 
+        else:
+            hDiscNoMatch.Fill(tmp_output[j])
+            if(recoPt[i][j] > 250):
+                hDiscNoMatchPt.Fill(tmp_output[j])
+
+
 print "FakeRate Calculation"                                        
 #FakeRate
 fileFakeRate = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu.root")
@@ -269,9 +323,16 @@ ZtotCand =0
 ZpasHEPcand =0
 ZevtpasHEP =0
 
+ZinvInput = []
+for event in fileFakeRate.slimmedTuple:
+    for i in xrange(len(event.cand_m)):
+        ZinvInput.append(dg.getData(event, i))
+
+zinvOutput = clf.predict(ZinvInput)
+
+outputCount = 0
 for event in fileFakeRate.slimmedTuple:
     Zevt = Zevt+1
-    ZinvInput = []
     Zinvmet = []
     ZinvpassHEP = []
     hFakeDen.Fill(event.MET)
@@ -279,17 +340,16 @@ for event in fileFakeRate.slimmedTuple:
     numflag = False
     numflagHEP = False
     for i in xrange(len(event.cand_m)):
-        ZinvInput.append(dg.getData(event, i))
         Zinvmet.append(event.MET)
         ZinvpassHEP.append(HEPReqs(event, i))
-    if(len(ZinvInput)):
+    if(len(event.cand_m)):
         ZevtwidCand = ZevtwidCand+1
-        Zinvoutput = clf.predict(ZinvInput)
-        for i in xrange(len(Zinvoutput)):
+        for j in xrange(len(event.cand_m)):
             ZtotCand = ZtotCand+1
-            if(Zinvoutput[i] > discCut):
+            if(zinvOutput[outputCount] > discCut):
                 numflag = True
-            if(ZinvpassHEP[i]):
+            outputCount += 1
+            if(ZinvpassHEP[j]):
                 ZpasHEPcand = ZpasHEPcand+1
                 numflagHEP = True
     if(numflag):hFakeNum.Fill(Zinvmet[i])
