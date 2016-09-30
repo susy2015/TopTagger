@@ -98,6 +98,39 @@ def HEPReqs(event, i):
     return passHEPRequirments + passBreq
 
 
+class simpleTopCand:
+    def __init__(self, event, i, discriminator):
+        self.j1 = ROOT.TLorentzVector()
+        self.j2 = ROOT.TLorentzVector()
+        self.j3 = ROOT.TLorentzVector()
+        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.discriminator = discriminator
+
+    def __cmp__(self, other):
+        return self.discriminator < discriminator
+
+
+def resolveOverlap(event, discriminators):
+    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(event.j1_pt)]
+
+    topCands.sort()
+
+    finalTops = []
+
+    if(len(topCands)):
+        finalTops.append(topCands[0])
+        usedJets = [topCands[0].j1, topCands[0].j2, topCands[0].j3]
+        
+        for cand in topCands[1:]:
+            if not cand.j1 in usedJets and not usedJets.append(cand.j1) and not cand.j2 in usedJets:
+                usedJets += [cand.j1, cand.j2, cand.j3]
+                finalTops.append(cand)
+
+    return finalTops
+
+
 print "PROCESSING TRAINING DATA"
 
 file = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep.root")
