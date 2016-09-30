@@ -12,7 +12,6 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 
 
-
 class DataGetter:
 
     def __init__(self):
@@ -128,40 +127,6 @@ for event in file.slimmedTuple:
                 inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
     
 
-#NBg = 0.0
-#NSig = 0.0
-#for event in file.slimmedTuple:
-#    for i in xrange(len(event.genConstiuentMatchesVec)):
-#        if event.cand_pt < ptThreshold:
-#            if event.genConstiuentMatchesVec[i] == 3:
-#                NSig += 1.0/lowPtDownWeight
-#            else:
-#                NBg += 1.0/lowPtDownWeight
-#        else:
-#            if event.genConstiuentMatchesVec[i] == 3:
-#                NSig += 1.0
-#            else:
-#                NBg += 1.0
-#
-#inputData = []
-#inputAnswer = []
-#inputWgts = []
-#for event in file.slimmedTuple:
-#    for i in xrange(len(event.cand_m)):
-#        inputData.append(dg.getData(event, i))
-#        nmatch = event.genConstiuentMatchesVec[i]
-#        inputAnswer.append((nmatch == 3))
-#        if event.cand_pt < ptThreshold:
-#            if nmatch == 3:
-#                inputWgts.append((NSig+NBg)/NSig / lowPtDownWeight)
-#            else:
-#                inputWgts.append((NSig+NBg)/NBg / lowPtDownWeight)
-#        else:
-#            if nmatch == 3:
-#                inputWgts.append((NSig+NBg)/NSig)
-#            else:
-#                inputWgts.append((NSig+NBg)/NBg)
-#    
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
@@ -177,8 +142,6 @@ clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = svm.SVC()
 
 clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
-
-
 
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep.root")
