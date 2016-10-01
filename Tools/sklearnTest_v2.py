@@ -108,23 +108,57 @@ class simpleTopCand:
         self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
         self.discriminator = discriminator
 
-    def __cmp__(self, other):
-        return self.discriminator < discriminator
+    def __lt__(self, other):
+        return self.discriminator < other.discriminator
 
+def jetInList(jet, jlist):
+    for j in jlist:
+        if jet.DeltaR(j) < 0.01:
+            return True
+    return False
 
-def resolveOverlap(event, discriminators):
-    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(event.j1_pt)]
-
-    topCands.sort()
+def resolveOverlap(event, discriminators, threshold):
+    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(len(event.j1_pt))]
+    topCands.sort(reverse=True)
 
     finalTops = []
-
-    if(len(topCands)):
+    if(len(topCands) >= 1 and topCands[0].discriminator > threshold):
         finalTops.append(topCands[0])
         usedJets = [topCands[0].j1, topCands[0].j2, topCands[0].j3]
         
         for cand in topCands[1:]:
-            if not cand.j1 in usedJets and not usedJets.append(cand.j1) and not cand.j2 in usedJets:
+            #if not cand.j1 in usedJets and not cand.j2 in usedJets and not cand.j3 in usedJets:
+            if not jetInList(cand.j1, usedJets) and not jetInList(cand.j2, usedJets) and not jetInList(cand.j3, usedJets):
+                if cand.discriminator > threshold:
+                    usedJets += [cand.j1, cand.j2, cand.j3]
+                    finalTops.append(cand)
+
+    return finalTops
+
+class simpleTopCandHEP:
+    def __init__(self, event, i, passFail):
+        self.j1 = ROOT.TLorentzVector()
+        self.j2 = ROOT.TLorentzVector()
+        self.j3 = ROOT.TLorentzVector()
+        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.cand_m = event.cand_m[i]
+        self.passHEP = passFail
+
+    def __lt__(self, other):
+        return abs(self.cand_m - 173.4) < abs(other.cand_m - 173.4)
+
+def resolveOverlapHEP(event, passFail):
+    topCands = [simpleTopCandHEP(event, i, passFail[i]) for i in xrange(len(event.j1_pt))]
+    topCands.sort(reverse=True)
+
+    finalTops = []
+    usedJets = []
+    for cand in topCands:
+        #if not cand.j1 in usedJets and not cand.j2 in usedJets and not cand.j3 in usedJets:
+        if not jetInList(cand.j1, usedJets) and not jetInList(cand.j2, usedJets) and not jetInList(cand.j3, usedJets):
+            if cand.passHEP:
                 usedJets += [cand.j1, cand.j2, cand.j3]
                 finalTops.append(cand)
 
@@ -216,44 +250,15 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
-discCut = 0.75
+discCut = 0.25
 
 inputList = []
-truth = []
-genPt = []
-recoPt = []
-passHEP = []
-varsmap = {}
 for event in fileValidation.slimmedTuple:
-    tmp_truth = []
-    tmp_genPt = []
-    tmp_recoPt = []
-    tmp_passHEP = []
-    tmp_varsmap = {}
     for pt in event.genTopPt:
         hEffDen.Fill(pt)
         hEffHEPDen.Fill(pt)
     for i in xrange(len(event.cand_m)):
-        tmp_recoPt.append(event.cand_pt[i])
         inputList.append(dg.getData(event, i))
-        tmp_truth.append(event.genConstiuentMatchesVec[i])
-        tmp_genPt.append(event.genConstMatchGenPtVec[i])
-        tmp_passHEP.append(HEPReqs(event, i))
-        Varsval = dg.getData(event, i)
-        for j in xrange(len(Varsval)):
-            if varsname[j] in tmp_varsmap:
-                tmp_varsmap[varsname[j]].append(Varsval[j])
-            else:
-                tmp_varsmap[varsname[j]] = [Varsval[j]]
-    truth.append(tmp_truth)
-    genPt.append(tmp_genPt)
-    recoPt.append(tmp_recoPt)
-    passHEP.append(tmp_passHEP)
-    for key in tmp_varsmap.keys():
-        if key in varsmap:
-            varsmap[key].append(tmp_varsmap[key])
-        else:
-            varsmap[key] = [tmp_varsmap[key]]
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
@@ -261,48 +266,64 @@ output = clf.predict(npInputList)
 
 print "FILLING HISTOGRAMS"
 
+hnTops = ROOT.TH1D("hnTop", "hnTop", 6, 0, 6)
+hnTopsHEP = ROOT.TH1D("hnTopHEP", "hnTopHEP", 6, 0, 6)
+
 outputCount = 0;
-for i in xrange(len(truth)):
-    #prep output
-    nCands = len(truth[i])
+for event in fileValidation.slimmedTuple:
+    nCands = len(event.genConstiuentMatchesVec)
     tmp_output = []
+    passHEP = []
     for j in xrange(nCands):
         tmp_output.append(output[outputCount])
         outputCount += 1
-    for j in xrange(nCands):
-        hDisc.Fill(tmp_output[j])
-        hmatchGenPt.Fill(genPt[i][j])
-        if(tmp_output[j] > discCut):
-            hPurityDen.Fill(recoPt[i][j])
-            hNConstMatchTag.Fill(truth[i][j])
-            for vname in varsname:
-                if(histranges.has_key(vname)) : hist_tag[vname].Fill(varsmap[vname][i][j])
+        passHEP.append(HEPReqs(event, j))
+
+    tops = resolveOverlap(event, tmp_output, discCut)
+    topsHEP = resolveOverlapHEP(event, passHEP)
+    hnTops.Fill(len(tops))
+    hnTopsHEP.Fill(len(topsHEP))
+
+    for i in xrange(len(event.cand_m)):
+        #prep output
+        Varsval = dg.getData(event, i)
+
+        hDisc.Fill(tmp_output[i])
+        hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
+        if(tmp_output[i] > discCut):
+            hPurityDen.Fill(event.cand_pt[i])
+            hNConstMatchTag.Fill(event.genConstiuentMatchesVec[i])
+            for j, vname in enumerate(varsname):
+                if(histranges.has_key(vname)):
+                    hist_tag[vname].Fill(Varsval[j])
         else:
-            hNConstMatchNoTag.Fill(truth[i][j])
-            for vname in varsname:
-                if(histranges.has_key(vname)) : hist_notag[vname].Fill(varsmap[vname][i][j])
-        if(passHEP[i][j]):
-            hPurityHEPDen.Fill(recoPt[i][j])
-            hNConstMatchTagHEP.Fill(truth[i][j])
+            hNConstMatchNoTag.Fill(event.genConstiuentMatchesVec[i])
+            for j, vname in enumerate(varsname):
+                if(histranges.has_key(vname)):
+                    hist_notag[vname].Fill(Varsval[j])
+        passHEP = HEPReqs(event, i)
+        if(passHEP):
+            hPurityHEPDen.Fill(event.cand_pt[i])
+            hNConstMatchTagHEP.Fill(event.genConstiuentMatchesVec[i])
         else:
-            hNConstMatchNoTagHEP.Fill(truth[i][j])
+            hNConstMatchNoTagHEP.Fill(event.genConstiuentMatchesVec[i])
         #Truth matched candidates
-        if(truth[i][j] == 3):
+        if(event.genConstiuentMatchesVec[i] == 3):
             #pass reco discriminator threshold 
-            if(tmp_output[j] > discCut):
-                hEffNum.Fill(genPt[i][j])
-                hPurityNum.Fill(recoPt[i][j])
-            if(passHEP[i][j]):
-                hEffHEPNum.Fill(genPt[i][j])
-                hPurityHEPNum.Fill(recoPt[i][j])
-                hDiscMatch.Fill(tmp_output[j])
-            if(recoPt[i][j] > 250):
-                hDiscMatchPt.Fill(tmp_output[j])
+            if(tmp_output[i] > discCut):
+                hEffNum.Fill(event.genConstMatchGenPtVec[i])
+                hPurityNum.Fill(event.cand_pt[i])
+            if(passHEP):
+                hEffHEPNum.Fill(event.genConstMatchGenPtVec[i])
+                hPurityHEPNum.Fill(event.cand_pt[i])
+                hDiscMatch.Fill(tmp_output[i])
+            if(event.cand_pt[i] > 250):
+                hDiscMatchPt.Fill(tmp_output[i])
         #not truth matched 
         else:
-            hDiscNoMatch.Fill(tmp_output[j])
-            if(recoPt[i][j] > 250):
-                hDiscNoMatchPt.Fill(tmp_output[j])
+            hDiscNoMatch.Fill(tmp_output[i])
+            if(event.cand_pt[i] > 250):
+                hDiscNoMatchPt.Fill(tmp_output[i])
 
 
 print "FakeRate Calculation"                                        
@@ -381,7 +402,9 @@ for event in fileValidation.slimmedTuple:
         rocInput.append(dg.getData(event, i))
         rocScore.append((event.genConstiuentMatchesVec[i]==3))
         rocHEP.append(HEPReqs(event, i))
+
 rocOutput = clf.predict(rocInput)
+
 for i in xrange(len(rocOutput)):
     if(rocScore[i]):
         Nmatch= Nmatch+1
@@ -465,6 +488,14 @@ c.SetLogy()
 c.Print("discriminator_log_v2.png")
 
 c.SetLogy(False)
+
+#dra nTops Plot
+hnTops.SetLineColor(ROOT.kRed)
+hnTopsHEP.SetLineColor(ROOT.kBlue)
+hnTops.GetYaxis().SetRangeUser(0, 1.3*max(hnTops.GetMaximum(), hnTopsHEP.GetMaximum()))
+hnTops.Draw()
+hnTopsHEP.Draw("same")
+c.Print("nTops_v2.png")
 
 #draw num constituent matched plot
 
