@@ -13,6 +13,12 @@ make
 
 You can change the sample name, #events and ratio (training sample to validation sample)
 
+For sample to be used for fakerate calculation, Run the following command
+
+./makeTrainingTuples -f -D ZJetsToNuNu -E 10000 -R 1
+
+'f' option enable slection cut (met, Njet and Nbjet) for fakerate sample
+
 II. Running mva code
 
 Its a python file: sklearnTest.py, Lates version is sklearnTest_v2.py (later it will be merged in one)
