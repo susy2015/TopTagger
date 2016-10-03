@@ -16,7 +16,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        #["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -33,7 +34,7 @@ class DataGetter:
 #Variable histo declaration  
 dg = DataGetter()
 
-histranges = {"cand_m":[10, 50, 300], 
+histranges = {"cand_m":[20, 50, 300], 
               "cand_dRMax":[50,0,5],
               "cand_pt":[50,0,1000],
               "j1_m":[100, 0, 100],
@@ -101,43 +102,46 @@ print "PROCESSING TRAINING DATA"
 
 file = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep.root")
 
-ptThreshold = 150.0
-lowPtDownWeight = 10.0
+hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
+hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 
-NBg = 0.0
-NSig = 0.0
 for event in file.slimmedTuple:
     for i in xrange(len(event.genConstiuentMatchesVec)):
-        if event.cand_pt < ptThreshold:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0/lowPtDownWeight
-            else:
-                NBg += 1.0/lowPtDownWeight
+        if event.genConstiuentMatchesVec[i] == 3:
+            hPtMatch.Fill(event.cand_pt[i])
         else:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0
-            else:
-                NBg += 1.0
+            hPtNoMatch.Fill(event.cand_pt[i])
+
+NSig = 0.0#hPtMatch.Integral()
+NBg = 0.0#hPtNoMatch.Integral()
+
+#hPtMatch.Scale(1/hPtMatch.Integral())
+#hPtNoMatch.Scale(1/hPtNoMatch.Integral())
+
+hwMatch   = ROOT.TH1D("hwMatch",   "hwMatch",   1000, 0.0, 1.0)
+hwNoMatch = ROOT.TH1D("hwNoMatch", "hwNoMatch", 1000, 0.0, 1.0)
 
 inputData = []
 inputAnswer = []
 inputWgts = []
 for event in file.slimmedTuple:
     for i in xrange(len(event.cand_m)):
-        inputData.append(dg.getData(event, i))
-        nmatch = event.genConstiuentMatchesVec[i]
-        inputAnswer.append((nmatch == 3))
-        if event.cand_pt < ptThreshold:
+        #if(event.cand_pt[i] > 150):
+            inputData.append(dg.getData(event, i))
+            nmatch = event.genConstiuentMatchesVec[i]
+            inputAnswer.append(int(nmatch == 3))
             if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig / lowPtDownWeight)
+                inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                NSig += inputWgts[-1]
+                hwMatch.Fill(inputWgts[-1])
             else:
-                inputWgts.append((NSig+NBg)/NBg / lowPtDownWeight)
-        else:
-            if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig)
-            else:
-                inputWgts.append((NSig+NBg)/NBg)
+                inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                NBg += inputWgts[-1]
+                hwNoMatch.Fill(inputWgts[-1])
     
+
+print NSig, NBg
+
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
@@ -145,9 +149,9 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 print "TRAINING MVA"
 
 #clf = RandomForestClassifier(n_estimators=10)
-#clf = RandomForestRegressor(n_estimators=10)
+clf = RandomForestRegressor(n_estimators=100, n_jobs=4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
+#clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
 #clf = svm.SVC()
@@ -170,6 +174,31 @@ hEffHEPNum = ROOT.TH1D("hEffHEPNum", "hEffHEPNum", 25, 0.0, 1000.0)
 hEffHEPDen = ROOT.TH1D("hEffHEPDen", "hEffHEPDen", 25, 0.0, 1000.0)
 hPurityHEPNum = ROOT.TH1D("hPurityHEPNum", "hPurityHEPNum", 25, 0.0, 1000.0)
 hPurityHEPDen = ROOT.TH1D("hPurityHEPDen", "hPurityHEPDen", 25, 0.0, 1000.0)
+
+hDisc = ROOT.TH1D("disc", "disc", 20, 0, 1.0)
+hDiscMatch = ROOT.TH1D("discMatch", "discMatch", 20, 0, 1.0)
+hDiscMatch.SetLineColor(ROOT.kRed)
+hDiscNoMatch = ROOT.TH1D("discNoMatch", "discNoMatch", 20, 0, 1.0)
+hDiscNoMatch.SetLineColor(ROOT.kBlue)
+hDiscMatchPt = ROOT.TH1D("discMatchPt", "discMatchPt", 20, 0, 1.0)
+hDiscMatchPt.SetLineColor(ROOT.kRed)
+hDiscMatchPt.SetLineStyle(ROOT.kDashed)
+hDiscNoMatchPt = ROOT.TH1D("discNoMatchPt", "discNoMatchPt", 20, 0, 1.0)
+hDiscNoMatchPt.SetLineColor(ROOT.kBlue)
+hDiscNoMatchPt.SetLineStyle(ROOT.kDashed)
+
+hNConstMatchTag   = ROOT.TH1D("hNConstMatchTag",   "hNConstMatchTag",   6, -0.5, 5.5)
+hNConstMatchTag.SetLineColor(ROOT.kRed)
+hNConstMatchNoTag = ROOT.TH1D("hNConstMatchNoTag", "hNConstMatchNoTag", 6, -0.5, 5.5)
+hNConstMatchNoTag.SetLineColor(ROOT.kBlue)
+hNConstMatchTagHEP   = ROOT.TH1D("hNConstMatchTagHEP",   "hNConstMatchTagHEP",   6, -0.5, 5.5)
+hNConstMatchTagHEP.SetLineColor(ROOT.kRed)
+hNConstMatchTagHEP.SetLineStyle(ROOT.kDashed)
+hNConstMatchNoTagHEP = ROOT.TH1D("hNConstMatchNoTagHEP", "hNConstMatchNoTagHEP", 6, -0.5, 5.5)
+hNConstMatchNoTagHEP.SetLineColor(ROOT.kBlue)
+hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
+
+discCut = 0.15
 
 inputList = []
 truth = []
@@ -198,31 +227,6 @@ print "CALCULATING DISCRIMINATORS"
 output = clf.predict(inputList)
 
 print "FILLING HISTOGRAMS"
-
-hDisc = ROOT.TH1D("disc", "disc", 20, 0, 1.0)
-hDiscMatch = ROOT.TH1D("discMatch", "discMatch", 20, 0, 1.0)
-hDiscMatch.SetLineColor(ROOT.kRed)
-hDiscNoMatch = ROOT.TH1D("discNoMatch", "discNoMatch", 20, 0, 1.0)
-hDiscNoMatch.SetLineColor(ROOT.kBlue)
-hDiscMatchPt = ROOT.TH1D("discMatchPt", "discMatchPt", 20, 0, 1.0)
-hDiscMatchPt.SetLineColor(ROOT.kRed)
-hDiscMatchPt.SetLineStyle(ROOT.kDashed)
-hDiscNoMatchPt = ROOT.TH1D("discNoMatchPt", "discNoMatchPt", 20, 0, 1.0)
-hDiscNoMatchPt.SetLineColor(ROOT.kBlue)
-hDiscNoMatchPt.SetLineStyle(ROOT.kDashed)
-
-hNConstMatchTag   = ROOT.TH1D("hNConstMatchTag",   "hNConstMatchTag",   6, -0.5, 5.5)
-hNConstMatchTag.SetLineColor(ROOT.kRed)
-hNConstMatchNoTag = ROOT.TH1D("hNConstMatchNoTag", "hNConstMatchNoTag", 6, -0.5, 5.5)
-hNConstMatchNoTag.SetLineColor(ROOT.kBlue)
-hNConstMatchTagHEP   = ROOT.TH1D("hNConstMatchTagHEP",   "hNConstMatchTagHEP",   6, -0.5, 5.5)
-hNConstMatchTagHEP.SetLineColor(ROOT.kRed)
-hNConstMatchTagHEP.SetLineStyle(ROOT.kDashed)
-hNConstMatchNoTagHEP = ROOT.TH1D("hNConstMatchNoTagHEP", "hNConstMatchNoTagHEP", 6, -0.5, 5.5)
-hNConstMatchNoTagHEP.SetLineColor(ROOT.kBlue)
-hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
-
-discCut = 0.75
 
 for i in xrange(len(output)):
     hDisc.Fill(output[i])
@@ -258,9 +262,21 @@ for i in xrange(len(output)):
         if(recoPt[i] > 250):
             hDiscNoMatchPt.Fill(output[i])
 
+
 print "PLOTTING"
 
 c = ROOT.TCanvas("c1","c1",800,800)
+
+#Random plots
+
+hwMatch.SetLineColor(ROOT.kRed)
+hwMatch.Draw()
+hwNoMatch.Draw("same")
+c.SetLogx()
+c.SetLogy()
+c.Print("weights.png")
+c.SetLogx(False)
+c.SetLogy(False)
 
 #Draw discriminator plot
 
@@ -406,7 +422,7 @@ if isinstance(clf, GradientBoostingRegressor):
     #plt.title('Variable Importance')
     #plt.show()
     
-    print feature_importance
+    print zip(dg.getList(), feature_importance)
     print sorted_idx
 
 print "DONE!"
