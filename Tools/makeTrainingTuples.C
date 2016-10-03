@@ -86,10 +86,15 @@ private:
         const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
         const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("genDecayMomIdxVec");
 
-        std::vector<TLorentzVector> jetsLVec_forTagger;
+	std::vector<TLorentzVector> jetsLVec_forTagger;
         std::vector<double> recoJetsBtag_forTagger;
         std::vector<double> qgLikelihood_forTagger;
         AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger);
+
+	const double met=tr.getVar<double>("met");
+	int cntNJetsPt30 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Arr);
+	int cntCSVS = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVS, AnaConsts::bTagArr);
+
 
         //New Tagger starts here
         //prep input object (constituent) vector
@@ -172,6 +177,9 @@ private:
         //for now I just require that there is at least 1 top candidate 
         bool passMVABaseline = (topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
+	const bool passFRBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
+	tr.registerDerivedVar("passFRBaseline",passFRBaseline);
+	tr.registerDerivedVar("MET", met);
     }
 
 public:
@@ -181,7 +189,7 @@ public:
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
         //double variables list here
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec"};
     }
@@ -207,22 +215,27 @@ int main(int argc, char* argv[])
     int opt;
     int option_index = 0;
     static struct option long_options[] = {
-        {"condor",           no_argument, 0, 'c'},
+        {"fakerate",           no_argument, 0, 'f'},
+	{"condor",           no_argument, 0, 'c'},
         {"dataSets",   required_argument, 0, 'D'},
         {"numFiles",   required_argument, 0, 'N'},
         {"startFile",  required_argument, 0, 'M'},
         {"numEvts",    required_argument, 0, 'E'},
         {"ratio"  ,    required_argument, 0, 'R'},
     };
-
+    bool forFakeRate = false;
     bool runOnCondor = false;
     string dataSets = "", sampleloc = AnaSamples::fileDir, outFile = "trainingTuple", sampleRatios = "1:1";
     int nFiles = -1, startFile = 0, nEvts = -1, printInterval = 10000;
 
-    while((opt = getopt_long(argc, argv, "cD:N:M:E:R:", long_options, &option_index)) != -1)
+    while((opt = getopt_long(argc, argv, "fcD:N:M:E:R:", long_options, &option_index)) != -1)
     {
         switch(opt)
         {
+        case 'f':
+            forFakeRate = true;
+            break;
+
         case 'c':
             runOnCondor = true;
             break;
@@ -361,9 +374,11 @@ int main(int argc, char* argv[])
 
                         //Get cut variable 
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
-
-                        //fill mini tuple
-                        if(passMVABaseline)
+			const bool& passFRBaseline = tr.getVar<bool>("passFRBaseline");
+			//fill mini tuple
+			bool passbaseline = forFakeRate? passFRBaseline : passMVABaseline;
+			// if(passMVABaseline)
+			if(passbaseline)
                         {
                             mtmVec[mtmIndex].first->fill();
                             ++splitCounter;
