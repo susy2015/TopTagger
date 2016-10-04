@@ -251,9 +251,20 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
 discCut = 0.25
-
+cut =[]
+EffNumroc = [0 for i in range(20)]
+Effroc = [0 for i in range(20)]
+EffDenroc = 0
+FakeNumroc = [0 for i in range(20)]
+Fakeroc = [0 for i in range(20)]
+FakeDenroc = 0
+#cut.append(0)
+for j in range(20):
+    cut.append(round(j*0.05+0.05, 2))
+   
 inputList = []
 for event in fileValidation.slimmedTuple:
+    if(len(event.genTopPt)):EffDenroc += 1
     for pt in event.genTopPt:
         hEffDen.Fill(pt)
         hEffHEPDen.Fill(pt)
@@ -268,10 +279,13 @@ print "FILLING HISTOGRAMS"
 
 hnTops = ROOT.TH1D("hnTop", "hnTop", 6, 0, 6)
 hnTopsHEP = ROOT.TH1D("hnTopHEP", "hnTopHEP", 6, 0, 6)
+hnMVAcand = ROOT.TH1D("hnMVAcand", "hnMVAcand", 6, 0, 6)
+hnHEPcand = ROOT.TH1D("hnHEPcand", "hnHEPcand", 6, 0, 6)
 
 outputCount = 0;
 for event in fileValidation.slimmedTuple:
-    nCands = len(event.genConstiuentMatchesVec)
+    #nCands = len(event.genConstiuentMatchesVec)
+    nCands = len(event.cand_m)
     tmp_output = []
     passHEP = []
     for j in xrange(nCands):
@@ -283,14 +297,15 @@ for event in fileValidation.slimmedTuple:
     topsHEP = resolveOverlapHEP(event, passHEP)
     hnTops.Fill(len(tops))
     hnTopsHEP.Fill(len(topsHEP))
-
+    MVAcand =0
+    HEPcand =0
     for i in xrange(len(event.cand_m)):
         #prep output
         Varsval = dg.getData(event, i)
 
         hDisc.Fill(tmp_output[i])
-        hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
         if(tmp_output[i] > discCut):
+            MVAcand +=1
             hPurityDen.Fill(event.cand_pt[i])
             hNConstMatchTag.Fill(event.genConstiuentMatchesVec[i])
             for j, vname in enumerate(varsname):
@@ -303,12 +318,17 @@ for event in fileValidation.slimmedTuple:
                     hist_notag[vname].Fill(Varsval[j])
         passHEP = HEPReqs(event, i)
         if(passHEP):
+            HEPcand +=1
             hPurityHEPDen.Fill(event.cand_pt[i])
             hNConstMatchTagHEP.Fill(event.genConstiuentMatchesVec[i])
         else:
             hNConstMatchNoTagHEP.Fill(event.genConstiuentMatchesVec[i])
         #Truth matched candidates
         if(event.genConstiuentMatchesVec[i] == 3):
+            for k in xrange(len(cut)):
+                if(tmp_output[i] > cut[k]):
+                    EffNumroc[k] += 1
+            hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
             #pass reco discriminator threshold 
             if(tmp_output[i] > discCut):
                 hEffNum.Fill(event.genConstMatchGenPtVec[i])
@@ -316,7 +336,7 @@ for event in fileValidation.slimmedTuple:
             if(passHEP):
                 hEffHEPNum.Fill(event.genConstMatchGenPtVec[i])
                 hPurityHEPNum.Fill(event.cand_pt[i])
-                hDiscMatch.Fill(tmp_output[i])
+            hDiscMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscMatchPt.Fill(tmp_output[i])
         #not truth matched 
@@ -324,7 +344,8 @@ for event in fileValidation.slimmedTuple:
             hDiscNoMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscNoMatchPt.Fill(tmp_output[i])
-
+    hnMVAcand.Fill(MVAcand)
+    hnHEPcand.Fill(HEPcand)
 
 print "FakeRate Calculation"                                        
 #FakeRate
@@ -334,51 +355,46 @@ hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
 hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
 
-Zevt =0
-ZevtwidCand =0
-ZtotCand =0
-ZpasHEPcand =0
-ZevtpasHEP =0
-
 ZinvInput = []
+Zinvmet = []
+ZinvpassHEP = []
 for event in fileFakeRate.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
-
+        Zinvmet.append(event.MET)
+        ZinvpassHEP.append(HEPReqs(event, i))       
 zinvOutput = clf.predict(ZinvInput)
 
 outputCount = 0
 for event in fileFakeRate.slimmedTuple:
-    Zevt = Zevt+1
-    Zinvmet = []
-    ZinvpassHEP = []
+    FakeDenroc += 1
     hFakeDen.Fill(event.MET)
     hFakeDenHEP.Fill(event.MET)
     numflag = False
     numflagHEP = False
-    for i in xrange(len(event.cand_m)):
-        Zinvmet.append(event.MET)
-        ZinvpassHEP.append(HEPReqs(event, i))
-    if(len(event.cand_m)):
-        ZevtwidCand = ZevtwidCand+1
-        for j in xrange(len(event.cand_m)):
-            ZtotCand = ZtotCand+1
-            if(zinvOutput[outputCount] > discCut):
-                numflag = True
-            outputCount += 1
-            if(ZinvpassHEP[j]):
-                ZpasHEPcand = ZpasHEPcand+1
-                numflagHEP = True
-    if(numflag):hFakeNum.Fill(Zinvmet[i])
-    if(numflagHEP):
-        hFakeNumHEP.Fill(Zinvmet[i])
-        ZevtpasHEP = ZevtpasHEP+1
+    tagIdx = 0
+    tagIdxHEP = 0
+    numflagroc = [False for r in range(20)]
+    for j in xrange(len(event.cand_m)):
+        if(zinvOutput[outputCount] > discCut):
+            numflag = True
+            tagIdx = outputCount
+        if(ZinvpassHEP[outputCount]):
+            numflagHEP = True
+            tagIdxHEP = outputCount
+        for k in xrange(len(cut)):
+            if(zinvOutput[outputCount]>cut[k]):
+                numflagroc[k] = True
+        outputCount += 1
+    if(numflag):hFakeNum.Fill(Zinvmet[tagIdx])
+    if(numflagHEP):hFakeNumHEP.Fill(Zinvmet[tagIdxHEP])
+    for k in xrange(len(cut)):
+        if(numflagroc[k]):FakeNumroc[k] += 1
 
 print "ROC Calculation"
 #ttbar
-hroc = ROOT.TProfile("hroc", "hroc", 20, 0, 1, 0, 1)
-hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 20, 0, 1, 0, 1)
-cut =[]
+hroc = ROOT.TProfile("hroc", "hroc", 100, 0, 1, 0, 1)
+hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 100, 0, 1, 0, 1)
 TP = []
 FP = []
 TPR =[]
@@ -387,8 +403,7 @@ Nmatch = 0
 Nnomatch = 0
 TPHEP =0
 FPHEP =0
-for j in range(19):
-    cut.append(round(j*0.05+0.05, 2))
+for j in range(20):
     TP.append(0)
     FP.append(0)
     TPR.append(0)
@@ -425,9 +440,12 @@ TPRHEP = float(TPHEP)/Nmatch
 FPRHEP = float(FPHEP)/Nnomatch
 hroc_HEP.Fill(FPRHEP,TPRHEP)
 
+print "TPR: ", TPR
+print "FPR: ", FPR
+
 #Zinv
-hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 20, 0, 1, 0, 1)
-hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 20, 0, 1, 0, 1)
+hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 100, 0, 1, 0, 1)
+hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
 FPZ = []
 FPRZ =[]
 NnomatchZ = 0
@@ -435,7 +453,7 @@ FPHEPZ =0
 FPRHEPZ =0
 rocInputZ = []
 rocHEPZ = []
-for j in range(19):
+for j in range(20):
     FPZ.append(0)
     FPRZ.append(0)
 for event in fileFakeRate.slimmedTuple:
@@ -454,6 +472,16 @@ for j in xrange(len(cut)):
     hrocZ.Fill(FPRZ[j],TPR[j])
 FPRHEPZ = float(FPHEPZ)/NnomatchZ
 hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
+
+hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 0.3, 0, 0.3)
+hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
+for j in xrange(len(cut)):
+    Effroc[j] = float(EffNumroc[j])/EffDenroc
+    Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
+    hroc_alt.Fill(Fakeroc[j], Effroc[j])
+
+print "EffDenroc: ", EffDenroc
+print "EffNumroc: ", EffNumroc
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -489,12 +517,26 @@ c.Print("discriminator_log_v2.png")
 
 c.SetLogy(False)
 
-#dra nTops Plot
+#draw nTops Plot
 hnTops.SetLineColor(ROOT.kRed)
+hnMVAcand.SetLineColor(ROOT.kRed)
+hnMVAcand.SetLineStyle(ROOT.kDashed)
 hnTopsHEP.SetLineColor(ROOT.kBlue)
-hnTops.GetYaxis().SetRangeUser(0, 1.3*max(hnTops.GetMaximum(), hnTopsHEP.GetMaximum()))
+hnHEPcand.SetLineColor(ROOT.kBlue)
+hnHEPcand.SetLineStyle(ROOT.kDashed)
+hnTops.GetYaxis().SetRangeUser(0, 1.3*max([hnTops.GetMaximum(), hnTopsHEP.GetMaximum(), hnMVAcand.GetMaximum(), hnHEPcand.GetMaximum()]))
+leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+leg.AddEntry(hnTops,"Resolved tops (MVA)")
+leg.AddEntry(hnTopsHEP,"Resolved tops (HEP)")
+#leg.AddEntry(hnMVAcand,"Disc. passed candidates (MVA)")
+#leg.AddEntry(hnHEPcand,"HEP passed candidates (HEP)")
+hnTops.SetStats(0)
+hnTops.SetTitle("")
 hnTops.Draw()
 hnTopsHEP.Draw("same")
+#hnMVAcand.Draw("same")
+#hnHEPcand.Draw("same")
+leg.Draw("same")
 c.Print("nTops_v2.png")
 
 #draw num constituent matched plot
@@ -544,10 +586,16 @@ hGenPt = hEffDen.Clone("hGenPt")
 hGenPt.SetLineColor(ROOT.kBlue)
 hmatchGenPt.SetLineColor(ROOT.kBlack)
 hGenPtDisc.SetLineColor(ROOT.kRed)
-hmatchGenPt.Draw()
-hGenPt.Draw("same")
+leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+leg.AddEntry(hGenPt, "p_{T} of all gen tops")
+leg.AddEntry(hmatchGenPt, "p_{T} of gen tops mached to a cand")
+leg.AddEntry(hGenPtDisc, "p_{T} of gen tops mached to a disc. passed cand")
+hGenPt.SetTitle("")
+hGenPt.SetStats(0)
+hGenPt.Draw()
+hmatchGenPt.Draw("same")
 hGenPtDisc.Draw("same")
-
+leg.Draw("same")
 c.Print("GentopPt_v2.png")
 
 hEff = hEffNum.Clone("hEff")
@@ -568,51 +616,47 @@ hEffHEPNum.Draw("same")
 leg.Draw("same")
 c.Print("efficiency_v2.png")
 
+print "EffDen: ", hEffDen.Integral()
+print "EffNum: ", hEffNum.Integral()
+
 #draw purity
-
-leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
-leg.AddEntry(hNConstMatchTag, "Top Tagged (MVA)")
-leg.AddEntry(hNConstMatchNoTag, "Not Top Tagged (MVA)")
-leg.AddEntry(hNConstMatchTagHEP, "Top Tagged (HEP)")
-leg.AddEntry(hNConstMatchNoTagHEP, "Not Top Tagged (HEP)")
-
-hPurityNum.SetStats(0)
-hPurityNum.SetTitle("")
-hPurityNum.GetXaxis().SetTitle("reco top Pt [GeV]")
-hPurityNum.GetYaxis().SetTitle("Purity")
-hPurityNum.GetXaxis().SetTitle("reco top Pt [GeV]")
-hPurityNum.GetYaxis().SetRangeUser(0, 1)
-
-hPurityNum.SetLineColor(ROOT.kRed)
+hPurity = hPurityNum.Clone("hPurity")
+hPurity.SetStats(0)
+hPurity.SetTitle("")
+hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
+hPurity.GetYaxis().SetTitle("Purity")
+hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
+hPurity.GetYaxis().SetRangeUser(0, 1)
+hPurity.Divide(hPurityDen)
+hPurityHEPNum.Divide(hPurityHEPDen)
+hPurity.SetLineColor(ROOT.kRed)
 hPurityHEPNum.SetLineColor(ROOT.kBlue)
 
 leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
-leg.AddEntry(hPurityNum, "MVA")
+leg.AddEntry(hPurity, "MVA")
 leg.AddEntry(hPurityHEPNum, "HEP")
 
-
-hPurityNum.Divide(hPurityDen)
-hPurityHEPNum.Divide(hPurityHEPDen)
-hPurityNum.Draw()
+hPurity.Draw()
 hPurityHEPNum.Draw("same")
 leg.Draw("same")
 c.Print("purity_v2.png")
 
 #FakeRate
-hFakeNum.SetStats(0)
-hFakeNum.SetTitle("")
-hFakeNum.GetXaxis().SetTitle("met [GeV]")
-hFakeNum.GetYaxis().SetTitle("FakeRate")
+hFakeRate = hFakeNum.Clone("hFakeRate")
+hFakeRate.SetStats(0)
+hFakeRate.SetTitle("")
+hFakeRate.GetXaxis().SetTitle("met [GeV]")
+hFakeRate.GetYaxis().SetTitle("FakeRate")
 leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
-leg.AddEntry(hFakeNum, "MVA")
+leg.AddEntry(hFakeRate, "MVA")
 leg.AddEntry(hFakeNumHEP, "HEP")
-hFakeNum.Divide(hFakeDen)
-hFakeNum.GetYaxis().SetRangeUser(0, 1)
+hFakeRate.Divide(hFakeDen)
+hFakeRate.GetYaxis().SetRangeUser(0, 1)
 hFakeNumHEP.Divide(hFakeDenHEP)
 hFakeNumHEP.GetYaxis().SetRangeUser(0, 1)
-hFakeNum.SetLineColor(ROOT.kRed)
+hFakeRate.SetLineColor(ROOT.kRed)
 hFakeNumHEP.SetLineColor(ROOT.kBlue)
-hFakeNum.Draw()
+hFakeRate.Draw()
 hFakeNumHEP.Draw("same")
 leg.Draw("same")
 c.Print("FakeRate_v2.png")
@@ -621,12 +665,15 @@ c.Print("FakeRate_v2.png")
 hroc.SetStats(0)
 hroc.SetXTitle("FPR")
 hroc.SetYTitle("TPR")
+hroc.GetYaxis().SetRangeUser(0, 1)
 hroc_HEP.SetStats(0)
 hroc_HEP.SetLineColor(ROOT.kRed)
 hroc_HEP.SetMarkerColor(ROOT.kRed)
 hroc_HEP.SetMarkerStyle(20)
 hroc_HEP.SetMarkerSize(1)
-hroc.Draw()
+hroc.SetMarkerStyle(20)
+hroc.SetMarkerSize(1)
+hroc.Draw("pe")
 hroc_HEP.Draw("samePE")
 c.Print("roc_v2.png")
 
@@ -638,9 +685,19 @@ hroc_HEPZ.SetLineColor(ROOT.kRed)
 hroc_HEPZ.SetMarkerColor(ROOT.kRed)
 hroc_HEPZ.SetMarkerStyle(20)
 hroc_HEPZ.SetMarkerSize(1)
+hrocZ.SetMarkerStyle(20)
+hrocZ.SetMarkerSize(1)
+hrocZ.GetYaxis().SetRangeUser(0, 1)
 hrocZ.Draw()
 hroc_HEPZ.Draw("samePE")
 c.Print("rocZ_v2.png")
+
+hroc_alt.SetStats(0)
+hroc_alt.SetXTitle("FakeRate")
+hroc_alt.SetYTitle("Efficiency")
+hroc_alt.GetYaxis().SetRangeUser(0, 0.3)
+hroc_alt.Draw()
+c.Print("roc_alt_v2.png")
 
 #with open("iris.dot", 'w') as f:
 #    f = tree.export_graphviz(clf, out_file=f,
@@ -668,11 +725,6 @@ if isinstance(clf, GradientBoostingRegressor):
 print "DONE!"
 
 #Writing histograms in a root file.
-hEff = hEffNum.Clone("hEff")
-hEffHEP = hEffHEPNum.Clone("hEffHEP")
-hPurity = hPurityNum.Clone("hPurity")
-hPurityHEP = hPurityHEPNum.Clone("hPurityHEP")
-
 mf = ROOT.TFile('MVAOutput.root','RECREATE')
 hDiscMatch.Write()
 hDiscNoMatch.Write()
@@ -686,9 +738,10 @@ for h in hist_tag:
     hist_tag[h].Write()
     hist_notag[h].Write()
 hEff.Write()
-hEffHEP.Write()
+#hEffHEP.Write()
 hPurity.Write()
-hPurityHEP.Write()
+#hPurityHEP.Write()
+hFakeRate.Write()
 hroc.Write()
 hroc_HEP.Write()
 hrocZ.Write()
