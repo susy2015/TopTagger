@@ -190,12 +190,12 @@ private:
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
         //Generate basic MVA selection 
-        //for now I just require that there is at least 1 top candidate 
         bool passMVABaseline = true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
 	const bool passFRBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
 	tr.registerDerivedVar("passFRBaseline",passFRBaseline);
 	tr.registerDerivedVar("MET", met);
+	tr.registerDerivedVar("Njet",cntNJetsPt30);
     }
 
 public:
@@ -208,7 +208,7 @@ public:
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
         allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
         //integer values list here
-        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec","met", "nConstituents"};
+        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet"};
     }
 
     std::set<std::string> getVarSet()

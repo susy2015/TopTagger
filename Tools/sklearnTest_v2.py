@@ -176,7 +176,8 @@ hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
 hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
 
-NEVTS = 1e10
+NEVTS = 1e3
+NEVTS_Z = 1e3
 
 Nevts = 0
 for event in trainingfile_ttbar.slimmedTuple:
@@ -188,8 +189,6 @@ for event in trainingfile_ttbar.slimmedTuple:
             hPtMatch.Fill(event.cand_pt[i])
         else:
             hPtNoMatch.Fill(event.cand_pt[i])
-
-NEVTS_Z = 1e10
 
 Nevts = 0
 for event in trainingfile_znunu.slimmedTuple:
@@ -313,17 +312,14 @@ hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 discCut = 0.08
 
 cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
-EffNumroc = [0 for i in range(len(cut))]
-Effroc = [0 for i in range(len(cut))]
+EffNumroc = len(cut) * [0]
+Effroc =    len(cut) * [0]
 EffDenroc = 0
-FakeNumroc = [0 for i in range(len(cut))]
-Fakeroc = [0 for i in range(len(cut))]
+EffNumrocHEP = 0
+FakeNumroc = len(cut) * [0]
+Fakeroc =    len(cut) * [0]
 FakeDenroc = 0
-
-print len(cut), cut
-#cut.append(0)
-#for j in range(20):
-#    cut.append(round(j*0.05+0.05, 2))
+FakeNumrocHEP = 0
    
 inputList = []
 
@@ -351,7 +347,6 @@ for event in fileValidation.slimmedTuple:
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
-#output = clf.predict(npInputList)
 output = clf.predict_proba(npInputList)[:,1]
 
 print "FILLING HISTOGRAMS"
@@ -360,13 +355,19 @@ hnTops = ROOT.TH1D("hnTop", "hnTop", 6, 0, 6)
 hnTopsHEP = ROOT.TH1D("hnTopHEP", "hnTopHEP", 6, 0, 6)
 hnMVAcand = ROOT.TH1D("hnMVAcand", "hnMVAcand", 6, 0, 6)
 hnHEPcand = ROOT.TH1D("hnHEPcand", "hnHEPcand", 6, 0, 6)
-
+evtWidcand = 0
+cand = 0
+matchcand = 0
+nomatchcand =0
 outputCount = 0;
 Nevts = 0
 for event in fileValidation.slimmedTuple:
     if Nevts >= NEVTS:
         break
     Nevts += 1
+    if(len(event.cand_m)):
+        evtWidcand+=1
+    cand +=len(event.cand_m)
     #nCands = len(event.genConstiuentMatchesVec)
     nCands = len(event.cand_m)
     tmp_output = []
@@ -408,6 +409,7 @@ for event in fileValidation.slimmedTuple:
             hNConstMatchNoTagHEP.Fill(event.genConstiuentMatchesVec[i])
         #Truth matched candidates
         if(event.genConstiuentMatchesVec[i] == 3):
+            matchcand += 1
             for k in xrange(len(cut)):
                 if(tmp_output[i] > cut[k]):
                     EffNumroc[k] += 1
@@ -419,16 +421,24 @@ for event in fileValidation.slimmedTuple:
             if(passHEP):
                 hEffHEPNum.Fill(event.genConstMatchGenPtVec[i])
                 hPurityHEPNum.Fill(event.cand_pt[i])
+                EffNumrocHEP +=1
             hDiscMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscMatchPt.Fill(tmp_output[i])
         #not truth matched 
         else:
+            nomatchcand += 1
             hDiscNoMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscNoMatchPt.Fill(tmp_output[i])
     hnMVAcand.Fill(MVAcand)
     hnHEPcand.Fill(HEPcand)
+
+print "evt: ", Nevts
+print "evtWidcand: ", evtWidcand
+print "cand: ", cand
+print "matchcand: ", matchcand
+print "nomatchcand: ", nomatchcand
 
 print "FakeRate Calculation"                                        
 #FakeRate
@@ -437,14 +447,12 @@ hFakeNum = ROOT.TH1D("hFakeNum", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
 hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
-
-hFakeNjNum = ROOT.TH1D("hFakeNjNum", "hFakeNjNum", 20, 0.0, 20.0)
-hFakeNjDen = ROOT.TH1D("hFakeNjDen", "hFakeNjDen", 20, 0.0, 20.0)
-hFakeNjNumHEP = ROOT.TH1D("hFakeNjNumHEP", "hFakeNjNum", 20, 0.0, 20.0)
-hFakeNjDenHEP = ROOT.TH1D("hFakeNjDenHEP", "hFakeNjDen", 20, 0.0, 20.0)
+hFakeNum_njet = ROOT.TH1D("hFakeNum_njet", "hFakeNum_njet", 20, 0, 20)
+hFakeDen_njet = ROOT.TH1D("hFakeDen_njet", "hFakeDen_njet", 20, 0, 20)
+hFakeNumHEP_njet = ROOT.TH1D("hFakeNumHEP_njet", "hFakeNumHEP_njet", 20, 0, 20)
+hFakeDenHEP_njet = ROOT.TH1D("hFakeDenHEP_njet", "hFakeDenHEP_njet", 20, 0, 20)
 
 ZinvInput = []
-Zinvmet = []
 ZinvpassHEP = []
 Nevts = 0
 for event in fileFakeRate.slimmedTuple:
@@ -453,7 +461,6 @@ for event in fileFakeRate.slimmedTuple:
     Nevts +=1
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
-        Zinvmet.append(event.MET)
         ZinvpassHEP.append(HEPReqs(event, i))       
 zinvOutput = clf.predict_proba(ZinvInput)[:,1]
 
@@ -468,13 +475,11 @@ for event in fileFakeRate.slimmedTuple:
     Nevts +=1
     FakeDenroc += 1
     hFakeDen.Fill(event.MET)
+    hFakeDen_njet.Fill(event.Njet)
     hFakeDenHEP.Fill(event.MET)
-    hFakeNjDen.Fill(event.nConstituents)
-    hFakeNjDenHEP.Fill(event.nConstituents)
+    hFakeDenHEP_njet.Fill(event.Njet)
     numflag = False
     numflagHEP = False
-    tagIdx = 0
-    tagIdxHEP = 0
     numflagroc = [False for r in range(len(cut))]
     tops = resolveOverlap(event, zinvOutput, discCut)
     topsHEP = resolveOverlapHEP(event, ZinvpassHEP)
@@ -484,20 +489,19 @@ for event in fileFakeRate.slimmedTuple:
     for j in xrange(len(event.cand_m)):
         if(zinvOutput[outputCount] > discCut):
             numflag = True
-            tagIdx = outputCount
         if(ZinvpassHEP[outputCount]):
             numflagHEP = True
-            tagIdxHEP = outputCount
         for k in xrange(len(cut)):
             if(zinvOutput[outputCount]>cut[k]):
                 numflagroc[k] = True
         outputCount += 1
     if(numflag):
-        hFakeNum.Fill(Zinvmet[tagIdx])
-        hFakeNjNum.Fill(event.nConstituents)
+        hFakeNum.Fill(event.MET)
+        hFakeNum_njet.Fill(event.Njet)
     if(numflagHEP):
-        hFakeNumHEP.Fill(Zinvmet[tagIdxHEP])
-        hFakeNjNumHEP.Fill(event.nConstituents)
+        hFakeNumHEP.Fill(event.MET)
+        hFakeNumHEP_njet.Fill(event.Njet)
+        FakeNumrocHEP += 1
     for k in xrange(len(cut)):
         if(numflagroc[k]):FakeNumroc[k] += 1
 
@@ -513,6 +517,7 @@ Nmatch = 0
 Nnomatch = 0
 TPHEP =0
 FPHEP =0
+
 print "cut:", cut
 
 rocOutput = clf.predict_proba(rocInput)[:,1]
@@ -543,16 +548,13 @@ print "FPR: ", FPR
 #Zinv
 hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 100, 0, 1, 0, 1)
 hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
-FPZ = []
-FPRZ =[]
+FPZ  = len(cut) * [0]
+FPRZ = len(cut) * [0]
 NnomatchZ = 0
 FPHEPZ =0
 FPRHEPZ =0
 rocInputZ = []
 rocHEPZ = []
-for j in range(len(cut)):
-    FPZ.append(0)
-    FPRZ.append(0)
 for event in fileFakeRate.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         rocInputZ.append(dg.getData(event, i))
@@ -570,12 +572,15 @@ for j in xrange(len(cut)):
 FPRHEPZ = float(FPHEPZ)/NnomatchZ
 hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
 
-hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 0.3, 0, 0.3)
+hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 0.5, 0, 0.5)
 hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
 for j in xrange(len(cut)):
     Effroc[j] = float(EffNumroc[j])/EffDenroc
     Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
     hroc_alt.Fill(Fakeroc[j], Effroc[j])
+EffrocHEP = float(EffNumrocHEP)/EffDenroc
+FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
+hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
 
 print "EffDenroc: ", EffDenroc
 print "EffNumroc: ", EffNumroc
@@ -625,14 +630,14 @@ hnTops.GetYaxis().SetRangeUser(0, 1.3*max([hnTops.GetMaximum(), hnTopsHEP.GetMax
 leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
 leg.AddEntry(hnTops,"Resolved tops (MVA)")
 leg.AddEntry(hnTopsHEP,"Resolved tops (HEP)")
-#leg.AddEntry(hnMVAcand,"Disc. passed candidates (MVA)")
-#leg.AddEntry(hnHEPcand,"HEP passed candidates (HEP)")
+leg.AddEntry(hnMVAcand,"Disc. passed candidates (MVA)")
+leg.AddEntry(hnHEPcand,"HEP passed candidates (HEP)")
 hnTops.SetStats(0)
 hnTops.SetTitle("")
 hnTops.Draw()
 hnTopsHEP.Draw("same")
-#hnMVAcand.Draw("same")
-#hnHEPcand.Draw("same")
+hnMVAcand.Draw("same")
+hnHEPcand.Draw("same")
 leg.Draw("same")
 c.Print("nTops_v2.png")
 
@@ -739,7 +744,7 @@ hPurity.SetTitle("")
 hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
 hPurity.GetYaxis().SetTitle("Purity")
 hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
-hPurity.GetYaxis().SetRangeUser(0, 1)
+hPurity.GetYaxis().SetRangeUser(0, 1.3)
 hPurity.Divide(hPurityDen)
 hPurityHEPNum.Divide(hPurityHEPDen)
 hPurity.SetLineColor(ROOT.kRed)
@@ -764,9 +769,9 @@ leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
 leg.AddEntry(hFakeRate, "MVA")
 leg.AddEntry(hFakeNumHEP, "HEP")
 hFakeRate.Divide(hFakeDen)
-hFakeRate.GetYaxis().SetRangeUser(0, 1)
+hFakeRate.GetYaxis().SetRangeUser(0, 1.3)
 hFakeNumHEP.Divide(hFakeDenHEP)
-hFakeNumHEP.GetYaxis().SetRangeUser(0, 1)
+hFakeNumHEP.GetYaxis().SetRangeUser(0, 1.3)
 hFakeRate.SetLineColor(ROOT.kRed)
 hFakeNumHEP.SetLineColor(ROOT.kBlue)
 hFakeRate.Draw()
@@ -774,28 +779,28 @@ hFakeNumHEP.Draw("same")
 leg.Draw("same")
 c.Print("FakeRate_v2.png")
 
-#FakeRate Nj
-hFakeRateNj = hFakeNjNum.Clone("hFakeRateNj")
-hFakeRateNj.SetStats(0)
-hFakeRateNj.SetTitle("")
-hFakeRateNj.GetXaxis().SetTitle("N_{j}")
-hFakeRateNj.GetYaxis().SetTitle("FakeRate")
+hFakeRate_njet = hFakeNum_njet.Clone("hFakeRate_njet")
+hFakeRate_njet.SetStats(0)
+hFakeRate_njet.SetTitle("")
+hFakeRate_njet.GetXaxis().SetTitle("N_{jet}")
+hFakeRate_njet.GetYaxis().SetTitle("FakeRate")
 leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
-leg.AddEntry(hFakeRateNj, "MVA")
-leg.AddEntry(hFakeNjNumHEP, "HEP")
-hFakeRateNj.Divide(hFakeNjDen)
-hFakeRateNj.GetYaxis().SetRangeUser(0, 1.3)
-hFakeNjNumHEP.Divide(hFakeNjDenHEP)
-#hFakeNjNumHEP.GetYaxis().SetRangeUser(0, 1)
-hFakeRateNj.SetLineColor(ROOT.kRed)
-hFakeNjNumHEP.SetLineColor(ROOT.kBlue)
-hFakeRateNj.Draw()
-hFakeNjNumHEP.Draw("same")
+leg.AddEntry(hFakeRate_njet, "MVA")
+leg.AddEntry(hFakeNumHEP_njet, "HEP")
+hFakeRate_njet.Divide(hFakeDen_njet)
+hFakeRate_njet.GetYaxis().SetRangeUser(0, 1.3)
+hFakeNumHEP_njet.Divide(hFakeDenHEP_njet)
+hFakeNumHEP_njet.GetYaxis().SetRangeUser(0, 1.3)
+hFakeRate_njet.SetLineColor(ROOT.kRed)
+hFakeNumHEP_njet.SetLineColor(ROOT.kBlue)
+hFakeRate_njet.Draw()
+hFakeNumHEP_njet.Draw("same")
 leg.Draw("same")
-c.Print("FakeRate_nj_v2.png")
+c.Print("FakeRate_njet_v2.png")
 
 #print roc
 hroc.SetStats(0)
+hroc.SetTitle("ROC:Objectwise (t#bart)")
 hroc.SetXTitle("FPR")
 hroc.SetYTitle("TPR")
 hroc.GetYaxis().SetRangeUser(0, 1)
@@ -810,6 +815,7 @@ hroc.Draw("pe")
 hroc_HEP.Draw("samePE")
 c.Print("roc_v2.png")
 
+hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
 hrocZ.SetStats(0)
 hrocZ.SetXTitle("FPR")
 hrocZ.SetYTitle("TPR")
@@ -825,11 +831,20 @@ hrocZ.Draw()
 hroc_HEPZ.Draw("samePE")
 c.Print("rocZ_v2.png")
 
+hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
 hroc_alt.SetStats(0)
 hroc_alt.SetXTitle("FakeRate")
 hroc_alt.SetYTitle("Efficiency")
-hroc_alt.GetYaxis().SetRangeUser(0, 0.3)
-hroc_alt.Draw()
+hroc_alt.GetYaxis().SetRangeUser(0, 0.5)
+hroc_HEP_alt.SetStats(0)
+hroc_HEP_alt.SetLineColor(ROOT.kRed)
+hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
+hroc_HEP_alt.SetMarkerStyle(20)
+hroc_HEP_alt.SetMarkerSize(1)
+hroc_alt.SetMarkerStyle(20)
+hroc_alt.SetMarkerSize(1)
+hroc_alt.Draw("pe")
+hroc_HEP_alt.Draw("samePE")
 c.Print("roc_alt_v2.png")
 
 #with open("iris.dot", 'w') as f:
