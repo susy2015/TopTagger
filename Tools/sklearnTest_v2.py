@@ -1,7 +1,6 @@
 import ROOT
 import numpy
 import math
-#import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 import sklearn.tree as tree
@@ -9,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import svm
 from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 
 
@@ -26,14 +26,10 @@ class DataGetter:
     def getList(self):
         return self.list
 
-#def getData(event, i):
-#    return [event.cand_m[i], event.cand_dRMax[i], event.cand_pt[i], event.j12_m[i], event.j13_m[i], event.j23_m[i], event.dR12[i], event.dR23[i], event.dR13[i], event.j1_pt[i], event.j2_pt[i], event.j3_pt[i], event.j1_m[i], event.j2_m[i], event.j3_m[i], event.j1_CSV[i], event.j2_CSV[i], event.j3_CSV[i], event.j12j3_dR[i], event.j13j2_dR[i], event.j23j1_dR[i]]
-
-
 #Variable histo declaration  
 dg = DataGetter()
 
-histranges = {"cand_m":[10, 50, 300], 
+histranges = {"cand_m":[20, 50, 300], 
               "cand_dRMax":[50,0,5],
               "cand_pt":[50,0,1000],
 #              "j1_m":[100, 0, 100],
@@ -176,8 +172,8 @@ hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
 hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
 
-NEVTS = 1e3
-NEVTS_Z = 1e3
+NEVTS = 1e10
+NEVTS_Z = 1e10
 
 Nevts = 0
 for event in trainingfile_ttbar.slimmedTuple:
@@ -254,9 +250,10 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 
 print "TRAINING MVA"
 
-clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
+#clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
 #clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
+clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0)
 #clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
@@ -309,7 +306,7 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
-discCut = 0.08
+discCut = 0.75
 
 cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
 EffNumroc = len(cut) * [0]
@@ -847,28 +844,29 @@ hroc_alt.Draw("pe")
 hroc_HEP_alt.Draw("samePE")
 c.Print("roc_alt_v2.png")
 
-#with open("iris.dot", 'w') as f:
-#    f = tree.export_graphviz(clf, out_file=f,
-#                             feature_names = ["cand_m", "cand_pt", "cand_dRMax"],
-#                             class_names = ["background", "top"],
-#                             filled=True, rounded=True)
-
 # Plot feature importance
-if isinstance(clf, GradientBoostingRegressor):
-    feature_importance = clf.feature_importances_
+feature_importance = clf.feature_importances_
+feature_names = numpy.array(dg.getList())
+feature_importance = 100.0 * (feature_importance / feature_importance.max())
+sorted_idx = numpy.argsort(feature_importance)
+
+#try to plot it with matplotlib
+try:
+    import matplotlib.pyplot as plt
+
     # make importances relative to max importance
-    feature_importance = 100.0 * (feature_importance / feature_importance.max())
-    sorted_idx = numpy.argsort(feature_importance)
     pos = numpy.arange(sorted_idx.shape[0]) + .5
     #plt.subplot(1, 2, 2)
-    #plt.barh(pos, feature_importance[sorted_idx], align='center')
-    #plt.yticks(pos, boston.feature_names[sorted_idx])
-    #plt.xlabel('Relative Importance')
-    #plt.title('Variable Importance')
+    plt.barh(pos, feature_importance[sorted_idx], align='center')
+    plt.yticks(pos, feature_names[sorted_idx])
+    plt.xlabel('Relative Importance')
+    plt.title('Variable Importance')
     #plt.show()
-    
-    print zip(dg.getList(), feature_importance)
-    print sorted_idx
+    plt.savefig("feature_importance.png")
+except ImportError:
+    #I guess no matplotlib is installed, just print to screen?
+    featureImportanceandNames = zip(feature_names, feature_importance)
+    print [featureImportanceandNames[a] for a in sorted_idx].reverse()
 
 print "DONE!"
 
