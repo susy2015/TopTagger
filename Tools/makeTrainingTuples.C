@@ -131,38 +131,52 @@ private:
             vh.add("cand_dRMax", topCand.getDRmax() );
 
             //Get Constituents
-            const std::vector<Constituent const *>& constituents = topCand.getConstituents();
+            const std::vector<Constituent const *>& top_constituents = topCand.getConstituents();
+            
+            std::vector<Constituent> RF_constituents;
+
+            for(const auto& constitutent : top_constituents)
+            {
+                TLorentzVector p4(constitutent->p());
+                p4.Boost(-topCand.p().BoostVector());
+                RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
+            }
+                
+            //re-sort constituents by p after deboosting
+            std::sort(RF_constituents.begin(), RF_constituents.end(), [](const Constituent& c1, const Constituent& c2){ return c1.p().P() > c2.p().P(); });
 
             //Get constituent variables
             //std::cout << "\tconst vec size: " << constituents.size() << std::endl;
-            for(int i = 0; i < constituents.size(); ++i)
+            for(int i = 0; i < RF_constituents.size(); ++i)
             {
-                vh.add("j" + std::to_string(i + 1) + "_pt",    constituents[i]->p().Pt()          );
-                vh.add("j" + std::to_string(i + 1) + "_eta",   constituents[i]->p().Eta()         );
-                vh.add("j" + std::to_string(i + 1) + "_phi",   constituents[i]->p().Phi()         );
-                vh.add("j" + std::to_string(i + 1) + "_m",     constituents[i]->p().M()           );
-                vh.add("j" + std::to_string(i + 1) + "_CSV",   constituents[i]->getBTagDisc()     );
-                vh.add("j" + std::to_string(i + 1) + "_QGL",   constituents[i]->getQGLikelihood() );
+                vh.add("j" + std::to_string(i + 1) + "_pt",    RF_constituents[i].p().P()           );
+                vh.add("j" + std::to_string(i + 1) + "_eta",   RF_constituents[i].p().Angle(topCand.p().Vect())         );
+                vh.add("j" + std::to_string(i + 1) + "_phi",   RF_constituents[i].p().Phi()         );
+                vh.add("j" + std::to_string(i + 1) + "_m",     RF_constituents[i].p().M()           );
+                vh.add("j" + std::to_string(i + 1) + "_CSV",   RF_constituents[i].getBTagDisc()     );
+                vh.add("j" + std::to_string(i + 1) + "_QGL",   RF_constituents[i].getQGLikelihood() );
 
                 //index of next jet (assumes < 4 jets)
-                int iNext = (i + 1) % constituents.size();
+                int iNext = (i + 1) % RF_constituents.size();
                 int iMin = std::min(i, iNext);
                 int iMax = std::max(i, iNext);
 
                 //Calculate delta angle variables
-                double dR   = ROOT::Math::VectorUtil::DeltaR(constituents[iMin]->p(), constituents[iMax]->p());
-                double dPhi = ROOT::Math::VectorUtil::DeltaPhi(constituents[iMin]->p(), constituents[iMax]->p());
-                double dEta = constituents[iMin]->p().Eta() - constituents[iMax]->p().Eta();
+                double dR   = ROOT::Math::VectorUtil::DeltaR(RF_constituents[iMin].p(), RF_constituents[iMax].p());
+                double dPhi = ROOT::Math::VectorUtil::DeltaPhi(RF_constituents[iMin].p(), RF_constituents[iMax].p());
+                double dEta = RF_constituents[iMin].p().Eta() - RF_constituents[iMax].p().Eta();
                 vh.add("dR"   + std::to_string(iMin + 1) + std::to_string(iMax + 1), dR);
-                vh.add("dPhi" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dPhi);
+                //vh.add("dPhi" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dPhi);
+                vh.add("dPhi" + std::to_string(iMin + 1) + std::to_string(iMax + 1), RF_constituents[iMin].p().Angle(RF_constituents[iMax].p().Vect()));
                 vh.add("dEta" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dEta);
 
                 //calculate pair masses
-                int iNNext = (iNext + 1) % constituents.size();
-                auto jetPair = constituents[i]->p() + constituents[iNext]->p();
+                int iNNext = (iNext + 1) % RF_constituents.size();
+                auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
                 vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", jetPair.M());
                 vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_pt", jetPair.Pt());
-                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, constituents[iNNext]->p()));
+                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, RF_constituents[iNNext].p()));
+                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", jetPair.Angle(RF_constituents[iNNext].p().Vect()));
             }
         }
 
@@ -173,9 +187,11 @@ private:
         tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second.first);
         tr.registerDerivedVec("genConstMatchGenPtVec", genMatches.second.second);
 
+        tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
+
         //Generate basic MVA selection 
         //for now I just require that there is at least 1 top candidate 
-        bool passMVABaseline = (topCands.size() >= 1) || genMatches.second.second->size() >= 1;
+        bool passMVABaseline = true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
 	const bool passFRBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
 	tr.registerDerivedVar("passFRBaseline",passFRBaseline);
@@ -189,9 +205,10 @@ public:
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
         //double variables list here
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
+        //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
         //integer values list here
-        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec"};
+        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec","met", "nConstituents"};
     }
 
     std::set<std::string> getVarSet()
