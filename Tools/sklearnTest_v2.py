@@ -15,7 +15,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        #self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_eta", "j2_eta", "j3_eta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -35,24 +36,27 @@ dg = DataGetter()
 histranges = {"cand_m":[10, 50, 300], 
               "cand_dRMax":[50,0,5],
               "cand_pt":[50,0,1000],
-              "j1_m":[100, 0, 100],
+#              "j1_m":[100, 0, 100],
               "j23_m":[100, 0, 250],
-              "j23j1_dR":[50,0,5],
+#              "j23j1_dR":[50,0,5],
               "j12_m":[100, 0, 250],
               "j13_m":[100, 0, 250],
-              "dR12":[50,0,5],
-              "dR23":[50,0,5],
-              "dR13":[50,0,5],
+              "dPhi12":[50,0,3.2],
+              "dPhi23":[50,0,3.2],
+              "dPhi13":[50,0,3.2],
               "j1_pt":[50,0,1000],
               "j2_pt":[50,0,1000],
               "j3_pt":[50,0,1000],
-              "j2_m":[100, 0, 250],
-              "j3_m":[100, 0, 250],
+#              "j2_m":[100, 0, 250],
+#              "j3_m":[100, 0, 250],
               "j1_CSV":[50, 0, 1],
               "j2_CSV":[50, 0, 1],
               "j3_CSV":[50, 0, 1],
-              "j12j3_dR":[50,0,5],
-              "j13j2_dR":[50,0,5],
+              "j1_eta":[50, 0, 4],
+              "j2_eta":[50, 0, 4],
+              "j3_eta":[50, 0, 4],
+#              "j12j3_dR":[50,0,5],
+#              "j13j2_dR":[50,0,5],
               "j1_QGL":[50, 0, 1],
               "j2_QGL":[50, 0, 1],
               "j3_QGL":[50, 0, 1]}
@@ -95,7 +99,7 @@ def HEPReqs(event, i):
 
     passBreq = (int(event.j1_CSV[i] > CSV_) + int(event.j2_CSV[i] > CSV_) + int(event.j3_CSV[i] > CSV_)) <= 1
 
-    return passHEPRequirments + passBreq
+    return passHEPRequirments and passBreq
 
 
 class simpleTopCand:
@@ -113,7 +117,7 @@ class simpleTopCand:
 
 def jetInList(jet, jlist):
     for j in jlist:
-        if jet.DeltaR(j) < 0.01:
+        if(abs(jet.M() - j.M()) < 0.0001):
             return True
     return False
 
@@ -122,16 +126,13 @@ def resolveOverlap(event, discriminators, threshold):
     topCands.sort(reverse=True)
 
     finalTops = []
-    if(len(topCands) >= 1 and topCands[0].discriminator > threshold):
-        finalTops.append(topCands[0])
-        usedJets = [topCands[0].j1, topCands[0].j2, topCands[0].j3]
-        
-        for cand in topCands[1:]:
-            #if not cand.j1 in usedJets and not cand.j2 in usedJets and not cand.j3 in usedJets:
-            if not jetInList(cand.j1, usedJets) and not jetInList(cand.j2, usedJets) and not jetInList(cand.j3, usedJets):
-                if cand.discriminator > threshold:
-                    usedJets += [cand.j1, cand.j2, cand.j3]
-                    finalTops.append(cand)
+    usedJets = []
+    for cand in topCands:
+        #if not cand.j1 in usedJets and not cand.j2 in usedJets and not cand.j3 in usedJets:
+        if not jetInList(cand.j1, usedJets) and not jetInList(cand.j2, usedJets) and not jetInList(cand.j3, usedJets):
+            if cand.discriminator > threshold:
+                usedJets += [cand.j1, cand.j2, cand.j3]
+                finalTops.append(cand)
 
     return finalTops
 
@@ -167,12 +168,34 @@ def resolveOverlapHEP(event, passFail):
 
 print "PROCESSING TRAINING DATA"
 
-file = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep.root")
+trainingfile_ttbar = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep_TRF2.root")
+trainingfile_znunu = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu_TRF2.root")
 
 hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
 hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
+hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
+hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
 
-for event in file.slimmedTuple:
+NEVTS = 1e10
+
+Nevts = 0
+for event in trainingfile_ttbar.slimmedTuple:
+    if Nevts >= NEVTS:
+        break
+    Nevts +=1
+    for i in xrange(len(event.genConstiuentMatchesVec)):
+        if event.genConstiuentMatchesVec[i] == 3:
+            hPtMatch.Fill(event.cand_pt[i])
+        else:
+            hPtNoMatch.Fill(event.cand_pt[i])
+
+NEVTS_Z = 1e10
+
+Nevts = 0
+for event in trainingfile_znunu.slimmedTuple:
+    if Nevts >= NEVTS_Z:
+        break
+    Nevts +=1
     for i in xrange(len(event.genConstiuentMatchesVec)):
         if event.genConstiuentMatchesVec[i] == 3:
             hPtMatch.Fill(event.cand_pt[i])
@@ -182,16 +205,48 @@ for event in file.slimmedTuple:
 inputData = []
 inputAnswer = []
 inputWgts = []
-for event in file.slimmedTuple:
+
+Nevts = 0
+for event in trainingfile_ttbar.slimmedTuple:
+    if Nevts >= NEVTS:
+        break
+    Nevts +=1
     for i in xrange(len(event.cand_m)):
         #if(event.cand_pt[i] > 150):
             inputData.append(dg.getData(event, i))
             nmatch = event.genConstiuentMatchesVec[i]
             inputAnswer.append(int(nmatch == 3))
             if nmatch == 3:
-                inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
             else:
-                inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
+
+Nevts = 0
+for event in trainingfile_znunu.slimmedTuple:
+    if Nevts >= NEVTS_Z:
+        break
+    Nevts +=1
+    for i in xrange(len(event.cand_m)):
+        #if(event.cand_pt[i] > 150):
+            inputData.append(dg.getData(event, i))
+            nmatch = event.genConstiuentMatchesVec[i]
+            inputAnswer.append(int(nmatch == 3))
+            if nmatch == 3:
+                if hPtZnunuMatch.GetBinContent(hPtZnunuMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtZnunuMatch.GetBinContent(hPtZnunuMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
+            else:
+                if hPtZnunuNoMatch.GetBinContent(hPtZnunuNoMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtZnunuNoMatch.GetBinContent(hPtZnunuNoMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
     
 
 npyInputData = numpy.array(inputData, numpy.float32)
@@ -200,20 +255,25 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 
 print "TRAINING MVA"
 
-#clf = RandomForestClassifier(n_estimators=10)
-clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
+clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
+#clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
 #clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
 #clf = svm.SVC()
 
+#randomize input data
+perms = numpy.random.permutation(npyInputData.shape[0])
+npyInputData = npyInputData[perms]
+npyInputAnswer = npyInputAnswer[perms]
+npyInputWgts = npyInputWgts[perms]
+
 clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
 
-
-fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep.root")
-
 print "PROCESSING VALIDATION DATA"
+
+fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_TRF2.root")
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)
@@ -250,30 +310,49 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
-discCut = 0.25
-cut =[]
-EffNumroc = [0 for i in range(20)]
-Effroc = [0 for i in range(20)]
+discCut = 0.08
+
+cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
+EffNumroc = [0 for i in range(len(cut))]
+Effroc = [0 for i in range(len(cut))]
 EffDenroc = 0
-FakeNumroc = [0 for i in range(20)]
-Fakeroc = [0 for i in range(20)]
+FakeNumroc = [0 for i in range(len(cut))]
+Fakeroc = [0 for i in range(len(cut))]
 FakeDenroc = 0
+
+print len(cut), cut
 #cut.append(0)
-for j in range(20):
-    cut.append(round(j*0.05+0.05, 2))
+#for j in range(20):
+#    cut.append(round(j*0.05+0.05, 2))
    
 inputList = []
+
+rocInput = []
+rocScore = []
+rocHEP = []
+
+Nevts = 0
 for event in fileValidation.slimmedTuple:
-    if(len(event.genTopPt)):EffDenroc += 1
+    if Nevts >= NEVTS:
+        break
+    Nevts += 1
+    if(len(event.genTopPt)):
+        EffDenroc += 1
     for pt in event.genTopPt:
         hEffDen.Fill(pt)
         hEffHEPDen.Fill(pt)
     for i in xrange(len(event.cand_m)):
         inputList.append(dg.getData(event, i))
 
+        rocInput.append(dg.getData(event, i))
+        rocScore.append((event.genConstiuentMatchesVec[i]==3))
+        rocHEP.append(HEPReqs(event, i))
+
+
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
-output = clf.predict(npInputList)
+#output = clf.predict(npInputList)
+output = clf.predict_proba(npInputList)[:,1]
 
 print "FILLING HISTOGRAMS"
 
@@ -283,7 +362,11 @@ hnMVAcand = ROOT.TH1D("hnMVAcand", "hnMVAcand", 6, 0, 6)
 hnHEPcand = ROOT.TH1D("hnHEPcand", "hnHEPcand", 6, 0, 6)
 
 outputCount = 0;
+Nevts = 0
 for event in fileValidation.slimmedTuple:
+    if Nevts >= NEVTS:
+        break
+    Nevts += 1
     #nCands = len(event.genConstiuentMatchesVec)
     nCands = len(event.cand_m)
     tmp_output = []
@@ -349,32 +432,55 @@ for event in fileValidation.slimmedTuple:
 
 print "FakeRate Calculation"                                        
 #FakeRate
-fileFakeRate = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu.root")
+fileFakeRate = ROOT.TFile.Open("trainingTuple_division_1_ZJetsToNuNu_TRF2.root")
 hFakeNum = ROOT.TH1D("hFakeNum", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDen = ROOT.TH1D("hFakeDen", "hFakeDen", 25, 0.0, 1000.0)
 hFakeNumHEP = ROOT.TH1D("hFakeNumHEP", "hFakeNum", 25, 0.0, 1000.0)
 hFakeDenHEP = ROOT.TH1D("hFakeDenHEP", "hFakeDen", 25, 0.0, 1000.0)
 
+hFakeNjNum = ROOT.TH1D("hFakeNjNum", "hFakeNjNum", 20, 0.0, 20.0)
+hFakeNjDen = ROOT.TH1D("hFakeNjDen", "hFakeNjDen", 20, 0.0, 20.0)
+hFakeNjNumHEP = ROOT.TH1D("hFakeNjNumHEP", "hFakeNjNum", 20, 0.0, 20.0)
+hFakeNjDenHEP = ROOT.TH1D("hFakeNjDenHEP", "hFakeNjDen", 20, 0.0, 20.0)
+
 ZinvInput = []
 Zinvmet = []
 ZinvpassHEP = []
+Nevts = 0
 for event in fileFakeRate.slimmedTuple:
+    if Nevts >= NEVTS_Z:
+        break
+    Nevts +=1
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
         Zinvmet.append(event.MET)
         ZinvpassHEP.append(HEPReqs(event, i))       
-zinvOutput = clf.predict(ZinvInput)
+zinvOutput = clf.predict_proba(ZinvInput)[:,1]
+
+hnTopsZinv = ROOT.TH1D("hnTopZinv", "hnTopZinv", 6, 0, 6)
+hnTopsHEPZinv = ROOT.TH1D("hnTopHEPZinv", "hnTopHEPZinv", 6, 0, 6)
 
 outputCount = 0
+Nevts = 0
 for event in fileFakeRate.slimmedTuple:
+    if Nevts >= NEVTS_Z:
+        break
+    Nevts +=1
     FakeDenroc += 1
     hFakeDen.Fill(event.MET)
     hFakeDenHEP.Fill(event.MET)
+    hFakeNjDen.Fill(event.nConstituents)
+    hFakeNjDenHEP.Fill(event.nConstituents)
     numflag = False
     numflagHEP = False
     tagIdx = 0
     tagIdxHEP = 0
-    numflagroc = [False for r in range(20)]
+    numflagroc = [False for r in range(len(cut))]
+    tops = resolveOverlap(event, zinvOutput, discCut)
+    topsHEP = resolveOverlapHEP(event, ZinvpassHEP)
+    hnTopsZinv.Fill(len(tops))
+    hnTopsHEPZinv.Fill(len(topsHEP))
+
     for j in xrange(len(event.cand_m)):
         if(zinvOutput[outputCount] > discCut):
             numflag = True
@@ -386,8 +492,12 @@ for event in fileFakeRate.slimmedTuple:
             if(zinvOutput[outputCount]>cut[k]):
                 numflagroc[k] = True
         outputCount += 1
-    if(numflag):hFakeNum.Fill(Zinvmet[tagIdx])
-    if(numflagHEP):hFakeNumHEP.Fill(Zinvmet[tagIdxHEP])
+    if(numflag):
+        hFakeNum.Fill(Zinvmet[tagIdx])
+        hFakeNjNum.Fill(event.nConstituents)
+    if(numflagHEP):
+        hFakeNumHEP.Fill(Zinvmet[tagIdxHEP])
+        hFakeNjNumHEP.Fill(event.nConstituents)
     for k in xrange(len(cut)):
         if(numflagroc[k]):FakeNumroc[k] += 1
 
@@ -395,30 +505,17 @@ print "ROC Calculation"
 #ttbar
 hroc = ROOT.TProfile("hroc", "hroc", 100, 0, 1, 0, 1)
 hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 100, 0, 1, 0, 1)
-TP = []
-FP = []
-TPR =[]
-FPR =[]
+TP =  len(cut)*[0]
+FP =  len(cut)*[0]
+TPR = len(cut)*[0]
+FPR = len(cut)*[0]
 Nmatch = 0
 Nnomatch = 0
 TPHEP =0
 FPHEP =0
-for j in range(20):
-    TP.append(0)
-    FP.append(0)
-    TPR.append(0)
-    FPR.append(0)
 print "cut:", cut
-rocInput = []
-rocScore = []
-rocHEP = []
-for event in fileValidation.slimmedTuple:
-    for i in xrange(len(event.cand_m)):
-        rocInput.append(dg.getData(event, i))
-        rocScore.append((event.genConstiuentMatchesVec[i]==3))
-        rocHEP.append(HEPReqs(event, i))
 
-rocOutput = clf.predict(rocInput)
+rocOutput = clf.predict_proba(rocInput)[:,1]
 
 for i in xrange(len(rocOutput)):
     if(rocScore[i]):
@@ -453,14 +550,14 @@ FPHEPZ =0
 FPRHEPZ =0
 rocInputZ = []
 rocHEPZ = []
-for j in range(20):
+for j in range(len(cut)):
     FPZ.append(0)
     FPRZ.append(0)
 for event in fileFakeRate.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         rocInputZ.append(dg.getData(event, i))
         rocHEPZ.append(HEPReqs(event, i))
-rocOutputZ = clf.predict(rocInputZ)
+rocOutputZ = clf.predict_proba(rocInputZ)[:,1]
 for i in xrange(len(rocOutputZ)):
     NnomatchZ = NnomatchZ+1
     if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
@@ -538,6 +635,22 @@ hnTopsHEP.Draw("same")
 #hnHEPcand.Draw("same")
 leg.Draw("same")
 c.Print("nTops_v2.png")
+
+#draw nTops Plot for Zinv
+hnTopsZinv.SetLineColor(ROOT.kRed)
+hnTopsHEPZinv.SetLineColor(ROOT.kBlue)
+hnTops.GetYaxis().SetRangeUser(0, 1.3*max([hnTopsZinv.GetMaximum(), hnTopsHEPZinv.GetMaximum()]))
+leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+leg.AddEntry(hnTops,"Resolved tops (MVA)")
+leg.AddEntry(hnTopsHEP,"Resolved tops (HEP)")
+hnTopsZinv.SetStats(0)
+hnTopsZinv.SetTitle("")
+hnTopsZinv.Draw()
+hnTopsHEPZinv.Draw("same")
+leg.Draw("same")
+c.SetLogy()
+c.Print("nTops_Zinv_v2.png")
+c.SetLogy(False)
 
 #draw num constituent matched plot
 
@@ -661,6 +774,26 @@ hFakeNumHEP.Draw("same")
 leg.Draw("same")
 c.Print("FakeRate_v2.png")
 
+#FakeRate Nj
+hFakeRateNj = hFakeNjNum.Clone("hFakeRateNj")
+hFakeRateNj.SetStats(0)
+hFakeRateNj.SetTitle("")
+hFakeRateNj.GetXaxis().SetTitle("N_{j}")
+hFakeRateNj.GetYaxis().SetTitle("FakeRate")
+leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+leg.AddEntry(hFakeRateNj, "MVA")
+leg.AddEntry(hFakeNjNumHEP, "HEP")
+hFakeRateNj.Divide(hFakeNjDen)
+hFakeRateNj.GetYaxis().SetRangeUser(0, 1.3)
+hFakeNjNumHEP.Divide(hFakeNjDenHEP)
+#hFakeNjNumHEP.GetYaxis().SetRangeUser(0, 1)
+hFakeRateNj.SetLineColor(ROOT.kRed)
+hFakeNjNumHEP.SetLineColor(ROOT.kBlue)
+hFakeRateNj.Draw()
+hFakeNjNumHEP.Draw("same")
+leg.Draw("same")
+c.Print("FakeRate_nj_v2.png")
+
 #print roc
 hroc.SetStats(0)
 hroc.SetXTitle("FPR")
@@ -719,7 +852,7 @@ if isinstance(clf, GradientBoostingRegressor):
     #plt.title('Variable Importance')
     #plt.show()
     
-    print feature_importance
+    print zip(dg.getList(), feature_importance)
     print sorted_idx
 
 print "DONE!"
