@@ -16,7 +16,7 @@ class DataGetter:
 
     def __init__(self):
         #self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_eta", "j2_eta", "j3_eta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12_dTheta", "j13_dTheta", "j23_dTheta"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -40,17 +40,20 @@ histranges = {"cand_m":[20, 50, 300],
               "dPhi12":[50,0,3.2],
               "dPhi23":[50,0,3.2],
               "dPhi13":[50,0,3.2],
-              "j1_pt":[50,0,1000],
-              "j2_pt":[50,0,1000],
-              "j3_pt":[50,0,1000],
+              "j1_p":[50,0,1000],
+              "j2_p":[50,0,1000],
+              "j3_p":[50,0,1000],
 #              "j2_m":[100, 0, 250],
 #              "j3_m":[100, 0, 250],
               "j1_CSV":[50, 0, 1],
               "j2_CSV":[50, 0, 1],
               "j3_CSV":[50, 0, 1],
-              "j1_eta":[50, 0, 4],
-              "j2_eta":[50, 0, 4],
-              "j3_eta":[50, 0, 4],
+              "j1_theta":[50, 0, 4],
+              "j2_theta":[50, 0, 4],
+              "j3_theta":[50, 0, 4],
+              "j12_dTheta":[50, 0, 4],
+              "j13_dTheta":[50, 0, 4],
+              "j23_dTheta":[50, 0, 4],
 #              "j12j3_dR":[50,0,5],
 #              "j13j2_dR":[50,0,5],
               "j1_QGL":[50, 0, 1],
@@ -103,9 +106,9 @@ class simpleTopCand:
         self.j1 = ROOT.TLorentzVector()
         self.j2 = ROOT.TLorentzVector()
         self.j3 = ROOT.TLorentzVector()
-        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
-        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
-        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.j1.SetPtEtaPhiM(event.j1_p[i], 0, event.j1_theta[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_p[i], 0, event.j2_theta[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_p[i], 0, event.j3_theta[i], event.j3_m[i])
         self.discriminator = discriminator
 
     def __lt__(self, other):
@@ -118,7 +121,7 @@ def jetInList(jet, jlist):
     return False
 
 def resolveOverlap(event, discriminators, threshold):
-    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(len(event.j1_pt))]
+    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(len(event.j1_p))]
     topCands.sort(reverse=True)
 
     finalTops = []
@@ -137,9 +140,9 @@ class simpleTopCandHEP:
         self.j1 = ROOT.TLorentzVector()
         self.j2 = ROOT.TLorentzVector()
         self.j3 = ROOT.TLorentzVector()
-        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
-        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
-        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.j1.SetPtEtaPhiM(event.j1_p[i], 0, event.j1_theta[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_p[i], 0, event.j2_theta[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_p[i], 0, event.j3_theta[i], event.j3_m[i])
         self.cand_m = event.cand_m[i]
         self.passHEP = passFail
 
@@ -147,7 +150,7 @@ class simpleTopCandHEP:
         return abs(self.cand_m - 173.4) < abs(other.cand_m - 173.4)
 
 def resolveOverlapHEP(event, passFail):
-    topCands = [simpleTopCandHEP(event, i, passFail[i]) for i in xrange(len(event.j1_pt))]
+    topCands = [simpleTopCandHEP(event, i, passFail[i]) for i in xrange(len(event.j1_p))]
     topCands.sort(reverse=True)
 
     finalTops = []
@@ -253,7 +256,7 @@ print "TRAINING MVA"
 #clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
 #clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0)
+clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0, max_depth=7, verbose=2)
 #clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
@@ -306,7 +309,7 @@ hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
 
-discCut = 0.75
+discCut = 0.50
 
 cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
 EffNumroc = len(cut) * [0]
