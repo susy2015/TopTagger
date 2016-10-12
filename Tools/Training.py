@@ -11,22 +11,9 @@ from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 import pickle
+from MVAcommon import *
 
-class DataGetter:
 
-    def __init__(self):
-        #self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_eta", "j2_eta", "j3_eta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list2 = ["event." + v + "[i]" for v in self.list]
-        self.theStrCommand = "[" + ", ".join(self.list2) + "]"
-
-    def getData(self, event, i):
-        return eval(self.theStrCommand)
-
-    def getList(self):
-        return self.list
-
-#Variable histo declaration  
 dg = DataGetter()
 
 print "PROCESSING TRAINING DATA"
@@ -34,13 +21,6 @@ print "PROCESSING TRAINING DATA"
 trainingfile_ttbar = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep_training.root")
 trainingfile_znunu = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu_training.root")
 
-hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
-hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
-hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
-hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
-
-NEVTS = 1e10
-NEVTS_Z = 1e10
 
 Nevts = 0
 for event in trainingfile_ttbar.slimmedTuple:
@@ -117,10 +97,10 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 
 print "TRAINING MVA"
 
-#clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
+clf = RandomForestClassifier(n_estimators=100, max_depth=100, n_jobs = 4)
 #clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0)
+#clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0)
 #clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
