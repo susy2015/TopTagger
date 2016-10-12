@@ -248,7 +248,7 @@ public:
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
-	allowedVarsI_ = {"passnJets", "passMET", "passdPhis", "passBJets"};
+	allowedVarsB_ = {"passnJets", "passMET", "passdPhis", "passBJets"};
     }
 
     std::set<std::string> getVarSet()

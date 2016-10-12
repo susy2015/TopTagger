@@ -16,7 +16,7 @@ class DataGetter:
 
     def __init__(self):
         #self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j12_dTheta", "j13_dTheta", "j23_dTheta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j12_dTheta", "j13_dTheta", "j23_dTheta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -37,9 +37,9 @@ histranges = {"cand_m":[20, 50, 300],
               "j23_m":[100, 0, 250],
               "j12_m":[100, 0, 250],
               "j13_m":[100, 0, 250],
-              "dPhi12":[50,0,3.2],
-              "dPhi23":[50,0,3.2],
-              "dPhi13":[50,0,3.2],
+              "dTheta12":[50,0,4],
+              "dTheta23":[50,0,4],
+              "dTheta13":[50,0,4],
               "j1_p":[50,0,1000],
               "j2_p":[50,0,1000],
               "j3_p":[50,0,1000],
