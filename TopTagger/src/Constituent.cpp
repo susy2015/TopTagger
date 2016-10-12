@@ -2,7 +2,7 @@
 
 Constituent::Constituent() : bTagDisc_(0.0), qgLikelihood_(0.0) {}
 
-Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood) : p_(p), bTagDisc_(bTagDisc), qgLikelihood_(qgLikelihood) {}
+Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood, const double& jetChrg) : p_(p), bTagDisc_(bTagDisc), qgLikelihood_(qgLikelihood) , jetChrg_(jetChrg) {}
 
 void Constituent::setPBtag(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood)
 {
@@ -26,3 +26,7 @@ void Constituent::setQGLikelihood(const double& qgLikelihood)
     qgLikelihood_ = qgLikelihood;
 }
 
+void Constituent::setJetCharge(const double& jetChrg)
+{
+  jetChrg_ = jetChrg;
+}

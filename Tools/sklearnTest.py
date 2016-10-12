@@ -16,7 +16,8 @@ from sklearn.ensemble import GradientBoostingRegressor
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
+        #["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dR12", "dR23", "dR13", "j1_pt", "j2_pt", "j3_pt", "j1_m", "j2_m", "j3_m", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12j3_dR", "j13j2_dR", "j23j1_dR"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -33,7 +34,7 @@ class DataGetter:
 #Variable histo declaration  
 dg = DataGetter()
 
-histranges = {"cand_m":[10, 50, 300], 
+histranges = {"cand_m":[20, 50, 300], 
               "cand_dRMax":[50,0,5],
               "cand_pt":[50,0,1000],
               "j1_m":[100, 0, 100],
@@ -50,8 +51,13 @@ histranges = {"cand_m":[10, 50, 300],
               "j2_m":[100, 0, 250],
               "j3_m":[100, 0, 250],
               "j1_CSV":[50, 0, 1],
+              "j2_CSV":[50, 0, 1],
+              "j3_CSV":[50, 0, 1],
               "j12j3_dR":[50,0,5],
-              "j13j2_dR":[50,0,5]}
+              "j13j2_dR":[50,0,5],
+              "j1_QGL":[50, 0, 1],
+              "j2_QGL":[50, 0, 1],
+              "j3_QGL":[50, 0, 1]}
 hist_tag = {}
 hist_notag = {}
 
@@ -96,43 +102,46 @@ print "PROCESSING TRAINING DATA"
 
 file = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep.root")
 
-ptThreshold = 150.0
-lowPtDownWeight = 10.0
+hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
+hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 
-NBg = 0.0
-NSig = 0.0
 for event in file.slimmedTuple:
     for i in xrange(len(event.genConstiuentMatchesVec)):
-        if event.cand_pt < ptThreshold:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0/lowPtDownWeight
-            else:
-                NBg += 1.0/lowPtDownWeight
+        if event.genConstiuentMatchesVec[i] == 3:
+            hPtMatch.Fill(event.cand_pt[i])
         else:
-            if event.genConstiuentMatchesVec[i] == 3:
-                NSig += 1.0
-            else:
-                NBg += 1.0
+            hPtNoMatch.Fill(event.cand_pt[i])
+
+NSig = 0.0#hPtMatch.Integral()
+NBg = 0.0#hPtNoMatch.Integral()
+
+#hPtMatch.Scale(1/hPtMatch.Integral())
+#hPtNoMatch.Scale(1/hPtNoMatch.Integral())
+
+hwMatch   = ROOT.TH1D("hwMatch",   "hwMatch",   1000, 0.0, 1.0)
+hwNoMatch = ROOT.TH1D("hwNoMatch", "hwNoMatch", 1000, 0.0, 1.0)
 
 inputData = []
 inputAnswer = []
 inputWgts = []
 for event in file.slimmedTuple:
     for i in xrange(len(event.cand_m)):
-        inputData.append(dg.getData(event, i))
-        nmatch = event.genConstiuentMatchesVec[i]
-        inputAnswer.append((nmatch == 3))
-        if event.cand_pt < ptThreshold:
+        #if(event.cand_pt[i] > 150):
+            inputData.append(dg.getData(event, i))
+            nmatch = event.genConstiuentMatchesVec[i]
+            inputAnswer.append(int(nmatch == 3))
             if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig / lowPtDownWeight)
+                inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                NSig += inputWgts[-1]
+                hwMatch.Fill(inputWgts[-1])
             else:
-                inputWgts.append((NSig+NBg)/NBg / lowPtDownWeight)
-        else:
-            if nmatch == 3:
-                inputWgts.append((NSig+NBg)/NSig)
-            else:
-                inputWgts.append((NSig+NBg)/NBg)
+                inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                NBg += inputWgts[-1]
+                hwNoMatch.Fill(inputWgts[-1])
     
+
+print NSig, NBg
+
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
@@ -140,14 +149,17 @@ npyInputWgts = numpy.array(inputWgts, numpy.float32)
 print "TRAINING MVA"
 
 #clf = RandomForestClassifier(n_estimators=10)
-#clf = RandomForestRegressor(n_estimators=10)
+clf = RandomForestRegressor(n_estimators=100, n_jobs=4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
+#clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
 #clf = svm.SVC()
 
 clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
+
+
+
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep.root")
 
@@ -162,32 +174,6 @@ hEffHEPNum = ROOT.TH1D("hEffHEPNum", "hEffHEPNum", 25, 0.0, 1000.0)
 hEffHEPDen = ROOT.TH1D("hEffHEPDen", "hEffHEPDen", 25, 0.0, 1000.0)
 hPurityHEPNum = ROOT.TH1D("hPurityHEPNum", "hPurityHEPNum", 25, 0.0, 1000.0)
 hPurityHEPDen = ROOT.TH1D("hPurityHEPDen", "hPurityHEPDen", 25, 0.0, 1000.0)
-
-inputList = []
-truth = []
-genPt = []
-recoPt = []
-passHEP = []
-
-for event in fileValidation.slimmedTuple:
-    for pt in event.genTopPt:
-        hEffDen.Fill(pt)
-        hEffHEPDen.Fill(pt)
-    for i in xrange(len(event.cand_m)):
-        recoPt.append(event.cand_pt[i])
-        inputList.append(dg.getData(event, i))
-        truth.append(event.genConstiuentMatchesVec[i])
-        genPt.append(event.genConstMatchGenPtVec[i])
-        passHEP.append(HEPReqs(event, i))
-        Varsval = dg.getData(event, i)
-        for j in xrange(len(Varsval)):
-            varsmap[varsname[j]].append(Varsval[j])
-   
-print "CALCULATING DISCRIMINATORS"
-
-output = clf.predict(inputList)
-
-print "FILLING HISTOGRAMS"
 
 hDisc = ROOT.TH1D("disc", "disc", 20, 0, 1.0)
 hDiscMatch = ROOT.TH1D("discMatch", "discMatch", 20, 0, 1.0)
@@ -212,7 +198,35 @@ hNConstMatchNoTagHEP = ROOT.TH1D("hNConstMatchNoTagHEP", "hNConstMatchNoTagHEP",
 hNConstMatchNoTagHEP.SetLineColor(ROOT.kBlue)
 hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
-discCut = 0.75
+discCut = 0.15
+
+inputList = []
+truth = []
+genPt = []
+recoPt = []
+passHEP = []
+rocScore = []
+
+for event in fileValidation.slimmedTuple:
+    for pt in event.genTopPt:
+        hEffDen.Fill(pt)
+        hEffHEPDen.Fill(pt)
+    for i in xrange(len(event.cand_m)):
+        recoPt.append(event.cand_pt[i])
+        inputList.append(dg.getData(event, i))
+        truth.append(event.genConstiuentMatchesVec[i])
+        rocScore.append((event.genConstiuentMatchesVec[i]==3))
+        genPt.append(event.genConstMatchGenPtVec[i])
+        passHEP.append(HEPReqs(event, i))
+        Varsval = dg.getData(event, i)
+        for j in xrange(len(Varsval)):
+            varsmap[varsname[j]].append(Varsval[j])
+
+print "CALCULATING DISCRIMINATORS"
+
+output = clf.predict(inputList)
+
+print "FILLING HISTOGRAMS"
 
 for i in xrange(len(output)):
     hDisc.Fill(output[i])
@@ -248,9 +262,21 @@ for i in xrange(len(output)):
         if(recoPt[i] > 250):
             hDiscNoMatchPt.Fill(output[i])
 
+
 print "PLOTTING"
 
 c = ROOT.TCanvas("c1","c1",800,800)
+
+#Random plots
+
+hwMatch.SetLineColor(ROOT.kRed)
+hwMatch.Draw()
+hwNoMatch.Draw("same")
+c.SetLogx()
+c.SetLogy()
+c.Print("weights.png")
+c.SetLogx(False)
+c.SetLogy(False)
 
 #Draw discriminator plot
 
@@ -325,7 +351,6 @@ for h in hist_tag:
     c.Print(h+".png")
 
 #draw efficiency
-
 hEffNum.SetStats(0)
 hEffNum.SetTitle("")
 hEffNum.GetXaxis().SetTitle("gen top Pt [GeV]")
@@ -397,7 +422,32 @@ if isinstance(clf, GradientBoostingRegressor):
     #plt.title('Variable Importance')
     #plt.show()
     
-    print feature_importance
+    print zip(dg.getList(), feature_importance)
     print sorted_idx
 
 print "DONE!"
+
+#Writing histograms in a root file.
+hEff = hEffNum.Clone("hEff")
+hEffHEP = hEffHEPNum.Clone("hEffHEP")
+hPurity = hPurityNum.Clone("hPurity")
+hPurityHEP = hPurityHEPNum.Clone("hPurityHEP")
+
+mf = ROOT.TFile('MVAOutput.root','RECREATE')
+hDiscMatch.Write()
+hDiscNoMatch.Write()
+hDiscMatchPt.Write()
+hDiscNoMatchPt.Write()
+hNConstMatchTag.Write()
+hNConstMatchNoTag.Write()
+hNConstMatchTagHEP.Write()
+hNConstMatchNoTagHEP.Write()
+for h in hist_tag:
+    hist_tag[h].Write()
+    hist_notag[h].Write()
+hEff.Write()
+hEffHEP.Write()
+hPurity.Write()
+hPurityHEP.Write()
+mf.Write()
+mf.Close()
