@@ -9,19 +9,14 @@ Run the following commands
 
 make 
 
-./makeTrainingTuples -D TTbarSingleLep -E 10000 -R 1
+./makeTrainingTuples -D TTbarSingleLep -E 10000 -R 1:1
 
 You can change the sample name, #events and ratio (training sample to validation sample)
 
-Rename the sample with an extra phase '_training'
+Rename the trainingTuple_division_0_TTbarSingleLep.root sample with an extra phase '_training'
 
-For sample to be used for validation, Run the following command
 
-./makeTrainingTuples -f -D ZJetsToNuNu -E 10000 -R 1
-
-'f' option enable slection cut (met, Njet and Nbjet) for validation sample
-
-Rename the sample with an extra	phase '_validation'
+Rename the trainingTuple_division_1_TTbarSingleLep.root sample with an extra	phase '_validation'
 
 II. Running mva code
 
