@@ -1,6 +1,8 @@
+# Tagger development tools
+
 We use scikit package for MVA based tagger. Its python based.
 
-I. Samples for training and validation
+## Samples for training and validation
 
 Root files cantaining only relavant variables.
 makeTrainingTuples.C produces this root file;
@@ -18,7 +20,7 @@ Rename the trainingTuple_division_0_TTbarSingleLep.root sample with an extra pha
 
 Rename the trainingTuple_division_1_TTbarSingleLep.root sample with an extra	phase '_validation'
 
-II. Running mva code
+## Running sklearn mva code
 
 There are two python files: 
 
@@ -36,6 +38,42 @@ python Validation.py
 
 It will create plots of Efficincy, Fakerate, Purity, input variables and also roc curve in png format. It will also creates a root file containing those distributions in histogram format.
 
+## OpenCV Instructions 
 
+OpenCV provides a C++ interface to a random forest algorithm which can be integrated into our normal c++ workflow
 
+### Installing openCV
 
+Inorder to use sample weights we need the latest release of openCV 3.1.0.  You may either download the sources as a tarball or downlod the repository from github. 
+
+The tarball may be downloaded from 
+
+```
+http://opencv.org/downloads.html
+```
+
+Ensure you download the version for 3.1.0
+
+Untar the archive in your "CMSSW_X_Y_Z/src" folder
+
+rename the folder from "opencv-3.1.0" to "opencv"
+
+To install from github do the following in your "CMSSW_X_Y_Z/src"
+
+```
+git clone git@github.com:opencv/opencv.git
+cd opencv
+git checkout 3.1.0
+cmake .
+make -j4
+```
+
+### Running openCV test code
+
+The openCV test code can be found in "TopTagger/Tools".  This code uses the same input tuples as the sklearn implementation.  The code can be compiled by running "make" in the "TopTagger/Tools" folder and this produes the executable "openCVTest".  To run the code the necessary library locations for opencv must be added to the LD_LIBRARY_PATH variable.  This will be done automatically by running the following
+
+```
+source opencvSetup.sh
+```
+
+The code may then be run with the command "./openCVTest"
