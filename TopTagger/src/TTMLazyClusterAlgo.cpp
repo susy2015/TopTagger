@@ -16,6 +16,7 @@ void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc)
     hightMassCut_   = cfgDoc->get("hightJetMassCut", commonCxt, -999.9);
     minTopCandMass_ = cfgDoc->get("minTopCandMass",  commonCxt, -999.9);
     maxTopCandMass_ = cfgDoc->get("maxTopCandMass",  commonCxt, -999.9);
+    dRMax_          = cfgDoc->get("dRMax",           commonCxt, -999.9);
 
     doMonojet_      = cfgDoc->get("doMonojet",      localCxt,  false);
     doDijet_        = cfgDoc->get("doDijet",        localCxt,  false);
@@ -52,7 +53,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
 
                     TopObject topCand({&constituents[i], &constituents[j]});
                 
-                    if(topCand.getDRmax() < 1.5)
+                    if(topCand.getDRmax() < dRMax_)
                     {
                         topCandidates.push_back(topCand);
                     }
@@ -73,7 +74,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
                     double m123 = topCand.p().M();
                     bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
 
-                    if(topCand.getDRmax() < 1.5 && passMassWindow)
+                    if(topCand.getDRmax() < dRMax_ && passMassWindow)
                     {
                         topCandidates.push_back(topCand);
                     }
