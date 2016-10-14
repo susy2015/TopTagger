@@ -365,7 +365,10 @@ int main(int argc, char* argv[])
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
     {
         int splitNum = stoi(sampleRatios.substr((pos)?(pos + 1):(0)));
-        string ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
+        string ofname;
+        if(iter == 0)      ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_training" + ".root";
+        else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
+        else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
         mtmVec.emplace_back(new MiniTupleMaker(ofname, "slimmedTuple"), splitNum);
     }
 
