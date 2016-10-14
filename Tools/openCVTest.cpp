@@ -162,6 +162,8 @@ int main()
 
     rtree->train(trainingData);
 
+    rtree->save("toptagger.model");
+
     std::cout << "Processing validation data" << std::endl;
     
     auto validData = getDataset("trainingTuple_division_1_TTbarSingleLep_TRF2.root");
@@ -171,13 +173,15 @@ int main()
     
     std::cout << "Predicting results" << std::endl;
 
+    Ptr<RTrees> rtree2 = RTrees::load<RTrees>("toptagger.model");
+
     std::vector<double> prediction;
     for(int iSample = 0; iSample < testdata.rows; ++iSample)
     {
         // extract a row from the testing matrix
         Mat testSample = testdata.row(iSample);
 
-        prediction.push_back(rtree->predict(testSample));
+        prediction.push_back(rtree2->predict(testSample));
     }
 
     //std::cout << "Calculating Error" << std::endl;
