@@ -4,9 +4,10 @@
 #include "TopTagger/TopTagger/include/TTModule.h"
 
 #include <string>
+#include <vector>
 
 #include "opencv/include/opencv/cv.h"
-#include "opencv/include/opencv/mh.h"
+#include "opencv/include/opencv/ml.h"
 
 class TTMOpenCVMVA : public TTModule
 {
@@ -14,7 +15,8 @@ private:
     double discriminator_;
     std::string modelFile_;
 
-    cv::Ptr<RTrees> treePtr_;
+    cv::Ptr<cv::ml::RTrees> treePtr_;
+    std::vector<std::string> vars_;
 
 public:
     void getParameters(const cfg::CfgDocument*);
