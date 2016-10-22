@@ -54,6 +54,10 @@ class BaseHistgram
   TH1D *hgentopPt_old_num;
   TH1D *hrecotopPt_den;
   TH1D *hrecotopPt_num;
+  TH1D *hrecotopEta_den;
+  TH1D *hrecotopEta_num;
+  TH1D *hrecotopDRmax_den;
+  TH1D *hrecotopDRmax_num;
   TH1D *hfakeMET_den;
   TH1D *hfakeMET_num;
   TH1D *hfakeNJET_den;
@@ -120,6 +124,14 @@ void BaseHistgram::BookHistgram(const char *outFileName, const int& filerun)
   hrecotopPt_den->Sumw2();
   hrecotopPt_num = new TH1D("hrecotopPt_num","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
   hrecotopPt_num->Sumw2();
+  hrecotopEta_den = new TH1D("hrecotopEta_den","Top #eta;#eta;Event",24, -2.4, 2.4);
+  hrecotopEta_den->Sumw2();
+  hrecotopEta_num = new TH1D("hrecotopEta_num","Top #eta;#eta;Event",24, -2.4, 2.4);
+  hrecotopEta_num->Sumw2();
+  hrecotopDRmax_den = new TH1D("hrecotopDRmax_den","Top #DeltaRmax;#DeltaRmax;Event",30, 0, 1.5);
+  hrecotopDRmax_den->Sumw2();
+  hrecotopDRmax_num = new TH1D("hrecotopDRmax_num","Top #DeltaRmax;#DeltaRmax;Event",30, 0, 1.5);
+  hrecotopDRmax_num->Sumw2();
   hgentopPt_old_den = new TH1D("hgentopPt_old_den","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
   hgentopPt_old_den->Sumw2();
   hgentopPt_old_num = new TH1D("hgentopPt_old_num","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
