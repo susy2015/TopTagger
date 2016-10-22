@@ -27,13 +27,26 @@ MT2LIB     = -L$(CMSSW_BASE)/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -lTopTagg
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples
+PROGRAMS = makeTrainingTuples TagTest1
 
-all: mkobj $(PROGRAMS)
+all: mkobj sampPyWrap $(PROGRAMS)
 
 
 mkobj:
 	@mkdir -p obj
+
+#code to compile shared library to link samples to python                                                                                                                               
+sampPyWrap: $(ODIR)/samplesModule.so
+
+$(ODIR)/samplesModule.so: $(ODIR)/samplesPyWrap.o $(ODIR)/samplesModulePyWrap.o
+	$(CXX) -shared -o $@ $^
+
+$(ODIR)/samplesPyWrap.o: $(RSDIR)/samples.cc $(RSDIR)/samples.h
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
+$(ODIR)/samplesModulePyWrap.o: $(RSDIR)/samplesModule.cc
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
 
 $(ODIR)/%.o : $(SDIR)/%.C
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
@@ -54,6 +67,9 @@ $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
 makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o $(ODIR)/samples.o $(ODIR)/makeTrainingTuples.o $(ODIR)/MiniTupleMaker.o 
+	$(LD) $^ $(LIBS) $(MT2LIB) -o $@
+
+TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
 	$(LD) $^ $(LIBS) $(MT2LIB) -o $@
 
 clean:
