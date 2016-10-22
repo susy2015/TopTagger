@@ -15,8 +15,14 @@ import pickle
 class DataGetter:
 
     def __init__(self):
-        #self.list = ["cand_m", "cand_dRMax", "cand_pt", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_pt", "j2_pt", "j3_pt", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j12_dTheta", "j13_dTheta", "j23_dTheta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j12_dTheta", "j13_dTheta", "j23_dTheta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j1_Chrg", "j2_Chrg", "j3_Chrg"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_QGL", "j2_QGL", "j3_QGL"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m"]
+        #self.list = ["j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
@@ -31,15 +37,15 @@ class DataGetter:
 dg = DataGetter()
 
 histranges = {"cand_m":[20, 50, 300], 
-              "cand_dRMax":[50,0,5],
-              "cand_pt":[50,0,1000],
+#              "cand_dRMax":[50,0,5],
+#              "cand_pt":[50,0,1000],
 #              "j1_m":[100, 0, 100],
               "j23_m":[100, 0, 250],
               "j12_m":[100, 0, 250],
               "j13_m":[100, 0, 250],
-              "dTheta12":[50,0,4],
-              "dTheta23":[50,0,4],
-              "dTheta13":[50,0,4],
+#              "dTheta12":[50,0,4],
+#              "dTheta23":[50,0,4],
+#              "dTheta13":[50,0,4],
               "j1_p":[50,0,1000],
               "j2_p":[50,0,1000],
               "j3_p":[50,0,1000],
@@ -48,15 +54,18 @@ histranges = {"cand_m":[20, 50, 300],
               "j1_CSV":[50, 0, 1],
               "j2_CSV":[50, 0, 1],
               "j3_CSV":[50, 0, 1],
-              "j1_theta":[50, 0, 4],
-              "j2_theta":[50, 0, 4],
-              "j3_theta":[50, 0, 4],
-              "j12_dTheta":[50, 0, 4],
-              "j23_dTheta":[50, 0, 4],
-              "j13_dTheta":[50, 0, 4],
+#              "j1_theta":[50, 0, 4],
+#              "j2_theta":[50, 0, 4],
+#              "j3_theta":[50, 0, 4],
+#              "j12_dTheta":[50, 0, 4],
+#              "j23_dTheta":[50, 0, 4],
+#              "j13_dTheta":[50, 0, 4],
               "j1_QGL":[50, 0, 1],
               "j2_QGL":[50, 0, 1],
-              "j3_QGL":[50, 0, 1]}
+              "j3_QGL":[50, 0, 1],
+              "j1_Chrg":[6, -1, 1],
+              "j2_Chrg":[6, -1, 1],
+              "j3_Chrg":[6, -1, 1]}
 hist_tag = {}
 hist_notag = {}
 
@@ -73,6 +82,9 @@ def HEPReqs(event, i):
     Rmin_ = 0.85 *(Mw/Mt)
     Rmax_ = 1.25 *(Mw/Mt)
     CSV_ = 0.800
+    minTopCandMass_ = 100
+    maxTopCandMass_ = 250
+    dRMax_ = 1.5
 
     #HEP tagger requirements
     passHEPRequirments = True
@@ -83,6 +95,12 @@ def HEPReqs(event, i):
     m12  = event.j12_m[i];
     m23  = event.j23_m[i];
     m13  = event.j13_m[i];
+    dRMax = event.cand_dRMax[i]
+    
+    #HEP Pre requirements
+    passPreRequirments = True
+    passMassWindow = (minTopCandMass_ < m123) and (m123 < maxTopCandMass_)
+    passPreRequirments = passMassWindow and dRMax < dRMax_
 
     #Implement HEP mass ratio requirements here
     criterionA = 0.2 < math.atan(m13/m12) and math.atan(m13/m12) < 1.3 and Rmin_ < m23/m123 and m23/m123 < Rmax_
@@ -95,8 +113,41 @@ def HEPReqs(event, i):
 
     passBreq = (int(event.j1_CSV[i] > CSV_) + int(event.j2_CSV[i] > CSV_) + int(event.j3_CSV[i] > CSV_)) <= 1
 
-    return passHEPRequirments and passBreq
+   # return passHEPRequirments and passBreq
+    return passPreRequirments and passHEPRequirments and passBreq
 
+#def HEPReqs(event, i):
+#    Mw = 80.385
+#    Mt = 173.5
+#    Rmin_ = 0.85 *(Mw/Mt)
+#    Rmax_ = 1.25 *(Mw/Mt)
+#    CSV_ = 0.800
+#    minTopCandMass_ = 100
+#    maxTopCandMass_ = 250
+#    dRMax_ = 1.5
+#
+#    #Get the total candidate mass
+#    m123 = event.cand_m[i]
+#    m23  = event.j23_m[i];
+#
+#    dRMax = event.cand_dRMax[i]
+#    
+#    #HEP Pre requirements
+#    passPreRequirments = True
+#    passMassWindow = (minTopCandMass_ < m123) and (m123 < maxTopCandMass_)
+#    passPreRequirments = passMassWindow and dRMax < dRMax_
+#
+#    #HEP tagger requirements
+#    passHEPRequirments = True
+#    passHEPRequirments =  Rmin_ < m23/m123 and m23/m123 < Rmax_
+#
+#    #CSV reqirement
+#    passBreq = event.j2_CSV[i] < CSV_ and event.j3_CSV[i] < CSV_
+#
+##    passBreq = (int(event.j1_CSV[i] > CSV_) + int(event.j2_CSV[i] > CSV_) + int(event.j3_CSV[i] > CSV_)) <= 1
+
+##    return passHEPRequirments and passBreq
+#    return passPreRequirments and passHEPRequirments and passBreq
 
 class simpleTopCand:
     def __init__(self, event, i, discriminator):
@@ -164,10 +215,10 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.50
+discCut = 0.25
 
-hPtMatch   = ROOT.TH1D("hPtMatch", "hPtMatch", 50, 0.0, 2000.0)
-hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
+hPtTTMatch   = ROOT.TH1D("hPtTTMatch", "hPtTTMatch", 50, 0.0, 2000.0)
+hPtTTNoMatch = ROOT.TH1D("hPtTTNoMatch", "hPtTTNoMatch", 50, 0.0, 2000.0)
 hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
 hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
 
@@ -176,6 +227,8 @@ hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)
 hPurityNum = ROOT.TH1D("hPurityNum", "hPurityNum", 25, 0.0, 1000.0)
 hPurityDen = ROOT.TH1D("hPurityDen", "hPurityDen", 25, 0.0, 1000.0)
+hPurity_discNum = ROOT.TH1D("hPurity_discNum", "hPurity_disc", 20, 0.0, 1.0)
+hPurity_discDen = ROOT.TH1D("hPurity_discDen", "hPurity_disc", 20, 0.0, 1.0)
 
 hEffHEPNum = ROOT.TH1D("hEffHEPNum", "hEffHEPNum", 25, 0.0, 1000.0)
 hEffHEPDen = ROOT.TH1D("hEffHEPDen", "hEffHEPDen", 25, 0.0, 1000.0)
@@ -193,6 +246,7 @@ hDiscMatchPt.SetLineStyle(ROOT.kDashed)
 hDiscNoMatchPt = ROOT.TH1D("discNoMatchPt", "discNoMatchPt", 20, 0, 1.0)
 hDiscNoMatchPt.SetLineColor(ROOT.kBlue)
 hDiscNoMatchPt.SetLineStyle(ROOT.kDashed)
+hMVAdisc_pt = ROOT.TH2D("hMVAdisc_pt", "disc vs cand pt", 25, 0.0, 1000.0, 20, 0, 1.0)
 
 hNConstMatchTag   = ROOT.TH1D("hNConstMatchTag",   "hNConstMatchTag",   6, -0.5, 5.5)
 hNConstMatchTag.SetLineColor(ROOT.kRed)
@@ -206,6 +260,9 @@ hNConstMatchNoTagHEP.SetLineColor(ROOT.kBlue)
 hNConstMatchNoTagHEP.SetLineStyle(ROOT.kDashed)
 
 hmatchGenPt = ROOT.TH1D("hmatchGenPt", "hmatchGenPt", 25, 0.0, 1000.0)
+hj1Theta = ROOT.TH1D("hj1Theta", "cos#theta(topboost, j1)", 50, -1 , 1)
+hj2Theta = ROOT.TH1D("hj2Theta", "cos#theta(topboost, j2)", 50, -1 , 1)
+hj3Theta = ROOT.TH1D("hj3Theta", "cos#theta(topboost, j3)", 50, -1 , 1)
 
 hnTops = ROOT.TH1D("hnTop", "hnTop", 6, 0, 6)
 hnTopsHEP = ROOT.TH1D("hnTopHEP", "hnTopHEP", 6, 0, 6)
