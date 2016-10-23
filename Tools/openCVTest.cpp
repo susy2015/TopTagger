@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <iomanip>
 
 #include "TFile.h"
 #include "TLegend.h"
@@ -51,7 +52,7 @@ Ptr<TrainData> getDataset(std::string fname, bool doWeights = false)
 
     while(tr.getNextEvent())
     {
-        if(tr.getEvtNum() > 10000) break;
+        if(doWeights && tr.getEvtNum() > 10000) break;
         for(int i = 0; i < variables.size(); ++i)
         {
             vecs[i] = &tr.getVec<double>(variables[i]);
@@ -128,37 +129,39 @@ int main()
     Mat priors = Mat(2, 1, CV_32FC1);  // weights of each classification for classes
     priors.at<float>(0,0) = 1.0;
     priors.at<float>(1,0) = 1.0;
-    //// (all equal as equal samples of each digit)
-    //
-    //RTParams params = RTParams(10, // max depth
-    //                           5, // min sample count
-    //                           0, // regression accuracy: N/A here
-    //                           false, // compute surrogate split, no missing data
-    //                           15, // max number of categories (use sub-optimal algorithm for larger numbers)
-    //                           priors, // the array of priors
-    //                           true,  // calculate variable importance
-    //                           4,       // number of variables randomly selected at node and used to find the best split(s).
-    //                           100, // max number of trees in the forest
-    //                           0.01f,// forrest accuracy
-    //                           CV_TERMCRIT_ITER |CV_TERMCRIT_EPS // termination cirteria
-    //    );
-    
-    // train random forest classifier (using training data)
 
     Ptr<RTrees> rtree = RTrees::create();
 
     //rtree->setActiveVarCount(int val);
     //rtree->setCalculateVarImportance(true);
-    //rtree->setTermCriteria(TermCriteria(TermCriteria::COUNT, 100, 0.1));
+    rtree->setTermCriteria(TermCriteria(TermCriteria::COUNT, 100, 0.1));
     //rtree->setCVFolds(int val);
-    //rtree->setMaxCategories(15);
-    //rtree->setMaxDepth(10);
-    //rtree->setMinSampleCount(5);
+    rtree->setMaxCategories(2);
+    rtree->setMaxDepth(8);
+    rtree->setMinSampleCount(5);
     //rtree->setPriors(priors);
     //rtree->setRegressionAccuracy(0);
     //rtree->setTruncatePrunedTree(false);
     //rtree->setUse1SERule(false);
     //rtree->setUseSurrogates(false);
+
+    std::cout << std::setw(30) << "getActiveVarCount: "         << rtree->getActiveVarCount() << std::endl;
+    std::cout << std::setw(30) << "getCalculateVarImportance: " << rtree->getCalculateVarImportance() << std::endl;
+    std::cout << std::setw(30) << "getTermCriteria: "           << rtree->getTermCriteria().type << "\t" <<  rtree->getTermCriteria().maxCount << "\t" <<  rtree->getTermCriteria().epsilon << std::endl;
+    std::cout << std::setw(30) << "getCVFolds: "                << rtree->getCVFolds() << std::endl;
+    std::cout << std::setw(30) << "getMaxCategories: "          << rtree->getMaxCategories() << std::endl;
+    std::cout << std::setw(30) << "getMaxDepth: "               << rtree->getMaxDepth() << std::endl;
+    std::cout << std::setw(30) << "getMinSampleCount: "         << rtree->getMinSampleCount() << std::endl;
+    std::cout << std::setw(30) << "getPriors: "                 << rtree->getPriors() << std::endl;
+    std::cout << std::setw(30) << "getRegressionAccuracy: "     << rtree->getRegressionAccuracy() << std::endl;
+    std::cout << std::setw(30) << "getTruncatePrunedTree: "     << rtree->getTruncatePrunedTree() << std::endl;
+    std::cout << std::setw(30) << "getUse1SERule: "             << rtree->getUse1SERule() << std::endl;
+    std::cout << std::setw(30) << "getUseSurrogates: "          << rtree->getUseSurrogates() << std::endl;
+
+    //Ptr<Boost> rtree = Boost::create();
+    //
+    //rtree->setWeightTrimRate(0);
+    //rtree->setBoostType(2);
 
     rtree->train(trainingData);
 
