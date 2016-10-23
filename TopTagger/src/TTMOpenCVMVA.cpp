@@ -6,6 +6,8 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
+#include <iostream>
+
 void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc)
 {
     //Construct contexts
@@ -17,7 +19,7 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc)
 
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
 
-    std::vector<std::string> vars_ = ttUtility::getMVAVars();
+    vars_ = ttUtility::getMVAVars();
 }
 
 void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
@@ -31,17 +33,20 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
     {
         //Construct data matrix for prediction
         std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
+        //std::cout << "LENGTH: " << varMap.size() << std::endl;
 
         cv::Mat inputData(vars_.size(), 1, 5);
         for(unsigned int i = 0; i < vars_.size(); ++i)
         {
             inputData.at<float>(i, 0) = varMap[vars_[i]];
+            //std::cout << vars_[i] << ": " << inputData.at<float>(i, 0) << ",\t";
         }
-        
+        //std::cout << std::endl;
+
         //predict value
         double discriminator = treePtr_->predict(inputData);
         topCand.setDiscriminator(discriminator);
-
+        //std::cout << discriminator << std::endl;
         //place in final top list if it passes the threshold
         if(discriminator > discriminator_)
         {
