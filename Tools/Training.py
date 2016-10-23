@@ -13,13 +13,16 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 import pickle
 from MVAcommon import *
-sys.path.append("../../opencv/lib/")
-import cv2
+try:
+    import cv2
+except ImportError:
+    sys.path.append("../../opencv/lib/")
+    import cv2
 import optparse
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
-parser.add_option ('-o', "--opencv" dest='opencv', type='bool', action='store_true', help="Run using opencv RTrees")
+parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
 
 options, args = parser.parse_args()
 
@@ -107,52 +110,69 @@ npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
 
-print "TRAINING MVA"
-
-clf = RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs = 4)
-#clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
-#clf = AdaBoostRegressor(n_estimators=100)
-#clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
-#clf = GradientBoostingRegressor(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0, loss='ls')
-#clf = DecisionTreeRegressor()
-#clf = DecisionTreeClassifier()
-#clf = svm.SVC()
-
-#randomize input data
+#randomize input data                                                                                                                                                                                                                         
 perms = numpy.random.permutation(npyInputData.shape[0])
 npyInputData = npyInputData[perms]
 npyInputAnswer = npyInputAnswer[perms]
 npyInputWgts = npyInputWgts[perms]
 
-clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
+print "TRAINING MVA"
 
-#Dump output from training
-fileObject = open("TrainingOutput.pkl",'wb')
-out = pickle.dump(clf, fileObject)
-fileObject.close()
+if options.opencv:
+    clf = cv2.ml.RTrees_create()
 
-# Plot feature importance
-feature_importance = clf.feature_importances_
-feature_names = numpy.array(dg.getList())
-feature_importance = 100.0 * (feature_importance / feature_importance.max())
-sorted_idx = numpy.argsort(feature_importance)
+    n_estimators = 100
+    clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.3)); #Do not make the 3rd arguement smaller, it can crash the code
+    clf.setMaxCategories(2);
+    clf.setMaxDepth(8);
+    clf.setMinSampleCount(5);
 
-#try to plot it with matplotlib
-try:
-    import matplotlib.pyplot as plt
+    #make opencv TrainData container
+    cvTrainData = cv2.ml.TrainData_create(npyInputData, cv2.ml.ROW_SAMPLE, npyInputAnswer, sampleWeights = npyInputWgts)
 
-    # make importances relative to max importance
-    pos = numpy.arange(sorted_idx.shape[0]) + .5
-    #plt.subplot(1, 2, 2)
-    plt.barh(pos, feature_importance[sorted_idx], align='center')
-    plt.yticks(pos, feature_names[sorted_idx])
-    plt.xlabel('Relative Importance')
-    plt.title('Variable Importance')
-    #plt.show()
-    plt.savefig("feature_importance.png")
-except ImportError:
-    #I guess no matplotlib is installed, just print to screen?
-    featureImportanceandNames = zip(feature_names, feature_importance)
-    print [featureImportanceandNames[a] for a in sorted_idx].reverse()
+    clf.train(cvTrainData)
+
+    clf.save("TrainingOutput.model")
+
+else:
+    clf = RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs = 4)
+    #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
+    #clf = AdaBoostRegressor(n_estimators=100)
+    #clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
+    #clf = GradientBoostingRegressor(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0, loss='ls')
+    #clf = DecisionTreeRegressor()
+    #clf = DecisionTreeClassifier()
+    #clf = svm.SVC()
+
+    clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
+
+    #Dump output from training
+    fileObject = open("TrainingOutput.pkl",'wb')
+    out = pickle.dump(clf, fileObject)
+    fileObject.close()
+
+    # Plot feature importance
+    feature_importance = clf.feature_importances_
+    feature_names = numpy.array(dg.getList())
+    feature_importance = 100.0 * (feature_importance / feature_importance.max())
+    sorted_idx = numpy.argsort(feature_importance)
+    
+    #try to plot it with matplotlib
+    try:
+        import matplotlib.pyplot as plt
+    
+        # make importances relative to max importance
+        pos = numpy.arange(sorted_idx.shape[0]) + .5
+        #plt.subplot(1, 2, 2)
+        plt.barh(pos, feature_importance[sorted_idx], align='center')
+        plt.yticks(pos, feature_names[sorted_idx])
+        plt.xlabel('Relative Importance')
+        plt.title('Variable Importance')
+        #plt.show()
+        plt.savefig("feature_importance.png")
+    except ImportError:
+        #I guess no matplotlib is installed, just print to screen?
+        featureImportanceandNames = zip(feature_names, feature_importance)
+        print [featureImportanceandNames[a] for a in sorted_idx].reverse()
 
 print "TRAINING DONE!"
