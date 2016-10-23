@@ -1,3 +1,4 @@
+import sys
 import ROOT
 import numpy
 import math
@@ -12,7 +13,15 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 import pickle
 from MVAcommon import *
+sys.path.append("../../opencv/lib/")
+import cv2
+import optparse
 
+parser = optparse.OptionParser("usage: %prog [options]\n")
+
+parser.add_option ('-o', "--opencv" dest='opencv', type='bool', action='store_true', help="Run using opencv RTrees")
+
+options, args = parser.parse_args()
 
 dg = DataGetter()
 
@@ -21,6 +30,7 @@ print "PROCESSING TRAINING DATA"
 trainingfile_ttbar = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep_training.root")
 trainingfile_znunu = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu_training.root")
 
+samplesToRun = [trainingfile_ttbar, trainingfile_znunu]
 
 Nevts = 0
 for event in trainingfile_ttbar.slimmedTuple:
