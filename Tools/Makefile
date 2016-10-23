@@ -58,14 +58,14 @@ $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
 makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o $(ODIR)/samples.o $(ODIR)/makeTrainingTuples.o $(ODIR)/MiniTupleMaker.o 
-	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(TOPLIB) -o $@
+	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(OPENVCLIBS) $(TOPLIB) -o $@
 
 #custom hack for compiling shark, will make bvbetter as time allows
 sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o sharkTest.o 
 	$(LD) $^ $(ROOTLIBS) $(TOPLIB) -I /home/pastika/Downloads/Shark-3.1.0/include/ -L /home/pastika/Downloads/Shark-3.1.0/lib/ -L /usr/lib/x86_64-linux-gnu/ -lshark -lboost_serialization -lgomp -o $@
 
 openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o openCVTest.o 
-	$(LD) $^ $(OPENVCLIBS) $(ROOTLIBS) $(TOPLIB)  -o $@
+	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
 
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
