@@ -10,7 +10,7 @@ from sklearn import svm
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
-
+import cv2
 
 class DataGetter:
 
@@ -175,8 +175,8 @@ hPtNoMatch = ROOT.TH1D("hPtNoMatch", "hPtNoMatch", 50, 0.0, 2000.0)
 hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
 hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
 
-NEVTS = 1e10
-NEVTS_Z = 1e10
+NEVTS = 1e4
+NEVTS_Z = 1e4
 
 Nevts = 0
 for event in trainingfile_ttbar.slimmedTuple:
@@ -196,9 +196,9 @@ for event in trainingfile_znunu.slimmedTuple:
     Nevts +=1
     for i in xrange(len(event.genConstiuentMatchesVec)):
         if event.genConstiuentMatchesVec[i] == 3:
-            hPtMatch.Fill(event.cand_pt[i])
+            hPtZnunuMatch.Fill(event.cand_pt[i])
         else:
-            hPtNoMatch.Fill(event.cand_pt[i])
+            hPtZnunuNoMatch.Fill(event.cand_pt[i])
 
 inputData = []
 inputAnswer = []
@@ -256,11 +256,17 @@ print "TRAINING MVA"
 #clf = RandomForestClassifier(n_estimators=100, n_jobs = 4)
 #clf = RandomForestRegressor(n_estimators=100, n_jobs = 4)
 #clf = AdaBoostRegressor(n_estimators=100)
-clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0, max_depth=7, verbose=2)
+#clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=0, max_depth=7, verbose=2)
 #clf = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, random_state=0, loss='ls')
 #clf = DecisionTreeRegressor()
 #clf = DecisionTreeClassifier()
 #clf = svm.SVC()
+clf = cv2.ml.RTrees_create()
+
+clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, 100, 0.3));
+clf.setMaxCategories(2);
+clf.setMaxDepth(8);
+clf.setMinSampleCount(5);
 
 #randomize input data
 perms = numpy.random.permutation(npyInputData.shape[0])
@@ -268,7 +274,11 @@ npyInputData = npyInputData[perms]
 npyInputAnswer = npyInputAnswer[perms]
 npyInputWgts = npyInputWgts[perms]
 
-clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
+#make opencv TrainData container
+cvTrainData = cv2.ml.TrainData_create(npyInputData, cv2.ml.ROW_SAMPLE, npyInputAnswer, sampleWeights = npyInputWgts)
+
+#clf = clf.fit(npyInputData, npyInputAnswer, npyInputWgts)
+clf.train(cvTrainData)
 
 print "PROCESSING VALIDATION DATA"
 
@@ -347,7 +357,8 @@ for event in fileValidation.slimmedTuple:
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
-output = clf.predict_proba(npInputList)[:,1]
+#output = clf.predict_proba(npInputList)[:,1]
+output = [clf.predict(inputs)[0] for inputs in npInputList]
 
 print "FILLING HISTOGRAMS"
 
@@ -461,8 +472,9 @@ for event in fileFakeRate.slimmedTuple:
     Nevts +=1
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
-        ZinvpassHEP.append(HEPReqs(event, i))       
-zinvOutput = clf.predict_proba(ZinvInput)[:,1]
+        ZinvpassHEP.append(HEPReqs(event, i))
+npyZinvInput = numpy.array(ZinvInput, dtype=numpy.float32)
+zinvOutput = output = [clf.predict(inputs)[0] for inputs in npyZinvInput]
 
 hnTopsZinv = ROOT.TH1D("hnTopZinv", "hnTopZinv", 6, 0, 6)
 hnTopsHEPZinv = ROOT.TH1D("hnTopHEPZinv", "hnTopHEPZinv", 6, 0, 6)
@@ -505,85 +517,85 @@ for event in fileFakeRate.slimmedTuple:
     for k in xrange(len(cut)):
         if(numflagroc[k]):FakeNumroc[k] += 1
 
-print "ROC Calculation"
-#ttbar
-hroc = ROOT.TProfile("hroc", "hroc", 100, 0, 1, 0, 1)
-hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 100, 0, 1, 0, 1)
-TP =  len(cut)*[0]
-FP =  len(cut)*[0]
-TPR = len(cut)*[0]
-FPR = len(cut)*[0]
-Nmatch = 0
-Nnomatch = 0
-TPHEP =0
-FPHEP =0
-
-print "cut:", cut
-
-rocOutput = clf.predict_proba(rocInput)[:,1]
-
-for i in xrange(len(rocOutput)):
-    if(rocScore[i]):
-        Nmatch= Nmatch+1
-        if(rocHEP[i]):TPHEP = TPHEP+1
-    else:
-        Nnomatch = Nnomatch+1
-        if(rocHEP[i]):FPHEP = FPHEP+1
-    for j in xrange(len(cut)):
-        if(rocOutput[i]>cut[j]):
-            if(rocScore[i]):TP[j] = TP[j]+1
-            else:FP[j] = FP[j]+1
-
-for j in xrange(len(cut)):
-    TPR[j] = float(TP[j])/Nmatch
-    FPR[j] = float(FP[j])/Nnomatch
-    hroc.Fill(FPR[j],TPR[j])
-TPRHEP = float(TPHEP)/Nmatch
-FPRHEP = float(FPHEP)/Nnomatch
-hroc_HEP.Fill(FPRHEP,TPRHEP)
-
-print "TPR: ", TPR
-print "FPR: ", FPR
-
-#Zinv
-hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 100, 0, 1, 0, 1)
-hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
-FPZ  = len(cut) * [0]
-FPRZ = len(cut) * [0]
-NnomatchZ = 0
-FPHEPZ =0
-FPRHEPZ =0
-rocInputZ = []
-rocHEPZ = []
-for event in fileFakeRate.slimmedTuple:
-    for i in xrange(len(event.cand_m)):
-        rocInputZ.append(dg.getData(event, i))
-        rocHEPZ.append(HEPReqs(event, i))
-rocOutputZ = clf.predict_proba(rocInputZ)[:,1]
-for i in xrange(len(rocOutputZ)):
-    NnomatchZ = NnomatchZ+1
-    if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
-    for j in xrange(len(cut)):
-        if(rocOutputZ[i]>cut[j]):
-            FPZ[j] = FPZ[j]+1
-for j in xrange(len(cut)):
-    FPRZ[j] = float(FPZ[j])/NnomatchZ
-    hrocZ.Fill(FPRZ[j],TPR[j])
-FPRHEPZ = float(FPHEPZ)/NnomatchZ
-hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
-
-hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 0.5, 0, 0.5)
-hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
-for j in xrange(len(cut)):
-    Effroc[j] = float(EffNumroc[j])/EffDenroc
-    Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
-    hroc_alt.Fill(Fakeroc[j], Effroc[j])
-EffrocHEP = float(EffNumrocHEP)/EffDenroc
-FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
-hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
-
-print "EffDenroc: ", EffDenroc
-print "EffNumroc: ", EffNumroc
+#print "ROC Calculation"
+##ttbar
+#hroc = ROOT.TProfile("hroc", "hroc", 100, 0, 1, 0, 1)
+#hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 100, 0, 1, 0, 1)
+#TP =  len(cut)*[0]
+#FP =  len(cut)*[0]
+#TPR = len(cut)*[0]
+#FPR = len(cut)*[0]
+#Nmatch = 0
+#Nnomatch = 0
+#TPHEP =0
+#FPHEP =0
+#
+#print "cut:", cut
+#
+#rocOutput = clf.predict_proba(rocInput)[:,1]
+#
+#for i in xrange(len(rocOutput)):
+#    if(rocScore[i]):
+#        Nmatch= Nmatch+1
+#        if(rocHEP[i]):TPHEP = TPHEP+1
+#    else:
+#        Nnomatch = Nnomatch+1
+#        if(rocHEP[i]):FPHEP = FPHEP+1
+#    for j in xrange(len(cut)):
+#        if(rocOutput[i]>cut[j]):
+#            if(rocScore[i]):TP[j] = TP[j]+1
+#            else:FP[j] = FP[j]+1
+#
+#for j in xrange(len(cut)):
+#    TPR[j] = float(TP[j])/Nmatch
+#    FPR[j] = float(FP[j])/Nnomatch
+#    hroc.Fill(FPR[j],TPR[j])
+#TPRHEP = float(TPHEP)/Nmatch
+#FPRHEP = float(FPHEP)/Nnomatch
+#hroc_HEP.Fill(FPRHEP,TPRHEP)
+#
+#print "TPR: ", TPR
+#print "FPR: ", FPR
+#
+##Zinv
+#hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 100, 0, 1, 0, 1)
+#hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
+#FPZ  = len(cut) * [0]
+#FPRZ = len(cut) * [0]
+#NnomatchZ = 0
+#FPHEPZ =0
+#FPRHEPZ =0
+#rocInputZ = []
+#rocHEPZ = []
+#for event in fileFakeRate.slimmedTuple:
+#    for i in xrange(len(event.cand_m)):
+#        rocInputZ.append(dg.getData(event, i))
+#        rocHEPZ.append(HEPReqs(event, i))
+#rocOutputZ = clf.predict_proba(rocInputZ)[:,1]
+#for i in xrange(len(rocOutputZ)):
+#    NnomatchZ = NnomatchZ+1
+#    if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+#    for j in xrange(len(cut)):
+#        if(rocOutputZ[i]>cut[j]):
+#            FPZ[j] = FPZ[j]+1
+#for j in xrange(len(cut)):
+#    FPRZ[j] = float(FPZ[j])/NnomatchZ
+#    hrocZ.Fill(FPRZ[j],TPR[j])
+#FPRHEPZ = float(FPHEPZ)/NnomatchZ
+#hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
+#
+#hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 0.5, 0, 0.5)
+#hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
+#for j in xrange(len(cut)):
+#    Effroc[j] = float(EffNumroc[j])/EffDenroc
+#    Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
+#    hroc_alt.Fill(Fakeroc[j], Effroc[j])
+#EffrocHEP = float(EffNumrocHEP)/EffDenroc
+#FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
+#hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
+#
+#print "EffDenroc: ", EffDenroc
+#print "EffNumroc: ", EffNumroc
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -799,77 +811,77 @@ leg.Draw("same")
 c.Print("FakeRate_njet_v2.png")
 
 #print roc
-hroc.SetStats(0)
-hroc.SetTitle("ROC:Objectwise (t#bart)")
-hroc.SetXTitle("FPR")
-hroc.SetYTitle("TPR")
-hroc.GetYaxis().SetRangeUser(0, 1)
-hroc_HEP.SetStats(0)
-hroc_HEP.SetLineColor(ROOT.kRed)
-hroc_HEP.SetMarkerColor(ROOT.kRed)
-hroc_HEP.SetMarkerStyle(20)
-hroc_HEP.SetMarkerSize(1)
-hroc.SetMarkerStyle(20)
-hroc.SetMarkerSize(1)
-hroc.Draw("pe")
-hroc_HEP.Draw("samePE")
-c.Print("roc_v2.png")
-
-hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
-hrocZ.SetStats(0)
-hrocZ.SetXTitle("FPR")
-hrocZ.SetYTitle("TPR")
-hroc_HEPZ.SetStats(0)
-hroc_HEPZ.SetLineColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerStyle(20)
-hroc_HEPZ.SetMarkerSize(1)
-hrocZ.SetMarkerStyle(20)
-hrocZ.SetMarkerSize(1)
-hrocZ.GetYaxis().SetRangeUser(0, 1)
-hrocZ.Draw()
-hroc_HEPZ.Draw("samePE")
-c.Print("rocZ_v2.png")
-
-hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
-hroc_alt.SetStats(0)
-hroc_alt.SetXTitle("FakeRate")
-hroc_alt.SetYTitle("Efficiency")
-hroc_alt.GetYaxis().SetRangeUser(0, 0.5)
-hroc_HEP_alt.SetStats(0)
-hroc_HEP_alt.SetLineColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerStyle(20)
-hroc_HEP_alt.SetMarkerSize(1)
-hroc_alt.SetMarkerStyle(20)
-hroc_alt.SetMarkerSize(1)
-hroc_alt.Draw("pe")
-hroc_HEP_alt.Draw("samePE")
-c.Print("roc_alt_v2.png")
+#hroc.SetStats(0)
+#hroc.SetTitle("ROC:Objectwise (t#bart)")
+#hroc.SetXTitle("FPR")
+#hroc.SetYTitle("TPR")
+#hroc.GetYaxis().SetRangeUser(0, 1)
+#hroc_HEP.SetStats(0)
+#hroc_HEP.SetLineColor(ROOT.kRed)
+#hroc_HEP.SetMarkerColor(ROOT.kRed)
+#hroc_HEP.SetMarkerStyle(20)
+#hroc_HEP.SetMarkerSize(1)
+#hroc.SetMarkerStyle(20)
+#hroc.SetMarkerSize(1)
+#hroc.Draw("pe")
+#hroc_HEP.Draw("samePE")
+#c.Print("roc_v2.png")
+#
+#hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
+#hrocZ.SetStats(0)
+#hrocZ.SetXTitle("FPR")
+#hrocZ.SetYTitle("TPR")
+#hroc_HEPZ.SetStats(0)
+#hroc_HEPZ.SetLineColor(ROOT.kRed)
+#hroc_HEPZ.SetMarkerColor(ROOT.kRed)
+#hroc_HEPZ.SetMarkerStyle(20)
+#hroc_HEPZ.SetMarkerSize(1)
+#hrocZ.SetMarkerStyle(20)
+#hrocZ.SetMarkerSize(1)
+#hrocZ.GetYaxis().SetRangeUser(0, 1)
+#hrocZ.Draw()
+#hroc_HEPZ.Draw("samePE")
+#c.Print("rocZ_v2.png")
+#
+#hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
+#hroc_alt.SetStats(0)
+#hroc_alt.SetXTitle("FakeRate")
+#hroc_alt.SetYTitle("Efficiency")
+#hroc_alt.GetYaxis().SetRangeUser(0, 0.5)
+#hroc_HEP_alt.SetStats(0)
+#hroc_HEP_alt.SetLineColor(ROOT.kRed)
+#hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
+#hroc_HEP_alt.SetMarkerStyle(20)
+#hroc_HEP_alt.SetMarkerSize(1)
+#hroc_alt.SetMarkerStyle(20)
+#hroc_alt.SetMarkerSize(1)
+#hroc_alt.Draw("pe")
+#hroc_HEP_alt.Draw("samePE")
+#c.Print("roc_alt_v2.png")
 
 # Plot feature importance
-feature_importance = clf.feature_importances_
-feature_names = numpy.array(dg.getList())
-feature_importance = 100.0 * (feature_importance / feature_importance.max())
-sorted_idx = numpy.argsort(feature_importance)
+#feature_importance = clf.feature_importances_
+#feature_names = numpy.array(dg.getList())
+#feature_importance = 100.0 * (feature_importance / feature_importance.max())
+#sorted_idx = numpy.argsort(feature_importance)
 
 #try to plot it with matplotlib
-try:
-    import matplotlib.pyplot as plt
-
-    # make importances relative to max importance
-    pos = numpy.arange(sorted_idx.shape[0]) + .5
-    #plt.subplot(1, 2, 2)
-    plt.barh(pos, feature_importance[sorted_idx], align='center')
-    plt.yticks(pos, feature_names[sorted_idx])
-    plt.xlabel('Relative Importance')
-    plt.title('Variable Importance')
-    #plt.show()
-    plt.savefig("feature_importance.png")
-except ImportError:
-    #I guess no matplotlib is installed, just print to screen?
-    featureImportanceandNames = zip(feature_names, feature_importance)
-    print [featureImportanceandNames[a] for a in sorted_idx].reverse()
+#try:
+#    import matplotlib.pyplot as plt
+#
+#    # make importances relative to max importance
+#    pos = numpy.arange(sorted_idx.shape[0]) + .5
+#    #plt.subplot(1, 2, 2)
+#    plt.barh(pos, feature_importance[sorted_idx], align='center')
+#    plt.yticks(pos, feature_names[sorted_idx])
+#    plt.xlabel('Relative Importance')
+#    plt.title('Variable Importance')
+#    #plt.show()
+#    plt.savefig("feature_importance.png")
+#except ImportError:
+#    #I guess no matplotlib is installed, just print to screen?
+#    featureImportanceandNames = zip(feature_names, feature_importance)
+#    print [featureImportanceandNames[a] for a in sorted_idx].reverse()
 
 print "DONE!"
 
@@ -891,9 +903,9 @@ hEff.Write()
 hPurity.Write()
 #hPurityHEP.Write()
 hFakeRate.Write()
-hroc.Write()
-hroc_HEP.Write()
-hrocZ.Write()
-hroc_HEPZ.Write()
+#hroc.Write()
+#hroc_HEP.Write()
+#hrocZ.Write()
+#hroc_HEPZ.Write()
 mf.Write()
 mf.Close()
