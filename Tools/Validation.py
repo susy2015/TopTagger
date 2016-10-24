@@ -1,3 +1,4 @@
+import sys
 import ROOT
 import numpy
 import math
@@ -12,7 +13,18 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 import pickle
 from MVAcommon import *
+try:
+    import cv2
+except ImportError:
+    sys.path.append("../../opencv/lib/")
+    import cv2
+import optparse
 
+parser = optparse.OptionParser("usage: %prog [options]\n")
+
+parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
+
+options, args = parser.parse_args()
 
 dg = DataGetter()
 varsname = dg.getList()
@@ -20,9 +32,14 @@ varsname = dg.getList()
 print "PROCESSING VALIDATION DATA"
 
 #Get training output
-fileTraining = open("TrainingOutput_RFC_noTheta.pkl",'r')
-clf1 = pickle.load(fileTraining)
-fileTraining.close()
+if options.opencv:
+    #This is absolutely terrible, but I have to recreate the openCV training here because it cannot be loaded in python yet
+    import Training
+    clf1 = Training.clf
+else:
+    fileTraining = open("TrainingOutput.pkl",'r')
+    clf1 = pickle.load(fileTraining)
+    fileTraining.close()
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
 
@@ -63,12 +80,12 @@ for event in fileValidation.slimmedTuple:
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
-output = clf1.predict_proba(npInputList)[:,1]
-#output = clf1.predict(npInputList)
-
+if options.opencv:
+    output = [clf1.predict(inputs)[0] for inputs in npInputList]
+else:
+    output = clf1.predict_proba(npInputList)[:,1]
 
 print "FILLING HISTOGRAMS"
-
 
 evtWidcand = 0
 cand = 0
@@ -100,6 +117,7 @@ for event in fileValidation.slimmedTuple:
     MVAcand =0
     HEPcand =0
     for i in xrange(len(event.cand_m)):
+        #if event.cand_pt[i] < 100: continue
         #prep output
         Varsval = dg.getData(event, i)
         hDisc.Fill(tmp_output[i])
@@ -176,9 +194,11 @@ for event in fileFakeRate.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
         ZinvpassHEP.append(HEPReqs(event, i))       
-zinvOutput = clf1.predict_proba(ZinvInput)[:,1]
-#zinvOutput = clf1.predict(ZinvInput)
-
+if options.opencv:
+    npZinvInput = numpy.array(ZinvInput, dtype=numpy.float32)
+    zinvOutput = [clf1.predict(inputs)[0] for inputs in npZinvInput]
+else:
+    zinvOutput = clf1.predict_proba(ZinvInput)[:,1]
 
 outputCount = 0
 Nevts = 0
@@ -232,8 +252,12 @@ FPHEP =0
 
 print "cut:", cut
 
-rocOutput = clf1.predict_proba(rocInput)[:,1]
-#rocOutput = clf1.predict(rocInput)
+if options.opencv:
+    nprocInput = numpy.array(rocInput, dtype=numpy.float32)
+    rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
+else:
+    rocOutput = clf1.predict_proba(rocInput)[:,1]
+
 for i in xrange(len(rocOutput)):
     if(rocScore[i]):
         Nmatch= Nmatch+1
@@ -271,8 +295,13 @@ for event in fileFakeRate.slimmedTuple:
     for i in xrange(len(event.cand_m)):
         rocInputZ.append(dg.getData(event, i))
         rocHEPZ.append(HEPReqs(event, i))
-rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
-#rocOutputZ = clf1.predict(rocInputZ)
+
+if options.opencv:
+    nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
+    rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
+else:
+    rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
+
 for i in xrange(len(rocOutputZ)):
     NnomatchZ = NnomatchZ+1
     if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
