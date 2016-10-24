@@ -52,7 +52,7 @@ FakeNumroc = len(cut) * [0]
 Fakeroc =    len(cut) * [0]
 FakeDenroc = 0
 FakeNumrocHEP = 0
-   
+
 inputList = []
 
 rocInput = []
@@ -152,7 +152,7 @@ for event in fileValidation.slimmedTuple:
                 if(tmp_output[i] > cut[k]):
                     EffNumroc[k] += 1
             hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
-            #pass reco discriminator threshold 
+            #pass reco discriminator threshold
             if(tmp_output[i] > discCut):
                 hEffNum.Fill(event.genConstMatchGenPtVec[i])
                 hPurityNum.Fill(event.cand_pt[i])
@@ -164,7 +164,7 @@ for event in fileValidation.slimmedTuple:
             hDiscMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscMatchPt.Fill(tmp_output[i])
-        #not truth matched 
+        #not truth matched
         else:
             nomatchcand += 1
             hDiscNoMatch.Fill(tmp_output[i])
@@ -179,7 +179,7 @@ print "cand: ", cand
 print "matchcand: ", matchcand
 print "nomatchcand: ", nomatchcand
 
-print "FakeRate Calculation"                                        
+print "FakeRate Calculation"
 #FakeRate
 fileFakeRate = ROOT.TFile.Open("trainingTuple_division_1_ZJetsToNuNu_validation.root")
 
@@ -193,7 +193,7 @@ for event in fileFakeRate.slimmedTuple:
     Nevts +=1
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
-        ZinvpassHEP.append(HEPReqs(event, i))       
+        ZinvpassHEP.append(HEPReqs(event, i))
 if options.opencv:
     npZinvInput = numpy.array(ZinvInput, dtype=numpy.float32)
     zinvOutput = [clf1.predict(inputs)[0] for inputs in npZinvInput]
@@ -296,8 +296,8 @@ for event in fileFakeRate.slimmedTuple:
         rocInputZ.append(dg.getData(event, i))
         rocHEPZ.append(HEPReqs(event, i))
 
+nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
 if options.opencv:
-    nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
     rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
 else:
     rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
@@ -624,6 +624,62 @@ c.Print("purity_disc.png")
 
 hMVAdisc_pt.Draw("colz")
 c.Print("discriminator_vs_candPt.png")
+
+from sklearn.covariance import EmpiricalCovariance
+
+npRocInput = numpy.array(rocInput)
+npRocAnswers = numpy.array(rocScore)
+slimNpData0 = npRocInput[npRocAnswers==0]
+slimNpData1 = npRocInput[npRocAnswers==1]
+
+ecv = EmpiricalCovariance()
+ecv.fit(slimNpData0)
+
+from scipy.linalg import fractional_matrix_power
+def diagElements(m):
+    size = m.shape[0]
+    return numpy.matrix(numpy.diag([m[i, i] for i in xrange(size)]))
+
+def corrMat(m):
+    sqrt_diag = fractional_matrix_power(diagElements(m), -0.5)
+    return numpy.array(sqrt_diag * m  * sqrt_diag)
+
+corr0 = corrMat(numpy.matrix(ecv.covariance_))
+
+ecv.fit(slimNpData0)
+
+corr1 = corrMat(numpy.matrix(ecv.covariance_))
+
+ecv.fit(nprocInputZ)
+
+corrZ = corrMat(numpy.matrix(ecv.covariance_))
+
+#try to plot it with matplotlib
+try:
+    import matplotlib.pyplot as plt
+
+    plt.matshow(corr0, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_ttbar_nomatch.png")
+
+    plt.matshow(corr1, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_ttbar_match.png")
+
+    plt.matshow(corrZ, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_Znunu.png")
+except ImportError:
+    pass #I guess we could puta root based backup here?
 
 #Writing histograms in a root file.
 mf = ROOT.TFile('MVAOutput.root','RECREATE')
