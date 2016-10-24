@@ -37,7 +37,7 @@ if options.opencv:
     import Training
     clf1 = Training.clf
 else:
-    fileTraining = open("TrainingOutput_RFC_noTheta.pkl",'r')
+    fileTraining = open("TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
     fileTraining.close()
 
@@ -87,7 +87,6 @@ else:
 
 print "FILLING HISTOGRAMS"
 
-
 evtWidcand = 0
 cand = 0
 matchcand = 0
@@ -118,6 +117,7 @@ for event in fileValidation.slimmedTuple:
     MVAcand =0
     HEPcand =0
     for i in xrange(len(event.cand_m)):
+        #if event.cand_pt[i] < 100: continue
         #prep output
         Varsval = dg.getData(event, i)
         hDisc.Fill(tmp_output[i])

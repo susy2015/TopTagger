@@ -110,7 +110,18 @@ npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
 
-#randomize input data                                                                                                                                                                                                                         
+nSig = npyInputWgts[npyInputAnswer==1].sum()
+nBg = npyInputWgts[npyInputAnswer==0].sum()
+
+#Equalize the relative weights of signal and bg
+for i in xrange(len(npyInputAnswer)):
+    if npyInputAnswer[i] == 0:
+        npyInputWgts[i] *= nSig/nBg
+
+nSig = npyInputWgts[npyInputAnswer==1].sum()
+nBg = npyInputWgts[npyInputAnswer==0].sum()
+
+#randomize input data
 perms = numpy.random.permutation(npyInputData.shape[0])
 npyInputData = npyInputData[perms]
 npyInputAnswer = npyInputAnswer[perms]
@@ -124,7 +135,7 @@ if options.opencv:
     n_estimators = 100
     clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.3)); #Do not make the 3rd arguement smaller, it can crash the code
     clf.setMaxCategories(2);
-    clf.setMaxDepth(8);
+    clf.setMaxDepth(15);
     clf.setMinSampleCount(5);
 
     #make opencv TrainData container
