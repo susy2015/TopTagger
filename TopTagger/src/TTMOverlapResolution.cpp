@@ -15,8 +15,10 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc)
     cfg::Context commonCxt("Common");
     cfg::Context localCxt("TTMOverlapResolution");
 
-    mt_                  = cfgDoc->get("mt",                  commonCxt, -999.9);
-    maxTopEta_           = cfgDoc->get("maxTopEta",           localCxt,  -999.9);
+    mt_         = cfgDoc->get("mt",         commonCxt, -999.9);
+
+    maxTopEta_  = cfgDoc->get("maxTopEta",  localCxt,  -999.9);
+    sortMethod_ = cfgDoc->get("sortMethod", localCxt,  "topMass");
 }
 
 void TTMOverlapResolution::run(TopTaggerResults& ttResults)
@@ -28,12 +30,20 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     //This is not the ideal method to track this, maybe have candidates?
     std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
 
-    //Sort the top vector by fabs(candMass - trueTopMass)
-    auto topMassSort = [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_);};
-    std::sort(tops.begin(), tops.end(), topMassSort);
-
-    //This variable is necessary to account for bug in Hongxuan's code
-    int nTops = 0;
+    //Sort the top vector for overlap resolution
+    if(sortMethod_.find("topMass") != std::string::npos)
+    {
+        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_); } );
+    }
+    else if(sortMethod_.find("pt") != std::string::npos)
+    {
+        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->p().Pt() < t2->p().Pt(); } );
+    }
+    else if(sortMethod_.find("mvaDisc") != std::string::npos)
+    {
+        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->getDiscriminator() < t2->getDiscriminator(); } );
+    }
+    
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
@@ -63,8 +73,6 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
         }
 
         //If the candidate survived, it must be a good top!!!
-
-        ++nTops;
 
         //Add the good tops constituents to the set tracking which constituents have been used
         for(const auto& jet : jets)

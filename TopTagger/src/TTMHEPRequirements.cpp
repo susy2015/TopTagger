@@ -30,7 +30,6 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
     //Get the list of final tops into which we will stick candidates
     std::vector<TopObject*>& tops = ttResults.getTops();
 
-    //For now I will be a terrible person and hardcode the cuts
     for(auto& topCand : topCandidates)
     {
         //Grab the list of constituents which make up this top candidate 

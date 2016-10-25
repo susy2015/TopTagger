@@ -1,6 +1,8 @@
 
 #include "SusyAnaTools/Tools/NTupleReader.h"
 
+#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
+          
 #include "opencv/cv.h"       // opencv general include file
 #include "opencv/ml.h"  // opencv machine learning include file
 
@@ -8,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <iomanip>
+#include <algorithm> 
 
 #include "TFile.h"
 #include "TLegend.h"
@@ -18,73 +21,82 @@ using namespace cv;
 using namespace cv::ml; // OpenCV API is in the C++ "cv" namespace
 
 //ClassificationDataset getDataset(std::string fname, bool doWeights = false)
-Ptr<TrainData> getDataset(std::string fname, bool doWeights = false)
+Ptr<TrainData> getDataset(std::vector<std::string> fnames, bool doWeights = false)
 {
-    static const std::vector<std::string> variables = {"cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12_dTheta", "j13_dTheta", "j23_dTheta"};
-
-    TFile *f_train = TFile::Open(fname.c_str());
-    TTree *t_train = (TTree*)f_train->Get("slimmedTuple");
-
-    TH1 * hMatch   = new TH1D("hMatch",   "hMatch",   200, 0, 2000);
-    TH1 * hNoMatch = new TH1D("hNoMatch", "hNoMatch", 200, 0, 2000);
-
-    NTupleReader tr_pre(t_train);
-
-    while(tr_pre.getNextEvent())
-    {
-        const std::vector<double>& cand_pt = tr_pre.getVec<double>("cand_pt");
-        const std::vector<int>& genConstiuentMatchesVec = tr_pre.getVec<int>("genConstiuentMatchesVec");
-
-        for(int i = 0; i < cand_pt.size(); ++i)
-        {
-            if(genConstiuentMatchesVec[i] == 3) hMatch->Fill(cand_pt[i]);
-            else                                hNoMatch->Fill(cand_pt[i]);
-        }
-    }
-
-    NTupleReader tr(t_train);
+    static const std::vector<std::string> variables = ttUtility::getMVAVars();
 
     std::vector<std::vector<float>> inputs;
     std::vector<unsigned int> outputs;
     std::vector<double> pt_weights;
 
-    std::vector<const std::vector<double>*> vecs(variables.size(), nullptr);
-
-    while(tr.getNextEvent())
+    for(auto& fname : fnames)
     {
-        if(doWeights && tr.getEvtNum() > 10000) break;
-        for(int i = 0; i < variables.size(); ++i)
+        TFile *f_train = TFile::Open(fname.c_str());
+        TTree *t_train = (TTree*)f_train->Get("slimmedTuple");
+
+        TH1 * hMatch   = new TH1D("hMatch",   "hMatch",   200, 0, 2000);
+        TH1 * hNoMatch = new TH1D("hNoMatch", "hNoMatch", 200, 0, 2000);
+
+        NTupleReader tr_pre(t_train);
+
+        while(tr_pre.getNextEvent())
         {
-            vecs[i] = &tr.getVec<double>(variables[i]);
+            if(doWeights && tr_pre.getEvtNum() > 10000) break;
+            const std::vector<double>& cand_pt = tr_pre.getVec<double>("cand_pt");
+            const std::vector<int>& genConstiuentMatchesVec = tr_pre.getVec<int>("genConstiuentMatchesVec");
+
+            for(int i = 0; i < cand_pt.size(); ++i)
+            {
+                if(genConstiuentMatchesVec[i] == 3) hMatch->Fill(cand_pt[i]);
+                else                                hNoMatch->Fill(cand_pt[i]);
+            }
         }
 
-        const std::vector<int>& genConstiuentMatchesVec = tr.getVec<int>("genConstiuentMatchesVec");
+        NTupleReader tr(t_train);
 
-        for(int i = 0; i < vecs.front()->size(); ++i)
+        std::vector<const std::vector<double>*> vecs(variables.size(), nullptr);
+
+        while(tr.getNextEvent())
         {
-            std::vector<float> input;
-
-            for(int j = 0; j < vecs.size(); ++j)
+            if(doWeights && tr.getEvtNum() > 10000) break;
+            for(int i = 0; i < variables.size(); ++i)
             {
-                input.push_back(vecs[j]->at(i));
+                vecs[i] = &tr.getVec<double>(variables[i]);
             }
 
-            int match = genConstiuentMatchesVec[i] == 3;
+            const std::vector<int>& genConstiuentMatchesVec = tr.getVec<int>("genConstiuentMatchesVec");
 
-            inputs.push_back(input);
-            outputs.push_back(match);
+            for(int i = 0; i < vecs.front()->size(); ++i)
+            {
+                std::vector<float> input;
 
-            if(match) pt_weights.push_back(1.0);//1/hMatch->Integral());
-            else      pt_weights.push_back(hMatch->Integral()/hNoMatch->Integral());
+                for(int j = 0; j < vecs.size(); ++j)
+                {
+                    input.push_back(vecs[j]->at(i));
+                }
+
+                int match = genConstiuentMatchesVec[i] == 3;
+
+                inputs.push_back(input);
+                outputs.push_back(match);
+
+                if(match) pt_weights.push_back(1.0/hMatch->Integral());
+                else      pt_weights.push_back(1.0/hNoMatch->Integral());
+            }
         }
     }
 
-    Mat data = Mat(inputs.size(), inputs.front().size(), CV_32FC1);
-    Mat labels = Mat(outputs.size(), 1, CV_32FC1);
+    Mat data = Mat(inputs.size(), inputs.front().size(), CV_32F);
+    Mat labels = Mat(outputs.size(), 1, CV_32F);
     Mat weights = Mat(outputs.size(), 1, CV_32F);
 
+    //stupid randomization solution
+    std::vector<int> sampleIndices(inputs.size(), 0);
+    for(int i = 0; i < inputs.size(); ++i) sampleIndices[i] = i;
+    std::random_shuffle ( sampleIndices.begin(), sampleIndices.end() );
+
     //stick data into matrix
-    for(int iSample = 0; iSample < inputs.size(); ++iSample)
+    for(int iSample : sampleIndices)
     {
         labels.at<float>(iSample, 0) = outputs[iSample];
         for(int iFeature = 0; iFeature < inputs[iSample].size(); ++iFeature)
@@ -114,7 +126,7 @@ int main()
 
     std::cout << "Processing training data" << std::endl;
 
-    auto trainingData = getDataset("trainingTuple_division_0_TTbarSingleLep_TRF2.root", true);
+    auto trainingData = getDataset({"trainingTuple_division_0_TTbarSingleLep_TRF2.root", "trainingTuple_division_0_ZJetsToNuNu_TRF2.root"}, true);
 
     std::cout << "Training MVA" << std::endl;
 
@@ -165,14 +177,18 @@ int main()
 
     rtree->train(trainingData);
 
+    rtree->save("toptagger.model");
+
     std::cout << "Processing validation data" << std::endl;
     
-    auto validData = getDataset("trainingTuple_division_1_TTbarSingleLep_TRF2.root");
+    auto validData = getDataset({"trainingTuple_division_1_TTbarSingleLep_TRF2.root"});
 
     Mat testdata = validData->getSamples();
     Mat testlabels = validData->getResponses();
     
     std::cout << "Predicting results" << std::endl;
+
+    Ptr<RTrees> rtree2 = RTrees::load<RTrees>("toptagger.model");
 
     std::vector<double> prediction;
     for(int iSample = 0; iSample < testdata.rows; ++iSample)
@@ -180,7 +196,7 @@ int main()
         // extract a row from the testing matrix
         Mat testSample = testdata.row(iSample);
 
-        prediction.push_back(rtree->predict(testSample));
+        prediction.push_back(rtree2->predict(testSample));
     }
 
     //std::cout << "Calculating Error" << std::endl;
