@@ -32,12 +32,25 @@ OPENVCLIBS = -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples openCVTest # sharkTest
+PROGRAMS = makeTrainingTuples openCVTest TagTest1 # sharkTest
 
-all: mkobj $(PROGRAMS)
+all: mkobj sampPyWrap $(PROGRAMS)
 
 mkobj:
 	@mkdir -p obj
+
+#code to compile shared library to link samples to python                                                                                                                               
+sampPyWrap: $(ODIR)/samplesModule.so
+
+$(ODIR)/samplesModule.so: $(ODIR)/samplesPyWrap.o $(ODIR)/samplesModulePyWrap.o
+	$(CXX) -shared -o $@ $^
+
+$(ODIR)/samplesPyWrap.o: $(RSDIR)/samples.cc $(RSDIR)/samples.h
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
+$(ODIR)/samplesModulePyWrap.o: $(RSDIR)/samplesModule.cc
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
 
 $(ODIR)/%.o : $(SDIR)/%.C
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(SDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
@@ -66,6 +79,9 @@ sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o sharkTest.o
 
 openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o openCVTest.o 
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
+
+TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+	$(LD) $^ $(LIBS) $(MT2LIB) -o $@
 
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
