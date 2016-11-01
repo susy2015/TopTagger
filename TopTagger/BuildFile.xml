@@ -1,5 +1,7 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="TopTagger/CfgParser"/>
-<Flags CXXFLAGS="-I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/include/ -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/core/include -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/video/include -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/objdetect/include -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/ml/include/ -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/photo/include/ -I/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/modules/imgproc/include/ -L/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/ -lopencv_ml -lopencv_core"/>
+<Flags CXXFLAGS="-Isrc/opencv/include/ -Isrc/opencv/modules/core/include -Isrc/opencv/modules/video/include -Isrc/opencv/modules/objdetect/include -Isrc/opencv/modules/ml/include/ -Isrc/opencv/modules/photo/include/ -Isrc/opencv/modules/imgproc/include/ -Lsrc/opencv/lib/"/>
 <Flags CXXFLAGS="-g"/>
 <flags EDM_PLUGIN="0"/>
+<lib name="opencv_ml"/>
+<lib name="opencv_core"/>
