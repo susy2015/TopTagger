@@ -85,7 +85,7 @@ nBg = npyInputWgts[npyInputAnswer==0].sum()
 #Equalize the relative weights of signal and bg
 for i in xrange(len(npyInputAnswer)):
     if npyInputAnswer[i] == 0:
-        npyInputWgts[i] *= nSig/nBg
+        npyInputWgts[i] *= 2*nSig/nBg
 
 nSig = npyInputWgts[npyInputAnswer==1].sum()
 nBg = npyInputWgts[npyInputAnswer==0].sum()
@@ -102,10 +102,10 @@ if options.opencv:
     clf = cv2.ml.RTrees_create()
 
     n_estimators = 100
-    clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.3)); #Do not make the 3rd arguement smaller, it can crash the code
-    clf.setMaxCategories(2);
-    clf.setMaxDepth(15);
-    clf.setMinSampleCount(5);
+    clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.1))
+    #clf.setMaxCategories(2)
+    clf.setMaxDepth(15)
+    #clf.setMinSampleCount(5)
 
     #make opencv TrainData container
     cvTrainData = cv2.ml.TrainData_create(npyInputData, cv2.ml.ROW_SAMPLE, npyInputAnswer, sampleWeights = npyInputWgts)
@@ -115,7 +115,7 @@ if options.opencv:
     clf.save("TrainingOutput.model")
 
 else:
-    clf = RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs = 4)
+    clf = RandomForestClassifier(n_estimators=100, max_depth=15, n_jobs = 4)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
     #clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
