@@ -1,3 +1,4 @@
+import sys
 import ROOT
 import numpy
 import math
@@ -12,7 +13,19 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import GradientBoostingRegressor
 import pickle
 from MVAcommon import *
+try:
+    import cv2
+except ImportError:
+    sys.path.append("../../opencv/lib/")
+    import cv2
+import optparse
 
+parser = optparse.OptionParser("usage: %prog [options]\n")
+
+parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
+parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
+
+options, args = parser.parse_args()
 
 dg = DataGetter()
 varsname = dg.getList()
@@ -20,9 +33,14 @@ varsname = dg.getList()
 print "PROCESSING VALIDATION DATA"
 
 #Get training output
-fileTraining = open("TrainingOutput.pkl",'r')
-clf1 = pickle.load(fileTraining)
-fileTraining.close()
+if options.opencv:
+    #This is absolutely terrible, but I have to recreate the openCV training here because it cannot be loaded in python yet
+    import Training
+    clf1 = Training.clf
+else:
+    fileTraining = open("TrainingOutput.pkl",'r')
+    clf1 = pickle.load(fileTraining)
+    fileTraining.close()
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
 
@@ -35,7 +53,7 @@ FakeNumroc = len(cut) * [0]
 Fakeroc =    len(cut) * [0]
 FakeDenroc = 0
 FakeNumrocHEP = 0
-   
+
 inputList = []
 
 rocInput = []
@@ -44,6 +62,7 @@ rocHEP = []
 
 Nevts = 0
 for event in fileValidation.slimmedTuple:
+    if event.Njet<4 : continue
     if Nevts >= NEVTS:
         break
     Nevts += 1
@@ -62,12 +81,12 @@ for event in fileValidation.slimmedTuple:
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
-output = clf1.predict_proba(npInputList)[:,1]
-#output = clf1.predict(npInputList)
-
+if options.opencv:
+    output = [clf1.predict(inputs)[0] for inputs in npInputList]
+else:
+    output = clf1.predict_proba(npInputList)[:,1]
 
 print "FILLING HISTOGRAMS"
-
 
 evtWidcand = 0
 cand = 0
@@ -76,6 +95,7 @@ nomatchcand =0
 outputCount = 0;
 Nevts = 0
 for event in fileValidation.slimmedTuple:
+    if event.Njet<4 : continue
     if Nevts >= NEVTS:
         break
     Nevts += 1
@@ -98,13 +118,15 @@ for event in fileValidation.slimmedTuple:
     MVAcand =0
     HEPcand =0
     for i in xrange(len(event.cand_m)):
+        #if event.cand_pt[i] < 100: continue
         #prep output
         Varsval = dg.getData(event, i)
-
         hDisc.Fill(tmp_output[i])
+        hMVAdisc_pt.Fill(event.cand_pt[i], tmp_output[i])
         if(tmp_output[i] > discCut):
             MVAcand +=1
             hPurityDen.Fill(event.cand_pt[i])
+            hPurity_discDen.Fill(tmp_output[i])
             hNConstMatchTag.Fill(event.genConstiuentMatchesVec[i])
             for j, vname in enumerate(varsname):
                 if(histranges.has_key(vname)):
@@ -124,14 +146,18 @@ for event in fileValidation.slimmedTuple:
         #Truth matched candidates
         if(event.genConstiuentMatchesVec[i] == 3):
             matchcand += 1
+            hj1Theta.Fill(math.cos(event.j1_theta[i]))
+            hj2Theta.Fill(math.cos(event.j2_theta[i]))
+            hj3Theta.Fill(math.cos(event.j3_theta[i]))
             for k in xrange(len(cut)):
                 if(tmp_output[i] > cut[k]):
                     EffNumroc[k] += 1
             hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
-            #pass reco discriminator threshold 
+            #pass reco discriminator threshold
             if(tmp_output[i] > discCut):
                 hEffNum.Fill(event.genConstMatchGenPtVec[i])
                 hPurityNum.Fill(event.cand_pt[i])
+                hPurity_discNum.Fill(tmp_output[i])
             if(passHEP):
                 hEffHEPNum.Fill(event.genConstMatchGenPtVec[i])
                 hPurityHEPNum.Fill(event.cand_pt[i])
@@ -139,7 +165,7 @@ for event in fileValidation.slimmedTuple:
             hDiscMatch.Fill(tmp_output[i])
             if(event.cand_pt[i] > 250):
                 hDiscMatchPt.Fill(tmp_output[i])
-        #not truth matched 
+        #not truth matched
         else:
             nomatchcand += 1
             hDiscNoMatch.Fill(tmp_output[i])
@@ -154,7 +180,7 @@ print "cand: ", cand
 print "matchcand: ", matchcand
 print "nomatchcand: ", nomatchcand
 
-print "FakeRate Calculation"                                        
+print "FakeRate Calculation"
 #FakeRate
 fileFakeRate = ROOT.TFile.Open("trainingTuple_division_1_ZJetsToNuNu_validation.root")
 
@@ -162,19 +188,23 @@ ZinvInput = []
 ZinvpassHEP = []
 Nevts = 0
 for event in fileFakeRate.slimmedTuple:
+    if event.Njet<4 : continue
     if Nevts >= NEVTS_Z:
         break
     Nevts +=1
     for i in xrange(len(event.cand_m)):
         ZinvInput.append(dg.getData(event, i))
-        ZinvpassHEP.append(HEPReqs(event, i))       
-zinvOutput = clf1.predict_proba(ZinvInput)[:,1]
-#zinvOutput = clf1.predict(ZinvInput)
-
+        ZinvpassHEP.append(HEPReqs(event, i))
+if options.opencv:
+    npZinvInput = numpy.array(ZinvInput, dtype=numpy.float32)
+    zinvOutput = [clf1.predict(inputs)[0] for inputs in npZinvInput]
+else:
+    zinvOutput = clf1.predict_proba(ZinvInput)[:,1]
 
 outputCount = 0
 Nevts = 0
 for event in fileFakeRate.slimmedTuple:
+    if event.Njet<4 : continue
     if Nevts >= NEVTS_Z:
         break
     Nevts +=1
@@ -210,85 +240,96 @@ for event in fileFakeRate.slimmedTuple:
     for k in xrange(len(cut)):
         if(numflagroc[k]):FakeNumroc[k] += 1
 
-print "ROC Calculation"
-#ttbar
-TP =  len(cut)*[0]
-FP =  len(cut)*[0]
-TPR = len(cut)*[0]
-FPR = len(cut)*[0]
-Nmatch = 0
-Nnomatch = 0
-TPHEP =0
-FPHEP =0
-
-print "cut:", cut
-
-rocOutput = clf1.predict_proba(rocInput)[:,1]
-#rocOutput = clf1.predict(rocInput)
-for i in xrange(len(rocOutput)):
-    if(rocScore[i]):
-        Nmatch= Nmatch+1
-        if(rocHEP[i]):TPHEP = TPHEP+1
+if not options.noROC:
+    print "ROC Calculation"
+    #ttbar
+    TP =  len(cut)*[0]
+    FP =  len(cut)*[0]
+    TPR = len(cut)*[0]
+    FPR = len(cut)*[0]
+    Nmatch = 0
+    Nnomatch = 0
+    TPHEP =0
+    FPHEP =0
+    
+    print "cut:", cut
+    
+    if options.opencv:
+        nprocInput = numpy.array(rocInput, dtype=numpy.float32)
+        rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
     else:
-        Nnomatch = Nnomatch+1
-        if(rocHEP[i]):FPHEP = FPHEP+1
+        rocOutput = clf1.predict_proba(rocInput)[:,1]
+    
+    for i in xrange(len(rocOutput)):
+        if(rocScore[i]):
+            Nmatch= Nmatch+1
+            if(rocHEP[i]):TPHEP = TPHEP+1
+        else:
+            Nnomatch = Nnomatch+1
+            if(rocHEP[i]):FPHEP = FPHEP+1
+        for j in xrange(len(cut)):
+            if(rocOutput[i]>cut[j]):
+                if(rocScore[i]):TP[j] = TP[j]+1
+                else:FP[j] = FP[j]+1
+    
     for j in xrange(len(cut)):
-        if(rocOutput[i]>cut[j]):
-            if(rocScore[i]):TP[j] = TP[j]+1
-            else:FP[j] = FP[j]+1
-
-for j in xrange(len(cut)):
-    TPR[j] = float(TP[j])/Nmatch
-    FPR[j] = float(FP[j])/Nnomatch
-    hroc.Fill(FPR[j],TPR[j])
-TPRHEP = float(TPHEP)/Nmatch
-FPRHEP = float(FPHEP)/Nnomatch
-hroc_HEP.Fill(FPRHEP,TPRHEP)
-
-print "TPR: ", TPR
-print "FPR: ", FPR
-
-#Zinv
-
-FPZ  = len(cut) * [0]
-FPRZ = len(cut) * [0]
-NnomatchZ = 0
-FPHEPZ =0
-FPRHEPZ =0
-rocInputZ = []
-rocHEPZ = []
-for event in fileFakeRate.slimmedTuple:
-    for i in xrange(len(event.cand_m)):
-        rocInputZ.append(dg.getData(event, i))
-        rocHEPZ.append(HEPReqs(event, i))
-rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
-#rocOutputZ = clf1.predict(rocInputZ)
-for i in xrange(len(rocOutputZ)):
-    NnomatchZ = NnomatchZ+1
-    if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+        TPR[j] = float(TP[j])/Nmatch
+        FPR[j] = float(FP[j])/Nnomatch
+        hroc.Fill(FPR[j],TPR[j])
+    TPRHEP = float(TPHEP)/Nmatch
+    FPRHEP = float(FPHEP)/Nnomatch
+    hroc_HEP.Fill(FPRHEP,TPRHEP)
+    
+    print "TPR: ", TPR
+    print "FPR: ", FPR
+    
+    #Zinv
+    
+    FPZ  = len(cut) * [0]
+    FPRZ = len(cut) * [0]
+    NnomatchZ = 0
+    FPHEPZ =0
+    FPRHEPZ =0
+    rocInputZ = []
+    rocHEPZ = []
+    for event in fileFakeRate.slimmedTuple:
+        if event.Njet<4 : continue
+        for i in xrange(len(event.cand_m)):
+            rocInputZ.append(dg.getData(event, i))
+            rocHEPZ.append(HEPReqs(event, i))
+    
+    nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
+    if options.opencv:
+        rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
+    else:
+        rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
+    
+    for i in xrange(len(rocOutputZ)):
+        NnomatchZ = NnomatchZ+1
+        if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+        for j in xrange(len(cut)):
+            if(rocOutputZ[i]>cut[j]):
+                FPZ[j] = FPZ[j]+1
     for j in xrange(len(cut)):
-        if(rocOutputZ[i]>cut[j]):
-            FPZ[j] = FPZ[j]+1
-for j in xrange(len(cut)):
-    FPRZ[j] = float(FPZ[j])/NnomatchZ
-    hrocZ.Fill(FPRZ[j],TPR[j])
-FPRHEPZ = float(FPHEPZ)/NnomatchZ
-hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
-
-
-for j in xrange(len(cut)):
-    Effroc[j] = float(EffNumroc[j])/EffDenroc
-    Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
-    hroc_alt.Fill(Fakeroc[j], Effroc[j])
-EffrocHEP = float(EffNumrocHEP)/EffDenroc
-FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
-hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
-
-print "EffDenroc: ", EffDenroc
-print "EffNumroc: ", EffNumroc
-
-print "FakerocHEP:", FakerocHEP
-print "EffrocHEP:",EffrocHEP
+        FPRZ[j] = float(FPZ[j])/NnomatchZ
+        hrocZ.Fill(FPRZ[j],TPR[j])
+    FPRHEPZ = float(FPHEPZ)/NnomatchZ
+    hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
+    
+    
+    for j in xrange(len(cut)):
+        Effroc[j] = float(EffNumroc[j])/EffDenroc
+        Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
+        hroc_alt.Fill(Fakeroc[j], Effroc[j])
+    EffrocHEP = float(EffNumrocHEP)/EffDenroc
+    FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
+    hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
+    
+    print "EffDenroc: ", EffDenroc
+    print "EffNumroc: ", EffNumroc
+    
+    print "FakerocHEP:", FakerocHEP
+    print "EffrocHEP:",EffrocHEP
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -449,7 +490,6 @@ hPurity.SetStats(0)
 hPurity.SetTitle("")
 hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
 hPurity.GetYaxis().SetTitle("Purity")
-hPurity.GetXaxis().SetTitle("reco top Pt [GeV]")
 hPurity.GetYaxis().SetRangeUser(0, 1.3)
 hPurity.Divide(hPurityDen)
 hPurityHEP = hPurityHEPNum.Clone("hPurityHEP")
@@ -465,6 +505,7 @@ hPurity.Draw()
 hPurityHEP.Draw("same")
 leg.Draw("same")
 c.Print("purity.png")
+
 
 #FakeRate
 hFakeRate_met = hFakeNum.Clone("hFakeRate_met")
@@ -507,57 +548,141 @@ hFakeRateHEP_njet.Draw("same")
 leg.Draw("same")
 c.Print("FakeRate_njet.png")
 
-#print roc
-hroc.SetStats(0)
-hroc.SetTitle("ROC:Objectwise (t#bar{t})")
-hroc.SetXTitle("FPR")
-hroc.SetYTitle("TPR")
-hroc.GetYaxis().SetRangeUser(0, 1)
-hroc_HEP.SetStats(0)
-hroc_HEP.SetLineColor(ROOT.kRed)
-hroc_HEP.SetMarkerColor(ROOT.kRed)
-hroc_HEP.SetMarkerStyle(20)
-hroc_HEP.SetMarkerSize(1)
-hroc.SetMarkerStyle(20)
-hroc.SetMarkerSize(1)
-hroc.Draw("pe")
-hroc_HEP.Draw("samePE")
-c.Print("roc.png")
+if not options.noROC:
+    #print roc
+    hroc.SetStats(0)
+    hroc.SetTitle("ROC:Objectwise (t#bar{t})")
+    hroc.SetXTitle("FPR")
+    hroc.SetYTitle("TPR")
+    hroc.GetYaxis().SetRangeUser(0, 1)
+    hroc_HEP.SetStats(0)
+    hroc_HEP.SetLineColor(ROOT.kRed)
+    hroc_HEP.SetMarkerColor(ROOT.kRed)
+    hroc_HEP.SetMarkerStyle(20)
+    hroc_HEP.SetMarkerSize(1)
+    hroc.SetMarkerStyle(20)
+    hroc.SetMarkerSize(1)
+    hroc.Draw("pe")
+    hroc_HEP.Draw("samePE")
+    c.Print("roc.png")
+    
+    hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
+    hrocZ.SetStats(0)
+    hrocZ.SetXTitle("FPR")
+    hrocZ.SetYTitle("TPR")
+    hroc_HEPZ.SetStats(0)
+    hroc_HEPZ.SetLineColor(ROOT.kRed)
+    hroc_HEPZ.SetMarkerColor(ROOT.kRed)
+    hroc_HEPZ.SetMarkerStyle(20)
+    hroc_HEPZ.SetMarkerSize(1)
+    hrocZ.SetMarkerStyle(20)
+    hrocZ.SetMarkerSize(1)
+    hrocZ.GetYaxis().SetRangeUser(0, 1)
+    hrocZ.Draw("pe")
+    hroc_HEPZ.Draw("samePE")
+    c.Print("rocZ.png")
+    
+    hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
+    hroc_alt.SetStats(0)
+    hroc_alt.SetXTitle("FakeRate")
+    hroc_alt.SetYTitle("Efficiency")
+    hroc_alt.GetYaxis().SetRangeUser(0, 1)
+    hroc_alt.GetXaxis().SetRangeUser(0, 1)
+    hroc_HEP_alt.SetStats(0)
+    hroc_HEP_alt.SetLineColor(ROOT.kRed)
+    hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
+    hroc_HEP_alt.SetMarkerStyle(20)
+    hroc_HEP_alt.SetMarkerSize(1)
+    hroc_alt.SetMarkerStyle(20)
+    hroc_alt.SetMarkerSize(1)
+    hroc_alt.Draw("pe")
+    hroc_HEP_alt.Draw("samePE")
+    c.Print("roc_alt.png")
 
-hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
-hrocZ.SetStats(0)
-hrocZ.SetXTitle("FPR")
-hrocZ.SetYTitle("TPR")
-hroc_HEPZ.SetStats(0)
-hroc_HEPZ.SetLineColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerStyle(20)
-hroc_HEPZ.SetMarkerSize(1)
-hrocZ.SetMarkerStyle(20)
-hrocZ.SetMarkerSize(1)
-hrocZ.GetYaxis().SetRangeUser(0, 1)
-hrocZ.Draw("pe")
-hroc_HEPZ.Draw("samePE")
-c.Print("rocZ.png")
+#few test plots
+hj1Theta.SetTitle("cos#theta(topboost, j_{i})")
+hj1Theta.SetStats(0)
+hj1Theta.SetLineColor(ROOT.kRed)
+hj2Theta.SetLineColor(ROOT.kBlack)
+hj3Theta.SetLineColor(ROOT.kBlue)
+leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
+leg.AddEntry(hj1Theta, "j1")
+leg.AddEntry(hj2Theta, "j2")
+leg.AddEntry(hj3Theta, "j3")
+hj1Theta.Draw()
+hj2Theta.Draw("same")
+hj3Theta.Draw("same")
+leg.Draw("same")
+c.Print("Matched_theta.png")
 
-hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
-hroc_alt.SetStats(0)
-hroc_alt.SetXTitle("FakeRate")
-hroc_alt.SetYTitle("Efficiency")
-hroc_alt.GetYaxis().SetRangeUser(0, 1)
-hroc_alt.GetXaxis().SetRangeUser(0, 1)
-hroc_HEP_alt.SetStats(0)
-hroc_HEP_alt.SetLineColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerStyle(20)
-hroc_HEP_alt.SetMarkerSize(1)
-hroc_alt.SetMarkerStyle(20)
-hroc_alt.SetMarkerSize(1)
-hroc_alt.Draw("pe")
-hroc_HEP_alt.Draw("samePE")
-c.Print("roc_alt.png")
+hPurity_disc = hPurity_discNum.Clone("hPurity_disc")
+hPurity_disc.SetStats(0)
+hPurity_disc.SetTitle("")
+hPurity_disc.GetXaxis().SetTitle("MVA disc.")
+hPurity_disc.GetYaxis().SetTitle("Purity")
+hPurity_disc.GetYaxis().SetRangeUser(0, 1.3)
+hPurity_disc.Divide(hPurity_discDen)
+hPurity_disc.Draw()
+c.Print("purity_disc.png")
 
+hMVAdisc_pt.Draw("colz")
+c.Print("discriminator_vs_candPt.png")
 
+from sklearn.covariance import EmpiricalCovariance
+
+npRocInput = numpy.array(rocInput)
+npRocAnswers = numpy.array(rocScore)
+slimNpData0 = npRocInput[npRocAnswers==0]
+slimNpData1 = npRocInput[npRocAnswers==1]
+
+ecv = EmpiricalCovariance()
+ecv.fit(slimNpData0)
+
+from scipy.linalg import fractional_matrix_power
+def diagElements(m):
+    size = m.shape[0]
+    return numpy.matrix(numpy.diag([m[i, i] for i in xrange(size)]))
+
+def corrMat(m):
+    sqrt_diag = fractional_matrix_power(diagElements(m), -0.5)
+    return numpy.array(sqrt_diag * m  * sqrt_diag)
+
+corr0 = corrMat(numpy.matrix(ecv.covariance_))
+
+ecv.fit(slimNpData0)
+
+corr1 = corrMat(numpy.matrix(ecv.covariance_))
+
+ecv.fit(nprocInputZ)
+
+corrZ = corrMat(numpy.matrix(ecv.covariance_))
+
+#try to plot it with matplotlib
+try:
+    import matplotlib.pyplot as plt
+
+    plt.matshow(corr0, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_ttbar_nomatch.png")
+
+    plt.matshow(corr1, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_ttbar_match.png")
+
+    plt.matshow(corrZ, cmap=plt.cm.seismic, vmin = -1, vmax = 1)
+    varlist = dg.getList()
+    plt.xticks(range(len(varlist)), varlist, rotation='vertical')
+    plt.yticks(range(len(varlist)), varlist)
+    plt.colorbar(orientation='vertical')
+    plt.savefig("feature_corrolation_Znunu.png")
+except ImportError:
+    pass #I guess we could puta root based backup here?
 
 #Writing histograms in a root file.
 mf = ROOT.TFile('MVAOutput.root','RECREATE')
@@ -580,12 +705,13 @@ hFakeRate_met.Write()
 hFakeRateHEP_met.Write()
 hFakeRate_njet.Write()
 hFakeRateHEP_njet.Write()
-hroc.Write()
-hroc_HEP.Write()
-hrocZ.Write()
-hroc_HEPZ.Write()
-hroc_alt.Write()
-hroc_HEP_alt.Write()
+if not options.noROC:
+    hroc.Write()
+    hroc_HEP.Write()
+    hrocZ.Write()
+    hroc_HEPZ.Write()
+    hroc_alt.Write()
+    hroc_HEP_alt.Write()
 mf.Write()
 mf.Close()
 

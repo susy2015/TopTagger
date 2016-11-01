@@ -44,40 +44,21 @@ OpenCV provides a C++ interface to a random forest algorithm which can be integr
 
 ### Installing openCV
 
-In order to use sample weights we need the latest release of openCV 3.1.0.  You may either download the sources as a zip or downlod the repository from github. Downloading the zip will use less disk space.
-
-The tarball may be downloaded from 
-
-```
-http://opencv.org/downloads.html
-```
-
-Ensure you download the version for 3.1.0
-
-Unzip the archive in your "CMSSW_X_Y_Z/src" folder and rename the folder as follows
-
-```
-unzip opencv-3.1.0.zip
-rm opencv-3.1.0.zip
-mv opencv-3.1.0.zip opencv
-cd opencv
-```
-
-rename the folder from "opencv-3.1.0" to "opencv"
+In order to use sample weights we need the latest release of openCV 3.1.0 and a bug fix I have added to stop RTree training form crashing.  You may download the repository from github via my fork in susy2015.
 
 To install from github do the following in your "CMSSW_X_Y_Z/src"
 
 ```
-git clone git@github.com:opencv/opencv.git
+git clone git@github.com:susy2015/opencv.git
 cd opencv
-git checkout 3.1.0
+git checkout 3.1.0_StopBugFix
 ```
 
 To compile openCV run the following commands in the "opencv" folder
 
 ```
 cmake .
-make -j4
+make -j6
 ```
 
 ### Running openCV test code

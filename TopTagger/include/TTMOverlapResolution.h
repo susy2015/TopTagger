@@ -3,12 +3,15 @@
 
 #include "TopTagger/TopTagger/include/TTModule.h"
 
+#include <string>
+
 class TopTaggerResults;
 
 class TTMOverlapResolution : public TTModule
 {
 private:
     double mt_, maxTopEta_;
+    std::string sortMethod_;
 
 public:
     void getParameters(const cfg::CfgDocument*);

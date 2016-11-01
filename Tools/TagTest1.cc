@@ -5,8 +5,8 @@
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 
-#include "TaggerTest/include/TaggerUtility.h"
-#include "TaggerTest/include/PlotUtility.h"
+#include "TaggerUtility.h"
+#include "PlotUtility.h"
 #include "TagTest1.h"
 
 // === Main Function ===================================================
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 
   //configure top tagger
   TopTagger tt;
-  tt.setCfgFile("file.cfg");
+  tt.setCfgFile("MyFile.cfg");
 
 
   TString sample(subsamplename);
@@ -69,6 +69,8 @@ int main(int argc, char* argv[]) {
     const vector<int> &genDecayMomIdxVec = tr->getVec<int>("genDecayMomIdxVec");
     const vector<TLorentzVector> &jetsLVec = tr->getVec<TLorentzVector>("jetsLVec");
     const vector<double> &recoJetsBtag_0 = tr->getVec<double>("recoJetsBtag_0");
+    const std::vector<double>& qgLikelihood      = tr->getVec<double>("qgLikelihood");
+    const std::vector<double>& recoJetsCharge      = tr->getVec<double>("recoJetsCharge_0");
 
     double met=tr->getVar<double>("met");
     double metphi=tr->getVar<double>("metphi");
@@ -89,13 +91,19 @@ int main(int argc, char* argv[]) {
     const vector<TLorentzVector> &jetsForTopLVec = tr->getVec<TLorentzVector>("jetsLVec_forTagger"+spec);
     const vector<double> &recoJetsBtag_ForTop = tr->getVec<double>("recoJetsBtag_forTagger"+spec);
     //cut    
-    if(!(passMET && passNJET && passBJET))continue;
-    
+    //if(!(passMET && passNJET && passBJET))continue;
+    if(!passNJET)continue;
     vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-   
+
+    std::vector<TLorentzVector> jetsLVec_forTagger;
+    std::vector<double> recoJetsBtag_forTagger;
+    std::vector<double> qgLikelihood_forTagger;
+    std::vector<double> recoJetsCharge_forTagger;
+    AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag_0, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, recoJetsCharge, recoJetsCharge_forTagger);
+
     // top tagger
     //construct vector of constituents 
-    vector<Constituent> constituents = ttUtility::packageConstituents(jetsForTopLVec, recoJetsBtag_ForTop);
+    vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, recoJetsCharge_forTagger);
     //run tagger
     tt.runTagger(constituents);
     //get output of tagger
@@ -108,7 +116,7 @@ int main(int argc, char* argv[]) {
     bool topmatch = false;
     bool topmatchCand = false;
     bool topmatch_old = false;
-    vector<TopObject*> MatchNtop;
+    vector<TopObject> MatchNtop;
     vector<TopObject> MatchNtopCand;
     vector<TLorentzVector> MatchGentop; 
     vector<TLorentzVector> MatchGentopWidCand; 
@@ -120,14 +128,14 @@ int main(int argc, char* argv[]) {
     if(topcat.GetMatchedTop(nTopsLVec_old, MatchNtop_old, hadtopLVec, MatchGentop_old)) topmatch_old = true;//final top match
 
     //constituent matching
-    vector<bool> monojetmatch(MatchNtopCand.size(),false);
-    vector<bool> dijet2match(MatchNtopCand.size(),false);
-    vector<bool> trijet3match(MatchNtopCand.size(),false);
-    if(MatchNtopCand.size()){
-      for(unsigned tc = 0; tc<MatchNtopCand.size(); tc++){
-	vector<Constituent const*> topconst = MatchNtopCand[tc].getConstituents();
-	if(topconst.size()!=3)cout<<"const: "<<topconst.size()<<endl;
-	vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentopWidCand[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+    vector<bool> monojetmatch(MatchNtop.size(),false);
+    vector<bool> dijet2match(MatchNtop.size(),false);
+    vector<bool> trijet3match(MatchNtop.size(),false);
+    if(MatchNtop.size()){
+      for(unsigned tc = 0; tc<MatchNtop.size(); tc++){
+	vector<Constituent const*> topconst = MatchNtop[tc].getConstituents();
+	//if(topconst.size()!=2)cout<<"const: "<<topconst.size()<<endl;
+	vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentop[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 	if(topconst.size()==1) monojetmatch[tc]=true;
 	if(topconst.size()==2){
 	  int dimatch = topcat.GetMatchedTopConst(topconst, gentopdauLVec);
@@ -139,17 +147,17 @@ int main(int argc, char* argv[]) {
 	}
       }
     }
- vector<TopObject> ConstMatchNtop;
- if(MatchNtopCand.size()){
-   for(unsigned cm = 0; cm<MatchNtopCand.size(); cm++){
-     if(trijet3match[cm] || dijet2match[cm] || monojetmatch[cm])ConstMatchNtop.push_back(MatchNtopCand[cm]);
+ vector<TopObject*> ConstMatchNtop;
+ if(MatchNtop.size()){
+   for(unsigned cm = 0; cm<MatchNtop.size(); cm++){
+     if(trijet3match[cm] || dijet2match[cm] || monojetmatch[cm])ConstMatchNtop.push_back(&MatchNtop[cm]);
    }
  }
     pUtility::FillInt(myBaseHistgram.hNtop,Ntop.size(),Lumiscale);
     pUtility::FillInt(myBaseHistgram.hNtopCand,NtopCand.size(),Lumiscale);   
     pUtility::FillInt(myBaseHistgram.hMatchedNtop,MatchNtop.size(),Lumiscale);
-     if(NtopCand.size()){         
-       pUtility::FillInt(myBaseHistgram.hMatchedNtopCand,MatchNtopCand.size(),Lumiscale);
+     if(Ntop.size()){         
+       pUtility::FillInt(myBaseHistgram.hMatchedNtopCand,MatchNtop.size(),Lumiscale);
        pUtility::FillInt(myBaseHistgram.hConstMatchedNtop,ConstMatchNtop.size(),Lumiscale);    
      }       
      pUtility::FillInt(myBaseHistgram.hNtop_old, nTops_old,Lumiscale);//from old tagger
@@ -181,9 +189,10 @@ int main(int argc, char* argv[]) {
      pUtility::FillDouble(myBaseHistgram.hgentopPt_den,hadtopLVec[ie].Pt(),Lumiscale);
      pUtility::FillInt(myBaseHistgram.hEffNJET_den, nJets, Lumiscale); 
      bool fMatch = false;
-      for(unsigned je = 0; je<MatchGentopWidCand.size(); je++){
-	if(hadtopLVec[ie]!=MatchGentopWidCand[je])continue;
+      for(unsigned je = 0; je<MatchGentop.size(); je++){
+	if(hadtopLVec[ie]!=MatchGentop[je])continue;
 	if(trijet3match[je] || dijet2match[je] || monojetmatch[je]){fMatch = true; break;}
+	//fMatch = true; break;
       }
       if(fMatch){
 	pUtility::FillDouble(myBaseHistgram.hgentopPt_num,hadtopLVec[ie].Pt(),Lumiscale);
@@ -201,16 +210,20 @@ int main(int argc, char* argv[]) {
       if(fMatch)pUtility::FillDouble(myBaseHistgram.hgentopPt_old_num,hadtopLVec[ie].Pt(),Lumiscale);
     }
     //Purity
-    for(unsigned ip = 0; ip<NtopCand.size(); ip++){
-      pUtility::FillDouble(myBaseHistgram.hrecotopPt_den,NtopCand[ip].p().Pt(),Lumiscale);  
+    for(unsigned ip = 0; ip<Ntop.size(); ip++){
+      pUtility::FillDouble(myBaseHistgram.hrecotopPt_den,Ntop[ip]->p().Pt(),Lumiscale);  
+      pUtility::FillDouble(myBaseHistgram.hrecotopEta_den,Ntop[ip]->p().Eta(),Lumiscale);
+      pUtility::FillDouble(myBaseHistgram.hrecotopDRmax_den,Ntop[ip]->getDRmax(),Lumiscale);    
       pUtility::FillInt(myBaseHistgram.hPurNJET_den, nJets, Lumiscale); 
       bool fMatch = false;
-      for(unsigned jp = 0; jp<MatchNtopCand.size(); jp++){
-	if(NtopCand[ip].p()!=MatchNtopCand[jp].p())continue;
+      for(unsigned jp = 0; jp<MatchNtop.size(); jp++){
+	if(Ntop[ip]->p()!=MatchNtop[jp].p())continue;
 	if(trijet3match[jp] || dijet2match[jp] || monojetmatch[jp]){fMatch = true; break;}
       }
       if(fMatch){
-	pUtility::FillDouble(myBaseHistgram.hrecotopPt_num,NtopCand[ip].p().Pt(),Lumiscale);
+	pUtility::FillDouble(myBaseHistgram.hrecotopPt_num,Ntop[ip]->p().Pt(),Lumiscale);
+	pUtility::FillDouble(myBaseHistgram.hrecotopEta_num,Ntop[ip]->p().Eta(),Lumiscale);
+	pUtility::FillDouble(myBaseHistgram.hrecotopDRmax_num,Ntop[ip]->getDRmax(),Lumiscale);
 	pUtility::FillInt(myBaseHistgram.hPurNJET_num, nJets, Lumiscale); 
       }
     }

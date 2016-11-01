@@ -22,6 +22,7 @@
 #include <utility>
 #include <map>
 #include <set>
+#include <math.h>
 
 class PrepVariables
 {
@@ -71,9 +72,9 @@ private:
         }
     };
   
-  TopTagger* topTagger_;
-  TopCat topMatcher_;
-  std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
+    TopTagger* topTagger_;
+    TopCat topMatcher_;
+    std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
 
     void prepVariables(NTupleReader& tr)
     {
@@ -125,7 +126,15 @@ private:
 
         std::vector<TLorentzVector> genTops = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 
-        std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+        std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+
+        std::vector<int> *genMatchdR = new std::vector<int>(genMatches.first);
+        std::vector<int> *genMatchConst = new std::vector<int>(genMatches.second.first);
+        std::vector<double> *genMatchVec = new std::vector<double>();
+        for(const auto& vec : genMatches.second.second)
+        {
+            genMatchVec->push_back(vec.Pt());
+        }
 
         //Class which holds and registers vectors of variables
         //Annoyingly this list of variables to expect is necessary
@@ -179,7 +188,7 @@ private:
 		vh.add("j" + std::to_string(i + 1) + "_m",     RF_constituents[i].p().M()           );
                 vh.add("j" + std::to_string(i + 1) + "_CSV",   RF_constituents[i].getBTagDisc()     );
                 vh.add("j" + std::to_string(i + 1) + "_QGL",   RF_constituents[i].getQGLikelihood() );
-                vh.add("j" + std::to_string(i + 1) + "_Chrg",  RF_constituents[i].getJetCharge() );
+                //vh.add("j" + std::to_string(i + 1) + "_Chrg",  RF_constituents[i].getJetCharge() );
 
                 //index of next jet (assumes < 4 jets)
                 int iNext = (i + 1) % RF_constituents.size();
@@ -196,28 +205,41 @@ private:
                 //vh.add("dEta" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dEta);
 
                 //calculate pair masses
-                //int iNNext = (iNext + 1) % RF_constituents.size();
+
                 auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
                 vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", jetPair.M());
-
-                TLorentzVector j1 = RF_constituents[i].p();
-                j1.Boost(-jetPair.BoostVector());
-                TLorentzVector j2 = RF_constituents[iNext].p();
-                j2.Boost(-jetPair.BoostVector());
-                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta", jetPair.Angle(j1.Vect()));
                 
+                //TLorentzVector j1 = RF_constituents[i].p();
+                //j1.Boost(-jetPair.BoostVector());
+                //TLorentzVector j2 = RF_constituents[iNext].p();
+                //j2.Boost(-jetPair.BoostVector());
+                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta", jetPair.Angle(j1.Vect()));
+                
+		// int iNNext = (iNext + 1) % RF_constituents.size();
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_pt", jetPair.Pt());
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, RF_constituents[iNNext].p()));
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", jetPair.Angle(RF_constituents[iNNext].p().Vect()));
             }
+	    //TLorentzVector bj = RF_constituents[0].p();
+	    //bj.Boost(topCand.p().BoostVector());
+	    //TLorentzVector Wj1 = RF_constituents[1].p();
+            //TLorentzVector Wj2 = RF_constituents[2].p();
+	    //Wj1.Boost(topCand.p().BoostVector());
+            //Wj2.Boost(topCand.p().BoostVector());
+	    //TLorentzVector Wj = Wj1 + Wj2;
+	    //bj.Boost(-Wj.BoostVector());
+	    //Wj1.Boost(-Wj.BoostVector());
+            //Wj2.Boost(-Wj.BoostVector());
+	    //vh.add("bW1_dTheta",cos(bj.Angle(Wj1.Vect())));
+	    //vh.add("bW2_dTheta",cos(bj.Angle(Wj2.Vect())));
         }
 
         vh.registerFunctions();
 
         //register matching vectors
-        tr.registerDerivedVec("genTopMatchesVec",        genMatches.first);
-        tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second.first);
-        tr.registerDerivedVec("genConstMatchGenPtVec", genMatches.second.second);
+        tr.registerDerivedVec("genTopMatchesVec",        genMatchdR);
+        tr.registerDerivedVec("genConstiuentMatchesVec", genMatchConst);
+        tr.registerDerivedVec("genConstMatchGenPtVec", genMatchVec);
 
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
@@ -244,7 +266,7 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_dTheta", "j23_dTheta", "j13_dTheta", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_Chrg", "j2_Chrg", "j3_Chrg", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab","MET"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "MET"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
@@ -437,7 +459,7 @@ int main(int argc, char* argv[])
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
 			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
 			//fill mini tuple
-			bool passbaseline = forFakeRate? passValidationBaseline : passMVABaseline;
+			bool passbaseline = true;//forFakeRate? passValidationBaseline : passMVABaseline;
 			// if(passMVABaseline)
 			if(passbaseline)
                         {

@@ -2,7 +2,9 @@
 
 ##Compiling the tagger
 
-The code is provided with full support for usage in CMSSW as well as with standalone root.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.  To compile the standaline library in a root aware terminal go to TopTagger/TopTagger/test and run "make".
+The code is provided with full support for usage in CMSSW as well as with standalone root.  Note that with the latest release openCV is required to be installed to build top tagger code.  Instructions for installing on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.  
+
+To compile the standaline library in a root aware terminal go to TopTagger/TopTagger/test and run "make".  You will also need to install openCV on your laptop.
 
 ##Top tagger structure 
 

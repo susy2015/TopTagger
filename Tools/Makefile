@@ -32,12 +32,25 @@ OPENVCLIBS = -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples openCVTest # sharkTest
+PROGRAMS = makeTrainingTuples openCVTest TagTest1 # sharkTest
 
-all: mkobj $(PROGRAMS)
+all: mkobj sampPyWrap $(PROGRAMS)
 
 mkobj:
 	@mkdir -p obj
+
+#code to compile shared library to link samples to python                                                                                                                               
+sampPyWrap: $(ODIR)/samplesModule.so
+
+$(ODIR)/samplesModule.so: $(ODIR)/samplesPyWrap.o $(ODIR)/samplesModulePyWrap.o
+	$(CXX) -shared -o $@ $^
+
+$(ODIR)/samplesPyWrap.o: $(RSDIR)/samples.cc $(RSDIR)/samples.h
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
+$(ODIR)/samplesModulePyWrap.o: $(RSDIR)/samplesModule.cc
+	$(CXX) --std=c++11 -c -fPIC -o $@ $<
+
 
 $(ODIR)/%.o : $(SDIR)/%.C
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(SDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
@@ -57,15 +70,18 @@ $(ODIR)/%.o : $(RSDIR)/%.cc
 $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
-makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o $(ODIR)/samples.o $(ODIR)/makeTrainingTuples.o $(ODIR)/MiniTupleMaker.o 
-	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(TOPLIB) -o $@
+makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o  $(ODIR)/makeTrainingTuples.o
+	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(OPENVCLIBS) $(TOPLIB) -o $@
 
 #custom hack for compiling shark, will make bvbetter as time allows
-sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o sharkTest.o 
+sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/sharkTest.o 
 	$(LD) $^ $(ROOTLIBS) $(TOPLIB) -I /home/pastika/Downloads/Shark-3.1.0/include/ -L /home/pastika/Downloads/Shark-3.1.0/lib/ -L /usr/lib/x86_64-linux-gnu/ -lshark -lboost_serialization -lgomp -o $@
 
-openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o openCVTest.o 
-	$(LD) $^ $(OPENVCLIBS) $(ROOTLIBS) $(TOPLIB)  -o $@
+openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/openCVTest.o 
+	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
+
+TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
