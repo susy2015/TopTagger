@@ -72,9 +72,9 @@ private:
         }
     };
   
-  TopTagger* topTagger_;
-  TopCat topMatcher_;
-  std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
+    TopTagger* topTagger_;
+    TopCat topMatcher_;
+    std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
 
     void prepVariables(NTupleReader& tr)
     {
@@ -208,35 +208,38 @@ private:
 
                 auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
                 vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", jetPair.M());
-
-                TLorentzVector j1 = RF_constituents[i].p();
-                j1.Boost(-jetPair.BoostVector());
-                TLorentzVector j2 = RF_constituents[iNext].p();
-                j2.Boost(-jetPair.BoostVector());
-                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta", jetPair.Angle(j1.Vect()));
+                
+                //TLorentzVector j1 = RF_constituents[i].p();
+                //j1.Boost(-jetPair.BoostVector());
+                //TLorentzVector j2 = RF_constituents[iNext].p();
+                //j2.Boost(-jetPair.BoostVector());
+                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta", jetPair.Angle(j1.Vect()));
                 
 		// int iNNext = (iNext + 1) % RF_constituents.size();
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_pt", jetPair.Pt());
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, RF_constituents[iNNext].p()));
                 //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", jetPair.Angle(RF_constituents[iNNext].p().Vect()));
             }
-	    TLorentzVector bj = RF_constituents[0].p();
-	    bj.Boost(topCand.p().BoostVector());
-	    TLorentzVector Wj1 = RF_constituents[1].p();TLorentzVector Wj2 = RF_constituents[2].p();
-	    Wj1.Boost(topCand.p().BoostVector());Wj2.Boost(topCand.p().BoostVector());
-	    TLorentzVector Wj = Wj1 + Wj2;
-	    bj.Boost(-Wj.BoostVector());
-	    Wj1.Boost(-Wj.BoostVector());Wj2.Boost(-Wj.BoostVector());
-	    vh.add("bW1_dTheta",cos(bj.Angle(Wj1.Vect())));
-	    vh.add("bW2_dTheta",cos(bj.Angle(Wj2.Vect())));
+	    //TLorentzVector bj = RF_constituents[0].p();
+	    //bj.Boost(topCand.p().BoostVector());
+	    //TLorentzVector Wj1 = RF_constituents[1].p();
+            //TLorentzVector Wj2 = RF_constituents[2].p();
+	    //Wj1.Boost(topCand.p().BoostVector());
+            //Wj2.Boost(topCand.p().BoostVector());
+	    //TLorentzVector Wj = Wj1 + Wj2;
+	    //bj.Boost(-Wj.BoostVector());
+	    //Wj1.Boost(-Wj.BoostVector());
+            //Wj2.Boost(-Wj.BoostVector());
+	    //vh.add("bW1_dTheta",cos(bj.Angle(Wj1.Vect())));
+	    //vh.add("bW2_dTheta",cos(bj.Angle(Wj2.Vect())));
         }
 
         vh.registerFunctions();
 
         //register matching vectors
-        tr.registerDerivedVec("genTopMatchesVec",        genMatches.first);
-        tr.registerDerivedVec("genConstiuentMatchesVec", genMatches.second.first);
-        tr.registerDerivedVec("genConstMatchGenPtVec", genMatches.second.second);
+        tr.registerDerivedVec("genTopMatchesVec",        genMatchdR);
+        tr.registerDerivedVec("genConstiuentMatchesVec", genMatchConst);
+        tr.registerDerivedVec("genConstMatchGenPtVec", genMatchVec);
 
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
@@ -456,7 +459,7 @@ int main(int argc, char* argv[])
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
 			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
 			//fill mini tuple
-			bool passbaseline = forFakeRate? passValidationBaseline : passMVABaseline;
+			bool passbaseline = true;//forFakeRate? passValidationBaseline : passMVABaseline;
 			// if(passMVABaseline)
 			if(passbaseline)
                         {
