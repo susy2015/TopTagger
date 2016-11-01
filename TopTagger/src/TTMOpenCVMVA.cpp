@@ -33,20 +33,17 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
     {
         //Construct data matrix for prediction
         std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
-        //std::cout << "LENGTH: " << varMap.size() << std::endl;
 
-        cv::Mat inputData(vars_.size(), 1, 5);
+        cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type
         for(unsigned int i = 0; i < vars_.size(); ++i)
         {
             inputData.at<float>(i, 0) = varMap[vars_[i]];
-            //std::cout << vars_[i] << ": " << inputData.at<float>(i, 0) << ",\t";
         }
-        //std::cout << std::endl;
 
         //predict value
         double discriminator = treePtr_->predict(inputData);
         topCand.setDiscriminator(discriminator);
-        //std::cout << discriminator << std::endl;
+
         //place in final top list if it passes the threshold
         if(discriminator > discriminator_)
         {
