@@ -215,13 +215,7 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.25
-
-hPtTTMatch   = ROOT.TH1D("hPtTTMatch", "hPtTTMatch", 50, 0.0, 2000.0)
-hPtTTNoMatch = ROOT.TH1D("hPtTTNoMatch", "hPtTTNoMatch", 50, 0.0, 2000.0)
-hPtZnunuMatch   = ROOT.TH1D("hPtZnunuMatch", "hPtZnunuMatch", 50, 0.0, 2000.0)
-hPtZnunuNoMatch = ROOT.TH1D("hPtZnunuNoMatch", "hPtZnunuNoMatch", 50, 0.0, 2000.0)
-
+discCut = 0.5
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)

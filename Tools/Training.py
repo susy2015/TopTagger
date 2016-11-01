@@ -31,81 +31,49 @@ dg = DataGetter()
 
 print "PROCESSING TRAINING DATA"
 
-trainingfile_ttbar = ROOT.TFile.Open("trainingTuple_division_0_TTbarSingleLep_training.root")
-trainingfile_znunu = ROOT.TFile.Open("trainingTuple_division_0_ZJetsToNuNu_training.root")
-
-samplesToRun = [trainingfile_ttbar, trainingfile_znunu]
-
-Nevts = 0
-for event in trainingfile_ttbar.slimmedTuple:
-    if Nevts >= NEVTS:
-        break
-    Nevts +=1
-    for i in xrange(len(event.genConstiuentMatchesVec)):
-        if event.genConstiuentMatchesVec[i] == 3:
-            hPtTTMatch.Fill(event.cand_pt[i])
-        else:
-            hPtTTNoMatch.Fill(event.cand_pt[i])
-
-Nevts = 0
-for event in trainingfile_znunu.slimmedTuple:
-    if Nevts >= NEVTS_Z:
-        break
-    Nevts +=1
-    for i in xrange(len(event.genConstiuentMatchesVec)):
-        if event.genConstiuentMatchesVec[i] == 3:
-            hPtZnunuMatch.Fill(event.cand_pt[i])
-        else:
-            hPtZnunuNoMatch.Fill(event.cand_pt[i])
+samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.root", "trainingTuple_division_0_ZJetsToNuNu_training.root", "trainingTuple_division_0_Signal_training.root"]
 
 inputData = []
 inputAnswer = []
 inputWgts = []
 
-Nevts = 0
-for event in trainingfile_ttbar.slimmedTuple:
-    if Nevts >= NEVTS:
-        break
-    Nevts +=1
-    for i in xrange(len(event.cand_m)):
-       # if(event.cand_pt[i] > 150):
-        inputData.append(dg.getData(event, i))
-        nmatch = event.genConstiuentMatchesVec[i]
-        inputAnswer.append(int(nmatch == 3))
-        if nmatch == 3:
-#            inputData.append(dg.getData(event, i))
-#            inputAnswer.append(int(nmatch == 3))
-            if hPtTTMatch.GetBinContent(hPtTTMatch.FindBin(event.cand_pt[i])) > 10:
-                inputWgts.append(1.0 / hPtTTMatch.GetBinContent(hPtTTMatch.FindBin(event.cand_pt[i])))
+for datasetName in samplesToRun:
+    dataset = ROOT.TFile.Open(datasetName)
+
+    hPtMatch   = ROOT.TH1D("hPtMatch" + datasetName, "hPtMatch", 50, 0.0, 2000.0)
+    hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
+    
+    Nevts = 0
+    for event in dataset.slimmedTuple:
+        if Nevts >= NEVTS:
+            break
+        Nevts +=1
+        for i in xrange(len(event.genConstiuentMatchesVec)):
+            if event.genConstiuentMatchesVec[i] == 3:
+                hPtMatch.Fill(event.cand_pt[i])
             else:
-                inputWgts.append(0.0)
-        else:
-            if hPtTTNoMatch.GetBinContent(hPtTTNoMatch.FindBin(event.cand_pt[i])) > 10:
-                inputWgts.append(1.0 / hPtTTNoMatch.GetBinContent(hPtTTNoMatch.FindBin(event.cand_pt[i])))
+                hPtNoMatch.Fill(event.cand_pt[i])
+    
+    Nevts = 0
+    for event in dataset.slimmedTuple:
+        if Nevts >= NEVTS:
+            break
+        Nevts +=1
+        for i in xrange(len(event.cand_m)):
+            inputData.append(dg.getData(event, i))
+            nmatch = event.genConstiuentMatchesVec[i]
+            inputAnswer.append(int(nmatch == 3))
+            if nmatch == 3:
+                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
             else:
-                inputWgts.append(0.0)
-                
-Nevts = 0
-for event in trainingfile_znunu.slimmedTuple:
-    if Nevts >= NEVTS_Z:
-        break
-    Nevts +=1
-    for i in xrange(len(event.cand_m)):
-       # if(event.cand_pt[i] > 150):
-        inputData.append(dg.getData(event, i))
-        nmatch = event.genConstiuentMatchesVec[i]
-        inputAnswer.append(int(nmatch == 3))
-        if nmatch == 3:
-            if hPtZnunuMatch.GetBinContent(hPtZnunuMatch.FindBin(event.cand_pt[i])) > 10:
-                    inputWgts.append(1.0 / hPtZnunuMatch.GetBinContent(hPtZnunuMatch.FindBin(event.cand_pt[i])))
-            else:
-                inputWgts.append(0.0)
-        else:
-            if hPtZnunuNoMatch.GetBinContent(hPtZnunuNoMatch.FindBin(event.cand_pt[i])) > 10:
-                inputWgts.append(1.0 / hPtZnunuNoMatch.GetBinContent(hPtZnunuNoMatch.FindBin(event.cand_pt[i])))
-            else:
-                inputWgts.append(0.0)
-                
+                if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
+
                 
 npyInputData = numpy.array(inputData, numpy.float32)
 npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
