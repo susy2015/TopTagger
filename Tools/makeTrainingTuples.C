@@ -384,9 +384,11 @@ int main(int argc, char* argv[])
 
     //parse sample splitting and set up minituples
     vector<pair<MiniTupleMaker *, int>> mtmVec;
+    int sumRatio = 0;
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
     {
         int splitNum = stoi(sampleRatios.substr((pos)?(pos + 1):(0)));
+        sumRatio += splitNum;
         string ofname;
         if(iter == 0)      ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_training" + ".root";
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
@@ -440,13 +442,20 @@ int main(int argc, char* argv[])
 
                     while(tr.getNextEvent())
                     {
+                        //Get sample lumi weight and correct for the actual number of events 
+                        //This needs to happen before we ad sampleWgt to the mini tuple variables to save
+                        double weight = file.getWeight() * (double(file.nEvts) / nEvts) * (double(sumRatio) / mtmVec[mtmIndex].second);
+                        tr.registerDerivedVar("sampleWgt", weight);
+
                         //Things to run only on first event
                         if(tr.isFirstEvent())
                         {
                             //Initialize the mini tuple branches, needs to be done after first call of tr.getNextEvent()
                             for(auto& mtm : mtmVec)
                             {
-                                mtm.first->setTupleVars(prepVars.getVarSet());
+                                auto varSet = prepVars.getVarSet();
+                                varSet.insert("sampleWgt");
+                                mtm.first->setTupleVars(varSet);
                                 mtm.first->initBranches(tr);
                             }
                         }
