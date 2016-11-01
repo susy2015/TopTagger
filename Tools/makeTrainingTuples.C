@@ -126,7 +126,15 @@ private:
 
         std::vector<TLorentzVector> genTops = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 
-        std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+        std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+
+        std::vector<int> *genMatchdR = new std::vector<int>(genMatches.first);
+        std::vector<int> *genMatchConst = new std::vector<int>(genMatches.second.first);
+        std::vector<double> *genMatchVec = new std::vector<double>();
+        for(const auto& vec : genMatches.second.second)
+        {
+            genMatchVec->push_back(vec.Pt());
+        }
 
         //Class which holds and registers vectors of variables
         //Annoyingly this list of variables to expect is necessary

@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
     bool topmatch = false;
     bool topmatchCand = false;
     bool topmatch_old = false;
-    vector<TopObject*> MatchNtop;
+    vector<TopObject> MatchNtop;
     vector<TopObject> MatchNtopCand;
     vector<TLorentzVector> MatchGentop; 
     vector<TLorentzVector> MatchGentopWidCand; 
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
     vector<bool> trijet3match(MatchNtop.size(),false);
     if(MatchNtop.size()){
       for(unsigned tc = 0; tc<MatchNtop.size(); tc++){
-	vector<Constituent const*> topconst = MatchNtop[tc]->getConstituents();
+	vector<Constituent const*> topconst = MatchNtop[tc].getConstituents();
 	//if(topconst.size()!=2)cout<<"const: "<<topconst.size()<<endl;
 	vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentop[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 	if(topconst.size()==1) monojetmatch[tc]=true;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
  vector<TopObject*> ConstMatchNtop;
  if(MatchNtop.size()){
    for(unsigned cm = 0; cm<MatchNtop.size(); cm++){
-     if(trijet3match[cm] || dijet2match[cm] || monojetmatch[cm])ConstMatchNtop.push_back(MatchNtop[cm]);
+     if(trijet3match[cm] || dijet2match[cm] || monojetmatch[cm])ConstMatchNtop.push_back(&MatchNtop[cm]);
    }
  }
     pUtility::FillInt(myBaseHistgram.hNtop,Ntop.size(),Lumiscale);
@@ -217,7 +217,7 @@ int main(int argc, char* argv[]) {
       pUtility::FillInt(myBaseHistgram.hPurNJET_den, nJets, Lumiscale); 
       bool fMatch = false;
       for(unsigned jp = 0; jp<MatchNtop.size(); jp++){
-	if(Ntop[ip]->p()!=MatchNtop[jp]->p())continue;
+	if(Ntop[ip]->p()!=MatchNtop[jp].p())continue;
 	if(trijet3match[jp] || dijet2match[jp] || monojetmatch[jp]){fMatch = true; break;}
       }
       if(fMatch){
