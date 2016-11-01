@@ -23,6 +23,7 @@ import optparse
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
 parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
+parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
 
 options, args = parser.parse_args()
 

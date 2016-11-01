@@ -23,6 +23,7 @@ import optparse
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
 parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
+parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
 
 options, args = parser.parse_args()
 
@@ -239,95 +240,96 @@ for event in fileFakeRate.slimmedTuple:
     for k in xrange(len(cut)):
         if(numflagroc[k]):FakeNumroc[k] += 1
 
-print "ROC Calculation"
-#ttbar
-TP =  len(cut)*[0]
-FP =  len(cut)*[0]
-TPR = len(cut)*[0]
-FPR = len(cut)*[0]
-Nmatch = 0
-Nnomatch = 0
-TPHEP =0
-FPHEP =0
-
-print "cut:", cut
-
-if options.opencv:
-    nprocInput = numpy.array(rocInput, dtype=numpy.float32)
-    rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
-else:
-    rocOutput = clf1.predict_proba(rocInput)[:,1]
-
-for i in xrange(len(rocOutput)):
-    if(rocScore[i]):
-        Nmatch= Nmatch+1
-        if(rocHEP[i]):TPHEP = TPHEP+1
+if not options.noROC:
+    print "ROC Calculation"
+    #ttbar
+    TP =  len(cut)*[0]
+    FP =  len(cut)*[0]
+    TPR = len(cut)*[0]
+    FPR = len(cut)*[0]
+    Nmatch = 0
+    Nnomatch = 0
+    TPHEP =0
+    FPHEP =0
+    
+    print "cut:", cut
+    
+    if options.opencv:
+        nprocInput = numpy.array(rocInput, dtype=numpy.float32)
+        rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
     else:
-        Nnomatch = Nnomatch+1
-        if(rocHEP[i]):FPHEP = FPHEP+1
+        rocOutput = clf1.predict_proba(rocInput)[:,1]
+    
+    for i in xrange(len(rocOutput)):
+        if(rocScore[i]):
+            Nmatch= Nmatch+1
+            if(rocHEP[i]):TPHEP = TPHEP+1
+        else:
+            Nnomatch = Nnomatch+1
+            if(rocHEP[i]):FPHEP = FPHEP+1
+        for j in xrange(len(cut)):
+            if(rocOutput[i]>cut[j]):
+                if(rocScore[i]):TP[j] = TP[j]+1
+                else:FP[j] = FP[j]+1
+    
     for j in xrange(len(cut)):
-        if(rocOutput[i]>cut[j]):
-            if(rocScore[i]):TP[j] = TP[j]+1
-            else:FP[j] = FP[j]+1
-
-for j in xrange(len(cut)):
-    TPR[j] = float(TP[j])/Nmatch
-    FPR[j] = float(FP[j])/Nnomatch
-    hroc.Fill(FPR[j],TPR[j])
-TPRHEP = float(TPHEP)/Nmatch
-FPRHEP = float(FPHEP)/Nnomatch
-hroc_HEP.Fill(FPRHEP,TPRHEP)
-
-print "TPR: ", TPR
-print "FPR: ", FPR
-
-#Zinv
-
-FPZ  = len(cut) * [0]
-FPRZ = len(cut) * [0]
-NnomatchZ = 0
-FPHEPZ =0
-FPRHEPZ =0
-rocInputZ = []
-rocHEPZ = []
-for event in fileFakeRate.slimmedTuple:
-    if event.Njet<4 : continue
-    for i in xrange(len(event.cand_m)):
-        rocInputZ.append(dg.getData(event, i))
-        rocHEPZ.append(HEPReqs(event, i))
-
-nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
-if options.opencv:
-    rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
-else:
-    rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
-
-for i in xrange(len(rocOutputZ)):
-    NnomatchZ = NnomatchZ+1
-    if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+        TPR[j] = float(TP[j])/Nmatch
+        FPR[j] = float(FP[j])/Nnomatch
+        hroc.Fill(FPR[j],TPR[j])
+    TPRHEP = float(TPHEP)/Nmatch
+    FPRHEP = float(FPHEP)/Nnomatch
+    hroc_HEP.Fill(FPRHEP,TPRHEP)
+    
+    print "TPR: ", TPR
+    print "FPR: ", FPR
+    
+    #Zinv
+    
+    FPZ  = len(cut) * [0]
+    FPRZ = len(cut) * [0]
+    NnomatchZ = 0
+    FPHEPZ =0
+    FPRHEPZ =0
+    rocInputZ = []
+    rocHEPZ = []
+    for event in fileFakeRate.slimmedTuple:
+        if event.Njet<4 : continue
+        for i in xrange(len(event.cand_m)):
+            rocInputZ.append(dg.getData(event, i))
+            rocHEPZ.append(HEPReqs(event, i))
+    
+    nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
+    if options.opencv:
+        rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
+    else:
+        rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
+    
+    for i in xrange(len(rocOutputZ)):
+        NnomatchZ = NnomatchZ+1
+        if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+        for j in xrange(len(cut)):
+            if(rocOutputZ[i]>cut[j]):
+                FPZ[j] = FPZ[j]+1
     for j in xrange(len(cut)):
-        if(rocOutputZ[i]>cut[j]):
-            FPZ[j] = FPZ[j]+1
-for j in xrange(len(cut)):
-    FPRZ[j] = float(FPZ[j])/NnomatchZ
-    hrocZ.Fill(FPRZ[j],TPR[j])
-FPRHEPZ = float(FPHEPZ)/NnomatchZ
-hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
-
-
-for j in xrange(len(cut)):
-    Effroc[j] = float(EffNumroc[j])/EffDenroc
-    Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
-    hroc_alt.Fill(Fakeroc[j], Effroc[j])
-EffrocHEP = float(EffNumrocHEP)/EffDenroc
-FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
-hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
-
-print "EffDenroc: ", EffDenroc
-print "EffNumroc: ", EffNumroc
-
-print "FakerocHEP:", FakerocHEP
-print "EffrocHEP:",EffrocHEP
+        FPRZ[j] = float(FPZ[j])/NnomatchZ
+        hrocZ.Fill(FPRZ[j],TPR[j])
+    FPRHEPZ = float(FPHEPZ)/NnomatchZ
+    hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
+    
+    
+    for j in xrange(len(cut)):
+        Effroc[j] = float(EffNumroc[j])/EffDenroc
+        Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
+        hroc_alt.Fill(Fakeroc[j], Effroc[j])
+    EffrocHEP = float(EffNumrocHEP)/EffDenroc
+    FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
+    hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
+    
+    print "EffDenroc: ", EffDenroc
+    print "EffNumroc: ", EffNumroc
+    
+    print "FakerocHEP:", FakerocHEP
+    print "EffrocHEP:",EffrocHEP
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -546,55 +548,56 @@ hFakeRateHEP_njet.Draw("same")
 leg.Draw("same")
 c.Print("FakeRate_njet.png")
 
-#print roc
-hroc.SetStats(0)
-hroc.SetTitle("ROC:Objectwise (t#bar{t})")
-hroc.SetXTitle("FPR")
-hroc.SetYTitle("TPR")
-hroc.GetYaxis().SetRangeUser(0, 1)
-hroc_HEP.SetStats(0)
-hroc_HEP.SetLineColor(ROOT.kRed)
-hroc_HEP.SetMarkerColor(ROOT.kRed)
-hroc_HEP.SetMarkerStyle(20)
-hroc_HEP.SetMarkerSize(1)
-hroc.SetMarkerStyle(20)
-hroc.SetMarkerSize(1)
-hroc.Draw("pe")
-hroc_HEP.Draw("samePE")
-c.Print("roc.png")
-
-hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
-hrocZ.SetStats(0)
-hrocZ.SetXTitle("FPR")
-hrocZ.SetYTitle("TPR")
-hroc_HEPZ.SetStats(0)
-hroc_HEPZ.SetLineColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerColor(ROOT.kRed)
-hroc_HEPZ.SetMarkerStyle(20)
-hroc_HEPZ.SetMarkerSize(1)
-hrocZ.SetMarkerStyle(20)
-hrocZ.SetMarkerSize(1)
-hrocZ.GetYaxis().SetRangeUser(0, 1)
-hrocZ.Draw("pe")
-hroc_HEPZ.Draw("samePE")
-c.Print("rocZ.png")
-
-hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
-hroc_alt.SetStats(0)
-hroc_alt.SetXTitle("FakeRate")
-hroc_alt.SetYTitle("Efficiency")
-hroc_alt.GetYaxis().SetRangeUser(0, 1)
-hroc_alt.GetXaxis().SetRangeUser(0, 1)
-hroc_HEP_alt.SetStats(0)
-hroc_HEP_alt.SetLineColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
-hroc_HEP_alt.SetMarkerStyle(20)
-hroc_HEP_alt.SetMarkerSize(1)
-hroc_alt.SetMarkerStyle(20)
-hroc_alt.SetMarkerSize(1)
-hroc_alt.Draw("pe")
-hroc_HEP_alt.Draw("samePE")
-c.Print("roc_alt.png")
+if not options.noROC:
+    #print roc
+    hroc.SetStats(0)
+    hroc.SetTitle("ROC:Objectwise (t#bar{t})")
+    hroc.SetXTitle("FPR")
+    hroc.SetYTitle("TPR")
+    hroc.GetYaxis().SetRangeUser(0, 1)
+    hroc_HEP.SetStats(0)
+    hroc_HEP.SetLineColor(ROOT.kRed)
+    hroc_HEP.SetMarkerColor(ROOT.kRed)
+    hroc_HEP.SetMarkerStyle(20)
+    hroc_HEP.SetMarkerSize(1)
+    hroc.SetMarkerStyle(20)
+    hroc.SetMarkerSize(1)
+    hroc.Draw("pe")
+    hroc_HEP.Draw("samePE")
+    c.Print("roc.png")
+    
+    hrocZ.SetTitle("ROC:Objectwise (t#bar{t} and Z_{inv})")
+    hrocZ.SetStats(0)
+    hrocZ.SetXTitle("FPR")
+    hrocZ.SetYTitle("TPR")
+    hroc_HEPZ.SetStats(0)
+    hroc_HEPZ.SetLineColor(ROOT.kRed)
+    hroc_HEPZ.SetMarkerColor(ROOT.kRed)
+    hroc_HEPZ.SetMarkerStyle(20)
+    hroc_HEPZ.SetMarkerSize(1)
+    hrocZ.SetMarkerStyle(20)
+    hrocZ.SetMarkerSize(1)
+    hrocZ.GetYaxis().SetRangeUser(0, 1)
+    hrocZ.Draw("pe")
+    hroc_HEPZ.Draw("samePE")
+    c.Print("rocZ.png")
+    
+    hroc_alt.SetTitle("ROC:Eff.(t#bar{t}) and Fakerate(Z_{inv})")
+    hroc_alt.SetStats(0)
+    hroc_alt.SetXTitle("FakeRate")
+    hroc_alt.SetYTitle("Efficiency")
+    hroc_alt.GetYaxis().SetRangeUser(0, 1)
+    hroc_alt.GetXaxis().SetRangeUser(0, 1)
+    hroc_HEP_alt.SetStats(0)
+    hroc_HEP_alt.SetLineColor(ROOT.kRed)
+    hroc_HEP_alt.SetMarkerColor(ROOT.kRed)
+    hroc_HEP_alt.SetMarkerStyle(20)
+    hroc_HEP_alt.SetMarkerSize(1)
+    hroc_alt.SetMarkerStyle(20)
+    hroc_alt.SetMarkerSize(1)
+    hroc_alt.Draw("pe")
+    hroc_HEP_alt.Draw("samePE")
+    c.Print("roc_alt.png")
 
 #few test plots
 hj1Theta.SetTitle("cos#theta(topboost, j_{i})")
@@ -702,12 +705,13 @@ hFakeRate_met.Write()
 hFakeRateHEP_met.Write()
 hFakeRate_njet.Write()
 hFakeRateHEP_njet.Write()
-hroc.Write()
-hroc_HEP.Write()
-hrocZ.Write()
-hroc_HEPZ.Write()
-hroc_alt.Write()
-hroc_HEP_alt.Write()
+if not options.noROC:
+    hroc.Write()
+    hroc_HEP.Write()
+    hrocZ.Write()
+    hroc_HEPZ.Write()
+    hroc_alt.Write()
+    hroc_HEP_alt.Write()
 mf.Write()
 mf.Close()
 
