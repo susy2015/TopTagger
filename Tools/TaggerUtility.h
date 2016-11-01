@@ -37,13 +37,113 @@ class TopVar
 
 class TopCat
 {
- public:
-  bool GetMatchedTop(std::vector<TopObject*> Top, std::vector<TopObject*> &MachedTop, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
-  bool GetMatchedTop(std::vector<TopObject> TopCand, std::vector<TopObject> &MachedTopCand, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
-  bool GetMatchedTop(std::vector<TLorentzVector> TopCand, std::vector<TLorentzVector> &MachedTopCand, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
-  int GetMatchedTopConst(std::vector<Constituent const *> topconst, std::vector<TLorentzVector>gentopdau);
+private:
 
-  std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> TopConst(std::vector<TopObject> tops, std::vector<TLorentzVector>genDecayLVec, std::vector<int>genDecayPdgIdVec, std::vector<int>genDecayIdxVec, std::vector<int>genDecayMomIdxVec);
+    template<typename T> inline const T pointerDeref(T obj) const
+    {
+        return obj;
+    }
+
+    template<typename T> inline const T& pointerDeref(T* const obj) const
+    {
+        return *obj;
+    }
+
+public:
+    //bool GetMatchedTop(std::vector<TopObject*> Top, std::vector<TopObject*> &MachedTop, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
+    template<typename T> bool GetMatchedTop(const std::vector<T>& TopCand, std::vector<TopObject>& MachedTopCand, const std::vector<TLorentzVector>& Gentop, std::vector<TLorentzVector>& MGentop)
+    {
+        bool match = false; 
+        if(Gentop.size()==0) return match;
+        double DeltaR = 0.4;
+        for(unsigned nt=0; nt<TopCand.size(); nt++)
+        {
+            double deltaRMin = 100000.;
+            unsigned tid = -1;
+            for(unsigned gent = 0; gent < Gentop.size(); gent++)
+            { // Loop over objects
+                const double dr = pointerDeref(TopCand[nt]).p().DeltaR(Gentop.at(gent));
+                if( dr < deltaRMin ) 
+                {
+                    deltaRMin = dr;
+                    tid = gent;
+                }
+            }
+            if(deltaRMin < DeltaR)
+            {
+                MachedTopCand.push_back(pointerDeref(TopCand[nt]));
+                MGentop.push_back(Gentop[tid]);
+                match = true;
+            }
+        }
+        return match;
+    }
+
+    bool GetMatchedTop(std::vector<TLorentzVector> TopCand, std::vector<TLorentzVector> &MachedTopCand, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
+    int GetMatchedTopConst(std::vector<Constituent const *> topconst, std::vector<TLorentzVector>gentopdau);
+
+    template<typename T> std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> TopConst(const std::vector<T>& tops, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)
+    {
+        //Check matching between top candidates and gen top
+        std::vector<int> topMatch;// = new std::vector<int>();
+        std::vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+        std::vector<TLorentzVector> MatchGentop;
+        std::vector<TopObject> matchTops;
+        bool topmatch = GetMatchedTop(tops, matchTops, hadtopLVec, MatchGentop);//final top match 
+
+        //check matching between reco top constituents and top gen decay daughters 
+        std::vector<int> topConstMatch;// = new std::vector<int>();
+        std::vector<TLorentzVector> constMatchGen;// = new std::vector<double>();
+        int iMatch = 0;
+        for(const auto& protoTop : tops)
+        {
+            const auto& top = pointerDeref(protoTop);
+            const std::vector<Constituent const*>& topConst = top.getConstituents();
+
+            //wrong horrible terrible bad inefficient hack to set reco top to gen top matching vector, please replace me!
+            if(topConst.size() && iMatch < matchTops.size() && matchTops[iMatch].getConstituents().size() && (topConst[0] == (matchTops[iMatch].getConstituents())[0]))
+            {
+                topMatch.push_back(1);
+                ++iMatch;
+            }
+            else topMatch.push_back(0);
+
+            int matches = 0;
+            const TLorentzVector* genTopPtr = nullptr;
+            for(const auto& genTop : hadtopLVec)
+            {
+                std::vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+                if(topConst.size()==1)
+                {
+                    matches = std::max(1, matches);
+                    genTopPtr = &genTop;
+                }
+                else if(topConst.size()==2)
+                {
+                    int dimatch = GetMatchedTopConst(topConst, gentopdauLVec);
+                    if(dimatch > matches)
+                    {
+                        matches = dimatch;
+                        genTopPtr = &genTop;
+                    }
+                }
+                else if(topConst.size()==3)
+                {
+                    int trimatch = GetMatchedTopConst(topConst, gentopdauLVec);
+                    if(trimatch > matches)
+                    {
+                        matches = trimatch;
+                        genTopPtr = &genTop;
+                    }
+                }
+            }
+            topConstMatch.push_back(matches);
+            if(genTopPtr) constMatchGen.push_back(*genTopPtr);
+            else          constMatchGen.push_back(TLorentzVector());
+        }
+        return std::make_pair(topMatch, std::make_pair(topConstMatch, constMatchGen));
+    }
+
 };
 
 
