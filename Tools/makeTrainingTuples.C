@@ -188,7 +188,7 @@ private:
 		vh.add("j" + std::to_string(i + 1) + "_m",     RF_constituents[i].p().M()           );
                 vh.add("j" + std::to_string(i + 1) + "_CSV",   RF_constituents[i].getBTagDisc()     );
                 vh.add("j" + std::to_string(i + 1) + "_QGL",   RF_constituents[i].getQGLikelihood() );
-                vh.add("j" + std::to_string(i + 1) + "_Chrg",  RF_constituents[i].getJetCharge() );
+                //vh.add("j" + std::to_string(i + 1) + "_Chrg",  RF_constituents[i].getJetCharge() );
 
                 //index of next jet (assumes < 4 jets)
                 int iNext = (i + 1) % RF_constituents.size();
@@ -263,7 +263,7 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_dTheta", "j23_dTheta", "j13_dTheta", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_Chrg", "j2_Chrg", "j3_Chrg", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab","bW1_dTheta", "bW2_dTheta", "MET"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "MET"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
