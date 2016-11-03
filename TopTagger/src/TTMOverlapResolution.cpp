@@ -35,15 +35,14 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     {
         std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_); } );
     }
-    else if(sortMethod_.find("pt") != std::string::npos)
+    else if(sortMethod_.find("topPt") != std::string::npos)
     {
-        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->p().Pt() < t2->p().Pt(); } );
+        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->p().Pt() > t2->p().Pt(); } );
     }
     else if(sortMethod_.find("mvaDisc") != std::string::npos)
     {
-        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->getDiscriminator() < t2->getDiscriminator(); } );
+        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->getDiscriminator() > t2->getDiscriminator(); } );
     }
-    
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
