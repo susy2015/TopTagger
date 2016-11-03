@@ -15,7 +15,60 @@ class TopTaggerResults;
 
 namespace ttUtility
 {
-    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<double>& jetChrg);
+    class ConstAK4Inputs
+    {
+    private:
+        const std::vector<TLorentzVector>* jetsLVec_;
+        const std::vector<double>* btagFactors_;
+        const std::vector<double>* qgLikelihood_;
+
+    public:
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+        void packageConstituents(std::vector<Constituent>& constituents);
+    };
+
+    class ConstAK8Inputs
+    {
+    private:
+        const std::vector<TLorentzVector>* jetsLVec_;
+        const std::vector<double>* tau1_;
+        const std::vector<double>* tau2_;
+        const std::vector<double>* tau3_;
+        const std::vector<double>* softDropMass_;
+        
+    public:
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass);
+        void packageConstituents(std::vector<Constituent>& constituents);
+    };
+
+    //template metaprogramming magic 
+    template<typename T, typename... Args> void packageConstituentsRecurse(std::vector<Constituent>& constituents, T input, Args... args)
+    {
+        input.packageConstituents(constituents);
+
+        packageConstituentsRecurse(constituents, args...);
+    }
+
+    //recursion termimnation specialization
+    template<typename T> void packageConstituentsRecurse(std::vector<Constituent>& constituents, T input)
+    {
+        input.packageConstituents(constituents);
+    }
+
+    //Function to fill constituent list based upon arbitrary list of input onjects
+    template<typename... Args> std::vector<Constituent> packageConstituents(Args... args)
+    {
+        //vector holding constituents to be created
+        std::vector<Constituent> constituents;
+
+        //begin the recursion to fill constituents
+        packageConstituentsRecurse(constituents, args...);
+
+        return constituents;        
+    }
+
+    //backwards compatability overload
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
     
     double calculateMT2(const TopTaggerResults& ttr);
 
