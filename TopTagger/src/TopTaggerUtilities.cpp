@@ -11,25 +11,49 @@
 
 namespace ttUtility
 {
-  std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<double>& jetChrg)
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass) : jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass) {}
+
+    void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
     {
         //vector holding constituents to be created
-        std::vector<Constituent> constituents;
+        //std::vector<Constituent> constituents;
 
         //Safety check that jet and b-tag vectors are the same length
-        if(jetsLVec.size() != btagFactors.size() || jetsLVec.size() != qgLikelihood.size() || jetsLVec.size() != jetChrg.size())
+        if(jetsLVec_->size() != btagFactors_->size() || jetsLVec_->size() != qgLikelihood_->size())
         {
-            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec.size()) + "\t" + std::to_string(qgLikelihood.size()));
+            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
         }
         
         //Construct constituents in place in the vector
-        for(unsigned int iJet = 0; iJet < jetsLVec.size(); ++iJet)
+        for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-	  constituents.emplace_back(jetsLVec[iJet], btagFactors[iJet], qgLikelihood[iJet], jetChrg[iJet]);
+            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
         }
+    }
 
-        //This will proceed as a move, not a deep copy
-        return constituents;
+    void ConstAK8Inputs::packageConstituents(std::vector<Constituent>& constituents)
+    {
+        //vector holding constituents to be created
+        //std::vector<Constituent> constituents;
+
+        //Safety check that jet and b-tag vectors are the same length
+        if(jetsLVec_->size() != tau1_->size() || jetsLVec_->size() != tau2_->size() || jetsLVec_->size() != tau3_->size() || jetsLVec_->size() != softDropMass_->size())
+        {
+            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n");
+        }
+        
+        //Construct constituents in place in the vector
+        for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
+        {
+            constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet]);
+        }
+    }
+
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood)
+    {
+        return packageConstituents(ConstAK4Inputs(jetsLVec, btagFactors, qgLikelihood));
     }
 
     double calculateMT2(const TopTaggerResults& ttr)
@@ -66,7 +90,7 @@ namespace ttUtility
         {
             TLorentzVector p4(constitutent->p());
             p4.Boost(-topCand.p().BoostVector());
-            RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood(), constitutent->getJetCharge());
+            RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
         }
             
         //re-sort constituents by p after deboosting
@@ -83,7 +107,6 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
             varMap["j" + std::to_string(i + 1) + "_QGL"]   = RF_constituents[i].getQGLikelihood();
-            varMap["j" + std::to_string(i + 1) + "_Chrg"]  = RF_constituents[i].getJetCharge();
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();
