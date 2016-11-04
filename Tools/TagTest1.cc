@@ -98,12 +98,11 @@ int main(int argc, char* argv[]) {
     std::vector<TLorentzVector> jetsLVec_forTagger;
     std::vector<double> recoJetsBtag_forTagger;
     std::vector<double> qgLikelihood_forTagger;
-    std::vector<double> recoJetsCharge_forTagger;
-    AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag_0, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, recoJetsCharge, recoJetsCharge_forTagger);
+    AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag_0, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger);
 
     // top tagger
     //construct vector of constituents 
-    vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, recoJetsCharge_forTagger);
+    vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger);
     //run tagger
     tt.runTagger(constituents);
     //get output of tagger

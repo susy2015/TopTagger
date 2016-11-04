@@ -43,9 +43,9 @@ histranges = {"cand_m":[20, 50, 300],
               "j23_m":[100, 0, 250],
               "j12_m":[100, 0, 250],
               "j13_m":[100, 0, 250],
-#              "dTheta12":[50,0,4],
-#              "dTheta23":[50,0,4],
-#              "dTheta13":[50,0,4],
+              "dTheta12":[50,0,4],
+              "dTheta23":[50,0,4],
+              "dTheta13":[50,0,4],
               "j1_p":[50,0,1000],
               "j2_p":[50,0,1000],
               "j3_p":[50,0,1000],
@@ -284,3 +284,8 @@ hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
 hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 1, 0, 1)
 hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
 
+#Eff vs disc value
+hEff_disc = ROOT.TProfile("hEff_disc", "hEff_disc", 100, 0, 1, 0, 1)
+
+#Fakerate vs disc value
+hFake_disc = ROOT.TProfile("hFake_disc", "hFake_disc", 100, 0, 1, 0, 1)

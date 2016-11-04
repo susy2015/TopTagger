@@ -92,7 +92,7 @@ private:
         std::vector<double> recoJetsBtag_forTagger;
         std::vector<double> qgLikelihood_forTagger;
         std::vector<double> recoJetsCharge_forTagger;
-        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, recoJetsCharge, recoJetsCharge_forTagger);
+        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger);
 
 	const double met=tr.getVar<double>("met");
 	const double metphi=tr.getVar<double>("metphi");
@@ -113,7 +113,7 @@ private:
 
         //New Tagger starts here
         //prep input object (constituent) vector
-        std::vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, recoJetsCharge_forTagger);
+        std::vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger);
 
         //run tagger
         topTagger_->runTagger(constituents);
@@ -170,7 +170,7 @@ private:
             {
                 TLorentzVector p4(constitutent->p());
                 p4.Boost(-topCand.p().BoostVector());
-                RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood(), constitutent->getJetCharge());
+                RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
             }
             
             //re-sort constituents by p after deboosting
@@ -188,7 +188,6 @@ private:
 		vh.add("j" + std::to_string(i + 1) + "_m",     RF_constituents[i].p().M()           );
                 vh.add("j" + std::to_string(i + 1) + "_CSV",   RF_constituents[i].getBTagDisc()     );
                 vh.add("j" + std::to_string(i + 1) + "_QGL",   RF_constituents[i].getQGLikelihood() );
-                //vh.add("j" + std::to_string(i + 1) + "_Chrg",  RF_constituents[i].getJetCharge() );
 
                 //index of next jet (assumes < 4 jets)
                 int iNext = (i + 1) % RF_constituents.size();
