@@ -321,15 +321,13 @@ if not options.noROC:
         Effroc[j] = float(EffNumroc[j])/EffDenroc
         Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
         hroc_alt.Fill(Fakeroc[j], Effroc[j])
+        hEff_disc.Fill(cut[j],Effroc[j])
+        hFake_disc.Fill(cut[j],Fakeroc[j])
     EffrocHEP = float(EffNumrocHEP)/EffDenroc
     FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
     hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
     
-    print "EffDenroc: ", EffDenroc
-    print "EffNumroc: ", EffNumroc
     
-    print "FakerocHEP:", FakerocHEP
-    print "EffrocHEP:",EffrocHEP
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -712,6 +710,8 @@ if not options.noROC:
     hroc_HEPZ.Write()
     hroc_alt.Write()
     hroc_HEP_alt.Write()
+    hEff_disc.Write()
+    hFake_disc.Write()
 mf.Write()
 mf.Close()
 
