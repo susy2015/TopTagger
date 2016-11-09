@@ -31,26 +31,27 @@ This class acts as a factory to allow dynamic creation of modules.  Its function
 TTModule:
 This is a pure virtual base class which defines the interface for a top tagger module.  This implements 2 pure virtual functions which must be overriden by all modules.  The first, "getParameters," is used to load any configuration parameters the module may need from the config file.  The second, "run," is used to run the particular algorithm implemented in the module.  None of these functions should even be called directly, but instead are called automatically by the TopTagger class.  It is also important that each module also include the line "REGESTER_TTMODULE(ModuleClassName)" after the class declaration.  This macro calls special code so that the TTMFactory class can dynamically implement the module by name.  
 
-TTMLazyClusterAlgo, TTMHEPRequirements, TTMOverlapResolution:
+TTMBasicClusterAlgo, TTMOpenCVMVA, TTMOverlapResolution:
 These three classes are module implementations.  They inherit, as all modules must, from TTModule and as described there implement the 2 functions "getParameter"s and "run."  Each module is called automatically from the TopTagger class.  They are also instantiated automatically based upon the configuration file.  
+
+To use ICHEP tagger, TTMHEPRequirements module must be used in place of TTMOpenCVMVA.
 
 ##Configuration file 
 
-The configuration file is central to the functioning of the top tagger code.  This file is a basic text file implemented to follow the structure of the HCAL configuration parser and the code can be found here "TopTagger/CfgParser."  This code upon which this is based can be found here (https://svnweb.cern.ch/cern/wsvn/cmshcos/trunk/hcalBase/include/hcal/cfg/?#aafaf15fcace155f9a3d702b52eb6d719).  The configuration script is used to tell the top tagger what modules to run and in which order, in addition to allowing any parameters necessary for the tagger and each module to be defined cleanly in one place.  An example configuration script can be found in TopTagger/TopTagger/test
+The configuration file is central to the functioning of the top tagger code.  This file is a basic text file implemented to follow the structure of the HCAL configuration parser and the code can be found here "TopTagger/CfgParser."  This code upon which this is based can be found here (https://svnweb.cern.ch/cern/wsvn/cmshcos/trunk/hcalBase/include/hcal/cfg/?#aafaf15fcace155f9a3d702b52eb6d719).  The configuration script is used to tell the top tagger what modules to run and in which order, in addition to allowing any parameters necessary for the tagger and each module to be defined cleanly in one place.  An example configuration script can be found in TopTagger/Tools/TopTaggerConfig.cfg
 
 ##Psudo-code
 
 ```c++
 
 //manditory includes to use top tagger
-#include "TopTagger.h"
-#include "TopTaggerResults.h"
+#include "TopTagger/TopTagger/include/TopTagger.h"
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+//this include is useful to get the helper function to make the vector of constituents
+#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 
 //this include is necessary to handle exceptions thrown by the top tagger code
 //#include "TTException.h"
-
-//this include is useful to get the helper function to make the vector of constituents
-#include "TopTaggerUtilities.h"
 
 
 int main()
@@ -59,7 +60,7 @@ int main()
 
     //configure top tagger
     TopTagger tt;
-    tt.setCfgFile("path/to/cfg/file.cfg");
+    tt.setCfgFile("path/TopTaggerConfig.cfg");
 
     for(auto& event : file)
     {
@@ -69,8 +70,11 @@ int main()
         //get b-tag info
         vector<double> btaginfo; // = b-tag vector
 
-        //construct vector of constituents 
-        vector<Constituent> constituents = ttUtility::packageCandidates(jets, btaginfo);
+	//get QGL info
+        vector<double>QGLinfo; // = jet QGL vector
+ 
+	//construct vector of constituents 
+        vector<Constituent> constituents = ttUtility::packageConstituents(jets, btaginfo, QGLinfo);
 
         //run tagger
         tt.runTagger(constituents);
@@ -78,7 +82,10 @@ int main()
         //get output of tagger
         const TopTaggerResults& ttr = tt.getResults();
 
-        //do something with the results
+	//get reconstructed top
+	vector<TopObject*> Ntop = ttr.getTops();	
+        
+	//do something with the results
         for(const TopObject* top : ttr.getTops())
         {
             //print top pt
@@ -89,9 +96,25 @@ int main()
 
 ```
 
+##Training output file
+
+TTMOpenCVMVA module needs a training out file (.model extension). One example from openCV MVA is in TopTagger/Tools/
+
+## Load opencv library path
+
+Now its done by dynamic path setting. So run the following command
+
+```
+source TopTagger/Tools/opencvSetup.sh
+```
+or 
+```
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${CMSSW_BASE}/src/opencv/lib/
+```
+
 ## Example code
 
-comming soon
+One is welcome to look TopTagger/Tools/TagTest1.cc
 
 
 ## Running MVA code
