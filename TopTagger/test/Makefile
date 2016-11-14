@@ -1,14 +1,19 @@
 ODIR       = obj
+RSDIR      = $(CMSSW_BASE)/src/SusyAnaTools/Tools
 
-TTIDIR     = ../../TopTagger/include
-TPIDIR     = ../../CfgParser/include
-
-TTSDIR     = ../../TopTagger/src
-TPSDIR     = ../../CfgParser/src
+TTIDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/include
+TPIDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/include
+TTSDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/src
+TPSDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/src
+OPENCV_DIRECTORY=$(CMSSW_BASE)/src/opencv
 
 CXX        = g++
 
-CXXFLAGS  += -I../../../ -std=c++0x
+CXXFLAGS  += -I. -I$(CMSSW_BASE)/src
+CXXFLAGS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/ -std=c++0x
 ## Optimization/debug flag
 CXXFLAGS += -g #-O3
 ## Enable for maximum warning
