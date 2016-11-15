@@ -44,7 +44,8 @@ else:
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
 
-cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
+#cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
+cut = numpy.arange(0.0, 1.0, 0.01)
 EffNumroc = len(cut) * [0]
 Effroc =    len(cut) * [0]
 EffDenroc = 0
@@ -59,7 +60,7 @@ inputList = []
 rocInput = []
 rocScore = []
 rocHEP = []
-
+evtwgt = []
 Nevts = 0
 for event in fileValidation.slimmedTuple:
     if event.Njet<4 : continue
@@ -67,17 +68,16 @@ for event in fileValidation.slimmedTuple:
         break
     Nevts += 1
     if(len(event.genTopPt)):
-        EffDenroc += 1
+        EffDenroc += 1*event.sampleWgt
     for pt in event.genTopPt:
-        hEffDen.Fill(pt)
-        hEffHEPDen.Fill(pt)
+        hEffDen.Fill(pt, event.sampleWgt)
+        hEffHEPDen.Fill(pt, event.sampleWgt)
     for i in xrange(len(event.cand_m)):
         inputList.append(dg.getData(event, i))
-
         rocInput.append(dg.getData(event, i))
         rocScore.append((event.genConstiuentMatchesVec[i]==3))
         rocHEP.append(HEPReqs(event, i))
-
+        evtwgt.append(event.sampleWgt)
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
@@ -88,20 +88,13 @@ else:
 
 print "FILLING HISTOGRAMS"
 
-evtWidcand = 0
-cand = 0
-matchcand = 0
-nomatchcand =0
-outputCount = 0;
+outputCount = 0
 Nevts = 0
 for event in fileValidation.slimmedTuple:
     if event.Njet<4 : continue
     if Nevts >= NEVTS:
         break
     Nevts += 1
-    if(len(event.cand_m)):
-        evtWidcand+=1
-    cand +=len(event.cand_m)
     #nCands = len(event.genConstiuentMatchesVec)
     nCands = len(event.cand_m)
     tmp_output = []
@@ -117,16 +110,17 @@ for event in fileValidation.slimmedTuple:
     hnTopsHEP.Fill(len(topsHEP))
     MVAcand =0
     HEPcand =0
+    MatchMVAcand =0
     for i in xrange(len(event.cand_m)):
         #if event.cand_pt[i] < 100: continue
         #prep output
         Varsval = dg.getData(event, i)
-        hDisc.Fill(tmp_output[i])
-        hMVAdisc_pt.Fill(event.cand_pt[i], tmp_output[i])
+        hDisc.Fill(tmp_output[i], event.sampleWgt)
+        hMVAdisc_pt.Fill(event.cand_pt[i], tmp_output[i], event.sampleWgt)
         if(tmp_output[i] > discCut):
             MVAcand +=1
-            hPurityDen.Fill(event.cand_pt[i])
-            hPurity_discDen.Fill(tmp_output[i])
+            hPurityDen.Fill(event.cand_pt[i], event.sampleWgt)
+            hPurity_discDen.Fill(tmp_output[i], event.sampleWgt)
             hNConstMatchTag.Fill(event.genConstiuentMatchesVec[i])
             for j, vname in enumerate(varsname):
                 if(histranges.has_key(vname)):
@@ -139,46 +133,40 @@ for event in fileValidation.slimmedTuple:
         passHEP = HEPReqs(event, i)
         if(passHEP):
             HEPcand +=1
-            hPurityHEPDen.Fill(event.cand_pt[i])
+            hPurityHEPDen.Fill(event.cand_pt[i], event.sampleWgt)
             hNConstMatchTagHEP.Fill(event.genConstiuentMatchesVec[i])
         else:
             hNConstMatchNoTagHEP.Fill(event.genConstiuentMatchesVec[i])
         #Truth matched candidates
         if(event.genConstiuentMatchesVec[i] == 3):
-            matchcand += 1
-            hj1Theta.Fill(math.cos(event.j1_theta[i]))
-            hj2Theta.Fill(math.cos(event.j2_theta[i]))
-            hj3Theta.Fill(math.cos(event.j3_theta[i]))
             for k in xrange(len(cut)):
-                if(tmp_output[i] > cut[k]):
-                    EffNumroc[k] += 1
+                discpass = (tmp_output[i]>cut[k] or tmp_output[i]==cut[k]) if(k==0) else (tmp_output[i]>cut[k])
+                if(discpass):
+                    EffNumroc[k] += 1*event.sampleWgt
             hmatchGenPt.Fill(event.genConstMatchGenPtVec[i])
             #pass reco discriminator threshold
             if(tmp_output[i] > discCut):
-                hEffNum.Fill(event.genConstMatchGenPtVec[i])
-                hPurityNum.Fill(event.cand_pt[i])
-                hPurity_discNum.Fill(tmp_output[i])
+                MatchMVAcand +=1
+                hEffNum.Fill(event.genConstMatchGenPtVec[i], event.sampleWgt)
+                hPurityNum.Fill(event.cand_pt[i], event.sampleWgt)
+                hPurity_discNum.Fill(tmp_output[i], event.sampleWgt)
             if(passHEP):
-                hEffHEPNum.Fill(event.genConstMatchGenPtVec[i])
-                hPurityHEPNum.Fill(event.cand_pt[i])
-                EffNumrocHEP +=1
-            hDiscMatch.Fill(tmp_output[i])
+                hEffHEPNum.Fill(event.genConstMatchGenPtVec[i],event.sampleWgt)
+                hPurityHEPNum.Fill(event.cand_pt[i],event.sampleWgt)
+                EffNumrocHEP +=1*event.sampleWgt
+            hDiscMatch.Fill(tmp_output[i], event.sampleWgt)
             if(event.cand_pt[i] > 250):
-                hDiscMatchPt.Fill(tmp_output[i])
+                hDiscMatchPt.Fill(tmp_output[i], event.sampleWgt)
         #not truth matched
         else:
-            nomatchcand += 1
-            hDiscNoMatch.Fill(tmp_output[i])
+            hDiscNoMatch.Fill(tmp_output[i], event.sampleWgt)
             if(event.cand_pt[i] > 250):
-                hDiscNoMatchPt.Fill(tmp_output[i])
-    hnMVAcand.Fill(MVAcand)
-    hnHEPcand.Fill(HEPcand)
+                hDiscNoMatchPt.Fill(tmp_output[i], event.sampleWgt)
+    hnMVAcand.Fill(MVAcand, event.sampleWgt)
+    hnHEPcand.Fill(HEPcand, event.sampleWgt)
+    hnMatchMVAcand.Fill(MatchMVAcand, event.sampleWgt)
 
 print "evt: ", Nevts
-print "evtWidcand: ", evtWidcand
-print "cand: ", cand
-print "matchcand: ", matchcand
-print "nomatchcand: ", nomatchcand
 
 print "FakeRate Calculation"
 #FakeRate
@@ -208,37 +196,41 @@ for event in fileFakeRate.slimmedTuple:
     if Nevts >= NEVTS_Z:
         break
     Nevts +=1
-    FakeDenroc += 1
-    hFakeDen.Fill(event.MET)
-    hFakeDen_njet.Fill(event.Njet)
-    hFakeDenHEP.Fill(event.MET)
-    hFakeDenHEP_njet.Fill(event.Njet)
+    FakeDenroc += 1*event.sampleWgt
+    hFakeDen.Fill(event.MET, event.sampleWgt)
+    hFakeDen_njet.Fill(event.Njet, event.sampleWgt)
+    hFakeDenHEP.Fill(event.MET, event.sampleWgt)
+    hFakeDenHEP_njet.Fill(event.Njet, event.sampleWgt)
     numflag = False
     numflagHEP = False
     numflagroc = [False for r in range(len(cut))]
     tops = resolveOverlap(event, zinvOutput, discCut)
     topsHEP = resolveOverlapHEP(event, ZinvpassHEP)
-    hnTopsZinv.Fill(len(tops))
-    hnTopsHEPZinv.Fill(len(topsHEP))
+    hnTopsZinv.Fill(len(tops), event.sampleWgt)
+    hnTopsHEPZinv.Fill(len(topsHEP), event.sampleWgt)
 
     for j in xrange(len(event.cand_m)):
+        hDiscNoMatch.Fill(zinvOutput[outputCount], event.sampleWgt)
+        if(event.cand_pt[j] > 250):
+            hDiscNoMatchPt.Fill(zinvOutput[outputCount], event.sampleWgt)
         if(zinvOutput[outputCount] > discCut):
             numflag = True
         if(ZinvpassHEP[outputCount]):
             numflagHEP = True
         for k in xrange(len(cut)):
-            if(zinvOutput[outputCount]>cut[k]):
+            discpass = (zinvOutput[outputCount]>cut[k] or zinvOutput[outputCount]==cut[k]) if(k==0) else (zinvOutput[outputCount]>cut[k])
+            if(discpass):
                 numflagroc[k] = True
         outputCount += 1
     if(numflag):
-        hFakeNum.Fill(event.MET)
-        hFakeNum_njet.Fill(event.Njet)
+        hFakeNum.Fill(event.MET, event.sampleWgt)
+        hFakeNum_njet.Fill(event.Njet, event.sampleWgt)
     if(numflagHEP):
-        hFakeNumHEP.Fill(event.MET)
-        hFakeNumHEP_njet.Fill(event.Njet)
-        FakeNumrocHEP += 1
+        hFakeNumHEP.Fill(event.MET, event.sampleWgt)
+        hFakeNumHEP_njet.Fill(event.Njet, event.sampleWgt)
+        FakeNumrocHEP += 1*event.sampleWgt
     for k in xrange(len(cut)):
-        if(numflagroc[k]):FakeNumroc[k] += 1
+        if(numflagroc[k]):FakeNumroc[k] += 1*event.sampleWgt
 
 if not options.noROC:
     print "ROC Calculation"
@@ -259,32 +251,29 @@ if not options.noROC:
         rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
     else:
         rocOutput = clf1.predict_proba(rocInput)[:,1]
-    
+
     for i in xrange(len(rocOutput)):
         if(rocScore[i]):
-            Nmatch= Nmatch+1
-            if(rocHEP[i]):TPHEP = TPHEP+1
+            Nmatch= Nmatch+1*evtwgt[i]
+            if(rocHEP[i]):TPHEP = TPHEP+1*evtwgt[i]
         else:
-            Nnomatch = Nnomatch+1
-            if(rocHEP[i]):FPHEP = FPHEP+1
+            Nnomatch = Nnomatch+1*evtwgt[i]
+            if(rocHEP[i]):FPHEP = FPHEP+1*evtwgt[i]
         for j in xrange(len(cut)):
-            if(rocOutput[i]>cut[j]):
-                if(rocScore[i]):TP[j] = TP[j]+1
-                else:FP[j] = FP[j]+1
+            discpass = (rocOutput[i]>cut[j] or rocOutput[i]==cut[j]) if(j==0) else (rocOutput[i]>cut[j])
+            if(discpass):
+                if(rocScore[i]):TP[j] = TP[j]+1*evtwgt[i]
+                else:FP[j] = FP[j]+1*evtwgt[i]
     
     for j in xrange(len(cut)):
-        TPR[j] = float(TP[j])/Nmatch
-        FPR[j] = float(FP[j])/Nnomatch
+        TPR[j] = round(float(TP[j])/Nmatch, 2)
+        FPR[j] = round(float(FP[j])/Nnomatch, 2)
         hroc.Fill(FPR[j],TPR[j])
     TPRHEP = float(TPHEP)/Nmatch
     FPRHEP = float(FPHEP)/Nnomatch
     hroc_HEP.Fill(FPRHEP,TPRHEP)
     
-    print "TPR: ", TPR
-    print "FPR: ", FPR
-    
     #Zinv
-    
     FPZ  = len(cut) * [0]
     FPRZ = len(cut) * [0]
     NnomatchZ = 0
@@ -292,12 +281,13 @@ if not options.noROC:
     FPRHEPZ =0
     rocInputZ = []
     rocHEPZ = []
+    evtwgtZ = []
     for event in fileFakeRate.slimmedTuple:
         if event.Njet<4 : continue
         for i in xrange(len(event.cand_m)):
             rocInputZ.append(dg.getData(event, i))
             rocHEPZ.append(HEPReqs(event, i))
-    
+            evtwgtZ.append(event.sampleWgt)
     nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
     if options.opencv:
         rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
@@ -305,21 +295,22 @@ if not options.noROC:
         rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
     
     for i in xrange(len(rocOutputZ)):
-        NnomatchZ = NnomatchZ+1
-        if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1
+        NnomatchZ = NnomatchZ+1*evtwgtZ[i]
+        if(rocHEPZ[i]):FPHEPZ = FPHEPZ+1*evtwgtZ[i]
         for j in xrange(len(cut)):
-            if(rocOutputZ[i]>cut[j]):
-                FPZ[j] = FPZ[j]+1
+            discpass = (rocOutputZ[i]>cut[j] or rocOutputZ[i]==cut[j]) if(j==0) else (rocOutputZ[i]>cut[j])
+            if(discpass):
+                FPZ[j] = FPZ[j]+1*evtwgtZ[i]
     for j in xrange(len(cut)):
-        FPRZ[j] = float(FPZ[j])/NnomatchZ
+        FPRZ[j] = round(float(FPZ[j])/NnomatchZ, 2)
         hrocZ.Fill(FPRZ[j],TPR[j])
     FPRHEPZ = float(FPHEPZ)/NnomatchZ
     hroc_HEPZ.Fill(FPRHEPZ,TPRHEP)
     
     
     for j in xrange(len(cut)):
-        Effroc[j] = float(EffNumroc[j])/EffDenroc
-        Fakeroc[j] = float(FakeNumroc[j])/FakeDenroc
+        Effroc[j] = round(float(EffNumroc[j])/EffDenroc, 2)
+        Fakeroc[j] = round(float(FakeNumroc[j])/FakeDenroc, 2)
         hroc_alt.Fill(Fakeroc[j], Effroc[j])
         hEff_disc.Fill(cut[j],Effroc[j])
         hFake_disc.Fill(cut[j],Fakeroc[j])
@@ -327,7 +318,11 @@ if not options.noROC:
     FakerocHEP = float(FakeNumrocHEP)/FakeDenroc
     hroc_HEP_alt.Fill(FakerocHEP,EffrocHEP)
     
-    
+    print "TPR: ", TPR 
+    print "FPR: ", FPR
+    print "FPRZ: ", FPRZ
+    print "Effroc: ", Effroc
+    print "Fakeroc: ", Fakeroc
 
 print "PLOTTING"
 c = ROOT.TCanvas("c1","c1",800,800)
@@ -384,6 +379,10 @@ hnMVAcand.Draw("same")
 hnHEPcand.Draw("same")
 leg.Draw("same")
 c.Print("nTops.png")
+
+hnMatchMVAcand.SetTitle("Const matched MVA disc passed cand")
+hnMatchMVAcand.Draw()
+c.Print("MatchedMVAcand.png")
 
 #draw nTops Plot for Zinv
 hnTopsZinv.SetLineColor(ROOT.kRed)
@@ -478,9 +477,6 @@ hEff.Draw()
 hEffHEP.Draw("same")
 leg.Draw("same")
 c.Print("efficiency.png")
-
-print "EffDen: ", hEffDen.Integral()
-print "EffNum: ", hEffNum.Integral()
 
 #draw purity
 hPurity = hPurityNum.Clone("hPurity")
@@ -598,21 +594,6 @@ if not options.noROC:
     c.Print("roc_alt.png")
 
 #few test plots
-hj1Theta.SetTitle("cos#theta(topboost, j_{i})")
-hj1Theta.SetStats(0)
-hj1Theta.SetLineColor(ROOT.kRed)
-hj2Theta.SetLineColor(ROOT.kBlack)
-hj3Theta.SetLineColor(ROOT.kBlue)
-leg = ROOT.TLegend(0.55, 0.75, 0.9, 0.9)
-leg.AddEntry(hj1Theta, "j1")
-leg.AddEntry(hj2Theta, "j2")
-leg.AddEntry(hj3Theta, "j3")
-hj1Theta.Draw()
-hj2Theta.Draw("same")
-hj3Theta.Draw("same")
-leg.Draw("same")
-c.Print("Matched_theta.png")
-
 hPurity_disc = hPurity_discNum.Clone("hPurity_disc")
 hPurity_disc.SetStats(0)
 hPurity_disc.SetTitle("")
@@ -692,6 +673,7 @@ hNConstMatchTag.Write()
 hNConstMatchNoTag.Write()
 hNConstMatchTagHEP.Write()
 hNConstMatchNoTagHEP.Write()
+
 for h in hist_tag:
     hist_tag[h].Write()
     hist_notag[h].Write()
