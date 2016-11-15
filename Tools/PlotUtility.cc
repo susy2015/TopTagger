@@ -86,7 +86,7 @@ vector<TLorentzVector> GetHadTopLVec(const vector<TLorentzVector>& genDecayLVec,
                         if(abs(pdgId)==5)topdauLVec.push_back(genDecayLVec[ig]);
                         if(abs(pdgId)==24)
                         {
-                            topdauLVec.push_back(genDecayLVec[ig]);	 
+			  //topdauLVec.push_back(genDecayLVec[ig]);	 
                             for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
                             {
                                 if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 

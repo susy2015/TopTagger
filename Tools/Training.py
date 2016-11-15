@@ -31,7 +31,8 @@ dg = DataGetter()
 
 print "PROCESSING TRAINING DATA"
 
-samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.root", "trainingTuple_division_0_ZJetsToNuNu_training.root", "trainingTuple_division_0_Signal_training.root"]
+samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.root", "trainingTuple_division_0_ZJetsToNuNu_training.root"]
+
 
 inputData = []
 inputAnswer = []
@@ -41,8 +42,10 @@ for datasetName in samplesToRun:
     dataset = ROOT.TFile.Open(datasetName)
 
     hPtMatch   = ROOT.TH1D("hPtMatch" + datasetName, "hPtMatch", 50, 0.0, 2000.0)
+    hPtMatch.Sumw2()
     hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
-    
+    hPtNoMatch.Sumw2()
+
     Nevts = 0
     for event in dataset.slimmedTuple:
         if Nevts >= NEVTS:
@@ -50,9 +53,9 @@ for datasetName in samplesToRun:
         Nevts +=1
         for i in xrange(len(event.genConstiuentMatchesVec)):
             if event.genConstiuentMatchesVec[i] == 3:
-                hPtMatch.Fill(event.cand_pt[i])
+                hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
             else:
-                hPtNoMatch.Fill(event.cand_pt[i])
+                hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
     
     Nevts = 0
     for event in dataset.slimmedTuple:
@@ -63,16 +66,17 @@ for datasetName in samplesToRun:
             inputData.append(dg.getData(event, i))
             nmatch = event.genConstiuentMatchesVec[i]
             inputAnswer.append(int(nmatch == 3))
-            if nmatch == 3:
-                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
-                else:
-                    inputWgts.append(0.0)
-            else:
-                if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
-                else:
-                    inputWgts.append(0.0)
+            inputWgts.append(event.sampleWgt)
+#            if nmatch == 3:
+#                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+#                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+#                else:
+#                    inputWgts.append(0.0)
+#            else:
+#                if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
+#                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+#                else:
+#                    inputWgts.append(0.0)
 
                 
 npyInputData = numpy.array(inputData, numpy.float32)
@@ -85,7 +89,7 @@ nBg = npyInputWgts[npyInputAnswer==0].sum()
 #Equalize the relative weights of signal and bg
 for i in xrange(len(npyInputAnswer)):
     if npyInputAnswer[i] == 0:
-        npyInputWgts[i] *= 2*nSig/nBg
+        npyInputWgts[i] *= nSig/nBg
 
 nSig = npyInputWgts[npyInputAnswer==1].sum()
 nBg = npyInputWgts[npyInputAnswer==0].sum()
@@ -104,7 +108,7 @@ if options.opencv:
     n_estimators = 100
     clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.1))
     #clf.setMaxCategories(2)
-    clf.setMaxDepth(15)
+    clf.setMaxDepth(12)
     #clf.setMinSampleCount(5)
 
     #make opencv TrainData container
@@ -115,7 +119,7 @@ if options.opencv:
     clf.save("TrainingOutput.model")
 
 else:
-    clf = RandomForestClassifier(n_estimators=100, max_depth=15, n_jobs = 4)
+    clf = RandomForestClassifier(n_estimators=100, max_depth=12, n_jobs = 4)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
     #clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
