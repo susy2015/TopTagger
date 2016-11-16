@@ -137,11 +137,11 @@ int main(int argc, char* argv[]) {
 	vector<TLorentzVector>gentopdauLVec = genUtility::GetTopdauLVec(MatchGentop[tc], genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 	if(topconst.size()==1) monojetmatch[tc]=true;
 	if(topconst.size()==2){
-	  int dimatch = topcat.GetMatchedTopConst(topconst, gentopdauLVec);
+	  int dimatch = topcat.GetMatchedTopConst(topconst, gentopdauLVec).first;
 	  if(dimatch==2)dijet2match[tc] = true;
 	}
 	if(topconst.size()==3){
-	  int trimatch = topcat.GetMatchedTopConst(topconst, gentopdauLVec);
+	  int trimatch = topcat.GetMatchedTopConst(topconst, gentopdauLVec).first;
 	  if(trimatch==3)trijet3match[tc] = true;
 	}
       }

@@ -1,12 +1,14 @@
 #ifndef TAGGERUTILITY_H
 #define TAGGERUTILITY_H
 
-#include <iostream>
 #include "TLorentzVector.h"
 #include "TopTagger/TopTagger/include/TopTagger.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 #include "PlotUtility.h"
+
+#include <utility>
+
 class TopVar
 {
  private:
@@ -80,7 +82,7 @@ public:
     }
 
     bool GetMatchedTop(std::vector<TLorentzVector> TopCand, std::vector<TLorentzVector> &MachedTopCand, std::vector<TLorentzVector>Gentop, std::vector<TLorentzVector> &MGentop); 
-    int GetMatchedTopConst(std::vector<Constituent const *> topconst, std::vector<TLorentzVector>gentopdau);
+    std::pair<int, int> GetMatchedTopConst(const std::vector<Constituent const *>& topconst, const std::vector<TLorentzVector>& gentopdau);
 
     template<typename T> std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> TopConst(const std::vector<T>& tops, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)
     {
@@ -113,26 +115,13 @@ public:
             for(const auto& genTop : hadtopLVec)
             {
                 std::vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-                if(topConst.size()==1)
+                auto matches = GetMatchedTopConst(topConst, gentopdauLVec);
+                int bestMatches = 0;
+                if(topConst.size() == matches.second)
                 {
-                    matches = std::max(1, matches);
-                    genTopPtr = &genTop;
-                }
-                else if(topConst.size()==2)
-                {
-                    int dimatch = GetMatchedTopConst(topConst, gentopdauLVec);
-                    if(dimatch > matches)
+                    if(matches.first > bestMatches)
                     {
-                        matches = dimatch;
-                        genTopPtr = &genTop;
-                    }
-                }
-                else if(topConst.size()==3)
-                {
-                    int trimatch = GetMatchedTopConst(topConst, gentopdauLVec);
-                    if(trimatch > matches)
-                    {
-                        matches = trimatch;
+                        bestMatches = matches.first;
                         genTopPtr = &genTop;
                     }
                 }
