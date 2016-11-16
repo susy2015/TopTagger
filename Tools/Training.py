@@ -52,7 +52,7 @@ for datasetName in samplesToRun:
             break
         Nevts +=1
         for i in xrange(len(event.genConstiuentMatchesVec)):
-            if event.genConstiuentMatchesVec[i] == 3:
+            if event.genConstiuentMatchesVec[i] == 3 and event.genTopMatchesVec[i]:
                 hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
             else:
                 hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
@@ -65,7 +65,7 @@ for datasetName in samplesToRun:
         for i in xrange(len(event.cand_m)):
             inputData.append(dg.getData(event, i))
             nmatch = event.genConstiuentMatchesVec[i]
-            inputAnswer.append(int(nmatch == 3))
+            inputAnswer.append(int(nmatch == 3) and event.genTopMatchesVec[i])
             inputWgts.append(event.sampleWgt)
 #            if nmatch == 3:
 #                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
