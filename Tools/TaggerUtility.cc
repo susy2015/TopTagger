@@ -1,5 +1,7 @@
 #include "TaggerUtility.h"
 
+#include <set>
+
 using namespace std;
 
 double TopVar::GetTopdRmin(TopObject* Top){
@@ -50,7 +52,7 @@ void TopVar::CalCombmass(TopObject* Top){
     m12=0;
     m23=0;
     m13=0;
-    m123=con[0]->p().M();   
+    m123=con[0]->p().M();
   }
   if(con.size()==2){
     m12=0;
@@ -87,7 +89,7 @@ void TopVar::CalCombmass(TopObject Top){
   }
 }
 //bool TopCat::GetMatchedTop(vector<TopObject*> Top, vector<TopObject*> &MachedTop, vector<TLorentzVector>Gentop, vector<TLorentzVector> &MGentop){
-//  bool match = false; 
+//  bool match = false;
 //  if(Gentop.size()==0) return match;
 //  double DeltaR = 0.4;
 //  for(unsigned nt=0; nt<Top.size();nt++){
@@ -107,7 +109,7 @@ void TopVar::CalCombmass(TopObject Top){
 //}
 //
 //bool TopCat::GetMatchedTop(vector<TopObject> TopCand, vector<TopObject> &MachedTopCand, vector<TLorentzVector>Gentop, vector<TLorentzVector> &MGentop){
-//  bool match = false; 
+//  bool match = false;
 //  if(Gentop.size()==0) return match;
 //  double DeltaR = 0.4;
 //  for(unsigned nt=0; nt<TopCand.size();nt++){
@@ -132,7 +134,7 @@ bool TopCat::GetMatchedTop(vector<TLorentzVector> Top, vector<TLorentzVector> &M
   for(unsigned nt=0; nt<Top.size();nt++){
     double deltaRMin = 100000.;
     unsigned tid = -1;
-    for(unsigned gent = 0; gent < Gentop.size(); gent++) { // Loop over objects                                                                                                 
+    for(unsigned gent = 0; gent < Gentop.size(); gent++) { // Loop over objects
       const double dr = Top[nt].DeltaR(Gentop.at(gent));
       if( dr < deltaRMin ) {deltaRMin = dr; tid = gent;}
     }
@@ -145,20 +147,33 @@ bool TopCat::GetMatchedTop(vector<TLorentzVector> Top, vector<TLorentzVector> &M
   return match;
 }
 
-int TopCat::GetMatchedTopConst(vector<Constituent const *> topconst, vector<TLorentzVector>gentopdau){
-  int match=0;
-  if(gentopdau.size()==0) return match;
-  double DeltaR = 0.4;
-  for(unsigned nt=0; nt<topconst.size();nt++){
-    double deltaRMin = 100000.;
-    for(unsigned gent = 0; gent < gentopdau.size(); gent++) { // Loop over objects                                                                                           
-      const double dr = topconst[nt]->p().DeltaR(gentopdau.at(gent));
-      if( dr < deltaRMin ) deltaRMin = dr;
+std::pair<int, int> TopCat::GetMatchedTopConst(const vector<Constituent const *>& topconst, const vector<TLorentzVector>& gentopdau)
+{
+    int match=0;
+    if(gentopdau.size()==0) return std::make_pair(0, 0);
+    double DeltaR = 0.4;
+    std::set<Constituent const *> matchedTopConsts;
+    for(unsigned gent = 0; gent < gentopdau.size(); gent++) 
+    {
+        double deltaRMin = 100000.;
+        Constituent const *bestMatch;
+        for(unsigned nt=0; nt<topconst.size();nt++)
+        { 
+            const double dr = topconst[nt]->p().DeltaR(gentopdau.at(gent));
+            if( dr < deltaRMin ) 
+            {
+                deltaRMin = dr;
+                bestMatch = topconst[nt];
+            }
+        }
+        if(deltaRMin < DeltaR)
+        {
+            //If multiple gentops match the same jet, the set will only contain unique matched jets 
+            matchedTopConsts.insert(bestMatch);
+            match++;
+        }
     }
-    if(deltaRMin < DeltaR) match++;
-  }
-  return match;
-
+    return std::make_pair(match, int(matchedTopConsts.size()));
 }
 
 //std::pair<std::vector<int>*, std::pair<std::vector<int>*, std::vector<double>*>> TopCat::TopConst(const std::vector<TopObject>& tops, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)
@@ -168,9 +183,9 @@ int TopCat::GetMatchedTopConst(vector<Constituent const *> topconst, vector<TLor
 //    vector<TLorentzVector> hadtopLVec = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 //    vector<TLorentzVector> MatchGentop;
 //    vector<TopObject> matchTops;
-//    bool topmatch = GetMatchedTop(tops, matchTops, hadtopLVec, MatchGentop);//final top match 
+//    bool topmatch = GetMatchedTop(tops, matchTops, hadtopLVec, MatchGentop);//final top match
 //
-//    //check matching between reco top constituents and top gen decay daughters 
+//    //check matching between reco top constituents and top gen decay daughters
 //    vector<int>* topConstMatch = new vector<int>();
 //    vector<double>* constMatchGenPt = new vector<double>();
 //    int iMatch = 0;
