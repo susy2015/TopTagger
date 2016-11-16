@@ -146,91 +146,12 @@ private:
         //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
-            //Get top candidate variables
-            vh.add("cand_pt",    topCand.p().Pt()   );
-            vh.add("cand_eta",   topCand.p().Eta()  );
-            vh.add("cand_phi",   topCand.p().Phi()  );
-            vh.add("cand_m",     topCand.p().M()    );
-            vh.add("cand_dRMax", topCand.getDRmax() );
+            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
 
-            //Get Constituents
-            const std::vector<Constituent const *>& top_constituents = topCand.getConstituents();
-            
-	    //Get constituent variables before deboost
-	    for(int i = 0; i < top_constituents.size(); ++i)
-	      {
-                vh.add("j" + std::to_string(i + 1) + "_phi_lab",   top_constituents[i]->p().Phi()         );
-                vh.add("j" + std::to_string(i + 1) + "_eta_lab",   top_constituents[i]->p().Eta()         );
-                vh.add("j" + std::to_string(i + 1) + "_pt_lab",    top_constituents[i]->p().Pt()         );
-	      }
-
-            std::vector<Constituent> RF_constituents;
-
-            for(const auto& constitutent : top_constituents)
+            for(auto& var : varMap)
             {
-                TLorentzVector p4(constitutent->p());
-                p4.Boost(-topCand.p().BoostVector());
-                RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
+                vh.add(var.first, var.second);
             }
-            
-            //re-sort constituents by p after deboosting
-            std::sort(RF_constituents.begin(), RF_constituents.end(), [](const Constituent& c1, const Constituent& c2){ return c1.p().P() > c2.p().P(); });
-
-            //Get constituent variables
-            //std::cout << "\tconst vec size: " << constituents.size() << std::endl;
-            for(int i = 0; i < RF_constituents.size(); ++i)
-            {
-                vh.add("j" + std::to_string(i + 1) + "_p",     RF_constituents[i].p().P()           );
-                vh.add("j" + std::to_string(i + 1) + "_theta", RF_constituents[i].p().Angle(topCand.p().Vect())         );
-                vh.add("j" + std::to_string(i + 1) + "_phi",   RF_constituents[i].p().Phi()         );
-		vh.add("j" + std::to_string(i + 1) + "_eta",   RF_constituents[i].p().Eta()         );
-		vh.add("j" + std::to_string(i + 1) + "_pt",    RF_constituents[i].p().Pt()         );
-		vh.add("j" + std::to_string(i + 1) + "_m",     RF_constituents[i].p().M()           );
-                vh.add("j" + std::to_string(i + 1) + "_CSV",   RF_constituents[i].getBTagDisc()     );
-                vh.add("j" + std::to_string(i + 1) + "_QGL",   RF_constituents[i].getQGLikelihood() );
-
-                //index of next jet (assumes < 4 jets)
-                int iNext = (i + 1) % RF_constituents.size();
-                int iMin = std::min(i, iNext);
-                int iMax = std::max(i, iNext);
-
-                //Calculate delta angle variables
-                double dR   = ROOT::Math::VectorUtil::DeltaR(RF_constituents[iMin].p(), RF_constituents[iMax].p());
-                double dPhi = ROOT::Math::VectorUtil::DeltaPhi(RF_constituents[iMin].p(), RF_constituents[iMax].p());
-                double dEta = RF_constituents[iMin].p().Eta() - RF_constituents[iMax].p().Eta();
-                //vh.add("dR"   + std::to_string(iMin + 1) + std::to_string(iMax + 1), dR);
-                //vh.add("dPhi" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dPhi);
-                vh.add("dTheta" + std::to_string(iMin + 1) + std::to_string(iMax + 1), RF_constituents[iMin].p().Angle(RF_constituents[iMax].p().Vect()));
-                //vh.add("dEta" + std::to_string(iMin + 1) + std::to_string(iMax + 1), dEta);
-
-                //calculate pair masses
-
-                auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
-                vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m", jetPair.M());
-                
-                //TLorentzVector j1 = RF_constituents[i].p();
-                //j1.Boost(-jetPair.BoostVector());
-                //TLorentzVector j2 = RF_constituents[iNext].p();
-                //j2.Boost(-jetPair.BoostVector());
-                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta", jetPair.Angle(j1.Vect()));
-                
-		// int iNNext = (iNext + 1) % RF_constituents.size();
-                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_pt", jetPair.Pt());
-                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", ROOT::Math::VectorUtil::DeltaR(jetPair, RF_constituents[iNNext].p()));
-                //vh.add("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "j" + std::to_string(iNNext + 1) +  "_dR", jetPair.Angle(RF_constituents[iNNext].p().Vect()));
-            }
-	    //TLorentzVector bj = RF_constituents[0].p();
-	    //bj.Boost(topCand.p().BoostVector());
-	    //TLorentzVector Wj1 = RF_constituents[1].p();
-            //TLorentzVector Wj2 = RF_constituents[2].p();
-	    //Wj1.Boost(topCand.p().BoostVector());
-            //Wj2.Boost(topCand.p().BoostVector());
-	    //TLorentzVector Wj = Wj1 + Wj2;
-	    //bj.Boost(-Wj.BoostVector());
-	    //Wj1.Boost(-Wj.BoostVector());
-            //Wj2.Boost(-Wj.BoostVector());
-	    //vh.add("bW1_dTheta",cos(bj.Angle(Wj1.Vect())));
-	    //vh.add("bW2_dTheta",cos(bj.Angle(Wj2.Vect())));
         }
 
         vh.registerFunctions();
@@ -265,7 +186,7 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "MET"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "MET", "N_CSV"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
@@ -503,4 +424,6 @@ int main(int argc, char* argv[])
     }
 
     for(auto& mtm : mtmVec) delete mtm.first;
+
+    assert(false);
 }
