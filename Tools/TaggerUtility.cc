@@ -112,7 +112,7 @@ std::pair<int, int> TopCat::GetMatchedTopConst(const vector<Constituent const *>
 {
     int match=0;
     if(gentopdau.size()==0) return std::make_pair(0, 0);
-    double DeltaR = 0.4;
+    const double DeltaR = 0.4;
     std::set<Constituent const *> matchedTopConsts;
     for(unsigned gent = 0; gent < gentopdau.size(); gent++) 
     {
