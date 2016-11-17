@@ -110,14 +110,13 @@ public:
             }
             else topMatch.push_back(0);
 
-            int matches = 0;
+            int bestMatches = 0;
             const TLorentzVector* genTopPtr = nullptr;
             for(const auto& genTop : hadtopLVec)
             {
                 std::vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
                 auto matches = GetMatchedTopConst(topConst, gentopdauLVec);
-                int bestMatches = 0;
-                if(topConst.size() == matches.second)
+                if(topConst.size() >= matches.second && matches.first == matches.second)
                 {
                     if(matches.first > bestMatches)
                     {
@@ -126,7 +125,7 @@ public:
                     }
                 }
             }
-            topConstMatch.push_back(matches);
+            topConstMatch.push_back(bestMatches);
             if(genTopPtr) constMatchGen.push_back(*genTopPtr);
             else          constMatchGen.push_back(TLorentzVector());
         }
