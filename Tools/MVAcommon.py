@@ -15,8 +15,8 @@ import pickle
 class DataGetter:
 
     def __init__(self):
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j12_dTheta", "j13_dTheta", "j23_dTheta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV"]
         #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_QGL", "j2_QGL", "j3_QGL"]
         #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV"]
@@ -24,6 +24,14 @@ class DataGetter:
         #self.list = ["cand_m", "j12_m", "j13_m", "j23_m"]
         #self.list = ["j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
+        
+        self.list.append("j1_QGL")
+        self.list2.append("1.0 if event.j1_CSV[i]>0.8 else event.j1_QGL[i]") 
+        self.list.append("j2_QGL")
+        self.list2.append("1.0 if event.j2_CSV[i]>0.8 else event.j2_QGL[i]") 
+        self.list.append("j3_QGL")
+        self.list2.append("1.0 if event.j3_CSV[i]>0.8 else event.j3_QGL[i]")
+
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 
     def getData(self, event, i):
@@ -215,7 +223,7 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.75
+discCut = 0.76
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)
