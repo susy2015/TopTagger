@@ -100,7 +100,7 @@ namespace ttUtility
         for(unsigned int i = 0; i < RF_constituents.size(); ++i)
         {
             varMap["j" + std::to_string(i + 1) + "_p"]     = RF_constituents[i].p().P();
-            varMap["j" + std::to_string(i + 1) + "_theta"] = RF_constituents[i].p().Angle(topCand.p().Vect());
+            //varMap["j" + std::to_string(i + 1) + "_theta"] = RF_constituents[i].p().Angle(topCand.p().Vect());
             varMap["j" + std::to_string(i + 1) + "_phi"]   = RF_constituents[i].p().Phi();
             varMap["j" + std::to_string(i + 1) + "_eta"]   = RF_constituents[i].p().Eta();
             varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
@@ -116,6 +116,10 @@ namespace ttUtility
 
             //Calculate delta angle variables
             varMap["dTheta" + std::to_string(iMin + 1) + std::to_string(iMax + 1)] = RF_constituents[iMin].p().Angle(RF_constituents[iMax].p().Vect());
+
+            //calculate pair masses
+            auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
+            varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m"] = jetPair.M();
         }
 
         return varMap;
