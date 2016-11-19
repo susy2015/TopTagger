@@ -30,6 +30,7 @@ public:
 
     const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
     int getNConstituents() const { return constituents_.size(); }
+    int getNBConstituents(double cvsCut) const;
 };
 
 #endif
