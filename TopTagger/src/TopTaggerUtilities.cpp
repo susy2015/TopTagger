@@ -106,7 +106,7 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
             varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
-            //Here we face the QGL if it is ba b jet
+            //Here we face the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > 0.800)?(1.0):(RF_constituents[i].getQGLikelihood());
 
             //index of next jet (assumes < 4 jets)
@@ -116,16 +116,6 @@ namespace ttUtility
 
             //Calculate delta angle variables
             varMap["dTheta" + std::to_string(iMin + 1) + std::to_string(iMax + 1)] = RF_constituents[iMin].p().Angle(RF_constituents[iMax].p().Vect());
-
-            //calculate pair masses
-            auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
-            varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m"] = jetPair.M();
-
-            TLorentzVector j1 = RF_constituents[i].p();
-            j1.Boost(-jetPair.BoostVector());
-            TLorentzVector j2 = RF_constituents[iNext].p();
-            j2.Boost(-jetPair.BoostVector());
-            varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_dTheta"] = jetPair.Angle(j1.Vect());
         }
 
         return varMap;
@@ -134,6 +124,5 @@ namespace ttUtility
     std::vector<std::string> getMVAVars()
     {
         return std::vector<std::string>({"cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"});
-        //"cand_m", "j12_m", "j13_m", "j23_m", "dPhi12", "dPhi23", "dPhi13", "j1_p", "j2_p", "j3_p", "j1_theta", "j2_theta", "j3_theta", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL", "j12_dTheta", "j13_dTheta", "j23_dTheta"});
     }
 }
