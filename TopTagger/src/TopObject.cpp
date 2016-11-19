@@ -29,3 +29,16 @@ void TopObject::addConstituent(Constituent const * constituent)
     constituents_.push_back(constituent);
     updateVariables();
 }
+
+int TopObject::getNBConstituents(double cvsCut) const
+{
+    int nb = 0;
+    for(const auto* constituent : constituents_)
+    {
+        if(constituent->getBTagDisc() > cvsCut)
+        {
+            ++nb;
+        }
+    }
+    return nb;
+}
