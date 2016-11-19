@@ -103,14 +103,33 @@ public:
             const std::vector<Constituent const*>& topConst = top.getConstituents();
 
             //wrong horrible terrible bad inefficient hack to set reco top to gen top matching vector, please replace me!
-            if(topConst.size() && iMatch < matchTops.size() && matchTops[iMatch].getConstituents().size() && (topConst[0] == (matchTops[iMatch].getConstituents())[0]))
+            //if(topConst.size() && iMatch < matchTops.size() && matchTops[iMatch].getConstituents().size() && (topConst[0] == (matchTops[iMatch].getConstituents())[0])))
+            //{
+            //    topMatch.push_back(1);
+            //    ++iMatch;
+            //}
+            //else topMatch.push_back(0);
+            if(topConst.size() && iMatch < matchTops.size())
             {
-                topMatch.push_back(1);
-                ++iMatch;
+                bool allMatch = true;
+                for(int iConst = 0; iConst < topConst.size(); ++iConst)
+                {
+                    if(topConst[iConst] != matchTops[iMatch].getConstituents()[iConst])
+                    {
+                        allMatch = false;
+                        break;
+                    }
+                }
+                if(allMatch)
+                {
+                    topMatch.push_back(1);
+                    ++iMatch;
+                }
+                else topMatch.push_back(0);
             }
             else topMatch.push_back(0);
 
-            int bestMatches = 0;
+            int bestMatches = 0, isTopMatch = 0;
             const TLorentzVector* genTopPtr = nullptr;
             for(const auto& genTop : hadtopLVec)
             {
@@ -118,10 +137,27 @@ public:
                 auto matches = GetMatchedTopConst(topConst, gentopdauLVec);
                 if(topConst.size() >= matches.second && matches.first == matches.second)
                 {
-                    if(matches.first > bestMatches)
+                    if(isTopMatch)
                     {
+                        if(matches.first > bestMatches)
+                        {
+                            bestMatches = matches.first;
+                            genTopPtr = &genTop;
+                        }
+                    }
+                    else if(topMatch.back() > isTopMatch)
+                    {
+                        isTopMatch = topMatch.back();
                         bestMatches = matches.first;
                         genTopPtr = &genTop;
+                    }
+                    else
+                    {
+                        if(matches.first > bestMatches)
+                        {
+                            bestMatches = matches.first;
+                            genTopPtr = &genTop;
+                        }
                     }
                 }
             }
