@@ -9,6 +9,8 @@
 #include <vector>
 #include <cmath>
 
+#include <iostream>
+
 void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc)
 {
     //Construct contexts
@@ -31,17 +33,34 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
 
     //Sort the top vector for overlap resolution
-    if(sortMethod_.find("topMass") != std::string::npos)
+    if(sortMethod_.compare("topMass") == 0)
     {
         std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_); } );
     }
-    else if(sortMethod_.find("topPt") != std::string::npos)
+    else if(sortMethod_.compare("topPt") == 0)
     {
         std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->p().Pt() > t2->p().Pt(); } );
     }
-    else if(sortMethod_.find("mvaDisc") != std::string::npos)
+    else if(sortMethod_.compare("mvaDisc") == 0)
     {
         std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->getDiscriminator() > t2->getDiscriminator(); } );
+    }
+    else if(sortMethod_.compare("mvaDiscWithb") == 0)
+    {
+        auto sortFunc = [this](TopObject* t1, TopObject* t2)
+        {
+            int nb1 = t1->getNBConstituents(0.800);
+            int nb2 = t2->getNBConstituents(0.800);
+            if     (nb1 == 1 && nb2 == 0) return true;
+            else if(nb1 == 0 && nb2 == 1) return false;
+            else if(nb1 < nb2)            return true;
+            else if(nb1 > nb2)            return false;
+
+            if(t1->getDiscriminator() > t2->getDiscriminator()) return true; 
+
+            return false;
+        };
+        std::sort(tops.begin(), tops.end(), sortFunc);
     }
 
     for(auto iTop = tops.begin(); iTop != tops.end();)

@@ -15,22 +15,8 @@ import pickle
 class DataGetter:
 
     def __init__(self):
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV"]
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_QGL", "j2_QGL", "j3_QGL"]
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV"]
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p"]
-        #self.list = ["cand_m", "j12_m", "j13_m", "j23_m"]
-        #self.list = ["j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
-        
-        self.list.append("j1_QGL")
-        self.list2.append("1.0 if event.j1_CSV[i]>0.8 else event.j1_QGL[i]") 
-        self.list.append("j2_QGL")
-        self.list2.append("1.0 if event.j2_CSV[i]>0.8 else event.j2_QGL[i]") 
-        self.list.append("j3_QGL")
-        self.list2.append("1.0 if event.j3_CSV[i]>0.8 else event.j3_QGL[i]")
 
         self.theStrCommand = "[" + ", ".join(self.list2) + "]"
 

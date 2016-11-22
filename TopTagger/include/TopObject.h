@@ -16,6 +16,9 @@ private:
 
     void updateVariables();
 
+    int genTopMatch_;
+    int genDaughterMatch_;
+
 public:
     TopObject() {};
     TopObject(std::vector<Constituent const *> constituents);
@@ -30,6 +33,13 @@ public:
 
     const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
     int getNConstituents() const { return constituents_.size(); }
+    int getNBConstituents(double cvsCut) const;
+
+    void setGenTopMatch(const int match) { genTopMatch_ = match; }
+    void setGenDaughterMatch(const int matches) { genDaughterMatch_ = matches; }
+
+    int getGenTopMatch() const { return genTopMatch_; }
+    int getGenDaughterMatch() const { return genDaughterMatch_; }
 };
 
 #endif
