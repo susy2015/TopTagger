@@ -130,19 +130,6 @@ void TopTagger::getParameters()
     while(keepLooping);
 }
 
-void TopTagger::registerModule(std::unique_ptr<TTModule>& module)
-{
-    //try-catch the entire function - exceptions rethrown by default
-    try
-    {
-        topTaggerModules_.push_back(std::move(module));
-    }
-    catch(const TTException& e)
-    {
-        handelException(e);
-    }
-}
-
 void TopTagger::runTagger(const std::vector<Constituent>& constituents)
 {
     //try-catch the entire function - exceptions rethrown by default
