@@ -10,6 +10,7 @@ class TTMHEPRequirements : public TTModule
 private:
     double mW_, mt_, Rmin_, Rmax_, csvThresh_, bEtaCut_;
     int maxNbInTop_;
+    bool doTrijet_, doDijet_;
 
 public:
     void getParameters(const cfg::CfgDocument*);
