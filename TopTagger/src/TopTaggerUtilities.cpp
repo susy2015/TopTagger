@@ -13,7 +13,7 @@ namespace ttUtility
 {
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass) : jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass) {}
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
 
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
     {
@@ -43,11 +43,45 @@ namespace ttUtility
         {
             THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n");
         }
-        
+
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet]);
+            //Calculate matching subjets 
+            // For each tagged top/W, find the corresponding subjets
+            std::vector<TLorentzVector> subjets;
+            for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
+            {
+                double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
+                if (myDR < 0.8)
+                {
+                    subjets.push_back(puppiSubJet);
+                }
+            }
+            // If more than 2 matches, find the best combination of two subjets
+            if (subjets.size() > 2) 
+            {
+                double min_diff = 999999.;
+                int min_j=0, min_k=1;
+                for (unsigned int j=0 ; j<subjets.size(); ++j)
+                {
+                    for (unsigned int k=j+1; k<subjets.size(); ++k)
+                    {
+                        TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
+                        double diff = abs(diff_LV.M());
+                        if(diff < min_diff)
+                        {
+                            min_diff = diff;
+                            min_j = j;
+                            min_k = k;
+                        }
+                    }
+                }
+                subjets = {subjets[min_j], subjets[min_k]};
+            }
+
+            //Emplace new constituent into vector
+            constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets);
         }
     }
 

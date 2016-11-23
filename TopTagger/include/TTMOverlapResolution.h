@@ -2,15 +2,16 @@
 #define TTMOVERLAPRESOLUTION_H
 
 #include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/include/TTMFilterBase.h"
 
 #include <string>
 
 class TopTaggerResults;
 
-class TTMOverlapResolution : public TTModule
+class TTMOverlapResolution : public TTModule, public TTMFilterBase
 {
 private:
-    double mt_, maxTopEta_;
+    double mt_, maxTopEta_, dRMatch_;
     std::string sortMethod_;
 
 public:

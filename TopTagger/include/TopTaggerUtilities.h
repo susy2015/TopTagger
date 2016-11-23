@@ -35,9 +35,10 @@ namespace ttUtility
         const std::vector<double>* tau2_;
         const std::vector<double>* tau3_;
         const std::vector<double>* softDropMass_;
+        const std::vector<TLorentzVector>* subjetsLVec_;
         
     public:
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
