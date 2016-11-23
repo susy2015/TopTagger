@@ -32,7 +32,7 @@ OPENVCLIBS = -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples openCVTest TagTest1 # sharkTest
+PROGRAMS = makeTrainingTuples openCVTest TagTest1 MVAstuff
 
 all: mkobj sampPyWrap $(PROGRAMS)
 
@@ -81,6 +81,9 @@ openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/openCVTest.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
 
 TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
+
+MVAstuff: $(ODIR)/MVAstuff.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
 clean:
