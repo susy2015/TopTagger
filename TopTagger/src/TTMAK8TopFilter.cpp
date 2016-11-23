@@ -4,11 +4,11 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
-void TTMAK8TopFilter::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMAK8TopFilter::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMAK8TopFilter");
+    cfg::Context localCxt(localContextName);
     
     dRMatch_ = cfgDoc->get("dRMatch", commonCxt, -999.9);
 }

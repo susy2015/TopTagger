@@ -28,7 +28,7 @@ private:
     bool passAK8TopReqs(const Constituent& constituent) const;
 
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMBasicClusterAlgo);

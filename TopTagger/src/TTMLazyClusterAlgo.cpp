@@ -4,11 +4,11 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
-void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMLazyClusterAlgo");
+    cfg::Context localCxt(localContextName);
     
     lowWMassCut_    = cfgDoc->get("lowWJetMassCut",  commonCxt, -999.9);
     highWMassCut_   = cfgDoc->get("highWJetMassCut", commonCxt, -999.9);

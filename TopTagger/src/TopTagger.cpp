@@ -104,6 +104,7 @@ void TopTagger::getParameters()
 
         //Get module name
         std::string moduleName = cfgDoc_->get("module", iModule, cxt, "");
+        std::string contextName = cfgDoc_->get("context", iModule, cxt, "");
 
         //if it is a non empty string look for module
         if(moduleName.size() > 0)
@@ -114,10 +115,13 @@ void TopTagger::getParameters()
                 //if a module is found, try again until one isn't
                 keepLooping = true;
 
+                //if the context name is empty, use the moduleName
+                if(contextName.size() == 0) contextName = moduleName;
+
                 //Create module and add to module to vector
                 topTaggerModules_.emplace_back(TTMFactory::createModule(moduleName));
                 //configure the new module from the config document
-                topTaggerModules_.back()->getParameters(cfgDoc_.get());
+                topTaggerModules_.back()->getParameters(cfgDoc_.get(), contextName);
             }
             else
             {

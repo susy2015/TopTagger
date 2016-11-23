@@ -6,11 +6,11 @@
 
 #include <cmath>
 
-void TTMHEPRequirements::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMHEPRequirements::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMHEPRequirements");
+    cfg::Context localCxt(localContextName);
 
     mW_ = cfgDoc->get("mW", commonCxt, -999.9);
     mt_ = cfgDoc->get("mt", commonCxt, -999.9);

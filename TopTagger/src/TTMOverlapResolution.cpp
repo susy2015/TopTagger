@@ -11,11 +11,11 @@
 
 #include <iostream>
 
-void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMOverlapResolution");
+    cfg::Context localCxt(localContextName);
 
     mt_         = cfgDoc->get("mt",         commonCxt, -999.9);
     maxTopEta_  = cfgDoc->get("maxTopEta",  commonCxt, -999.9);

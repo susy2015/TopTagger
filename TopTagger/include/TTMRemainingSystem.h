@@ -10,7 +10,7 @@ private:
     bool useSecondJet_;
 
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMRemainingSystem);

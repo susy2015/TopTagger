@@ -4,11 +4,11 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
-void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMBasicClusterAlgo");
+    cfg::Context localCxt(localContextName);
     
     //monojet parameters
     minAK8TopMass_  = cfgDoc->get("minAK8TopMass",  localCxt,  -999.9);
