@@ -20,8 +20,9 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     mt_         = cfgDoc->get("mt",         commonCxt, -999.9);
     maxTopEta_  = cfgDoc->get("maxTopEta",  commonCxt, -999.9);
 
-    dRMatch_    = cfgDoc->get("dRMatch",    localCxt,  -999.9);
-    sortMethod_ = cfgDoc->get("sortMethod", localCxt,  "topMass");
+    NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
+    dRMatch_       = cfgDoc->get("dRMatch",       localCxt,  -999.9);
+    sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "topMass");
 }
 
 void TTMOverlapResolution::run(TopTaggerResults& ttResults)
@@ -69,8 +70,8 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
-        //Check that this is a tri-jet resolved top
-        if((*iTop)->getNConstituents() == 3)
+        //Check that this top had the expected number of constituents
+        if((*iTop)->getNConstituents() == NConstituents_)
         {
             //Get constituent jets for this top
             const std::vector<Constituent const *>& jets = (*iTop)->getConstituents();

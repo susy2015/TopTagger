@@ -12,6 +12,7 @@ class TTMOverlapResolution : public TTModule, public TTMFilterBase
 {
 private:
     double mt_, maxTopEta_, dRMatch_;
+    int NConstituents_;
     std::string sortMethod_;
 
 public:
