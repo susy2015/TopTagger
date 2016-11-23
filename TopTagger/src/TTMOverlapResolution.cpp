@@ -2,6 +2,7 @@
 
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/Context.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
 #include <set>
@@ -67,6 +68,16 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
         };
         std::sort(tops.begin(), tops.end(), sortFunc);
     }
+    else if(sortMethod_.compare("none") == 0)
+    {
+        //do nothing 
+    }
+    else
+    {
+        THROW_TTEXCEPTION("Invalid sorting option");
+    }
+    
+    
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
