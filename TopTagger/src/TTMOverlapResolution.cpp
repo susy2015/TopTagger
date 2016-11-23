@@ -20,9 +20,9 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
 
     mt_         = cfgDoc->get("mt",         commonCxt, -999.9);
     maxTopEta_  = cfgDoc->get("maxTopEta",  commonCxt, -999.9);
+    dRMatch_    = cfgDoc->get("dRMatch",    commonCxt,  -999.9);
 
     NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
-    dRMatch_       = cfgDoc->get("dRMatch",       localCxt,  -999.9);
     sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "topMass");
 }
 
@@ -76,8 +76,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     {
         THROW_TTEXCEPTION("Invalid sorting option");
     }
-    
-    
+
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
