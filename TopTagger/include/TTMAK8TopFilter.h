@@ -7,10 +7,9 @@
 class TopTaggerResults;
 class Constituent;
 
-class TTMAK8TopFilter : public TTModule, public TTMFilterBase
+class TTMAK8TopFilter : public TTModule
 {
 private:
-    double dRMatch_;
 
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);
