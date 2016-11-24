@@ -22,6 +22,7 @@ void TTMHEPRequirements::getParameters(const cfg::CfgDocument* cfgDoc, const std
     bEtaCut_    = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_ = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    doMonojet_  = cfgDoc->get("doMonojet", localCxt, false);
     doDijet_    = cfgDoc->get("doDijet",   localCxt, false);
     doTrijet_   = cfgDoc->get("doTrijet",  localCxt, false);
 }
@@ -81,7 +82,14 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
             //Implement simplified HEP mass ratio requirements for di-jets here
             passHEPRequirments = Rmin_ < m23/m123 && m23/m123 < Rmax_;
         }
-        //Monojets get ignored by this module 
+        else if(doMonojet_ && jets.size() == 1) //monojets
+        {
+            //Monojets just get passed if they are active and AK4
+            if(jets[0]->getType() == AK4JET)
+            {
+                passHEPRequirments = true;
+            }
+        }
 
         //If we pass the HEP requirements add top to final candidates list
         if(passHEPRequirments)

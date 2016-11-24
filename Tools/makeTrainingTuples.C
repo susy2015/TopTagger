@@ -424,6 +424,4 @@ int main(int argc, char* argv[])
     }
 
     for(auto& mtm : mtmVec) delete mtm.first;
-
-    assert(false);
 }
