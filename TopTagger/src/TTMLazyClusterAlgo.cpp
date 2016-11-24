@@ -10,13 +10,14 @@ void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
     
-    lowWMassCut_    = cfgDoc->get("lowWJetMassCut",  commonCxt, -999.9);
-    highWMassCut_   = cfgDoc->get("highWJetMassCut", commonCxt, -999.9);
-    lowtMassCut_    = cfgDoc->get("lowtJetMassCut",  commonCxt, -999.9);
-    hightMassCut_   = cfgDoc->get("hightJetMassCut", commonCxt, -999.9);
-    minTopCandMass_ = cfgDoc->get("minTopCandMass",  commonCxt, -999.9);
-    maxTopCandMass_ = cfgDoc->get("maxTopCandMass",  commonCxt, -999.9);
     dRMax_          = cfgDoc->get("dRMax",           commonCxt, -999.9);
+
+    lowWMassCut_    = cfgDoc->get("lowWJetMassCut",  localCxt, -999.9);
+    highWMassCut_   = cfgDoc->get("highWJetMassCut", localCxt, -999.9);
+    lowtMassCut_    = cfgDoc->get("lowtJetMassCut",  localCxt, -999.9);
+    hightMassCut_   = cfgDoc->get("hightJetMassCut", localCxt, -999.9);
+    minTopCandMass_ = cfgDoc->get("minTopCandMass",  localCxt, -999.9);
+    maxTopCandMass_ = cfgDoc->get("maxTopCandMass",  localCxt, -999.9);
 
     doMonojet_      = cfgDoc->get("doMonojet",      localCxt,  false);
     doDijet_        = cfgDoc->get("doDijet",        localCxt,  false);

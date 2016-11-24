@@ -74,6 +74,8 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
         else if(doDijet_ && jets.size() == 2) //dijets
         {
             double m23  = (jets[0]->getType() == AK8JET)?(jets[0]->getSoftDropMass()):(jets[1]->getSoftDropMass());
+            //small hack for legacy tagger
+            if(m23 < 10e-10 && jets[0]->getType() == AK4JET && jets[1]->getType() == AK4JET) m23 = jets[0]->p().M();
             double m123 = topCand.p().M();
 
             //Implement simplified HEP mass ratio requirements for di-jets here

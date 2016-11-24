@@ -62,11 +62,15 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
                 {
                     //Ensure we never use the same jet twice
                     //Only pair the AK8 W with an AK4 jet
-                    if(i == j && constituents[j].getType() == AK4JET) continue;
+                    if(i == j || constituents[j].getType() != AK4JET) continue;
 
                     TopObject topCand({&constituents[i], &constituents[j]});
 
-                    if(topCand.getDRmax() < dRMax_)
+                    //mass window on the top candidate mass
+                    double m123 = topCand.p().M();
+                    bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
+
+                    if(topCand.getDRmax() < dRMax_ && passMassWindow)
                     {
                         topCandidates.push_back(topCand);
                     }

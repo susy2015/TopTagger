@@ -81,7 +81,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
         //Check that this top had the expected number of constituents
-        if((*iTop)->getNConstituents() == NConstituents_)
+        if(NConstituents_ < 0 || (*iTop)->getNConstituents() == NConstituents_)
         {
             //Get constituent jets for this top
             const std::vector<Constituent const *>& jets = (*iTop)->getConstituents();
