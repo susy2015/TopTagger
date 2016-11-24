@@ -21,7 +21,7 @@ protected:
     
 public:    
 
-    virtual void getParameters(const cfg::CfgDocument*) = 0;
+    virtual void getParameters(const cfg::CfgDocument*, const std::string&) = 0;
     virtual void run(TopTaggerResults&) = 0;
 };
 

@@ -9,15 +9,26 @@ class Constituent;
 class TTMBasicClusterAlgo : public TTModule
 {
 private:
-    double lowWMassCut_, highWMassCut_, lowtMassCut_, hightMassCut_, minTopCandMass_, maxTopCandMass_, dRMax_;
-    bool doMonojet_, doDijet_, doTrijet_;
+    //mino-jet variables
+    double minAK8TopMass_, maxAK8TopMass_, maxTopTau32_, minAK8TopPt_;
+    bool doMonojet_;
 
+    //dijet variables
+    double minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_;
+    bool doDijet_;
 
-    bool passAK8TopReqs(const Constituent& constituent) const;
+    //trijet variables
+    double minTopCandMass_, maxTopCandMass_, dRMax_;
+    bool doTrijet_;
+
+    //Implement the requirements to be tagged as an AK8 W
     bool passAK8WReqs(const Constituent& constituent) const;
 
+    //Implement the requirements to be tagged as an AK8 top
+    bool passAK8TopReqs(const Constituent& constituent) const;
+
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMBasicClusterAlgo);

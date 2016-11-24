@@ -12,7 +12,7 @@ private:
     bool doMonojet_, doDijet_, doTrijet_;
 
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMLazyClusterAlgo);

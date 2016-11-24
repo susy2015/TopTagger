@@ -4,11 +4,11 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
-void TTMRemainingSystem::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMRemainingSystem::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMRemainingSystem");
+    cfg::Context localCxt(localContextName);
 
     CSVThresh_    = cfgDoc->get("csvThreshold", commonCxt, -999.9);
     lowRsysMass_  = cfgDoc->get("lowRsysMass",  localCxt, -999.9);

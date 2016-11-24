@@ -8,11 +8,11 @@
 
 #include <iostream>
 
-void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc)
+void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
     cfg::Context commonCxt("Common");
-    cfg::Context localCxt("TTMOpenCVMVA");
+    cfg::Context localCxt(localContextName);
 
     discriminator_ = cfgDoc->get("discCut", localCxt, -999.9);
     modelFile_ = cfgDoc->get("modelFile", localCxt, "");

@@ -7,7 +7,7 @@ Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const 
     type_ = AK4JET;
 }
 
-Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass) : p_(p), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass)
+Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets) : p_(p), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass), subjets_(subjets)
 {
     type_ = AK8JET;
 }
@@ -59,3 +59,7 @@ void Constituent::setSoftDropMass(const double& softDropMass)
     softDropMass_ = softDropMass;
 }
 
+void Constituent::setSubJets(const std::vector<TLorentzVector>& subjets)
+{
+    subjets_ = subjets;
+}
