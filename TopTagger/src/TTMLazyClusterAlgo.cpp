@@ -10,7 +10,7 @@ void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
     
-    dRMax_          = cfgDoc->get("dRMax",           commonCxt, -999.9);
+    dRMax_          = cfgDoc->get("dRMax",           localCxt, -999.9);
 
     lowWMassCut_    = cfgDoc->get("lowWJetMassCut",  localCxt, -999.9);
     highWMassCut_   = cfgDoc->get("highWJetMassCut", localCxt, -999.9);
