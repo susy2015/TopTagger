@@ -63,3 +63,8 @@ void Constituent::setSubJets(const std::vector<TLorentzVector>& subjets)
 {
     subjets_ = subjets;
 }
+
+void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter)
+{
+    genMatches_.insert(std::make_pair(&genTop, genDaughter));
+}

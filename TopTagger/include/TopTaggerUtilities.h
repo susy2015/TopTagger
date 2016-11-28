@@ -15,7 +15,21 @@ class TopTaggerResults;
 
 namespace ttUtility
 {
-    class ConstAK4Inputs
+    class ConstGenInputs
+    {
+    protected:
+        const std::vector<TLorentzVector>* genDecayLVec_;
+        const std::vector<int>* genDecayPdgIdVec_;
+        const std::vector<int>* genDecayIdxVec_;
+        const std::vector<int>* genDecayMomIdxVec_;
+        std::vector<TLorentzVector> hadGenTops_;
+        std::vector<std::vector<const TLorentzVector*>> hadGenTopDaughters_;
+
+        ConstGenInputs();
+        ConstGenInputs(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+    };
+
+    class ConstAK4Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
@@ -24,10 +38,11 @@ namespace ttUtility
 
     public:
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
-    class ConstAK8Inputs
+    class ConstAK8Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
@@ -39,6 +54,7 @@ namespace ttUtility
         
     public:
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
@@ -71,11 +87,19 @@ namespace ttUtility
     //backwards compatability overload
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
     
+    //Tool to calcualte MT2 from tagger results
     double calculateMT2(const TopTaggerResults& ttr);
 
+    //MVA helper functions
     std::map<std::string, double> createMVAInputs(const TopObject& topCand);
 
     std::vector<std::string> getMVAVars();
+
+    //Gen matching helper functions 
+    std::vector<TLorentzVector> GetHadTopLVec(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+
+    std::vector<const TLorentzVector*> GetTopdauLVec(const TLorentzVector& top, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+
 }
 
 #endif
