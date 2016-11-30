@@ -111,6 +111,25 @@ namespace ttUtility
                 subjets = {subjets[min_j], subjets[min_k]};
             }
 
+            //Get gen matches if the required info is provided
+            if(genDecayLVec_ && genDecayPdgIdVec_ && genDecayIdxVec_ && genDecayMomIdxVec_)
+            {
+                for(unsigned int iGenTop = 0; iGenTop < hadGenTops_.size(); ++iGenTop)
+                {
+                    for(const auto& genDaughter : hadGenTopDaughters_[iGenTop])
+                    {
+                        for(const auto& subjet : subjets)
+                        {
+                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
+                            if(dR < 0.4)
+                            {
+                                constituents.back().addGenMatch(hadGenTops_[iGenTop], genDaughter);
+                            }
+                        }
+                    }
+                }
+            }
+
             //Emplace new constituent into vector
             constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets);
         }
