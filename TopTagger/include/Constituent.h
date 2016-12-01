@@ -4,6 +4,9 @@
 #include "TLorentzVector.h"
 
 #include <vector>
+#include <utility>
+#include <set>
+#include <map>
 
 enum ConstituentType
 {
@@ -23,6 +26,9 @@ private:
     double tau1_, tau2_, tau3_, softDropMass_;
     std::vector<TLorentzVector> subjets_;
 
+    //Variables for gen matching studies
+    std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatches_;
+
 public:
     Constituent();
     Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
@@ -39,6 +45,8 @@ public:
     void setSoftDropMass(const double& softDropMass);
     void setSubJets(const std::vector<TLorentzVector>& subjets);
 
+    void addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter);
+
     const TLorentzVector& p() const                       { return p_; }
     const TLorentzVector& P() const                       { return p(); }
     const TLorentzVector& getP() const                    { return p(); }
@@ -50,6 +58,7 @@ public:
     const double getTau3() const                          { return tau3_; }
     const double getSoftDropMass() const                  { return softDropMass_; }
     const std::vector<TLorentzVector>& getSubjets() const { return subjets_; }
+    const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
 };
 
 #endif

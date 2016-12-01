@@ -14,7 +14,7 @@ private:
     bool doMonojet_;
 
     //dijet variables
-    double minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_;
+    double minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_, dRMaxDiJet_;
     bool doDijet_;
 
     //trijet variables

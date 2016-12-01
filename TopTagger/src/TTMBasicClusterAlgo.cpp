@@ -23,13 +23,12 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     maxWTau21_      = cfgDoc->get("maxWTau21",      localCxt,  -999.9);
     minAK8WPt_      = cfgDoc->get("minAK8WPt",      localCxt,  -999.9);
     doDijet_        = cfgDoc->get("doDijet",        localCxt,  false);
+    dRMaxDiJet_     = cfgDoc->get("dRMaxDijet",     localCxt, -999.9);
 
     //trijet parameters
     minTopCandMass_ = cfgDoc->get("minTopCandMass", localCxt, -999.9);
     maxTopCandMass_ = cfgDoc->get("maxTopCandMass", localCxt, -999.9);
     doTrijet_       = cfgDoc->get("doTrijet",       localCxt,  false);
-
-    //shared between di and trijets 
     dRMax_          = cfgDoc->get("dRMax",          localCxt, -999.9);
 }
 
@@ -70,7 +69,7 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
                     double m123 = topCand.p().M();
                     bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
 
-                    if(topCand.getDRmax() < dRMax_ && passMassWindow)
+                    if(topCand.getDRmax() < dRMaxDiJet_ && passMassWindow)
                     {
                         topCandidates.push_back(topCand);
                     }

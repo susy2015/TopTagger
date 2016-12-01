@@ -11,9 +11,17 @@
 
 namespace ttUtility
 {
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+    ConstGenInputs::ConstGenInputs() : hadGenTops_(nullptr), hadGenTopDaughters_(nullptr) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
+    ConstGenInputs::ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : hadGenTops_(&hadGenTops), hadGenTopDaughters_(&hadGenTopDaughters) {}
+
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
+
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
 
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
     {
@@ -30,6 +38,22 @@ namespace ttUtility
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
             constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
+
+            //Get gen matches if the required info is provided
+            if(hadGenTops_ && hadGenTopDaughters_)
+            {
+                for(unsigned int iGenTop = 0; iGenTop < hadGenTops_->size(); ++iGenTop)
+                {
+                    for(const auto& genDaughter : (*hadGenTopDaughters_)[iGenTop])
+                    {
+                        double dR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], *genDaughter);
+                        if(dR < 0.4)
+                        {
+                            constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -82,6 +106,25 @@ namespace ttUtility
 
             //Emplace new constituent into vector
             constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets);
+
+            //Get gen matches if the required info is provided
+            if(hadGenTops_ && hadGenTopDaughters_)
+            {
+                for(unsigned int iGenTop = 0; iGenTop < hadGenTops_->size(); ++iGenTop)
+                {
+                    for(const auto& genDaughter : (*hadGenTopDaughters_)[iGenTop])
+                    {
+                        for(const auto& subjet : subjets)
+                        {
+                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
+                            if(dR < 0.4)
+                            {
+                                constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -163,4 +206,69 @@ namespace ttUtility
     {
         return std::vector<std::string>({"cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"});
     }
+
+    std::vector<TLorentzVector> GetHadTopLVec(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)
+    {
+        std::vector<TLorentzVector> tLVec;
+        for(unsigned it=0; it<genDecayLVec.size(); it++)
+        {
+            int pdgId = genDecayPdgIdVec.at(it);
+            if(abs(pdgId)==6)
+            {
+                for(unsigned ig=0; ig<genDecayLVec.size(); ig++)
+                {
+                    if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) )
+                    {
+                        int pdgId = genDecayPdgIdVec.at(ig);
+                        if(abs(pdgId)==24)
+                        {
+                            int flag = 0;
+                            for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
+                            {
+                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 
+                                {
+                                    int pdgid = genDecayPdgIdVec.at(iq);
+                                    if(abs(pdgid)== 11 || abs(pdgid)== 13 || abs(pdgid)== 15) flag++;
+                                }
+                            }
+                            if(!flag) tLVec.push_back(genDecayLVec.at(it));
+                        }
+                    }
+                }//dau. loop
+            }//top cond
+        }//genloop
+        return tLVec;
+    }
+
+    std::vector<const TLorentzVector*> GetTopdauLVec(const TLorentzVector& top, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)
+    {
+        std::vector<const TLorentzVector*>topdauLVec;
+        for(unsigned it=0; it<genDecayLVec.size(); it++)
+        {
+            if(genDecayLVec[it]==top){
+                for(unsigned ig=0; ig<genDecayLVec.size(); ig++)
+                {
+                    if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) )
+                    {
+                        int pdgId = genDecayPdgIdVec.at(ig);
+                        if(abs(pdgId)==5) topdauLVec.push_back(&(genDecayLVec[ig]));
+                        if(abs(pdgId)==24)
+                        {
+                            //topdauLVec.push_back(genDecayLVec[ig]);	 
+                            for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
+                            {
+                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 
+                                {
+                                    int pdgid = genDecayPdgIdVec.at(iq);
+                                    if(abs(pdgid)!= 11 && abs(pdgid)!= 13 && abs(pdgid)!= 15) topdauLVec.push_back(&(genDecayLVec[iq]));
+                                }
+                            }
+                        }
+                    }
+                }//dau. loop
+            }//top cand.
+        }//gen loop
+        return topdauLVec;
+    }
+
 }

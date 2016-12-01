@@ -113,7 +113,14 @@ private:
 
         //New Tagger starts here
         //prep input object (constituent) vector
-        std::vector<Constituent> constituents = ttUtility::packageConstituents(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger);
+        std::vector<TLorentzVector> hadGenTops = ttUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
+        std::vector<std::vector<const TLorentzVector*>> hadGenTopDaughters;
+        for(const auto& top : hadGenTops)
+        {
+            hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
+        }
+        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, hadGenTops, hadGenTopDaughters);
+        std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
         //run tagger
         topTagger_->runTagger(constituents);
@@ -128,13 +135,13 @@ private:
 
         std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 
-        std::vector<int> *genMatchdR = new std::vector<int>(genMatches.first);
-        std::vector<int> *genMatchConst = new std::vector<int>(genMatches.second.first);
+        std::vector<int> *genMatchdR = new std::vector<int>();//genMatches.first);
+        std::vector<int> *genMatchConst = new std::vector<int>();//genMatches.second.first);
         std::vector<double> *genMatchVec = new std::vector<double>();
-        for(const auto& vec : genMatches.second.second)
-        {
-            genMatchVec->push_back(vec.Pt());
-        }
+        //for(const auto& vec : genMatches.second.second)
+        //{
+        //    genMatchVec->push_back(vec.Pt());
+        //}
 
         //Class which holds and registers vectors of variables
         //Annoyingly this list of variables to expect is necessary
@@ -146,6 +153,21 @@ private:
         //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
+            const auto* bestMatch = topCand.getBestGenTopMatch();
+            genMatchdR->push_back(bestMatch !=  nullptr);
+            genMatchVec->push_back(bestMatch?(bestMatch->Pt()):(-999.9));
+
+            int NConstMatches = 0;
+            for(const auto* constituent : topCand.getConstituents())
+            {
+                auto iter = constituent->getGenMatches().find(bestMatch);
+                if(iter != constituent->getGenMatches().end())
+                {
+                    ++NConstMatches;
+                }
+            }
+            genMatchConst->push_back(NConstMatches);
+
             std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
 
             for(auto& var : varMap)
@@ -159,7 +181,7 @@ private:
         //register matching vectors
         tr.registerDerivedVec("genTopMatchesVec",        genMatchdR);
         tr.registerDerivedVec("genConstiuentMatchesVec", genMatchConst);
-        tr.registerDerivedVec("genConstMatchGenPtVec", genMatchVec);
+        tr.registerDerivedVec("genConstMatchGenPtVec",   genMatchVec);
 
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 

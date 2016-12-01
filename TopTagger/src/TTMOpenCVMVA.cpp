@@ -5,6 +5,7 @@
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 #include <iostream>
 
@@ -18,6 +19,11 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     modelFile_ = cfgDoc->get("modelFile", localCxt, "");
 
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
+    if(treePtr_ == nullptr)
+    {
+        //Throw if this is an invalid pointer
+        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" is not found!!!");
+    }
 
     vars_ = ttUtility::getMVAVars();
 }
