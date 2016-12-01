@@ -135,7 +135,7 @@ public:
             {
                 std::vector<TLorentzVector> gentopdauLVec = genUtility::GetTopdauLVec(genTop, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
                 auto matches = GetMatchedTopConst(topConst, gentopdauLVec);
-                if(topConst.size() >= matches.second && matches.first == matches.second)
+                if(topConst.size() >= matches.second)// && matches.first == matches.second)
                 {
                     if(isTopMatch)
                     {
