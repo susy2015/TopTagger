@@ -4,6 +4,8 @@
 
 TopObject::TopObject(std::vector<Constituent const *> constituents) : constituents_(constituents)
 {
+    discriminator_ = -999.9;
+    NGenMatchConstituents_ = -1;
     updateVariables();
 }
 
@@ -21,6 +23,13 @@ void TopObject::updateVariables()
     {
         double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, jet->p());
         dRmax_ = std::max(dRmax_, deltaR);
+
+        //If there is gen information in the constituent
+        //add it to the top gen match map
+        for(const auto& genMatch : jet->getGenMatches())
+        {
+            genMatchPossibilities_[genMatch.first].insert(genMatch.second.begin(), genMatch.second.end());
+        }
     }
 }
 
@@ -41,4 +50,23 @@ int TopObject::getNBConstituents(double cvsCut) const
         }
     }
     return nb;
+}
+
+const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax) const
+{
+    //int genDaughterMatches = 0;
+    const TLorentzVector* bestMatch = nullptr;
+    double bestMatchDR = 999.9;
+    for(const auto& genTop : genMatchPossibilities_)
+    {
+        if(genTop.second.size() < 2) continue;
+        double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, *genTop.first);
+        if(deltaR < bestMatchDR)
+        {
+            bestMatchDR = deltaR;
+            bestMatch = genTop.first;
+        }
+    }
+    if(bestMatchDR < dRMax) return bestMatch;
+    else                    return nullptr;
 }

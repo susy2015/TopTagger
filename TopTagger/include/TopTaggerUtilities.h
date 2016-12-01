@@ -18,15 +18,11 @@ namespace ttUtility
     class ConstGenInputs
     {
     protected:
-        const std::vector<TLorentzVector>* genDecayLVec_;
-        const std::vector<int>* genDecayPdgIdVec_;
-        const std::vector<int>* genDecayIdxVec_;
-        const std::vector<int>* genDecayMomIdxVec_;
-        std::vector<TLorentzVector> hadGenTops_;
-        std::vector<std::vector<const TLorentzVector*>> hadGenTopDaughters_;
+        const std::vector<TLorentzVector>* hadGenTops_;
+        const std::vector<std::vector<const TLorentzVector*>>* hadGenTopDaughters_;
 
         ConstGenInputs();
-        ConstGenInputs(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+        ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
     };
 
     class ConstAK4Inputs : public ConstGenInputs
@@ -38,7 +34,7 @@ namespace ttUtility
 
     public:
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
@@ -54,7 +50,7 @@ namespace ttUtility
         
     public:
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 

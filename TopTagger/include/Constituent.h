@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include <set>
+#include <map>
 
 enum ConstituentType
 {
@@ -26,7 +27,7 @@ private:
     std::vector<TLorentzVector> subjets_;
 
     //Variables for gen matching studies
-    std::set<std::pair<const TLorentzVector*, const TLorentzVector*>> genMatches_;
+    std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatches_;
 
 public:
     Constituent();
@@ -57,7 +58,7 @@ public:
     const double getTau3() const                          { return tau3_; }
     const double getSoftDropMass() const                  { return softDropMass_; }
     const std::vector<TLorentzVector>& getSubjets() const { return subjets_; }
-    const decltype(genMatches_) getGenMatches() const     { return genMatches_; }
+    const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
 };
 
 #endif
