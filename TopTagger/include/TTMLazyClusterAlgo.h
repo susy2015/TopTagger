@@ -8,7 +8,7 @@ class TopTaggerResults;
 class TTMLazyClusterAlgo : public TTModule
 {
 private:
-    double lowWMassCut_, highWMassCut_, lowtMassCut_, hightMassCut_, minTopCandMass_, maxTopCandMass_, dRMax_;
+    double lowWMassCut_, highWMassCut_, lowtMassCut_, hightMassCut_, minTopCandMass_, maxTopCandMass_, minJetPt_, dRMax_;
     bool doMonojet_, doDijet_, doTrijet_;
 
 public:
