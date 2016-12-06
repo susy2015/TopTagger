@@ -53,6 +53,7 @@ for datasetName in samplesToRun:
         Nevts +=1
         for i in xrange(len(event.genConstiuentMatchesVec)):
             if event.genConstiuentMatchesVec[i] == 3 and event.genTopMatchesVec[i]:
+#            if event.genTopMatchesVec[i]:
                 hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
             else:
                 hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
@@ -66,17 +67,19 @@ for datasetName in samplesToRun:
             inputData.append(dg.getData(event, i))
             nmatch = event.genConstiuentMatchesVec[i]
             inputAnswer.append(int(nmatch == 3) and event.genTopMatchesVec[i])
-            inputWgts.append(event.sampleWgt)
-#            if nmatch == 3:
-#                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-#                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
-#                else:
-#                    inputWgts.append(0.0)
-#            else:
-#                if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-#                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
-#                else:
-#                    inputWgts.append(0.0)
+#            inputAnswer.append(event.genTopMatchesVec[i])
+            #inputWgts.append(event.sampleWgt)
+            if int(nmatch == 3) and event.genTopMatchesVec[i]:
+#            if event.genTopMatchesVec[i]:
+                if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
+            else:
+                if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
+                    inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                else:
+                    inputWgts.append(0.0)
 
                 
 npyInputData = numpy.array(inputData, numpy.float32)
@@ -108,7 +111,7 @@ if options.opencv:
     n_estimators = 100
     clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.1))
     #clf.setMaxCategories(2)
-    clf.setMaxDepth(12)
+    clf.setMaxDepth(14)
     #clf.setMinSampleCount(5)
 
     #make opencv TrainData container
@@ -119,7 +122,7 @@ if options.opencv:
     clf.save("TrainingOutput.model")
 
 else:
-    clf = RandomForestClassifier(n_estimators=100, max_depth=12, n_jobs = 4)
+    clf = RandomForestClassifier(n_estimators=100, max_depth=14, n_jobs = 4)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
     #clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
