@@ -18,6 +18,7 @@ void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std
     hightMassCut_   = cfgDoc->get("hightJetMassCut", localCxt, -999.9);
     minTopCandMass_ = cfgDoc->get("minTopCandMass",  localCxt, -999.9);
     maxTopCandMass_ = cfgDoc->get("maxTopCandMass",  localCxt, -999.9);
+    minJetPt_       = cfgDoc->get("minJetPt",        localCxt, -999.9);
 
     doMonojet_      = cfgDoc->get("doMonojet",      localCxt,  false);
     doDijet_        = cfgDoc->get("doDijet",        localCxt,  false);
@@ -31,6 +32,8 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
 
     for(unsigned int i = 0; i < constituents.size(); ++i)
     {
+        if(constituents[i].p().Pt() < minJetPt_ || constituents[i].getType() != AK4JET) continue;
+
         //singlet tops
         if(doMonojet_)
         {
@@ -51,6 +54,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
                 for(unsigned int j = 0; j < constituents.size(); ++j)
                 {
                     if(i == j) continue;
+                    if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != AK4JET) continue;
 
                     TopObject topCand({&constituents[i], &constituents[j]});
                 
@@ -67,8 +71,12 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
         {
             for(unsigned int j = 0; j < i; ++j)
             {
+                if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != AK4JET) continue;
+
                 for(unsigned int k = 0; k < j; ++k)
                 {
+                    if(constituents[k].p().Pt() < minJetPt_ || constituents[k].getType() != AK4JET) continue;
+
                     TopObject topCand({&constituents[k], &constituents[j], &constituents[i]});
 
                     //mass window on the top candidate mass
