@@ -40,6 +40,14 @@ To use ICHEP tagger, TTMHEPRequirements module must be used in place of TTMOpenC
 
 The configuration file is central to the functioning of the top tagger code.  This file is a basic text file implemented to follow the structure of the HCAL configuration parser and the code can be found here "TopTagger/CfgParser."  This code upon which this is based can be found here (https://svnweb.cern.ch/cern/wsvn/cmshcos/trunk/hcalBase/include/hcal/cfg/?#aafaf15fcace155f9a3d702b52eb6d719).  The configuration script is used to tell the top tagger what modules to run and in which order, in addition to allowing any parameters necessary for the tagger and each module to be defined cleanly in one place.  An example configuration script can be found in TopTagger/Tools/TopTaggerConfig.cfg
 
+Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the working point "MVAAK8_2.0.2" (which is the release name found on https://github.com/susy2015/TopTaggerCfg/releases) is as follows
+
+```
+./getTaggerCfg.sh -t MVAAK8_2.0.2
+```
+
+This will download the configuration file along with the MVA training file if approperiate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option.  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating softlinks use the "-n" option.  
+
 ##Psudo-code
 
 ```c++
