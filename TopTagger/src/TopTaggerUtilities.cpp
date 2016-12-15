@@ -6,6 +6,8 @@
 #include "TopTagger/CfgParser/include/TTException.h"
 
 #include "Math/VectorUtil.h"
+#include "TF1.h"
+#include "TFile.h"
 
 #include <map>
 
@@ -19,9 +21,19 @@ namespace ttUtility
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    {
+        puppisd_corrGEN_ = nullptr;
+        puppisd_corrRECO_cen_ = nullptr;
+        puppisd_corrRECO_for_ = nullptr;
+    }
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) {}
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    {
+        puppisd_corrGEN_ = nullptr;
+        puppisd_corrRECO_cen_ = nullptr;
+        puppisd_corrRECO_for_ = nullptr;
+    }
 
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
     {
@@ -105,7 +117,7 @@ namespace ttUtility
             }
 
             //Emplace new constituent into vector
-            constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets);
+            constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets, getPUPPIweight((*jetsLVec_)[iJet].Pt(), (*jetsLVec_)[iJet].Eta()));
 
             //Get gen matches if the required info is provided
             if(hadGenTops_ && hadGenTopDaughters_)
@@ -125,6 +137,62 @@ namespace ttUtility
                     }
                 }
             }
+        }
+    }
+
+    std::vector<TLorentzVector> ConstAK8Inputs::denominator(const double ptCut) const 
+    {
+        std::vector<TLorentzVector> returnVector;
+        for(auto& jet : *jetsLVec_)
+        {
+            if(jet.Pt() > ptCut) returnVector.push_back(jet);
+        }
+        return returnVector;
+    }
+
+    double ConstAK8Inputs::getPUPPIweight(double puppipt, double puppieta ) const
+    {
+        double genCorr  = 1.;
+        double recoCorr = 1.;
+
+        if(puppisd_corrGEN_ && puppisd_corrRECO_cen_ && puppisd_corrRECO_for_)
+        {
+            genCorr =  puppisd_corrGEN_->Eval( puppipt );
+            if( fabs(puppieta) <= 1.3 )
+            {
+                recoCorr = puppisd_corrRECO_cen_->Eval( puppipt );
+            }
+            else
+            {
+                recoCorr = puppisd_corrRECO_for_->Eval( puppipt );
+            }
+        }
+
+        return genCorr * recoCorr;
+    }
+
+    void ConstAK8Inputs::setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
+    {
+        puppisd_corrGEN_ = puppisd_corrGEN;
+        puppisd_corrRECO_cen_ = puppisd_corrRECO_cen;
+        puppisd_corrRECO_for_ = puppisd_corrRECO_for;
+    }
+
+    void ConstAK8Inputs::prepHistosForWCorrectionFactors(const std::string fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
+    {
+        TFile* file = TFile::Open( "weights/puppiCorr.root","READ");
+        if(file)
+        {
+            puppisd_corrGEN      = (TF1*)file->Get("puppiJECcorr_gen");
+            puppisd_corrRECO_cen = (TF1*)file->Get("puppiJECcorr_reco_0eta1v3");
+            puppisd_corrRECO_for = (TF1*)file->Get("puppiJECcorr_reco_1v3eta2v5");
+
+            file->Close();
+            delete file;
+        }
+        else
+        {
+            THROW_TTEXCEPTION("W mass correction file not found w mass!!!!!!!" + fname + "\n");
         }
     }
 
@@ -183,7 +251,7 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
             varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
-            //Here we face the QGL if it is a b jet
+            //Here we fake the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > 0.800)?(1.0):(RF_constituents[i].getQGLikelihood());
 
             //index of next jet (assumes < 4 jets)

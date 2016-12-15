@@ -25,6 +25,7 @@ private:
     //AK8 specific variables 
     double tau1_, tau2_, tau3_, softDropMass_;
     std::vector<TLorentzVector> subjets_;
+    double wMassCorr_;
 
     //Variables for gen matching studies
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatches_;
@@ -32,7 +33,7 @@ private:
 public:
     Constituent();
     Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
-    Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets);
+    Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets, const double& wMassCorr);
     
     void setPBtag(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
     void setP(const TLorentzVector& p);
@@ -44,6 +45,7 @@ public:
     void setTau3(const double& tau3);
     void setSoftDropMass(const double& softDropMass);
     void setSubJets(const std::vector<TLorentzVector>& subjets);
+    void setWMassCorr(const double& wMassCorr);
 
     void addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter);
 
@@ -59,6 +61,7 @@ public:
     const double getSoftDropMass() const                  { return softDropMass_; }
     const std::vector<TLorentzVector>& getSubjets() const { return subjets_; }
     const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
+    const double getWMassCorr() const                     { return wMassCorr_; }
 };
 
 #endif
