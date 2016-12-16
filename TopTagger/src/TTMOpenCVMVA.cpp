@@ -22,6 +22,26 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    int iVar = 0;
+    bool keepLooping;
+    do
+    {
+        keepLooping = false;
+
+        //Get variable name
+        std::string varName = cfgDoc->get("mvaVar", iVar, localCxt, "");
+
+        //if it is a non empty string save in vector
+        if(varName.size() > 0)
+        {
+            keepLooping = true;
+
+            vars_.push_back(varName);
+        }
+        ++iVar;
+    }
+    while(keepLooping);
+
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
     if(treePtr_ == nullptr || treePtr_->empty())
     {
@@ -35,7 +55,11 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
         THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" yields untrained forest!!!");
     }
 
-    vars_ = ttUtility::getMVAVars();
+    //Check that the number of supplied variables matches the number expected in the model file
+    if(vars_.size() != static_cast<unsigned int>(treePtr_->getVarCount()))
+    {
+        THROW_TTEXCEPTION("Incorrect number of variables specified!!! " + std::to_string(treePtr_->getVarCount()) + "expected " + std::to_string(vars_.size()) + " found.");
+    }
 }
 
 void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
