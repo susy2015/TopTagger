@@ -23,10 +23,16 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
-    if(treePtr_ == nullptr)
+    if(treePtr_ == nullptr || treePtr_->empty())
     {
         //Throw if this is an invalid pointer
-        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" is not found!!!");
+        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" is not found or is invalid!!!");
+    }
+
+    //Checks that the loaded model file yields a valid trained model 
+    if(!treePtr_->isTrained())
+    {
+        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" yields untrained forest!!!");
     }
 
     vars_ = ttUtility::getMVAVars();
@@ -44,10 +50,14 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
         //We only want to apply the MVA algorithm to triplet tops
         if(topCand.getNConstituents() == 3)
         {
-            //Construct data matrix for prediction
+            //Prepare data from top candidate (this code is shared with training tuple producer)
+            //Perhaps one day the intermediate map can be bypassed ...
             std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
 
+            //Construct opencv data matrix for prediction
             cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type
+
+            //populate opencv data matrix based on desired input variables 
             for(unsigned int i = 0; i < vars_.size(); ++i)
             {
                 inputData.at<float>(i, 0) = varMap[vars_[i]];

@@ -18,6 +18,7 @@ private:
     double bEtaCut_;
     int maxNbInTop_;
 
+    //cv::Ptr is the opencv implementation of a smart pointer
     cv::Ptr<cv::ml::RTrees> treePtr_;
     std::vector<std::string> vars_;
 
