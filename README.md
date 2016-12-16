@@ -38,11 +38,14 @@ This class acts as a factory to allow dynamic creation of modules.  Its function
 
 This is a pure virtual base class which defines the interface for a top tagger module.  This implements 2 pure virtual functions which must be overridden by all modules.  The first, "getParameters," is used to load any configuration parameters the module may need from the config file.  The second, "run," is used to run the particular algorithm implemented in the module.  None of these functions should even be called directly, but instead are called automatically by the TopTagger class.  It is also important that each module also include the line "REGESTER_TTMODULE(ModuleClassName)" after the class declaration.  This macro calls special code so that the TTMFactory class can dynamically implement the module by name.
 
+
+
 ## Top Tagger Modules and the Configuration File.
 
 The configuration file is central to the functioning of the top tagger code.  This file is a basic text file implemented to follow the structure of the HCAL configuration parser and the code can be found here "TopTagger/CfgParser."  This code upon which this is based can be found here (https://svnweb.cern.ch/cern/wsvn/cmshcos/trunk/hcalBase/include/hcal/cfg/?#aafaf15fcace155f9a3d702b52eb6d719).  The configuration script is used to tell the top tagger what modules to run and in which order, in addition to allowing any parameters necessary for the tagger and each module to be defined cleanly in one place.  An example configuration script can be found in TopTagger/TopTagger/test/Example_TopTagger.cfg
 
 Modules are where all the real work of the top tagger is done.  Each module performs a particular tast and stores its results in a TopTaggerResults object which will eventually be presented to the user as a summary of final results.  All modules inherit from TTModule and, as described in TTModule" implement the 2 functions "getParameter"s and "run."  Each module is called automatically from the TopTagger class.  They are also instantiated automatically based upon the configuration file.
+
 
 ### TopTagger
 
@@ -55,6 +58,7 @@ This variable is an array and is used to define which other modules will be run 
 #### context[] (string):
 
 This variable must be specified for any module being run more than once to specify what context name to read its configuration from.
+
 
 ### Common
 
@@ -75,6 +79,7 @@ The maximum eta allowed for final selected tops.
 #### dRMatch:
 
 The dR matching cone used to match AK4 jets to AK8 subjets.
+
 
 ### TTMLazyClusterAlgo
 
@@ -111,6 +116,7 @@ Enable the W+jet top category.
 #### doTrijet (boolean):
 
 Enable the fully resolved top category.
+
 
 ### TTMBasicClusterAlgo
 
@@ -172,9 +178,11 @@ The maximum allowed value of the tau32 nsubjettiness variable for merged AK8 top
 
 The minimum pt requirement for AK8 jets to be considered as top candidates.  
 
+
 ### TTMAK8TopFilter
 
 This module applies any final selection requirements to the fully merged AK8 tops.  Candidates passing these requirements are passed directly into the final top list.  Currently this module simply passes all tops and had no parameters.
+
 
 ### TTMHEPRequirements
 
@@ -208,6 +216,7 @@ Enable the processing of AK4 dijet candidates or AK8 W + AK4 jet candidates (dep
 
 Enable the selection criterion for resolved AK4 trijet top candidates.  
 
+
 ### TTMOpenCVMVA
 
 This module implements the openCV Random Forest regressor to select resolved AK4 trijet candidates.  Those that pass the discriminator threshold are passed directly into the final top list.  
@@ -220,9 +229,28 @@ This is the minimum value for the random forest regressor discriminator value to
 
 This variable specifies the model file containing the trained random forest trained to discriminate trijet candidates matched to tops form those that do not.  
 
+#### mvaVar[] (string):
+
+This array specifies the variable names used in by the specified model file.  The order of these variables matters (as specified by the array indicies) and the array indicies must be sequential from 0 with no skipped indicies.  
+
+#### csvThreshold (float):
+
+The minimum cut value on the CSV discriminator for an AK4 jet to be considered a b-tagged jet.  
+
+#### bEtaCut (float):
+
+The maximum absolute psudorapidity requirement placed on jets to be considered b-tagged.  
+
+#### maxNbInTop (integer):
+
+The maximum number of b-jets to allow in a single top candidate.  
+
+
+
 ### TTMFilterBase
 
 This class forms the base class for "TTMOverlapResolution" and holds the code necessary to do AK4 jet matching to AK8 subjets.  
+
 
 ### TTMOverlapResolution
 
@@ -251,6 +279,7 @@ This is the maximum allowed angle between the first chosen jet and the second je
 #### useSecondJet (boolean):
 
 This flag defines if the algorith should try to look for a second jet, or simply use the first chosen just for the remaining system.  
+
 
 ### TTMFinalSort
 
@@ -374,4 +403,4 @@ Please go to TopTagger/Tools directory and find instruction in README
 
  LocalWords:  doDijet boolean doTrijet AK4 trijet TTMOpenCVMVA openCV regressor
  LocalWords:  discCut modelFile TTMFilterBase TTMOverlapResolution AK8 subjets
- LocalWords:  mvaDiscWithb
+ LocalWords:  mvaDiscWithb indicies
