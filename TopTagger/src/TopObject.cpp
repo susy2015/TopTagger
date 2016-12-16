@@ -39,12 +39,12 @@ void TopObject::addConstituent(Constituent const * constituent)
     updateVariables();
 }
 
-int TopObject::getNBConstituents(double cvsCut) const
+int TopObject::getNBConstituents(double cvsCut, double etaCut) const
 {
     int nb = 0;
     for(const auto* constituent : constituents_)
     {
-        if(constituent->getBTagDisc() > cvsCut)
+        if(constituent->getBTagDisc() > cvsCut && fabs(constituent->p().Eta()) < etaCut)
         {
             ++nb;
         }

@@ -35,7 +35,7 @@ public:
 
     const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
     int getNConstituents() const { return constituents_.size(); }
-    int getNBConstituents(double cvsCut) const;
+    int getNBConstituents(double cvsCut, double etaCut = 2.4) const;
 
     const decltype(genMatchPossibilities_)& getGenTopMatches() const { return genMatchPossibilities_; }
     const TLorentzVector* getBestGenTopMatch(const double dRMax = 0.6) const;

@@ -7,6 +7,7 @@
 class Constituent;
 class TopObject;
 class TopTaggerResults;
+class TF1;
 
 #include "TLorentzVector.h"
 
@@ -47,11 +48,20 @@ namespace ttUtility
         const std::vector<double>* tau3_;
         const std::vector<double>* softDropMass_;
         const std::vector<TLorentzVector>* subjetsLVec_;
+        TF1* puppisd_corrGEN_;
+        TF1* puppisd_corrRECO_cen_;
+        TF1* puppisd_corrRECO_for_;
         
+        double getPUPPIweight(double puppipt, double puppieta ) const;
+
     public:
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
+        std::vector<TLorentzVector> denominator(const double ptCut) const;
+        void setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
+
+        static void prepHistosForWCorrectionFactors(const std::string fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
     };
 
     //template metaprogramming magic 

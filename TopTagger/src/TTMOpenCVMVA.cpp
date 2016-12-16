@@ -15,17 +15,51 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut", localCxt, -999.9);
-    modelFile_ = cfgDoc->get("modelFile", localCxt, "");
+    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
+    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
+
+    csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
+    bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
+    maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
+
+    int iVar = 0;
+    bool keepLooping;
+    do
+    {
+        keepLooping = false;
+
+        //Get variable name
+        std::string varName = cfgDoc->get("mvaVar", iVar, localCxt, "");
+
+        //if it is a non empty string save in vector
+        if(varName.size() > 0)
+        {
+            keepLooping = true;
+
+            vars_.push_back(varName);
+        }
+        ++iVar;
+    }
+    while(keepLooping);
 
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
-    if(treePtr_ == nullptr)
+    if(treePtr_ == nullptr || treePtr_->empty())
     {
         //Throw if this is an invalid pointer
-        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" is not found!!!");
+        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" is not found or is invalid!!!");
     }
 
-    vars_ = ttUtility::getMVAVars();
+    //Checks that the loaded model file yields a valid trained model 
+    if(!treePtr_->isTrained())
+    {
+        THROW_TTEXCEPTION("Model file \"" + modelFile_ + "\" yields untrained forest!!!");
+    }
+
+    //Check that the number of supplied variables matches the number expected in the model file
+    if(vars_.size() != static_cast<unsigned int>(treePtr_->getVarCount()))
+    {
+        THROW_TTEXCEPTION("Incorrect number of variables specified!!! " + std::to_string(treePtr_->getVarCount()) + "expected " + std::to_string(vars_.size()) + " found.");
+    }
 }
 
 void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
@@ -40,10 +74,14 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
         //We only want to apply the MVA algorithm to triplet tops
         if(topCand.getNConstituents() == 3)
         {
-            //Construct data matrix for prediction
+            //Prepare data from top candidate (this code is shared with training tuple producer)
+            //Perhaps one day the intermediate map can be bypassed ...
             std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
 
+            //Construct opencv data matrix for prediction
             cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type
+
+            //populate opencv data matrix based on desired input variables 
             for(unsigned int i = 0; i < vars_.size(); ++i)
             {
                 inputData.at<float>(i, 0) = varMap[vars_[i]];
@@ -53,8 +91,11 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
             double discriminator = treePtr_->predict(inputData);
             topCand.setDiscriminator(discriminator);
 
+            //Check number of b-tagged jets in the top
+            bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
+
             //place in final top list if it passes the threshold
-            if(discriminator > discriminator_)
+            if(discriminator > discriminator_ && passBrequirements)
             {
                 tops.push_back(&topCand);
             }
