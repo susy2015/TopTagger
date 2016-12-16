@@ -14,6 +14,9 @@ class TTMOpenCVMVA : public TTModule
 private:
     double discriminator_;
     std::string modelFile_;
+    double csvThreshold_;
+    double bEtaCut_;
+    int maxNbInTop_;
 
     cv::Ptr<cv::ml::RTrees> treePtr_;
     std::vector<std::string> vars_;

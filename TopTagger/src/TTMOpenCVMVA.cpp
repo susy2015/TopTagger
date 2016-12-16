@@ -15,8 +15,12 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut", localCxt, -999.9);
-    modelFile_ = cfgDoc->get("modelFile", localCxt, "");
+    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
+    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
+
+    csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
+    bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
+    maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
     treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
     if(treePtr_ == nullptr)
@@ -53,8 +57,11 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
             double discriminator = treePtr_->predict(inputData);
             topCand.setDiscriminator(discriminator);
 
+            //Check number of b-tagged jets in the top
+            bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
+
             //place in final top list if it passes the threshold
-            if(discriminator > discriminator_)
+            if(discriminator > discriminator_ && passBrequirements)
             {
                 tops.push_back(&topCand);
             }
