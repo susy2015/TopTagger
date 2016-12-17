@@ -11,18 +11,9 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     cfg::Context localCxt(localContextName);
     
     //monojet parameters
-    minAK8TopMass_    = cfgDoc->get("minAK8TopMass",    localCxt, -999.9);
-    maxAK8TopMass_    = cfgDoc->get("maxAK8TopMass",    localCxt, -999.9);
-    maxTopTau32_      = cfgDoc->get("maxTopTau32",      localCxt, -999.9);
-    minAK8TopPt_      = cfgDoc->get("minAK8TopPt",      localCxt, -999.9);
     doMonojet_        = cfgDoc->get("doMonojet",        localCxt,  false);
 
     //dijet parameters
-    minAK8WMass_      = cfgDoc->get("minAK8WMass",      localCxt, -999.9);
-    maxAK8WMass_      = cfgDoc->get("maxAK8WMass",      localCxt, -999.9);
-    maxWTau21_        = cfgDoc->get("maxWTau21",        localCxt, -999.9);
-    minAK8WPt_        = cfgDoc->get("minAK8WPt",        localCxt, -999.9);
-    minAK4WPt_        = cfgDoc->get("minAK4WPt",        localCxt, -999.9);
     doDijet_          = cfgDoc->get("doDijet",          localCxt,  false);
     dRMaxDiJet_       = cfgDoc->get("dRMaxDijet",       localCxt, -999.9);
 
@@ -31,7 +22,9 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     maxTopCandMass_   = cfgDoc->get("maxTopCandMass",   localCxt, -999.9);
     doTrijet_         = cfgDoc->get("doTrijet",         localCxt,  false);
     dRMaxTrijet_      = cfgDoc->get("dRMaxTrijet",      localCxt, -999.9);
-    minAK4ResolvedPt_ = cfgDoc->get("minAK4ResolvedPt", localCxt, -999.9);
+
+    //get vars for TTMConstituentReqs
+    TTMConstituentReqs::getParameters(cfgDoc, localContextName);
 }
 
 void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
@@ -109,46 +102,4 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
             }
         }
     }
-}
-
-bool TTMBasicClusterAlgo::passAK8WReqs(const Constituent& constituent) const
-{
-    //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
-
-    //check that tau1 and 2 are valid
-    if(constituent.getTau1() <= 0 || constituent.getTau2() <= 0) return false;
-
-    double tau21 = constituent.getTau2()/constituent.getTau1();
-
-    return constituent.p().Pt() > minAK8WPt_ &&
-           constituent.getSoftDropMass() > minAK8WMass_  && 
-           constituent.getSoftDropMass() < maxAK8WMass_ &&
-           tau21 < maxWTau21_;
-}
-
-bool TTMBasicClusterAlgo::passAK4WReqs(const Constituent& constituent) const
-{
-    return constituent.getType() == AK4JET && constituent.p().Pt() > minAK4WPt_;
-}
-
-bool TTMBasicClusterAlgo::passAK8TopReqs(const Constituent& constituent) const
-{
-    //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
-
-    //check that tau2 and 3 are valid
-    if(constituent.getTau2() <= 0 || constituent.getTau3() <= 0) return false;
-
-    double tau32 = constituent.getTau3()/constituent.getTau2();
-
-    return constituent.p().Pt() > minAK8TopPt_ &&
-           constituent.getSoftDropMass() > minAK8TopMass_  && 
-           constituent.getSoftDropMass() < maxAK8TopMass_ &&
-           tau32 < maxTopTau32_;
-}
-
-bool TTMBasicClusterAlgo::passAK4ResolvedReqs(const Constituent& constituent) const
-{
-    return constituent.getType() == AK4JET && constituent.p().Pt() > minAK4ResolvedPt_;
 }
