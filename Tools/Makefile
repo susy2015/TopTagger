@@ -70,7 +70,7 @@ $(ODIR)/%.o : $(RSDIR)/%.cc
 $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
-makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o  $(ODIR)/makeTrainingTuples.o
+makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o  $(ODIR)/makeTrainingTuples.o $(ODIR)/customize.o
 	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(OPENVCLIBS) $(TOPLIB) -o $@
 
 #custom hack for compiling shark, will make bvbetter as time allows
@@ -80,7 +80,7 @@ sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/sharkTest.o
 openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/openCVTest.o 
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
 
-TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o $(ODIR)/baselineDef.o $(ODIR)/customize.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
 clean:
