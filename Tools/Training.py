@@ -38,6 +38,12 @@ inputData = []
 inputAnswer = []
 inputWgts = []
 
+def genTopMatch(event, i):
+    csv1 = event.j1_CSV[i] > 0.800
+    csv2 = event.j2_CSV[i] > 0.800
+    csv3 = event.j3_CSV[i] > 0.800
+    return event.genConstiuentMatchesVec[i] == 3 and event.genTopMatchesVec[i] and (csv1 + csv2 + csv3) <= 1
+
 for datasetName in samplesToRun:
     dataset = ROOT.TFile.Open(datasetName)
 
@@ -52,8 +58,9 @@ for datasetName in samplesToRun:
             break
         Nevts +=1
         for i in xrange(len(event.genConstiuentMatchesVec)):
-            if event.genConstiuentMatchesVec[i] == 3 and event.genTopMatchesVec[i]:
+#            if event.genConstiuentMatchesVec[i] == 3 and event.genTopMatchesVec[i]:
 #            if event.genTopMatchesVec[i]:
+            if genTopMatch(event, i):
                 hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
             else:
                 hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
@@ -69,8 +76,9 @@ for datasetName in samplesToRun:
             inputAnswer.append(int(nmatch == 3) and event.genTopMatchesVec[i])
 #            inputAnswer.append(event.genTopMatchesVec[i])
             #inputWgts.append(event.sampleWgt)
-            if int(nmatch == 3) and event.genTopMatchesVec[i]:
+#            if int(nmatch == 3) and event.genTopMatchesVec[i]:
 #            if event.genTopMatchesVec[i]:
+            if genTopMatch(event, i):    
                 if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
                     inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
                 else:
@@ -111,7 +119,7 @@ if options.opencv:
     n_estimators = 100
     clf.setTermCriteria((cv2.TERM_CRITERIA_COUNT, n_estimators, 0.1))
     #clf.setMaxCategories(2)
-    clf.setMaxDepth(14)
+    clf.setMaxDepth(18)
     #clf.setMinSampleCount(5)
 
     #make opencv TrainData container

@@ -9,6 +9,8 @@
 #include "PlotUtility.h"
 #include "TagTest1.h"
 
+topTagger::type3TopTagger * type3Ptr;
+
 // === Main Function ===================================================
 int main(int argc, char* argv[]) {
   if (argc < 5)
@@ -36,9 +38,9 @@ int main(int argc, char* argv[]) {
 
   //Use BaselineVessel class for baseline variables and selections
   std::string spec = "TagTest";
-  ExpBaselineVessel = new BaselineVessel(spec);
+  ExpBaselineVessel = new BaselineVessel(*static_cast<NTupleReader*>(nullptr), spec);
   AnaFunctions::prepareForNtupleReader();
-  AnaFunctions::prepareTopTagger();
+  AnaFunctions::prepareTopTagger(type3Ptr);
   NTupleReader *tr =0;
   tr = new NTupleReader(fChain);
   tr->registerFunction(&passBaselineFuncExp);

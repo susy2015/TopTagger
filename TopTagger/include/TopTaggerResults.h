@@ -6,13 +6,14 @@
 
 #include <vector>
 #include <set>
+#include <memory>
 
 class TopTaggerResults
 {
 private:
     //List of input objects which can be included in a resolved top
     //Will never be modified or changed by modules 
-    const std::vector<Constituent> * constituents_;
+    std::shared_ptr<const std::vector<Constituent>> constituents_;
 
     //List of jets used to construct final tops, needed for Rsys
     std::set<Constituent const *> usedConstituents_;
@@ -28,12 +29,19 @@ private:
 
 public:
 
-    TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(&constituents) {}
+    //This constructor makes a copy of constituents to ensure it remains in scope while 
+    //the top tagger results is in scope.  This copy is totally internal and is
+    //managed by the shared pointer.  
+TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(new std::vector<Constituent>(constituents)) {}
 
     ~TopTaggerResults() {}
 
     //Setters
-    void setConstituents(const std::vector<Constituent>& constituents) {constituents_ = &constituents;}
+    void setConstituents(const std::vector<Constituent>& constituents)
+    {
+        //Again a copy is made to ensure this vector remains in scope
+        constituents_.reset(&constituents);
+    }
 
     //non-const getters (for modules)
     decltype(topCandidates_)& getTopCandidates() { return topCandidates_; }
