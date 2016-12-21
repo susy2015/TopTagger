@@ -5,13 +5,12 @@
 TopObject::TopObject(std::vector<Constituent const *> constituents) : constituents_(constituents)
 {
     discriminator_ = -999.9;
-    NGenMatchConstituents_ = -1;
     updateVariables();
 }
 
 void TopObject::updateVariables()
 {
-    //reset sum p vector
+    // reset sum p vector
     p_.SetPtEtaPhiM(0.0, 0.0, 0.0, 0.0);
 
     // calculate the total 4-vector 

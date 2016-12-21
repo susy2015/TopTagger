@@ -19,7 +19,6 @@ private:
     void updateVariables();
 
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatchPossibilities_;
-    int NGenMatchConstituents_;
 
 public:
     TopObject() {};
