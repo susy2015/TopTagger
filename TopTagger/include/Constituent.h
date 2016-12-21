@@ -10,7 +10,7 @@
 
 enum ConstituentType
 {
-    AK4JET, AK6JET, AK8JET, CA8JET
+    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET
 };
 
 class Constituent
