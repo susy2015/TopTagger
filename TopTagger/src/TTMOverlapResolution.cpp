@@ -18,12 +18,13 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    mt_         = cfgDoc->get("mt",         commonCxt, -999.9);
-    maxTopEta_  = cfgDoc->get("maxTopEta",  commonCxt, -999.9);
-    dRMatch_    = cfgDoc->get("dRMatch",    commonCxt,  -999.9);
+    mt_           = cfgDoc->get("mt",           commonCxt, -999.9);
+    maxTopEta_    = cfgDoc->get("maxTopEta",    commonCxt, -999.9);
+    dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
 
+    cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
     NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
-    sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "topMass");
+    sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "EMPTY");
 }
 
 void TTMOverlapResolution::run(TopTaggerResults& ttResults)
@@ -54,8 +55,8 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     {
         auto sortFunc = [this](TopObject* t1, TopObject* t2)
         {
-            int nb1 = t1->getNBConstituents(0.800);
-            int nb2 = t2->getNBConstituents(0.800);
+            int nb1 = t1->getNBConstituents(cvsThreshold_);
+            int nb2 = t2->getNBConstituents(cvsThreshold_);
             if     (nb1 <= 1 && nb2 > 1)  return true;
             else if(nb1 > 1  && nb2 <= 1) return false;
             else if(nb1 <= 1 && nb2 <= 1) ; //sort by discriminator
