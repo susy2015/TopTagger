@@ -40,7 +40,7 @@ TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(n
     void setConstituents(const std::vector<Constituent>& constituents)
     {
         //Again a copy is made to ensure this vector remains in scope
-        constituents_.reset(&constituents);
+        constituents_.reset(new std::vector<Constituent>(constituents));
     }
 
     //non-const getters (for modules)
