@@ -41,7 +41,61 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     //Sort the top vector for overlap resolution
     if(sortMethod_.compare("topMass") == 0)
     {
-        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return fabs(t1->p().M() - this->mt_) < fabs(t2->p().M() - this->mt_); } );
+        auto sortFunc = [this](TopObject* t1, TopObject* t2)
+        {
+            double m1 = -999.9, m2 = -999.9;
+            const auto& constVec1 = t1->getConstituents();
+            switch(t1->getNConstituents())
+            {
+            case 3:
+                m1 = t1->p().M();
+                break;
+            case 2:
+                if(constVec1[0]->getType() == AK8JET)
+                {
+                    TLorentzVector psudoVec;
+                    psudoVec.SetPtEtaPhiM(constVec1[0]->p().Pt(), constVec1[0]->p().Eta(), constVec1[0]->p().Phi(), constVec1[0]->getSoftDropMass() * constVec1[0]->getWMassCorr());
+                    m1 = (psudoVec + constVec1[1]->p()).M();
+                }
+                else
+                {
+                    TLorentzVector psudoVec;
+                    psudoVec.SetPtEtaPhiM(constVec1[1]->p().Pt(), constVec1[1]->p().Eta(), constVec1[1]->p().Phi(), constVec1[1]->getSoftDropMass() * constVec1[1]->getWMassCorr());
+                    m1 = (psudoVec + constVec1[0]->p()).M();
+                }
+                break;
+            case 1:
+                m1 = constVec1[0]->getSoftDropMass();
+                break;
+            }
+
+            const auto& constVec2 = t2->getConstituents();
+            switch(t2->getNConstituents())
+            {
+            case 3:
+                m2 = t2->p().M();
+                break;
+            case 2:
+                if(constVec2[0]->getType() == AK8JET)
+                {
+                    TLorentzVector psudoVec;
+                    psudoVec.SetPtEtaPhiM(constVec2[0]->p().Pt(), constVec2[0]->p().Eta(), constVec2[0]->p().Phi(), constVec2[0]->getSoftDropMass() * constVec2[0]->getWMassCorr());
+                    m2 = (psudoVec + constVec2[1]->p()).M();
+                }
+                else
+                {
+                    TLorentzVector psudoVec;
+                    psudoVec.SetPtEtaPhiM(constVec2[1]->p().Pt(), constVec2[1]->p().Eta(), constVec2[1]->p().Phi(), constVec2[1]->getSoftDropMass() * constVec2[1]->getWMassCorr());
+                    m2 = (psudoVec + constVec2[0]->p()).M();
+                }
+                break;
+            case 1:
+                m2 = constVec2[0]->getSoftDropMass();
+                break;
+            }
+            return fabs(m1 - this->mt_) < fabs(m2 - this->mt_); 
+        };
+        std::sort(tops.begin(), tops.end(), sortFunc);
     }
     else if(sortMethod_.compare("topPt") == 0)
     {
