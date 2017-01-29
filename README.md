@@ -337,10 +337,10 @@ int main()
 
         //AK8 variables
         //get AK8 jet vector
-        std::vector<TLorentzVector> jets_AK8; //  = AK8 jet vector
+        vector<TLorentzVector> jets_AK8; //  = AK8 jet vector
 
         //get subjet vector (these will be dR and index matched to AK8 jets)
-        std::vector<TLorentzVector> subJetsLVec; // = AK8 subjets
+        vector<TLorentzVector> subJetsLVec; // = AK8 subjets
 
         //get subjet multiplicity variables
         std::vector<double> tau1; // = tau1 variable
@@ -350,9 +350,13 @@ int main()
         //get softdrop mass for AK8 jets
         std::vector<double> softDropMass; // = soft drop mass vector
 
+        //Correction file for W soft drop mass
+        std::string wMassCorrectionfile; // = mass correction root file for AK8 W jets
+
         //prepare containers of input collections
         ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jets_AK4, btaginfo, QGLinfo);
         ttUtility::ConstAK8Inputs myConstAK8Inputs = ttUtility::ConstAK8Inputs(jets_AK8, tau1, tau2, tau3, softDropMass, subJetsLVec);
+        myConstAK8Inputs.setWMassCorrHistos(wMassCorrectionfile);
 
 	//construct vector of constituents
         vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs, myConstAK8Inputs);
