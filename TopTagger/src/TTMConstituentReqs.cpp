@@ -38,8 +38,8 @@ bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
     double tau21 = constituent.getTau2()/constituent.getTau1();
 
     return constituent.p().Pt() > minAK8WPt_ &&
-           constituent.getSoftDropMass() > minAK8WMass_  && 
-           constituent.getSoftDropMass() < maxAK8WMass_ &&
+           constituent.getSoftDropMass() * constituent.getWMassCorr() > minAK8WMass_  && 
+           constituent.getSoftDropMass() * constituent.getWMassCorr() < maxAK8WMass_ &&
            tau21 < maxWTau21_;
 }
 

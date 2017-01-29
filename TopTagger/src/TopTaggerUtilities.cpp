@@ -171,6 +171,16 @@ namespace ttUtility
         return genCorr * recoCorr;
     }
 
+    void ConstAK8Inputs::setWMassCorrHistos(const std::string& fname)
+    {
+        TF1* puppisd_corrGEN = nullptr;
+        TF1* puppisd_corrRECO_cen = nullptr;
+        TF1* puppisd_corrRECO_for = nullptr;
+
+        ConstAK8Inputs::prepHistosForWCorrectionFactors(fname, puppisd_corrGEN, puppisd_corrRECO_cen, puppisd_corrRECO_for);
+        setWMassCorrHistos(puppisd_corrGEN,puppisd_corrRECO_cen, puppisd_corrRECO_for);
+    }
+
     void ConstAK8Inputs::setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
     {
         puppisd_corrGEN_ = puppisd_corrGEN;
@@ -178,7 +188,7 @@ namespace ttUtility
         puppisd_corrRECO_for_ = puppisd_corrRECO_for;
     }
 
-    void ConstAK8Inputs::prepHistosForWCorrectionFactors(const std::string fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
+    void ConstAK8Inputs::prepHistosForWCorrectionFactors(const std::string& fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
     {
         TFile* file = TFile::Open( "weights/puppiCorr.root","READ");
         if(file)
