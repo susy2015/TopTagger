@@ -190,7 +190,7 @@ namespace ttUtility
 
     void ConstAK8Inputs::prepHistosForWCorrectionFactors(const std::string& fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
     {
-        TFile* file = TFile::Open( "weights/puppiCorr.root","READ");
+        TFile* file = TFile::Open(fname.c_str(),"READ");
         if(file)
         {
             puppisd_corrGEN      = (TF1*)file->Get("puppiJECcorr_gen");
