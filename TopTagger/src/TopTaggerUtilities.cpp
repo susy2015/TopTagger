@@ -155,6 +155,9 @@ namespace ttUtility
         double genCorr  = 1.;
         double recoCorr = 1.;
 
+        //The correction is derived for jet > 200GeV. 
+        //It would return negative weight for low PT jet
+        if (puppipt < 200) return 1.; 
         if(puppisd_corrGEN_ && puppisd_corrRECO_cen_ && puppisd_corrRECO_for_)
         {
             genCorr =  puppisd_corrGEN_->Eval( puppipt );
