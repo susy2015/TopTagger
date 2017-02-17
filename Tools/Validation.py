@@ -2,15 +2,18 @@ import sys
 import ROOT
 import numpy
 import math
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-import sklearn.tree as tree
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
-from sklearn import svm
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import GradientBoostingRegressor
+try:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.ensemble import RandomForestRegressor
+    import sklearn.tree as tree
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn import svm
+    from sklearn.ensemble import AdaBoostRegressor
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.ensemble import GradientBoostingRegressor
+except ImportError:
+    print "SK-learn not found, hope you don't need it"
 import pickle
 from MVAcommon import *
 try:

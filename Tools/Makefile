@@ -32,7 +32,7 @@ OPENVCLIBS = -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples openCVTest TagTest1 # sharkTest
+PROGRAMS = makeTrainingTuples openCVTest # TagTest1 # sharkTest
 
 all: mkobj sampPyWrap $(PROGRAMS)
 
@@ -70,7 +70,7 @@ $(ODIR)/%.o : $(RSDIR)/%.cc
 $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
-makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o  $(ODIR)/makeTrainingTuples.o
+makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o $(ODIR)/makeTrainingTuples.o $(ODIR)/customize.o
 	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(OPENVCLIBS) $(TOPLIB) -o $@
 
 #custom hack for compiling shark, will make bvbetter as time allows
