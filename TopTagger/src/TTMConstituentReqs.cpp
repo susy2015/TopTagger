@@ -9,6 +9,9 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
     //Construct contexts
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
+
+    //common parameter
+    dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
     
     //monojet parameters
     minAK8TopMass_    = cfgDoc->get("minAK8TopMass",    localCxt, -999.9);
@@ -43,9 +46,17 @@ bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
            tau21 < maxWTau21_;
 }
 
-bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent) const
+bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent, const Constituent& constituentAK8) const
 {
-    return constituent.getType() == AK4JET && constituent.p().Pt() > minAK4WPt_;
+    //basic AK4 jet requirements 
+    bool basicReqs = constituent.getType() == AK4JET && constituent.p().Pt() > minAK4WPt_;
+
+    //check that the AK4 jet does not overlap with the selected AK8 subjets
+    //to keep the algorithm from needing to do unnecessary calculations on all matches
+    //we have to have the AK8 jet in the first position, not the second arguement
+    bool overlapCheck = constituentsAreUsed({&constituentAK8}, {&constituent}, dRMatch_);
+
+    return basicReqs && !overlapCheck;
 }
 
 bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const

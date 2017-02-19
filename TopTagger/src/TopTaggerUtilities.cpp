@@ -265,7 +265,7 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
             //Here we fake the QGL if it is a b jet
-            varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > 0.800)?(1.0):(RF_constituents[i].getQGLikelihood());
+            varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > 0.8484)?(1.0):(RF_constituents[i].getQGLikelihood());
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();
