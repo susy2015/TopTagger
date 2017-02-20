@@ -2,15 +2,16 @@
 #define TTMREMAININGSYSTEM_H
 
 #include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/include/TTMConstituentReqs.h"
 
-class TTMRemainingSystem : public TTModule
+class TTMRemainingSystem : public TTModule, public TTMConstituentReqs
 {
 private:
     double CSVThresh_, lowRsysMass_, highRsysMass_, dRMax_;
-    bool useSecondJet_;
+    bool useSecondJet_, allowW_;
 
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMRemainingSystem);

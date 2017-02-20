@@ -1,15 +1,19 @@
 import ROOT
 import numpy
 import math
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-import sklearn.tree as tree
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
-from sklearn import svm
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import GradientBoostingRegressor
+try:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.ensemble import RandomForestRegressor
+    import sklearn.tree as tree
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn import svm
+    from sklearn.ensemble import AdaBoostRegressor
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.ensemble import GradientBoostingRegressor
+except ImportError:
+    print "SK-learn not found, hope you don't need it"
+
 import pickle
 
 class DataGetter:
@@ -209,7 +213,7 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.76
+discCut = 0.60
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)

@@ -70,7 +70,7 @@ $(ODIR)/%.o : $(RSDIR)/%.cc
 $(ODIR)/%.o : $(RSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -I$(RSDIR) -I$(TTIDIR) -I$(TPIDIR) -o $@ -c $<
 
-makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o  $(ODIR)/makeTrainingTuples.o
+makeTrainingTuples: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/PlotUtility.o $(ODIR)/TaggerUtility.o $(ODIR)/samples.o $(ODIR)/MiniTupleMaker.o $(ODIR)/makeTrainingTuples.o $(ODIR)/customize.o
 	$(LD) $^ $(MT2LIB) $(ROOTLIBS) $(OPENVCLIBS) $(TOPLIB) -o $@
 
 #custom hack for compiling shark, will make bvbetter as time allows

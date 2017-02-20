@@ -48,9 +48,6 @@ public:
     void setCfgFile(const std::string&);
     void setCfgFileDirect(const std::string&);
 
-    //Adds new module to the end of the module vector 
-    void registerModule(std::unique_ptr<TTModule>&);
-
     //Runs the top tagger modules specified.  Runs once per event
     void runTagger(const std::vector<Constituent>&);
 

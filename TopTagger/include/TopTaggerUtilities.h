@@ -7,6 +7,7 @@
 class Constituent;
 class TopObject;
 class TopTaggerResults;
+class TF1;
 
 #include "TLorentzVector.h"
 
@@ -15,7 +16,17 @@ class TopTaggerResults;
 
 namespace ttUtility
 {
-    class ConstAK4Inputs
+    class ConstGenInputs
+    {
+    protected:
+        const std::vector<TLorentzVector>* hadGenTops_;
+        const std::vector<std::vector<const TLorentzVector*>>* hadGenTopDaughters_;
+
+        ConstGenInputs();
+        ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+    };
+
+    class ConstAK4Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
@@ -24,10 +35,11 @@ namespace ttUtility
 
     public:
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
-    class ConstAK8Inputs
+    class ConstAK8Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
@@ -35,10 +47,22 @@ namespace ttUtility
         const std::vector<double>* tau2_;
         const std::vector<double>* tau3_;
         const std::vector<double>* softDropMass_;
+        const std::vector<TLorentzVector>* subjetsLVec_;
+        TF1* puppisd_corrGEN_;
+        TF1* puppisd_corrRECO_cen_;
+        TF1* puppisd_corrRECO_for_;
         
+        double getPUPPIweight(double puppipt, double puppieta ) const;
+
     public:
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
+        std::vector<TLorentzVector> denominator(const double ptCut) const;
+        void setWMassCorrHistos(const std::string& fname);
+        void setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
+
+        static void prepHistosForWCorrectionFactors(const std::string& fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
     };
 
     //template metaprogramming magic 
@@ -70,11 +94,19 @@ namespace ttUtility
     //backwards compatability overload
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
     
+    //Tool to calcualte MT2 from tagger results
     double calculateMT2(const TopTaggerResults& ttr);
 
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand);
+    //MVA helper functions
+    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
 
     std::vector<std::string> getMVAVars();
+
+    //Gen matching helper functions 
+    std::vector<TLorentzVector> GetHadTopLVec(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+
+    std::vector<const TLorentzVector*> GetTopdauLVec(const TLorentzVector& top, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+
 }
 
 #endif

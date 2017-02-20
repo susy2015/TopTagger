@@ -2,6 +2,8 @@
 #define TOPOBJECT_H
 
 #include <vector>
+#include <map>
+#include <set>
 
 #include "TLorentzVector.h"
 
@@ -16,8 +18,7 @@ private:
 
     void updateVariables();
 
-    int genTopMatch_;
-    int genDaughterMatch_;
+    std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatchPossibilities_;
 
 public:
     TopObject() {};
@@ -33,13 +34,10 @@ public:
 
     const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
     int getNConstituents() const { return constituents_.size(); }
-    int getNBConstituents(double cvsCut) const;
+    int getNBConstituents(double cvsCut, double etaCut = 2.4) const;
 
-    void setGenTopMatch(const int match) { genTopMatch_ = match; }
-    void setGenDaughterMatch(const int matches) { genDaughterMatch_ = matches; }
-
-    int getGenTopMatch() const { return genTopMatch_; }
-    int getGenDaughterMatch() const { return genDaughterMatch_; }
+    const decltype(genMatchPossibilities_)& getGenTopMatches() const { return genMatchPossibilities_; }
+    const TLorentzVector* getBestGenTopMatch(const double dRMax = 0.6) const;
 };
 
 #endif

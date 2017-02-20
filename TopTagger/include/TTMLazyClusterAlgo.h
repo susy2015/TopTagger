@@ -8,11 +8,11 @@ class TopTaggerResults;
 class TTMLazyClusterAlgo : public TTModule
 {
 private:
-    double lowWMassCut_, highWMassCut_, lowtMassCut_, hightMassCut_, minTopCandMass_, maxTopCandMass_, dRMax_;
+    double lowWMassCut_, highWMassCut_, lowtMassCut_, hightMassCut_, minTopCandMass_, maxTopCandMass_, minJetPt_, dRMax_;
     bool doMonojet_, doDijet_, doTrijet_;
 
 public:
-    void getParameters(const cfg::CfgDocument*);
+    void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };
 REGISTER_TTMODULE(TTMLazyClusterAlgo);

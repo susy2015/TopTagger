@@ -1,13 +1,13 @@
 #include "TopTagger/TopTagger/include/Constituent.h"
 
-Constituent::Constituent() : bTagDisc_(0.0), qgLikelihood_(0.0) {}
+Constituent::Constituent() : type_(NOTYPE), bTagDisc_(0.0), qgLikelihood_(0.0), tau1_(0.0), tau2_(0.0), tau3_(0.0), softDropMass_(0.0), wMassCorr_(0.0) {}
 
-Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood) : p_(p), bTagDisc_(bTagDisc), qgLikelihood_(qgLikelihood) 
+Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood) : p_(p), bTagDisc_(bTagDisc), qgLikelihood_(qgLikelihood), tau1_(-999.9), tau2_(-999.9), tau3_(-999.9), softDropMass_(-999.9), wMassCorr_(-999.9)
 {
     type_ = AK4JET;
 }
 
-Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass) : p_(p), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass)
+Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets, const double& wMassCorr) : p_(p), bTagDisc_(-999.9), qgLikelihood_(-999.9), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass), subjets_(subjets), wMassCorr_(wMassCorr)
 {
     type_ = AK8JET;
 }
@@ -59,3 +59,17 @@ void Constituent::setSoftDropMass(const double& softDropMass)
     softDropMass_ = softDropMass;
 }
 
+void Constituent::setSubJets(const std::vector<TLorentzVector>& subjets)
+{
+    subjets_ = subjets;
+}
+
+void Constituent::setWMassCorr(const double& wMassCorr)
+{
+    wMassCorr_ = wMassCorr;
+}
+
+void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter)
+{
+    genMatches_[&genTop].insert(genDaughter);
+}

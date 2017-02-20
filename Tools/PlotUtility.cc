@@ -102,4 +102,53 @@ vector<TLorentzVector> GetHadTopLVec(const vector<TLorentzVector>& genDecayLVec,
         }//gen loop
         return topdauLVec;
     }
+
+
+
+vector<TLorentzVector> GetHadWLVec(const vector<TLorentzVector>& genDecayLVec, const vector<int>& genDecayPdgIdVec, const vector<int>& genDecayIdxVec, const vector<int>& genDecayMomIdxVec)
+{
+    vector<TLorentzVector> tLVec;
+    for(unsigned it=0; it<genDecayLVec.size(); it++)
+    {
+        int pdgId = genDecayPdgIdVec.at(it);
+        if(abs(pdgId)==24)
+        {
+            int flag = 0;                    
+            for(unsigned ig=0; ig<genDecayLVec.size(); ig++)
+            {
+                if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) )
+                {
+                    int pdgid = genDecayPdgIdVec.at(ig);
+                    if(abs(pdgid)== 11 || abs(pdgid)== 13 || abs(pdgid)== 15) flag++;
+                }
+            }//dau. loop
+            if(!flag) tLVec.push_back(genDecayLVec.at(it));
+
+        }//W cond
+    }//genloop
+    return tLVec;
+  }
+
+    vector<TLorentzVector> GetWdauLVec(TLorentzVector W, vector<TLorentzVector>genDecayLVec, vector<int>genDecayPdgIdVec, vector<int>genDecayIdxVec, vector<int>genDecayMomIdxVec)
+    {
+        vector<TLorentzVector>WdauLVec;
+        for(unsigned it=0; it<genDecayLVec.size(); it++)
+        {
+            if(genDecayLVec[it]==W){
+                for(unsigned ig=0; ig<genDecayLVec.size(); ig++)
+                {
+                    if( genDecayMomIdxVec.at(ig) == genDecayIdxVec.at(it) )
+                    {
+                        int pdgid = genDecayPdgIdVec.at(ig);
+                        if(abs(pdgid)!= 11 && abs(pdgid)!= 13 && abs(pdgid)!= 15) WdauLVec.push_back(genDecayLVec[ig]);
+                    }
+                }//dau. loop
+            }//W cand.
+        }//gen loop
+        return WdauLVec;
+    }
+
+
+
+
 }
