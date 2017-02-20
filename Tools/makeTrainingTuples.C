@@ -168,7 +168,7 @@ private:
             }
             genMatchConst->push_back(NConstMatches);
 
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
+            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, AnaConsts::cutCSVS);
 
             for(auto& var : varMap)
             {

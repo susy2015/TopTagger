@@ -30,6 +30,7 @@ class BaseHistgram
   void BookHistgram(const char *, const int&);
   TFile *oFile;
   TH1D *hNtop;
+  TH2D *hNjet_Ntop;
   TH1D *hNtop_old;
   TH1D *hNtopCand;
   TH1D *hMatchedNtop;
@@ -69,6 +70,14 @@ class BaseHistgram
   TH1D *hPurNJET_den;
   TH1D *hPurNJET_num;
 
+  TH1D *hgentopPt_2match_den;
+  TH1D *hgentopPt_2match_num;
+  TH1D *hgentopPt_1match_den;
+  TH1D *hgentopPt_1match_num;
+
+  TH1D *hgentopPt_Ineff_den;
+  TH1D *hgentopPt_Ineff_num;
+
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName, const int& filerun)
@@ -78,15 +87,17 @@ void BaseHistgram::BookHistgram(const char *outFileName, const int& filerun)
   filename+= "_TagTest1"+index+".root";
   oFile = new TFile(filename, "recreate");
  
-  hNtop = new TH1D("hNtop", "No. of top;N_{top};Event", 6, 0, 6);
+  hNtop = new TH1D("hNtop", "No. of top;N_{top};Event", 10, 0, 10);
   hNtop->Sumw2();
-  hNtop_old = new TH1D("hNtop_old", "No. of top;N_{top};Event", 6, 0, 6);
+  hNjet_Ntop = new TH2D("hNjet_Ntop", "No. of top;N_{jet};N_{top}", 15, 0, 15, 15, 0, 15);
+  hNjet_Ntop->Sumw2();
+  hNtop_old = new TH1D("hNtop_old", "No. of top;N_{top};Event", 10, 0, 10);
   hNtop_old->Sumw2();
   hNtopCand = new TH1D("hNtopCand", "No.of topcand;N_{top};Event", 10, 0, 10);
   hNtopCand->Sumw2();
-  hMatchedNtop = new TH1D("hMatchedNtop", "No.of matched top;N_{top};Event", 6, 0, 6);
+  hMatchedNtop = new TH1D("hMatchedNtop", "No.of matched top;N_{top};Event", 10, 0, 10);
   hMatchedNtop->Sumw2();
-  hConstMatchedNtop = new TH1D("hConstMatchedNtop", "No.of matched top;N_{top};Event", 6, 0, 6);
+  hConstMatchedNtop = new TH1D("hConstMatchedNtop", "No.of matched top;N_{top};Event", 10, 0, 10);
   hConstMatchedNtop->Sumw2();
   hMatchedNtopCand = new TH1D("hMatchedNtopCand", "No.of matched topcand;N_{top};Event", 10, 0, 10);
   hMatchedNtopCand->Sumw2();
@@ -157,6 +168,19 @@ void BaseHistgram::BookHistgram(const char *outFileName, const int& filerun)
   hPurNJET_den = new TH1D("hPurNJET_den","Purity in N_{jet} bin;N_{jet};Event",10, 4, 14);
   hPurNJET_den->Sumw2();
 
+  hgentopPt_2match_den = new TH1D("hgentopPt_2match_den","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_2match_den->Sumw2();
+  hgentopPt_2match_num = new TH1D("hgentopPt_2match_num","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_2match_num->Sumw2();
+  hgentopPt_1match_den = new TH1D("hgentopPt_1match_den","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_1match_den->Sumw2();
+  hgentopPt_1match_num = new TH1D("hgentopPt_1match_num","Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_1match_num->Sumw2();
+
+  hgentopPt_Ineff_den = new TH1D("hgentopPt_Ineff_den", "Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_Ineff_den->Sumw2();
+  hgentopPt_Ineff_num = new TH1D("hgentopPt_Ineff_num", "Top P_{T};p_{T}[GeV];Event",25, 0, 1000);
+  hgentopPt_Ineff_num->Sumw2();
 }
 bool FillChain(TChain* &chain, const char *subsample, const string condorSpec, const int& startfile, const int& filerun){
   AnaSamples::SampleSet        allSamples = condorSpec.empty()? AnaSamples::SampleSet():AnaSamples::SampleSet(condorSpec);
