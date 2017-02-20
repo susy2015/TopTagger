@@ -56,7 +56,8 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
                 {
                     //Ensure we never use the same jet twice
                     //Only pair the AK8 W with an AK4 jet
-                    if(i == j || passAK4WReqs(constituents[j])) continue;
+                    //the AK8 jet is passed to ensure the AK4 jet does not overlap with it
+                    if(i == j || !passAK4WReqs(constituents[j], constituents[i])) continue;
 
                     TopObject topCand({&constituents[i], &constituents[j]});
 

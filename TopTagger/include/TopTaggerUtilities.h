@@ -98,7 +98,7 @@ namespace ttUtility
     double calculateMT2(const TopTaggerResults& ttr);
 
     //MVA helper functions
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand);
+    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
 
     std::vector<std::string> getMVAVars();
 

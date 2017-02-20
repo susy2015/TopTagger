@@ -76,7 +76,7 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
         {
             //Prepare data from top candidate (this code is shared with training tuple producer)
             //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand);
+            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
 
             //Construct opencv data matrix for prediction
             cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type

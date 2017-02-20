@@ -1,6 +1,8 @@
 #ifndef TTMCONSTITUENTREQS_H
 #define TTMCONSTITUENTREQS_H
 
+#include "TopTagger/TopTagger/include/TTMFilterBase.h"
+
 #include <string>
 
 class Constituent;
@@ -10,9 +12,12 @@ namespace cfg
     class CfgDocument;
 }
 
-class TTMConstituentReqs
+class TTMConstituentReqs : public TTMFilterBase
 {
 protected:
+    //matching variable 
+    double dRMatch_;
+
     //mono-jet variables
     double minAK8TopMass_, maxAK8TopMass_, maxTopTau32_, minAK8TopPt_;
 
@@ -26,7 +31,7 @@ protected:
     bool passAK8WReqs(const Constituent& constituent) const;
 
     //Implement the requirements for AK4 jets to partner with AK8 W
-    bool passAK4WReqs(const Constituent& constituent) const;
+    bool passAK4WReqs(const Constituent& constituent, const Constituent& constituentAK8) const;
 
     //Implement the requirements to be tagged as an AK8 top
     bool passAK8TopReqs(const Constituent& constituent) const;
