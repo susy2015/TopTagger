@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
 
   //Use BaselineVessel class for baseline variables and selections
   std::string spec = "MVAstuff";
-  ExpBaselineVessel = new BaselineVessel(spec);
+  ExpBaselineVessel = new BaselineVessel(*static_cast<NTupleReader*>(nullptr), spec);
   AnaFunctions::prepareForNtupleReader();
-  AnaFunctions::prepareTopTagger();
+  //AnaFunctions::prepareTopTagger();
   NTupleReader *tr =0;
   tr = new NTupleReader(fChain);
   tr->registerFunction(&passBaselineFuncExp);

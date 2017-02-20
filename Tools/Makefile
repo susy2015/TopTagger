@@ -80,10 +80,10 @@ sharkTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/sharkTest.o
 openCVTest: $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/openCVTest.o 
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(ROOTLIBS) -o $@
 
-TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/baselineDef.o $(ODIR)/customize.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
-MVAstuff: $(ODIR)/MVAstuff.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
+MVAstuff: $(ODIR)/MVAstuff.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/baselineDef.o $(ODIR)/customize.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
 clean:
