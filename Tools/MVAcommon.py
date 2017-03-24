@@ -19,10 +19,10 @@ import pickle
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13"]#, "j1_CSV_b", "j2_CSV_b", "j3_CSV_b"]#, "j1_QGL", "j2_QGL", "j3_QGL"]
         self.list2 = ["event." + v + "[i]" for v in self.list]
 
-        self.theStrCommand = "[" + ", ".join(self.list2) + "]"
+        self.theStrCommand = "[" + ", ".join(self.list2) + ",max(0,event.j1_CSV[i]),max(0,event.j2_CSV[i]),max(0,event.j3_CSV[i]),max(0,event.j1_QGL[i]),max(0,event.j2_QGL[i]),max(0,event.j3_QGL[i])"  +  "]"
 
     def getData(self, event, i):
         return eval(self.theStrCommand)
@@ -34,7 +34,8 @@ class DataGetter:
 #Variable histo declaration                                                                                                                                                                       
 dg = DataGetter()
 
-histranges = {"cand_m":[20, 50, 300], 
+histranges = {"cand_pt":[50, 0, 1000], 
+              "cand_m":[20, 50, 300], 
 #              "cand_dRMax":[50,0,5],
 #              "cand_pt":[50,0,1000],
 #              "j1_m":[100, 0, 100],
@@ -213,7 +214,7 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.60
+discCut = 0.15
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)

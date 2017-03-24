@@ -40,9 +40,18 @@ if options.opencv:
     #This is absolutely terrible, but I have to recreate the openCV training here because it cannot be loaded in python yet
     import Training
     clf1 = Training.clf
+
+    fileTraining = open("TrainingTransform.pkl",'r')
+    dataTransform = pickle.load(fileTraining)
+    fileTraining.close()
+
 else:
     fileTraining = open("TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
+    fileTraining.close()
+
+    fileTraining = open("TrainingTransform.pkl",'r')
+    dataTransform = pickle.load(fileTraining)
     fileTraining.close()
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
@@ -59,6 +68,7 @@ FakeDenroc = 0
 FakeNumrocHEP = 0
 
 inputList = []
+answerList = []
 
 rocInput = []
 rocScore = []
@@ -81,12 +91,21 @@ for event in fileValidation.slimmedTuple:
         rocScore.append((event.genConstiuentMatchesVec[i]==3))
         rocHEP.append(HEPReqs(event, i))
         evtwgt.append(event.sampleWgt)
+        answerList.append([1,0])
 
 print "CALCULATING DISCRIMINATORS"
 npInputList = numpy.array(inputList, numpy.float32)
+npAnswerList = numpy.array(answerList, numpy.float32)
 if options.opencv:
-    output = [clf1.predict(inputs)[0] for inputs in npInputList]
+    npInputList = dataTransform.transform(npInputList)
+    cvTrainData = cv2.ml.TrainData_create(npInputList, cv2.ml.ROW_SAMPLE, npAnswerList)
+    #output = [clf1.predict(numpy.array([inputs]))[0] for inputs in npInputList]
+    #output = clf1.predict(npInputList)
+    inp = cvTrainData.getSamples()
+    output = clf1.predict(numpy.array([inp[0]]))
+    print output
 else:
+    npInputList = dataTransform.transform(npInputList)
     output = clf1.predict_proba(npInputList)[:,1]
 
 print "FILLING HISTOGRAMS"
@@ -188,8 +207,10 @@ for event in fileFakeRate.slimmedTuple:
         ZinvpassHEP.append(HEPReqs(event, i))
 if options.opencv:
     npZinvInput = numpy.array(ZinvInput, dtype=numpy.float32)
+    npZinvInput = dataTransform.transform(npZinvInput)
     zinvOutput = [clf1.predict(inputs)[0] for inputs in npZinvInput]
 else:
+    ZinvInput = dataTransform.transform(ZinvInput)
     zinvOutput = clf1.predict_proba(ZinvInput)[:,1]
 
 outputCount = 0
@@ -251,8 +272,10 @@ if not options.noROC:
     
     if options.opencv:
         nprocInput = numpy.array(rocInput, dtype=numpy.float32)
+        nprocInput = dataTransform.transform(nprocInput)
         rocOutput = [clf1.predict(inputs)[0] for inputs in nprocInput]
     else:
+        rocInput = dataTransform.transform(rocInput)
         rocOutput = clf1.predict_proba(rocInput)[:,1]
 
     for i in xrange(len(rocOutput)):
@@ -293,8 +316,10 @@ if not options.noROC:
             evtwgtZ.append(event.sampleWgt)
     nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
     if options.opencv:
+        nprocInputZ = dataTransform.transform(nprocInputZ)
         rocOutputZ = [clf1.predict(inputs)[0] for inputs in nprocInputZ]
     else:
+        rocInputZ = dataTransform.transform(rocInputZ)
         rocOutputZ = clf1.predict_proba(rocInputZ)[:,1]
     
     for i in xrange(len(rocOutputZ)):
