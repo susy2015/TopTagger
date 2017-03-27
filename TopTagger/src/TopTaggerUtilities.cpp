@@ -257,15 +257,17 @@ namespace ttUtility
         //Get constituent variables
         for(unsigned int i = 0; i < RF_constituents.size(); ++i)
         {
-            varMap["j" + std::to_string(i + 1) + "_p"]     = RF_constituents[i].p().P();
+            varMap["j" + std::to_string(i + 1) + "_p"]       = RF_constituents[i].p().P();
             //varMap["j" + std::to_string(i + 1) + "_theta"] = RF_constituents[i].p().Angle(topCand.p().Vect());
-            varMap["j" + std::to_string(i + 1) + "_phi"]   = RF_constituents[i].p().Phi();
-            varMap["j" + std::to_string(i + 1) + "_eta"]   = RF_constituents[i].p().Eta();
-            varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
-            varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
-            varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
+            varMap["j" + std::to_string(i + 1) + "_phi"]     = RF_constituents[i].p().Phi();
+            varMap["j" + std::to_string(i + 1) + "_eta"]     = RF_constituents[i].p().Eta();
+            varMap["j" + std::to_string(i + 1) + "_pt"]      = RF_constituents[i].p().Pt();
+            varMap["j" + std::to_string(i + 1) + "_m"]       = RF_constituents[i].p().M();
+            varMap["j" + std::to_string(i + 1) + "_CSV"]     = RF_constituents[i].getBTagDisc();
+            varMap["j" + std::to_string(i + 1) + "_CSV_b"]   = (RF_constituents[i].getBTagDisc() > csvThresh)?(1.0):(0.0);
             //Here we fake the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > csvThresh)?(1.0):(RF_constituents[i].getQGLikelihood());
+            varMap["j" + std::to_string(i + 1) + "_QGL_noMod"]   = RF_constituents[i].getQGLikelihood();
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();
