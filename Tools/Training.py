@@ -84,7 +84,7 @@ for datasetName in samplesToRun:
                         continue
                 inputData.append(dg.getData(event, i))
                 answer = nmatch == 3 and event.genTopMatchesVec[i]
-                inputAnswer.append([int(answer), int(not answer)])
+                inputAnswer.append(answer)
                 inputWgts.append(event.sampleWgt)
                 inputSampleWgts.append(event.sampleWgt)
 #                if int(nmatch == 3) and event.genTopMatchesVec[i]:
@@ -169,7 +169,7 @@ if options.opencv:
     #fout.Close()
 
 else:
-    clf = MLPClassifier(hidden_layer_sizes=(50, ), verbose=True)
+    clf = MLPClassifier(hidden_layer_sizes=(50, ), verbose=False)
     #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
@@ -219,11 +219,15 @@ else:
     #cv = KFold(n=len(npyInputData), n_folds=10)
     #cv_disc = 0.65
     #cv_i = 1
-    #cv_clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose=True)
     #for train, test in cv:#.split(npyInputData):
-    #    cv_clf.fit(npyInputData[train], npyInputAnswer[train], npyInputWgts[train])
-    #    outTrain = cv_clf.predict_proba(npyInputData[train])[:,1]
-    #    outValid = cv_clf.predict_proba(npyInputData[test])[:,1]
+    #    cv_clf = MLPClassifier(hidden_layer_sizes=(50, ), verbose=False)
+    #    npyInputDataTrain = dataScaler.transform(npyInputData[train])
+    #    npyInputAnswerTrain = npyInputAnswer[train]
+    #    npyInputDataValid = dataScaler.transform(npyInputData[test])
+    #    npyInputAnswerValid = npyInputAnswer[test]
+    #    cv_clf.fit(npyInputDataTrain, npyInputAnswerTrain)
+    #    outTrain = cv_clf.predict_proba(npyInputDataTrain)[:,1]
+    #    outValid = cv_clf.predict_proba(npyInputDataValid)[:,1]
     #
     #    print "fold: ", cv_i
     #    #train
@@ -242,7 +246,7 @@ else:
     #    hDiscNoMatchi = ROOT.TH1D("discNoMatch_%i"%cv_i, "discNoMatch_%i"%cv_i, 100, 0, 1.0)
     #    hDiscMatchi   = ROOT.TH1D("discMatch_%i"%cv_i,   "discMatch_%i"%cv_i, 100, 0, 1.0)
     #    for i in xrange(len(outValid)):
-    #        if npyInputAnswer[test][i] == 1:
+    #        if npyInputAnswerValid[i] == 1:
     #            hDiscMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])
     #        else:
     #            hDiscNoMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])

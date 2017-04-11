@@ -1,6 +1,7 @@
 import ROOT
 import numpy
 import math
+import tensorflow as tf
 
 class DataGetter:
 
@@ -16,6 +17,42 @@ class DataGetter:
     def getList(self):
         return self.list
 
+
+def weight_variable(shape, name):
+    """weight_variable generates a weight variable of a given shape."""
+    initial = tf.truncated_normal(shape, stddev=0.1, name=name)
+    return tf.Variable(initial)
+
+
+def bias_variable(shape, name):
+    """bias_variable generates a bias variable of a given shape."""
+    initial = tf.constant(0.1, shape=shape, name=name)
+    return tf.Variable(initial)
+
+def deepnn(x):
+    #constants 
+    NNodeLayer0 = 16
+    NNodeLayer1 = 50
+    NNodeLayer2 = 2
+    
+    # Fully connected layer 1
+    W_fc1 = weight_variable([NNodeLayer0, NNodeLayer1], name="W_fc1")
+    b_fc1 = bias_variable([NNodeLayer1], name="b_fc1")
+    
+    h_fc1 = tf.nn.relu(tf.matmul(x, W_fc1) + b_fc1)
+    
+    # Dropout - controls the complexity of the model, prevents co-adaptation of
+    # features.
+    keep_prob = tf.placeholder(tf.float32)
+    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+    
+    # Map the 50 features to 2 class (match or not match)
+    W_fc2 = weight_variable([NNodeLayer1, NNodeLayer2], name="W_fc2")
+    b_fc2 = bias_variable([NNodeLayer2], name="b_fc2")
+    
+    y_conv = tf.nn.softmax(tf.matmul(h_fc1, W_fc2) + b_fc2)
+    return y_conv, keep_prob
+    
 
 #Variable histo declaration                                                                                                                                                                       
 dg = DataGetter()
@@ -200,7 +237,7 @@ def resolveOverlapHEP(event, passFail):
 NEVTS = 1e10
 NEVTS_Z = 1e10
 #disc cut
-discCut = 0.50
+discCut = 0.60
 
 hEffNum = ROOT.TH1D("hEffNum", "hEffNum", 25, 0.0, 1000.0)
 hEffDen = ROOT.TH1D("hEffDen", "hEffDen", 25, 0.0, 1000.0)
@@ -261,14 +298,14 @@ hFakeDenHEP_njet = ROOT.TH1D("hFakeDenHEP_njet", "hFakeDenHEP_njet", 20, 0, 20)
 
 #ROC
 #ttbar
-hroc = ROOT.TProfile("hroc", "hroc", 100, 0, 1, 0, 1)
+hroc = ROOT.TProfile("hroc", "hroc", 1000, 0, 1, 0, 1)
 hroc_HEP = ROOT.TProfile("hroc_HEP", "hroc_HEP", 100, 0, 1, 0, 1)
 #Zinv
-hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 100, 0, 1, 0, 1)
-hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 100, 0, 1, 0, 1)
+hrocZ = ROOT.TProfile("hrocZ", "hrocZ", 1000, 0, 1, 0, 1)
+hroc_HEPZ = ROOT.TProfile("hroc_HEPZ", "hroc_HEPZ", 1000, 0, 1, 0, 1)
 
-hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 100, 0, 1, 0, 1)
-hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 100, 0, 1, 0, 1)
+hroc_alt = ROOT.TProfile("hroc_alt", "hroc_alt", 1000, 0, 1, 0, 1)
+hroc_HEP_alt = ROOT.TProfile("hroc_HEP_alt", "hroc_HEP_alt", 1000, 0, 1, 0, 1)
 
 #Eff vs disc value
 hEff_disc = ROOT.TProfile("hEff_disc", "hEff_disc", 100, 0, 1, 0, 1)
