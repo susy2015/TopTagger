@@ -26,8 +26,7 @@ saver.restore(sess, './model.ckpt')
 # Restrieve useful variables
 trainInfo = tf.get_collection('TrainInfo')
 x = trainInfo[0]
-keep_prob = trainInfo[1]
-y_conv = trainInfo[2]
+y_train = trainInfo[1]
 
 #Get data transformation
 mins = []
@@ -97,7 +96,7 @@ for event in fileValidation.slimmedTuple:
     tmp_output = []
     if len(npInputList):
         npInputList = (npInputList - mins) / ptps
-        tmp_output = sess.run(y_conv, feed_dict={x: npInputList, keep_prob: 1.0})[:,0]
+        tmp_output = sess.run(y_train, feed_dict={x: npInputList})[:,0]
 
 
     tops = resolveOverlap(event, tmp_output, discCut)
@@ -187,7 +186,7 @@ for event in fileFakeRate.slimmedTuple:
     if len(ZinvInput):
         npyZinvInput = numpy.array(ZinvInput)
         npyZinvInput = (npyZinvInput - mins) / ptps
-        zinvOutput = sess.run(y_conv, feed_dict={x: npyZinvInput, keep_prob: 1.0})[:,0]
+        zinvOutput = sess.run(y_train, feed_dict={x: npyZinvInput})[:,0]
 
     FakeDenroc += 1*event.sampleWgt
     hFakeDen.Fill(event.MET, event.sampleWgt)
@@ -240,7 +239,7 @@ if not options.noROC:
     
     nprocInput = numpy.array(rocInput, dtype=numpy.float32)
     nprocInput = (nprocInput - mins) / ptps
-    rocOutput = sess.run(y_conv, feed_dict={x: nprocInput, keep_prob: 1.0})[:,0]
+    rocOutput = sess.run(y_train, feed_dict={x: nprocInput})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutput = (rocOutput - rocOutput.min()) / rocOutput.ptp()
 
@@ -283,7 +282,7 @@ if not options.noROC:
             evtwgtZ.append(event.sampleWgt)
     nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
     nprocInputZ = (nprocInputZ - mins) / ptps
-    rocOutputZ = sess.run(y_conv, feed_dict={x: nprocInputZ, keep_prob: 1.0})[:,0]
+    rocOutputZ = sess.run(y_train, feed_dict={x: nprocInputZ})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutputZ = (rocOutputZ - rocOutputZ.min()) / rocOutputZ.ptp()
 

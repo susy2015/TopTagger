@@ -29,29 +29,40 @@ def bias_variable(shape, name):
     initial = tf.constant(0.1, shape=shape, name=name)
     return tf.Variable(initial)
 
-def deepnn(x):
+def createMLP(nnStruct):
     #constants 
-    NNodeLayer0 = 16
-    NNodeLayer1 = 50
-    NNodeLayer2 = 2
+    NLayer = len(nnStruct)
+
+    if len(nnStruct) < 2:
+        throw
     
-    # Fully connected layer 1
-    W_fc1 = weight_variable([NNodeLayer0, NNodeLayer1], name="W_fc1")
-    b_fc1 = bias_variable([NNodeLayer1], name="b_fc1")
+    #Define inputs and training inputs
+    x = tf.placeholder(tf.float32, [None, nnStruct[0]])
+    y_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
+
+    #variables for weights and activation functions 
+    w_fc = {}
+    b_fc = {}
+    h_fc = {}
+
+    # Fully connected input layer
+    w_fc[0] = weight_variable([nnStruct[0], nnStruct[1]], name="W_fc0")
+    b_fc[0] = bias_variable([nnStruct[1]], name="b_fc0")
+    h_fc[0] = x
     
-    h_fc1 = tf.nn.relu(tf.matmul(x, W_fc1) + b_fc1)
+    # create hidden layers 
+    for layer in xrange(1, NLayer - 1):
+        #use relu for hidden layers as this seems to give best result
+        h_fc[layer] = tf.nn.relu(tf.matmul(h_fc[layer - 1], w_fc[layer - 1]) + b_fc[layer - 1])
     
-    # Dropout - controls the complexity of the model, prevents co-adaptation of
-    # features.
-    keep_prob = tf.placeholder(tf.float32)
-    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+        # Map the features to next layer
+        w_fc[layer] = weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer - 1))
+        b_fc[layer] = bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer - 1))
     
-    # Map the 50 features to 2 class (match or not match)
-    W_fc2 = weight_variable([NNodeLayer1, NNodeLayer2], name="W_fc2")
-    b_fc2 = bias_variable([NNodeLayer2], name="b_fc2")
-    
-    y_conv = tf.nn.softmax(tf.matmul(h_fc1, W_fc2) + b_fc2)
-    return y_conv, keep_prob
+    #create last layer with softmax for classification 
+    y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2])
+
+    return x, y_, y
     
 
 #Variable histo declaration                                                                                                                                                                       

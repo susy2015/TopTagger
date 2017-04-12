@@ -57,14 +57,14 @@ def importData():
           Nevts +=1
           for i in xrange(len(event.cand_m)):
               nmatch = event.genConstiuentMatchesVec[i]
-              if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-                  if (int(nmatch == 0) and not event.genTopMatchesVec[i]):
+              if True:#(int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
+                  if (int(nmatch != 3) or not event.genTopMatchesVec[i]):
                       count += 1
-                      if count%10:
+                      if count%15:
                           continue
                   inputData.append(dg.getData(event, i))
                   answer = nmatch == 3 and event.genTopMatchesVec[i]
-                  inputAnswer.append([int(answer), int(not answer)])
+                  inputAnswer.append([int(answer), int((nmatch == 3 and not event.genTopMatchesVec[i]) or nmatch == 2), int(nmatch == 1), int(nmatch == 0)])
                   inputWgts.append(event.sampleWgt)
                   inputSampleWgts.append(event.sampleWgt)
   #                if int(nmatch == 3) and event.genTopMatchesVec[i]:
@@ -129,27 +129,20 @@ def main(_):
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData()
 
-  # Create the model
-  x = tf.placeholder(tf.float32, [None, 16])
-
-  # Define loss and optimizer
-  y_ = tf.placeholder(tf.float32, [None, 2])
-
   # Build the graph for the deep net
-  y_conv, keep_prob = deepnn(x)
+  x, y_, y = createMLP([npyInputData.shape[1], 50, npyInputAnswer.shape[1]])
 
   reg = tf.placeholder(tf.float32)
 
   tf.add_to_collection('TrainInfo', x)
-  tf.add_to_collection('TrainInfo', keep_prob)
-  tf.add_to_collection('TrainInfo', y_conv)
+  tf.add_to_collection('TrainInfo', y)
 
-  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
-  l2_norm = tf.nn.l2_loss(y_conv, name=None)
+  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
+  l2_norm = tf.nn.l2_loss(y, name=None)
   loss = cross_entropy + l2_norm*reg
   #train_step = tf.train.GradientDescentOptimizer(1.0).minimize(cross_entropy)
   train_step = tf.train.AdamOptimizer(1e-3).minimize(loss)
-  correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+  correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
   # Create a summary to monitor cost tensor
@@ -177,11 +170,10 @@ def main(_):
       for i in xrange(NSteps):
         batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:]]
         #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-        _, acc, summary = sess.run([train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0, reg: 0.0001})
+        _, acc, summary = sess.run([train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], reg: 0.0001})
         summary_writer.add_summary(summary, epoch*NSteps + i)
         print('epoch %d, step %d, training accuracy %g' % (epoch, i, acc))
 
-    #print sess.run(y_conv, feed_dict={x: npyInputData, keep_prob: 1.0})
     save_path = saver.save(sess, "model.ckpt")
     print("Model saved in file: %s" % save_path)
 
