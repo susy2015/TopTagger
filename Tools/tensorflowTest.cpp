@@ -14,7 +14,7 @@ void free_buffer(void* data, size_t length)
 
 
 int main() {
-    TF_Buffer* graph_def = read_file("frozen.pb");
+    TF_Buffer* graph_def = read_file("tfModel_frozen.pb");
     TF_Graph* graph = TF_NewGraph();
 
     // Import graph_def into graph

@@ -1,9 +1,10 @@
-import sys
+import os
 import ROOT
 import numpy
 import math
 import tensorflow as tf
 from tensorflow.python.framework import graph_io
+from tensorflow.python.tools import freeze_graph
 from MVAcommon_tf import *
 import optparse
 from math import sqrt
@@ -190,11 +191,34 @@ def main(_):
       if stopCnt >= 3:
         break
       lastLoss = currentLoss
-      
 
-    save_path = saver.save(sess, "model.ckpt")
-    graph_io.write_graph(sess.graph, "./", "test.pb")
-    print("Model saved in file: %s" % save_path)
+    #Save training checkout (contains a copy of the model and the weights 
+    try:
+      os.mkdir("models")
+    except OSError:
+      pass
+    checkpoint_path = "models/model.ckpt"
+    save_path = saver.save(sess, checkpoint_path)
+
+    input_graph_path = "tfModel.pb"
+    graph_io.write_graph(sess.graph, "./", input_graph_path)
+
+    #create frozen version of graph for distribution
+    input_saver_def_path = ""
+    input_binary = False
+    output_node_names = "y"
+    restore_op_name = "save/restore_all"
+    filename_tensor_name = "save/Const:0"
+    output_graph_path = "tfModel_frozen.pb"
+    clear_devices = False
+
+    freeze_graph.freeze_graph(input_graph_path, input_saver_def_path,
+                              input_binary, checkpoint_path, output_node_names,
+                              restore_op_name, filename_tensor_name,
+                              output_graph_path, clear_devices, "")
+
+    print("Model checkpoint saved in file: %s" % save_path)
+    print("Frozen model (model and weights) saved in file: %s" % output_graph_path)
 
 if __name__ == '__main__':
   tf.app.run(main=main)
