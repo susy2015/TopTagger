@@ -86,6 +86,12 @@ TagTest1: $(ODIR)/TagTest1.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODI
 MVAstuff: $(ODIR)/MVAstuff.o $(ODIR)/NTupleReader.o $(ODIR)/SATException.o $(ODIR)/baselineDef.o $(ODIR)/customize.o $(ODIR)/samples.o $(ODIR)/TaggerUtility.o $(ODIR)/PlotUtility.o
 	$(LD) $^ $(TOPLIB) $(OPENVCLIBS) $(MT2LIB) $(ROOTLIBS) -o $@
 
+#yet another custom hack for tensorflow test, this is mostly so I don't forget the really overcomplicated compile method
+TENSORFLOW_INC_DIR = /home/pastika/topTagger/tensorflow/
+TENSORFLOW_LIB_DIR = /home/pastika/.cache/bazel/_bazel_pastika/4f8ff7227a7b1d742c9014b7037b5955/execroot/tensorflow/bazel-out/local-opt/bin/tensorflow/
+tensorflowTest: tensorflowTest.cpp
+	g++ -std=c++11 -I $(TENSORFLOW_INC_DIR) -L $(TENSORFLOW_LIB_DIR) $^ $(TENSORFLOW_LIB_DIR)/c/_objs/c_api/tensorflow/c/c_api.pic.o -ltensorflow -o $@
+
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
 
