@@ -164,16 +164,33 @@ def main(_):
     summary_writer = tf.summary.FileWriter("log_graph", graph=tf.get_default_graph())
     sess.run(tf.global_variables_initializer())
 
-    for epoch in xrange(0, 200):
-      NData = len(npyInputData)
-      NSteps = 10
-      stepSize = NData/NSteps
+    trainThreshold = 1e-4
+    stopCnt = 0
+    lastLoss = 10e10
+    NData = len(npyInputData)
+    NSteps = 10
+    stepSize = NData/NSteps
+    MaxEpoch = 500
+    for epoch in xrange(0, MaxEpoch):
+      losses = []
+      accs = []
       for i in xrange(NSteps):
         batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:]]
         #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-        _, acc, summary = sess.run([train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], reg: 0.0001})
+        step_loss, _, acc, summary = sess.run([loss, train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], reg: 0.0001})
+        losses.append(step_loss)
+        accs.append(acc)
         summary_writer.add_summary(summary, epoch*NSteps + i)
-        print('epoch %d, step %d, training accuracy %g' % (epoch, i, acc))
+      currentLoss = numpy.mean(losses)
+      print('epoch %d, training accuracy %s, training loss %s' % (epoch, numpy.mean(accs), currentLoss))
+      if (lastLoss - currentLoss) < trainThreshold or (lastLoss - currentLoss) < 0:
+        stopCnt += 1
+      else:
+        stopCnt = 0
+      if stopCnt >= 3:
+        break
+      lastLoss = currentLoss
+      
 
     save_path = saver.save(sess, "model.ckpt")
     graph_io.write_graph(sess.graph, "./", "test.pb")
