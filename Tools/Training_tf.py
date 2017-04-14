@@ -3,6 +3,7 @@ import ROOT
 import numpy
 import math
 import tensorflow as tf
+from tensorflow.python.framework import graph_io
 from MVAcommon_tf import *
 import optparse
 from math import sqrt
@@ -163,7 +164,7 @@ def main(_):
     summary_writer = tf.summary.FileWriter("log_graph", graph=tf.get_default_graph())
     sess.run(tf.global_variables_initializer())
 
-    for epoch in xrange(0, 400):
+    for epoch in xrange(0, 200):
       NData = len(npyInputData)
       NSteps = 10
       stepSize = NData/NSteps
@@ -175,6 +176,7 @@ def main(_):
         print('epoch %d, step %d, training accuracy %g' % (epoch, i, acc))
 
     save_path = saver.save(sess, "model.ckpt")
+    graph_io.write_graph(sess.graph, "./", "test.pb")
     print("Model saved in file: %s" % save_path)
 
 if __name__ == '__main__':

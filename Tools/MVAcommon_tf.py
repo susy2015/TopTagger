@@ -26,7 +26,7 @@ def weight_variable(shape, name):
 
 def bias_variable(shape, name):
     """bias_variable generates a bias variable of a given shape."""
-    initial = tf.constant(0.1, shape=shape, name=name)
+    initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
     return tf.Variable(initial)
 
 def createMLP(nnStruct):
@@ -37,7 +37,7 @@ def createMLP(nnStruct):
         throw
     
     #Define inputs and training inputs
-    x = tf.placeholder(tf.float32, [None, nnStruct[0]])
+    x = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
     y_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
 
     #variables for weights and activation functions 
@@ -46,21 +46,21 @@ def createMLP(nnStruct):
     h_fc = {}
 
     # Fully connected input layer
-    w_fc[0] = weight_variable([nnStruct[0], nnStruct[1]], name="W_fc0")
+    w_fc[0] = weight_variable([nnStruct[0], nnStruct[1]], name="w_fc0")
     b_fc[0] = bias_variable([nnStruct[1]], name="b_fc0")
     h_fc[0] = x
     
     # create hidden layers 
     for layer in xrange(1, NLayer - 1):
         #use relu for hidden layers as this seems to give best result
-        h_fc[layer] = tf.nn.relu(tf.matmul(h_fc[layer - 1], w_fc[layer - 1]) + b_fc[layer - 1])
+        h_fc[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i"%(layer)),  b_fc[layer - 1], name="a_fc%i"%(layer)), name="h_fc%i"%(layer))
     
         # Map the features to next layer
-        w_fc[layer] = weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer - 1))
-        b_fc[layer] = bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer - 1))
+        w_fc[layer] = weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
+        b_fc[layer] = bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
     
     #create last layer with softmax for classification 
-    y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2])
+    y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2], name="y")
 
     return x, y_, y
     
