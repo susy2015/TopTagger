@@ -3,7 +3,7 @@
 #include <cstring>
 #include <memory>
 #include <vector>
-#include "/home/pastika/topTagger/tensorflow/tensorflow/c/c_api.h"
+#include "tensorflow/c/c_api.h"
 
 TF_Buffer* read_file(const char* file);
 
@@ -22,6 +22,8 @@ int main() {
     TF_ImportGraphDefOptions* graph_opts = TF_NewImportGraphDefOptions();
     TF_GraphImportGraphDef(graph, graph_def, graph_opts, status);
     TF_DeleteImportGraphDefOptions(graph_opts);
+    TF_DeleteBuffer(graph_def);
+
     if (TF_GetCode(status) != TF_OK) {
         fprintf(stderr, "ERROR: Unable to import graph %s\n", TF_Message(status));
         return 1;
@@ -98,7 +100,6 @@ int main() {
     for(auto tensor : output_values) TF_DeleteTensor(tensor);
     TF_DeleteSession(session, status);
     TF_DeleteStatus(status);
-    TF_DeleteBuffer(graph_def);
 
     // Use the graph
     TF_DeleteGraph(graph);
