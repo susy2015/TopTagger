@@ -34,6 +34,8 @@ private:
     TF_Buffer* read_file(const std::string& file);
 
 public:
+    ~TTMTensorflow();
+
     void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
 };

@@ -62,7 +62,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     if (TF_GetCode(status) != TF_OK) 
     {
-        THROW_TTEXCEPTION("ERROR: Unable to import graph " + std::string(TF_Message(status)));
+        THROW_TTEXCEPTION("ERROR: Unable to import graph: " + std::string(TF_Message(status)));
     }
 
     //Create tensorflow session from imported graph
@@ -72,7 +72,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     if (TF_GetCode(status) != TF_OK) 
     {
-        THROW_TTEXCEPTION("ERROR: Unable to import graph " + std::string(TF_Message(status)));
+        THROW_TTEXCEPTION("ERROR: Unable to create tf session: " + std::string(TF_Message(status)));
     }
 
     TF_Operation* op_x = TF_GraphOperationByName(graph, "x");
@@ -97,7 +97,7 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     //Get the list of final tops into which we will stick candidates
     std::vector<TopObject*>& tops = ttResults.getTops();
 
-    //tendorflow status variable
+    //tensorflow status variable
     TF_Status* status = TF_NewStatus();
 
     //Construct tensorflow input tensor
@@ -146,7 +146,7 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
 
             if (TF_GetCode(status) != TF_OK)
             {
-                THROW_TTEXCEPTION("ERROR: Unable to run graph " + std::string(TF_Message(status)));
+                THROW_TTEXCEPTION("ERROR: Unable to run graph: " + std::string(TF_Message(status)));
             }
 
             //Get output discriminator 
@@ -169,6 +169,19 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     for(auto tensor : input_values)  TF_DeleteTensor(tensor);
 
     TF_DeleteStatus(status);
+}
+
+TTMTensorflow::~TTMTensorflow()
+{
+    //tensorflow status variable
+    TF_Status* status = TF_NewStatus();
+    
+    TF_DeleteSession(session_, status);
+
+    if (TF_GetCode(status) != TF_OK)
+    {
+        THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
+    }
 }
 
 void free_buffer(void* data, size_t length) 
