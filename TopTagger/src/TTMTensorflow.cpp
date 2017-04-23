@@ -83,10 +83,9 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
         THROW_TTEXCEPTION("Input/output operations not found in graph");
     }
 
-    std::vector<TF_Output>     inputs_        = {       {op_x, 0} };
-    std::vector<TF_Output>     outputs_       = {       {op_y, 0} };
-    std::vector<TF_Operation*> targets_       = { op_y };
-
+    inputs_ .emplace_back(TF_Output({op_x, 0}));
+    outputs_.emplace_back(TF_Output({op_y, 0}));
+    targets_.emplace_back(op_y);
 
     TF_DeleteStatus(status);
 }
@@ -114,8 +113,6 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
 
     //Create place to store the output vectors 
     std::vector<TF_Tensor*>    output_values(1);
-
-    auto discriminators = static_cast<float*>(TF_TensorData(output_values[0]));
 
     for(auto& topCand : topCandidates)
     {
@@ -151,9 +148,12 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
             {
                 THROW_TTEXCEPTION("ERROR: Unable to run graph " + std::string(TF_Message(status)));
             }
-            
+
+            //Get output discriminator 
+            auto discriminators = static_cast<float*>(TF_TensorData(output_values[0]));            
             double discriminator = static_cast<double>(discriminators[0]);
             topCand.setDiscriminator(discriminator);
+            for(auto tensor : output_values) TF_DeleteTensor(tensor);
             
             //Check number of b-tagged jets in the top
             bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
@@ -167,7 +167,6 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     }
 
     for(auto tensor : input_values)  TF_DeleteTensor(tensor);
-    for(auto tensor : output_values) TF_DeleteTensor(tensor);
 
     TF_DeleteStatus(status);
 }
