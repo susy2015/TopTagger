@@ -63,15 +63,6 @@ rocScore = []
 rocHEP = []
 evtwgt = []
 Nevts = 0
-#for event in fileValidation.slimmedTuple:
-#    if event.Njet<4 : continue
-#    if Nevts >= NEVTS:
-#        break
-#    Nevts += 1
-
-#print "CALCULATING DISCRIMINATORS"
-
-#print "FILLING HISTOGRAMS"
 
 outputCount = 0
 Nevts = 0
