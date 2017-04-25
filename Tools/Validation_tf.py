@@ -11,8 +11,12 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 
 parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
 parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
+parser.add_option ('-d', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
 
 options, args = parser.parse_args()
+
+#disc cut
+discCut = options.discCut
 
 dg = DataGetter()
 varsname = dg.getList()

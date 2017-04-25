@@ -84,11 +84,6 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     return x, y_, y, yt, w_fc, b_fc
     
 
-#Variable histo declaration                                                                                                                                                                       
-dg = DataGetter()
-
-varsname = dg.getList()
-
 def HEPReqs(event, i):
     Mw = 80.385
     Mt = 173.5
@@ -194,6 +189,4 @@ def resolveOverlapHEP(event, passFail):
 
 NEVTS = 1e10
 NEVTS_Z = 1e10
-#disc cut
-discCut = 0.60
 
