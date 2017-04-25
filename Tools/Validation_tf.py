@@ -107,12 +107,7 @@ for event in fileValidation.slimmedTuple:
         passHEP.append(HEPReqs(event, i))
 
     #Batch calculate NN output to save python function calls
-    npInputList = numpy.array(inputList, numpy.float32)
-    tmp_output = []
-    if len(npInputList):
-        #npInputList = (npInputList - mins) / ptps
-        tmp_output = sess.run(y_train, feed_dict={x: npInputList})[:,0]
-
+    tmp_output = sess.run(y_train, feed_dict={x: data})[:,0]
 
     tops = resolveOverlap(event, tmp_output, discCut)
     topsHEP = resolveOverlapHEP(event, passHEP)
@@ -210,11 +205,7 @@ for event in fileFakeRate.slimmedTuple:
         ZinvpassHEP.append(HEPReqs(event, i))
 
     #batch calculate NN otuput
-    zinvOutput = []
-    if len(ZinvInput):
-        npyZinvInput = numpy.array(ZinvInput)
-        #npyZinvInput = (npyZinvInput - mins) / ptps
-        zinvOutput = sess.run(y_train, feed_dict={x: npyZinvInput})[:,0]
+    zinvOutput = sess.run(y_train, feed_dict={x: data})[:,0]
 
     FakeDenroc += 1*sampleWgt
     hFakeDen.Fill(MET, sampleWgt)
@@ -274,7 +265,6 @@ if not options.noROC:
     FPHEP =0
     
     nprocInput = numpy.array(rocInput, dtype=numpy.float32)
-    #nprocInput = (nprocInput - mins) / ptps
     rocOutput = sess.run(y_train, feed_dict={x: nprocInput})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutput = (rocOutput - rocOutput.min()) / rocOutput.ptp()
@@ -308,7 +298,6 @@ if not options.noROC:
     FPHEPZ =0
     FPRHEPZ =0
     nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
-    #nprocInputZ = (nprocInputZ - mins) / ptps
     rocOutputZ = sess.run(y_train, feed_dict={x: nprocInputZ})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutputZ = (rocOutputZ - rocOutputZ.min()) / rocOutputZ.ptp()
