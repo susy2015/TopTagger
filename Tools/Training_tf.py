@@ -153,7 +153,7 @@ def main(_):
         break
       lastLoss = currentLoss
 
-    #Save training checkout (contains a copy of the model and the weights 
+    #Save training checkpoint (contains a copy of the model and the weights 
     try:
       os.mkdir("models")
     except OSError:
