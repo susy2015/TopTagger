@@ -32,26 +32,33 @@ def importData():
       dataset = ROOT.TFile.Open(datasetName)
       print datasetName
   
-        
       Nevts = 0
       count = 0
       for event in dataset.slimmedTuple:
           if Nevts >= NEVTS:
               break
           Nevts +=1
-          for i in xrange(len(event.cand_m)):
-              nmatch = event.genConstiuentMatchesVec[i]
-              if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-                  if (int(nmatch != 3) or not event.genTopMatchesVec[i]):
+
+          genConstiuentMatchesVec = event.genConstiuentMatchesVec
+          genTopMatchesVec = event.genTopMatchesVec
+          sampleWgt = event.sampleWgt
+          cand_m = event.cand_m
+          data = dg.getData(event)
+
+          for i in xrange(len(cand_m)):
+              nmatch = genConstiuentMatchesVec[i]
+              if (int(nmatch == 3) and genTopMatchesVec[i]) or (int(nmatch == 0) and not genTopMatchesVec[i]):
+                  #Only accept some background
+                  if (int(nmatch != 3) or not genTopMatchesVec[i]):
                       count += 1
                       if count%10:
                           continue
-                  inputData.append(dg.getData(event, i))
-                  answer = nmatch == 3 and event.genTopMatchesVec[i]
+                  answer = nmatch == 3 and genTopMatchesVec[i]
+                  inputData.append(data[i])
                   #inputAnswer.append([float(answer), float((nmatch == 3 and not event.genTopMatchesVec[i]) or nmatch == 2), float(nmatch == 1), float(nmatch == 0)])
                   inputAnswer.append([float(answer), float(not answer)])
-                  inputWgts.append(event.sampleWgt)
-                  inputSampleWgts.append(event.sampleWgt)
+                  inputWgts.append(sampleWgt)
+                  inputSampleWgts.append(sampleWgt)
                   
   npyInputData = numpy.array(inputData, numpy.float32)
   npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
@@ -117,13 +124,15 @@ def main(_):
     summary_writer = tf.summary.FileWriter("log_graph", graph=tf.get_default_graph())
     sess.run(tf.global_variables_initializer())
 
+    #Training parameters
     trainThreshold = 1e-5
+    NSteps = 10
+    MaxEpoch = 500
+
     stopCnt = 0
     lastLoss = 10e10
     NData = len(npyInputData)
-    NSteps = 10
     stepSize = NData/NSteps
-    MaxEpoch = 500
     for epoch in xrange(0, MaxEpoch):
       losses = []
       accs = []

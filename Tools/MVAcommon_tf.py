@@ -6,13 +6,15 @@ import tensorflow as tf
 class DataGetter:
 
     def __init__(self):
-        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13"]#, "j1_CSV_b", "j2_CSV_b", "j3_CSV_b"]#, "j1_QGL", "j2_QGL", "j3_QGL"]
-        self.list2 = ["event." + v + "[i]" for v in self.list]
+        self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
+        self.list2 = ["event." + v for v in self.list]
 
-        self.theStrCommand = "[" + ", ".join(self.list2) + ",max(0,event.j1_CSV[i]),max(0,event.j2_CSV[i]),max(0,event.j3_CSV[i]),max(0,event.j1_QGL[i]),max(0,event.j2_QGL[i]),max(0,event.j3_QGL[i])"  +  "]"
+        self.theStrCommand = "numpy.array([" + ", ".join(self.list2) + "]).transpose()"
 
-    def getData(self, event, i):
-        return eval(self.theStrCommand)
+    def getData(self, event):
+        array = eval(self.theStrCommand)
+        array[array<0]=0
+        return array
 
     def getList(self):
         return self.list
