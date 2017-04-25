@@ -29,6 +29,19 @@ def bias_variable(shape, name):
     initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
     return tf.Variable(initial)
 
+### createMLP
+# This fucntion is designed to create a MLP for classification purposes (using softmax_cross_entropy_with_logits)
+# inputs 
+#  nnStruct - a list containing the number of nodes in each layer, including the input and output layers 
+#  offset_initial - a list of offsets which will be applied to the initial input features, they are stored in the tf model
+#  scale_initial - a list of scales which will be applied to each input feature after the offsets are subtracted, they are stored in the tf model
+# outputs
+#  x - placeholder for inputs
+#  y_ - placeholders for training answers 
+#  y - scaled and normalized outputs for users 
+#  yt - unscaled output for loss function
+#  w_fc - dictionary containing all weight variables
+#  b_fc - dictionary containing all bias variables 
 def createMLP(nnStruct, offset_initial, scale_initial):
     #constants 
     NLayer = len(nnStruct)
@@ -63,10 +76,9 @@ def createMLP(nnStruct, offset_initial, scale_initial):
         w_fc[layer] = weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
         b_fc[layer] = bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
     
-    #create last layer with softmax for classification 
-    #y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2], name="y")
+    #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the less function will do this)
     yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt")
-    #y = tf.nn.sigmoid(tf.constant(5.0)*(tf.nn.softmax(yt)-tf.constant(nnStruct[NLayer - 1]*[0.5])), name="y")
+    #create output y which is conditioned to be between 0 and 1 and have nice distinct peaks for the end user
     y = tf.multiply(tf.constant(0.5), (tf.nn.tanh(tf.constant(3.0)*yt)+tf.constant(1.0)), name="y")
 
     return x, y_, y, yt, w_fc, b_fc
