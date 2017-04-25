@@ -32,10 +32,6 @@ def importData():
       dataset = ROOT.TFile.Open(datasetName)
       print datasetName
   
-      hPtMatch   = ROOT.TH1D("hPtMatch" + datasetName, "hPtMatch", 50, 0.0, 2000.0)
-      hPtMatch.Sumw2()
-      hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
-      hPtNoMatch.Sumw2()
         
       Nevts = 0
       count = 0
