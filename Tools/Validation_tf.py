@@ -19,10 +19,10 @@ varsname = dg.getList()
 print "PROCESSING TTBAR VALIDATION DATA"
 
 #Get training output
-saver = tf.train.import_meta_graph('model.ckpt.meta')
+saver = tf.train.import_meta_graph('models/model.ckpt.meta')
 sess = tf.Session()
 # To initialize values with saved data
-saver.restore(sess, './model.ckpt')
+saver.restore(sess, './models/model.ckpt')
 # Restrieve useful variables
 trainInfo = tf.get_collection('TrainInfo')
 x = trainInfo[0]
@@ -95,7 +95,7 @@ for event in fileValidation.slimmedTuple:
     npInputList = numpy.array(inputList, numpy.float32)
     tmp_output = []
     if len(npInputList):
-        npInputList = (npInputList - mins) / ptps
+        #npInputList = (npInputList - mins) / ptps
         tmp_output = sess.run(y_train, feed_dict={x: npInputList})[:,0]
 
 
@@ -185,7 +185,7 @@ for event in fileFakeRate.slimmedTuple:
     zinvOutput = []
     if len(ZinvInput):
         npyZinvInput = numpy.array(ZinvInput)
-        npyZinvInput = (npyZinvInput - mins) / ptps
+        #npyZinvInput = (npyZinvInput - mins) / ptps
         zinvOutput = sess.run(y_train, feed_dict={x: npyZinvInput})[:,0]
 
     FakeDenroc += 1*event.sampleWgt
@@ -238,7 +238,7 @@ if not options.noROC:
     FPHEP =0
     
     nprocInput = numpy.array(rocInput, dtype=numpy.float32)
-    nprocInput = (nprocInput - mins) / ptps
+    #nprocInput = (nprocInput - mins) / ptps
     rocOutput = sess.run(y_train, feed_dict={x: nprocInput})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutput = (rocOutput - rocOutput.min()) / rocOutput.ptp()
@@ -281,7 +281,7 @@ if not options.noROC:
             rocHEPZ.append(HEPReqs(event, i))
             evtwgtZ.append(event.sampleWgt)
     nprocInputZ = numpy.array(rocInputZ, dtype=numpy.float32)
-    nprocInputZ = (nprocInputZ - mins) / ptps
+    #nprocInputZ = (nprocInputZ - mins) / ptps
     rocOutputZ = sess.run(y_train, feed_dict={x: nprocInputZ})[:,0]
     #rescale output to ensure we get the full ROC curve
     rocOutputZ = (rocOutputZ - rocOutputZ.min()) / rocOutputZ.ptp()

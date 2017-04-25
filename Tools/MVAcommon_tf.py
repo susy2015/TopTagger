@@ -29,7 +29,7 @@ def bias_variable(shape, name):
     initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
     return tf.Variable(initial)
 
-def createMLP(nnStruct):
+def createMLP(nnStruct, offset_initial, scale_initial):
     #constants 
     NLayer = len(nnStruct)
 
@@ -40,6 +40,10 @@ def createMLP(nnStruct):
     x = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
     y_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
 
+    #variables for pre-transforming data
+    offset = tf.constant(offset_initial, name="offest")
+    scale = tf.constant(scale_initial, name="scale")
+
     #variables for weights and activation functions 
     w_fc = {}
     b_fc = {}
@@ -48,7 +52,7 @@ def createMLP(nnStruct):
     # Fully connected input layer
     w_fc[0] = weight_variable([nnStruct[0], nnStruct[1]], name="w_fc0")
     b_fc[0] = bias_variable([nnStruct[1]], name="b_fc0")
-    h_fc[0] = x
+    h_fc[0] = tf.multiply(x-offset,scale)
     
     # create hidden layers 
     for layer in xrange(1, NLayer - 1):
@@ -60,9 +64,12 @@ def createMLP(nnStruct):
         b_fc[layer] = bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
     
     #create last layer with softmax for classification 
-    y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2], name="y")
+    #y = tf.nn.softmax(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]) + b_fc[NLayer - 2], name="y")
+    yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt")
+    #y = tf.nn.sigmoid(tf.constant(5.0)*(tf.nn.softmax(yt)-tf.constant(nnStruct[NLayer - 1]*[0.5])), name="y")
+    y = tf.multiply(tf.constant(0.5), (tf.nn.tanh(tf.constant(3.0)*yt)+tf.constant(1.0)), name="y")
 
-    return x, y_, y
+    return x, y_, y, yt, w_fc, b_fc
     
 
 #Variable histo declaration                                                                                                                                                                       
