@@ -198,6 +198,19 @@ def main(_):
     hDiscNoMatch.Write()
     hDiscMatch.Write()
 
+    #try:
+    #  import matplotlib.pyplot as plt
+    #  
+    #  labels = DataGetter().getList()
+    #  for i in xrange(0,len(labels)):
+    #    for j in xrange(0,i):
+    #      plt.clf()
+    #      plt.xlabel(labels[i])
+    #      plt.ylabel(labels[j])
+    #      plt.scatter(npyInputData[:,i], npyInputData[:,j], c=y_out[:,0], s=3, cmap='coolwarm', alpha=0.8)
+    #      plt.savefig("decission_boundary_%s_%s.png"%(labels[i], labels[j]))
+    #except ImportError:
+    #  print "matplotlib not found"
 
 if __name__ == '__main__':
   tf.app.run(main=main)
