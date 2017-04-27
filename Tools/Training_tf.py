@@ -31,7 +31,26 @@ def importData():
   for datasetName in samplesToRun:
       dataset = ROOT.TFile.Open(datasetName)
       print datasetName
-  
+
+      hPtMatch   = ROOT.TH1D("hPtMatch" + datasetName, "hPtMatch", 50, 0.0, 2000.0)
+      hPtMatch.Sumw2()
+      hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
+      hPtNoMatch.Sumw2()
+      
+      Nevts = 0
+      for event in dataset.slimmedTuple:
+          if Nevts >= NEVTS:
+              break
+          Nevts +=1
+          for i in xrange(len(event.genConstiuentMatchesVec)):
+              nmatch = event.genConstiuentMatchesVec[i]
+              if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
+                  if nmatch == 3 and event.genTopMatchesVec[i]:
+                      #            if event.genTopMatchesVec[i]:
+                      hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
+                  else:
+                      hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
+
       Nevts = 0
       count = 0
       for event in dataset.slimmedTuple:
@@ -57,17 +76,37 @@ def importData():
                   inputData.append(data[i])
                   #inputAnswer.append([float(answer), float((nmatch == 3 and not event.genTopMatchesVec[i]) or nmatch == 2), float(nmatch == 1), float(nmatch == 0)])
                   inputAnswer.append([float(answer), float(not answer)])
-                  inputWgts.append(sampleWgt)
+                  #inputWgts.append(sampleWgt)
                   inputSampleWgts.append(sampleWgt)
+                  if int(nmatch == 3) and event.genTopMatchesVec[i]:
+                      if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                          inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                      else:
+                          inputWgts.append(0.0)
+                  else:
+                      if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
+                          inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                      else:
+                          inputWgts.append(0.0)
+
                   
   npyInputData = numpy.array(inputData, numpy.float32)
   npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
   npyInputWgts = numpy.array(inputWgts, numpy.float32)
   npyInputSampleWgts = numpy.array(inputSampleWgts, numpy.float32)
   
-  nSig = len(npyInputWgts[npyInputAnswer[:,0]==1])#sum()
-  nBg = len(npyInputWgts[npyInputAnswer[:,0]==0])#sum()
-
+  nSig = npyInputWgts[npyInputAnswer[:,0]==1].sum()
+  nBg = npyInputWgts[npyInputAnswer[:,0]==0].sum()
+  
+  print nSig
+  print nBg
+  
+  #Equalize the relative weights of signal and bg
+  npyInputWgts[npyInputAnswer[:,0]==0] *= nSig/nBg
+  
+  nSig = npyInputWgts[npyInputAnswer[:,0]==1].sum()
+  nBg = npyInputWgts[npyInputAnswer[:,0]==0].sum()
+  
   print nSig
   print nBg
   
@@ -95,9 +134,12 @@ def main(_):
 
   reg = tf.placeholder(tf.float32)
 
+  wgt = tf.placeholder(tf.float32, [None])
+
   tf.add_to_collection('TrainInfo', x)
   tf.add_to_collection('TrainInfo', y)
 
+  #cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
   cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt))
   l2_norm = tf.constant(0.0)
   for w in w_fc.values():
@@ -140,9 +182,9 @@ def main(_):
       losses = []
       accs = []
       for i in xrange(NSteps):
-        batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:]]
+        batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
         #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-        step_loss, _, acc, summary = sess.run([loss, train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], reg: 0.0001})
+        step_loss, _, acc, summary = sess.run([loss, train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: 0.0001})
         losses.append(step_loss)
         accs.append(acc)
         summary_writer.add_summary(summary, epoch*NSteps + i)
