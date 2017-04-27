@@ -81,7 +81,8 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the less function will do this)
     yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt")
     #create output y which is conditioned to be between 0 and 1 and have nice distinct peaks for the end user
-    y = tf.multiply(tf.constant(0.5), (tf.nn.tanh(tf.constant(3.0)*yt)+tf.constant(1.0)), name="y")
+    #y = tf.multiply(tf.constant(0.5), (tf.nn.tanh(tf.constant(3.0)*yt)+tf.constant(1.0)), name="y")
+    y = tf.nn.softmax(yt, name="y")
 
     return x, y_, y, yt, w_fc, b_fc
     
