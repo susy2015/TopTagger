@@ -41,7 +41,8 @@ namespace ttUtility
         //std::vector<Constituent> constituents;
 
         //Safety check that jet and b-tag vectors are the same length
-        if(jetsLVec_->size() != btagFactors_->size() || jetsLVec_->size() != qgLikelihood_->size())
+        //Special exception for qgLikelihood if it is empty (for slimplified tagger)
+        if(jetsLVec_->size() != btagFactors_->size() || (qgLikelihood_->size() > 0 && jetsLVec_->size() != qgLikelihood_->size()))
         {
             THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
         }
@@ -49,7 +50,7 @@ namespace ttUtility
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
+            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (qgLikelihood_->size() > 0)?((*qgLikelihood_)[iJet]):(0.0));
 
             //Get gen matches if the required info is provided
             if(hadGenTops_ && hadGenTopDaughters_)
