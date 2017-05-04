@@ -1,19 +1,24 @@
+## Variables set by configure 
+OPENCV_DIRECTORY=@OPENCVDIR@
+TAGGERDIR=@TAGGERDIR@
+
+CXX=@CXX@
+LD=@CXX@
+CXXFLAGS=@CXXFLAGS@
+##End variables set by configure
+
 ODIR       = obj
-RSDIR      = $(CMSSW_BASE)/src/SusyAnaTools/Tools
 
-TTIDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/include
-TPIDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/include
-TTSDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/src
-TPSDIR     = $(CMSSW_BASE)/src/TopTagger/CfgParser/src
-OPENCV_DIRECTORY=$(CMSSW_BASE)/src/opencv
+TTIDIR     = $(TAGGERDIR)/TopTagger/include
+TPIDIR     = $(TAGGERDIR)/CfgParser/include
+TTSDIR     = $(TAGGERDIR)/TopTagger/src
+TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
-CXX        = g++
-
-CXXFLAGS  += -I. -I$(CMSSW_BASE)/src
+CXXFLAGS  += -I. -I$(TAGGERDIR)/..
 CXXFLAGS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
 CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
 CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
-CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/ -std=c++0x
+CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 ## Optimization/debug flag
 CXXFLAGS += -g #-O3
 ## Enable for maximum warning
@@ -24,7 +29,6 @@ CXXFLAGS  += $(shell root-config --cflags)
 
 CXXDEPFLAGS = -MMD -MP
 
-LD         = g++
 LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
@@ -52,14 +56,12 @@ $(ODIR)/%.o : $(TPSDIR)/%.cc
 $(ODIR)/%.o : $(TPSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -fPIC -o $@ -c $<
 
-#harvestHists: $(ODIR)/harvestHists.o
-#	$(LD) $^ $(LIBS) -o $@
-
 TopTagger : $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
 	ar rcs lib$@.a $^
 	gcc -shared -o lib$@.so $^
 
+
 clean:
-	rm -f $(ODIR)/*.o $(ODIR)/*.so $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
 
 -include $(ODIR)/*.d
