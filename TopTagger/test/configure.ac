@@ -5,13 +5,16 @@ AC_LANG(C++)
 AC_PROG_CXX
 
 dnl check for c++11
+dnl AX_CXX_COMPILE_STDC11()
 
 dnl set --std=c++11
-if test -z ${CXXFLAGS+x}; then
-   CXXFLAGS="--std=c++11"
-else
-   CXXFLAGS="--std=c++11 "$CXXFLAGS
-fi
+case "$CXXFLAGS" in 
+  *"--std=c++11"*)
+    # Do nothing
+    ;;
+  *)
+    CXXFLAGS+=" --std=c++11" 
+esac
 
 dnl check for root
 AC_CHECK_PROG(rootfound, root-config, yes, no)
@@ -41,8 +44,6 @@ AC_CHECK_HEADERS($TOPTAGGERDIR/CfgParser/include/TTException.h, [], [AC_ERROR([C
 AC_SUBST(TAGGERDIR, $TOPTAGGERDIR)
 
 dnl AC_SEARCH_LIBS(cv::ml::RTrees::load, opencv, [], [AC_ERROR([NO openCV library found])])
-
-echo $LIBS
 
 dnl Process Makefile.in to create Makefile
 AC_OUTPUT(Makefile)

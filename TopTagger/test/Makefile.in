@@ -1,35 +1,39 @@
 ## Variables set by configure 
-OPENCV_DIRECTORY=@OPENCVDIR@
-TAGGERDIR=@TAGGERDIR@
+OPENCV_DIRECTORY = @OPENCVDIR@
+TAGGERDIR        = @TAGGERDIR@
 
-CXX=@CXX@
-LD=@CXX@
-CXXFLAGS=@CXXFLAGS@
+CXX      = @CXX@
+LD       = @CXX@
+CXXFLAGS = @CXXFLAGS@
+LDFLAGS  = @LDFLAGS@
 ##End variables set by configure
 
+# directory to put intermediate files 
 ODIR       = obj
 
-TTIDIR     = $(TAGGERDIR)/TopTagger/include
-TPIDIR     = $(TAGGERDIR)/CfgParser/include
+# Top tagger includes
+INCLUDESDIRS  += -I. -I$(TAGGERDIR)/..
+
+# Top tagger source diretoriess
 TTSDIR     = $(TAGGERDIR)/TopTagger/src
 TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
-CXXFLAGS  += -I. -I$(TAGGERDIR)/..
-CXXFLAGS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
-CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
-CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
-CXXFLAGS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
+#openCV include dirs
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
+
+## Include ROOT
+INCLUDESDIRS  += $(shell root-config --cflags)
+
 ## Optimization/debug flag
 CXXFLAGS += -g #-O3
 ## Enable for maximum warning
 #CXXFLAGS += -Wall -Wextra -Weffc++
 
-## Include ROOT
-CXXFLAGS  += $(shell root-config --cflags)
-
+# Flags for generating auto dependancies 
 CXXDEPFLAGS = -MMD -MP
-
-LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
 
@@ -41,24 +45,24 @@ all: mkobj $(LIBRARIES) $(PROGRAMS)
 
 
 mkobj:
-	@mkdir -p obj
+	@mkdir -p $(ODIR)
 
 
 $(ODIR)/%.o : $(TTSDIR)/%.cc
-	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -fPIC -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 $(ODIR)/%.o : $(TTSDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -fPIC -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 $(ODIR)/%.o : $(TPSDIR)/%.cc
-	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -fPIC -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 $(ODIR)/%.o : $(TPSDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -fPIC -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 TopTagger : $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
 	ar rcs lib$@.a $^
-	gcc -shared -o lib$@.so $^
+	${LD} -shared -o lib$@.so $^
 
 
 clean:
