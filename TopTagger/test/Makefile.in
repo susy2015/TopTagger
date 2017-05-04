@@ -27,8 +27,6 @@ INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
 
-## Optimization/debug flag
-CXXFLAGS += -g #-O3
 ## Enable for maximum warning
 #CXXFLAGS += -Wall -Wextra -Weffc++
 
