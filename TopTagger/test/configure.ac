@@ -4,9 +4,6 @@ dnl Switch to a C++ compiler, and check if it works.
 AC_LANG(C++)
 AC_PROG_CXX
 
-dnl check for c++11
-dnl AX_CXX_COMPILE_STDC11()
-
 dnl set --std=c++11
 case "$CXXFLAGS" in 
   *"--std=c++11"*)
@@ -17,11 +14,16 @@ case "$CXXFLAGS" in
 esac
 
 dnl check for root
-AC_CHECK_PROG(rootfound, root-config, yes, no)
+AC_CHECK_PROG(rootconfigfound, root-config, yes, no)
+AC_CHECK_PROG(rootcintfound, rootcint, yes, no)
 
-if test $rootfound == no; then
-   AC_ERROR([ROOT not found.])
+if test ${rootconfigfound} == no; then
+   AC_ERROR([ROOT: root-config not found.])
 fi
+
+if test ${rootcintfound} == no; then
+   AC_ERROR([ROOT: rootcint not found.])
+fi   
 
 dnl check for openCV
 if test -z ${OPENCVDIR+x}; then
@@ -31,6 +33,9 @@ fi
 AC_CHECK_HEADERS($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required])])
 AC_CHECK_HEADERS($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required])])
 
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.so, [], [AC_ERROR([OpenCV lobraries are required])])
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.so, [], [AC_ERROR([OpenCV lobraries are required])])
+
 AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
 dnl check for top tagger code
@@ -38,12 +43,10 @@ if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../../"
 fi
 
-AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/include/TopTagger.h, [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
-AC_CHECK_HEADERS($TOPTAGGERDIR/CfgParser/include/TTException.h, [], [AC_ERROR([CfgParser includes are not found!!!!!!!!!!])])
+AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/include/TopTagger.h,        [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
+AC_CHECK_HEADERS($TOPTAGGERDIR/CfgParser/include/TTException.h,     [], [AC_ERROR([CfgParser includes are not found!!!!!!!!!!])])
 
 AC_SUBST(TAGGERDIR, $TOPTAGGERDIR)
-
-dnl AC_SEARCH_LIBS(cv::ml::RTrees::load, opencv, [], [AC_ERROR([NO openCV library found])])
 
 dnl Process Makefile.in to create Makefile
 AC_OUTPUT(Makefile)

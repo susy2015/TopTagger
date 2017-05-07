@@ -625,7 +625,8 @@ OPENCVDIR
 EGREP
 GREP
 CXXCPP
-rootfound
+rootcintfound
+rootconfigfound
 OBJEXT
 EXEEXT
 ac_ct_CXX
@@ -2481,7 +2482,6 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-
 case "$CXXFLAGS" in
   *"--std=c++11"*)
     # Do nothing
@@ -2494,11 +2494,11 @@ esac
 set dummy root-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_rootfound+:} false; then :
+if ${ac_cv_prog_rootconfigfound+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$rootfound"; then
-  ac_cv_prog_rootfound="$rootfound" # Let the user override the test.
+  if test -n "$rootconfigfound"; then
+  ac_cv_prog_rootconfigfound="$rootconfigfound" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -2507,7 +2507,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_rootfound="yes"
+    ac_cv_prog_rootconfigfound="yes"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2515,13 +2515,51 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_prog_rootfound" && ac_cv_prog_rootfound="no"
+  test -z "$ac_cv_prog_rootconfigfound" && ac_cv_prog_rootconfigfound="no"
 fi
 fi
-rootfound=$ac_cv_prog_rootfound
-if test -n "$rootfound"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rootfound" >&5
-$as_echo "$rootfound" >&6; }
+rootconfigfound=$ac_cv_prog_rootconfigfound
+if test -n "$rootconfigfound"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rootconfigfound" >&5
+$as_echo "$rootconfigfound" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+# Extract the first word of "rootcint", so it can be a program name with args.
+set dummy rootcint; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_rootcintfound+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$rootcintfound"; then
+  ac_cv_prog_rootcintfound="$rootcintfound" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_rootcintfound="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_rootcintfound" && ac_cv_prog_rootcintfound="no"
+fi
+fi
+rootcintfound=$ac_cv_prog_rootcintfound
+if test -n "$rootcintfound"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rootcintfound" >&5
+$as_echo "$rootcintfound" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -2529,8 +2567,12 @@ fi
 
 
 
-if test $rootfound == no; then
-   as_fn_error $? "ROOT not found." "$LINENO" 5
+if test ${rootconfigfound} == no; then
+   as_fn_error $? "ROOT: root-config not found." "$LINENO" 5
+fi
+
+if test ${rootcintfound} == no; then
+   as_fn_error $? "ROOT: rootcint not found." "$LINENO" 5
 fi
 
 if test -z ${OPENCVDIR+x}; then
@@ -2962,6 +3004,53 @@ fi
 done
 
 
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_ml.so" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_ml.so" >&5
+$as_echo_n "checking for $OPENCVDIR/lib/libopencv_ml.so... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$OPENCVDIR/lib/libopencv_ml.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  as_fn_error $? "OpenCV lobraries are required" "$LINENO" 5
+fi
+
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_core.so" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_core.so" >&5
+$as_echo_n "checking for $OPENCVDIR/lib/libopencv_core.so... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$OPENCVDIR/lib/libopencv_core.so"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  as_fn_error $? "OpenCV lobraries are required" "$LINENO" 5
+fi
+
+
 OPENCVDIR=$OPENCVDIR
 
 
@@ -2995,7 +3084,6 @@ done
 
 
 TAGGERDIR=$TOPTAGGERDIR
-
 
 
 ac_config_files="$ac_config_files Makefile"
