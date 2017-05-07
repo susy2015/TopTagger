@@ -10,7 +10,7 @@ case "$CXXFLAGS" in
     # Do nothing
     ;;
   *)
-    CXXFLAGS+=" --std=c++11" 
+    CXXFLAGS="$CXXFLAGS --std=c++11" 
 esac
 
 dnl check for root
