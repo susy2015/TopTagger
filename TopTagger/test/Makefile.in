@@ -16,6 +16,7 @@ INCLUDESDIRS  += -I. -I$(TAGGERDIR)/..
 
 # Top tagger source diretoriess
 TTSDIR     = $(TAGGERDIR)/TopTagger/src
+TTTDIR     = $(TAGGERDIR)/TopTagger/test
 TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
 #openCV include dirs
@@ -33,9 +34,15 @@ INCLUDESDIRS  += $(shell root-config --cflags)
 # Flags for generating auto dependancies 
 CXXDEPFLAGS = -MMD -MP
 
+#Necessary libraries, the order matters here!
+# ROOT libraries
 LIBS       = $(shell root-config --glibs)
+# top tagger libraries
+LIBS      += -L$(TTTDIR) -lTopTagger
+# openCV libraries
+LIBS      += -L$(OPENCV_DIRECTORY)/libs -lopencv_ml -lopencv_core
 
-PROGRAMS = 
+PROGRAMS = topTaggerTest
 
 LIBRARIES = TopTagger
 
@@ -45,11 +52,20 @@ all: mkobj $(LIBRARIES) $(PROGRAMS)
 mkobj:
 	@mkdir -p $(ODIR)
 
+#special rule to make root reflex dictionary
+rootdict.cc : rootdict.h
+	rootcint -f $@ $^
 
 $(ODIR)/%.o : $(TTSDIR)/%.cc
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 $(ODIR)/%.o : $(TTSDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TTTDIR)/%.cc
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TTTDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 $(ODIR)/%.o : $(TPSDIR)/%.cc
@@ -58,10 +74,20 @@ $(ODIR)/%.o : $(TPSDIR)/%.cc
 $(ODIR)/%.o : $(TPSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
-TopTagger : $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
-	ar rcs lib$@.a $^
-	${LD} -shared -o lib$@.so $^
+#Compile top tagger library
+TopTagger : libTopTagger.so libTopTagger.a
 
+#link shared library
+libTopTagger.so: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
+	${LD} -shared -o $@ $^
+
+#create static library
+libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
+	ar rcs $@ $^
+
+#compile topTaggerTest code
+topTaggerTest : libTopTagger.so $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
+	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBS) -o $@
 
 clean:
 	rm -f $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
