@@ -1,12 +1,75 @@
 # TopTagger
 
-##Compiling the tagger
 
-The code is provided with full support for usage in CMSSW as well as with standalone root.  Note that with the latest release openCV is required to be installed to build top tagger code.  Instructions for installing on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.
+## Compiling the tagger
 
-To compile the standalone library in a root aware terminal go to TopTagger/TopTagger/test and run "make".  You will also need to install openCV on your laptop.
+The code is provided with full support for usage in CMSSW as well as with standalone root.  Note that with the latest release, openCV is required to be installed to build top tagger code.  
 
-##Top tagger structure
+#### CMSSW Installation instructions
+
+Instructions for installing openCV on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.
+
+#### Standalone installation instructions
+
+To compile the standalone library requires the ROOT 6 [1] and OpenCV 3.1 (or newer) [2] packages.  After ROOT and OpenCV are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root)
+
+```
+git clone -b standaloneTesting git@github.com:susy2015/TopTagger.git
+#Alternately the code may be downloaded as a tarball here INSERTLINK
+cd TopTagger/TopTagger/test
+./configure OPENCVDIR=/path/to/opencv
+make -j4
+#optional for system wide install (will require sudo rights)
+#To install in a non-standard directory add PREFIX=/install/path to the configure command
+make install
+```
+
+This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code.  This will also compile a standalone example called ``topTaggerTest''.  
+
+
+[1] https://root.cern.ch/downloading-root
+
+Follow the instructions to install ROOT on your system
+
+[2] http://opencv.org/releases.html
+
+Download the source tarball and unpack (or check the code out from github) and run the following inside the opencv source folder
+
+```
+cmake .
+make -j4
+#optional for system wide install (will require sudo rights)
+make install
+```
+
+## Example code
+
+A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seem at the end of this readme.  
+
+### Getting a configuration file
+
+Before the top tagger can be used the top tagger configuration file must be checked out.  Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the standard working point for use with the example code (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
+
+```
+./getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
+```
+
+This will download the configuration file along with the MVA training file if appropriate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option (Multiple run directories can point to the same directory, this can be helpful to save space as the random forest training files are quite large).  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating the softlinks use the "-n" option.
+
+### Running the example
+
+The example executable is compiled along with the standalone library as described above.  If the tagger and openCV were installed centrally then there are no further steps required after installation to run the example code.  If either package was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
+
+```
+#do once per terminal if the opencv now the top tagger are not installed system wide
+source taggerSetup.sh
+#do once in any directory where you will run the top tagger example
+./getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
+#run the example code
+./topTaggerTest
+``` 
+
+## Top tagger structure
 
 The top tagger code is written to take modules which act on a central object to produce the final collection of top objects.  The tagger framework consists of the following classes (found in TopTagger/TopTagger/)
 
@@ -290,120 +353,149 @@ This module is used to sort the final list of tops after overlap resolution.
 This parameter defines the sorting order.  The possible options are "topMass", "topPt", and "none".
 
 
-
-##Getting a configuration file
-
-Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of a working point (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
-
-```
-./getTaggerCfg.sh -t MVAAK8_Medium_v1.0.1
-```
-
-This will download the configuration file along with the MVA training file if appropriate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option.  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating softlinks use the "-n" option.
-
-##Psudo-code
-
-```c++
-
-//manditory includes to use top tagger
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
-//this include is useful to get the helper function to make the vector of constituents
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
-
-//this include is necessary to handle exceptions thrown by the top tagger code
-//#include "TTException.h"
-
-
-int main()
-{
-    //Open data file
-
-    //configure top tagger
-    TopTagger tt;
-    tt.setCfgFile("path/TopTaggerConfig.cfg");
-
-    for(auto& event : file)
-    {
-        //AK4 variables
-        //get AK4 jet vector
-        vector<TLorentzVector> jets_AK4; // = AK4 jet vector
-
-        //get b-tag info
-        vector<double> btaginfo; // = b-tag vector
-
-	//get QGL info
-        vector<double> QGLinfo; // = jet QGL vector
-
-        //AK8 variables
-        //get AK8 jet vector
-        vector<TLorentzVector> jets_AK8; //  = AK8 jet vector
-
-        //get subjet vector (these will be dR and index matched to AK8 jets)
-        vector<TLorentzVector> subJetsLVec; // = AK8 subjets
-
-        //get subjet multiplicity variables
-        std::vector<double> tau1; // = tau1 variable
-        std::vector<double> tau2; // = tau2 variable
-        std::vector<double> tau3; // = tau3 variable
-
-        //get softdrop mass for AK8 jets
-        std::vector<double> softDropMass; // = soft drop mass vector
-
-        //Correction file for W soft drop mass
-        std::string wMassCorrectionfile; // = mass correction root file for AK8 W jets
-
-        //prepare containers of input collections
-        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jets_AK4, btaginfo, QGLinfo);
-        ttUtility::ConstAK8Inputs myConstAK8Inputs = ttUtility::ConstAK8Inputs(jets_AK8, tau1, tau2, tau3, softDropMass, subJetsLVec);
-        myConstAK8Inputs.setWMassCorrHistos(wMassCorrectionfile);
-
-	//construct vector of constituents
-        vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs, myConstAK8Inputs);
-
-        //run tagger
-        tt.runTagger(constituents);
-
-        //get output of tagger
-        const TopTaggerResults& ttr = tt.getResults();
-
-	//get reconstructed top
-	vector<TopObject*> Ntop = ttr.getTops();
-
-	//do something with the results
-        for(const TopObject* top : ttr.getTops())
-        {
-            //print top pt
-            printf("Top Pt: %lf\n", top->p().Pt());
-        }
-    }
-}
-```
-
-##Training output file
-
-TTMOpenCVMVA module needs a training out file (.model extension). This file is downloaded along with the cfg file as described in the "Configuration file" section.
-
-## Load opencv library path
-
-Now its done by dynamic path setting. So run the following command
-
-```
-source TopTagger/Tools/opencvSetup.csh
-```
-or
-```
-setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${CMSSW_BASE}/src/opencv/lib/
-```
-
-## Example code
-
-One is welcome to look TopTagger/Tools/TagTest1.cc
-
-
 ## Running MVA code
 
 Please go to TopTagger/Tools directory and find instruction in README
+
+
+## Output of example code
+
+```
+Event #: 1
+    N tops: 0
+
+Event #: 2
+    N tops: 1
+    Top properties: N constituents:   2,   Pt:  432.9,   Eta:  -0.272,   Phi:   2.470
+        Constituent properties: Constituent type:   3,   Pt:  392.2,   Eta:  -0.203,   Phi:   2.350
+        Constituent properties: Constituent type:   1,   Pt:   63.9,   Eta:  -0.577,   Phi:  -2.992
+
+Event #: 3
+    N tops: 0
+
+Event #: 4
+    N tops: 1
+    Top properties: N constituents:   2,   Pt:  272.1,   Eta:   0.753,   Phi:   1.779
+        Constituent properties: Constituent type:   3,   Pt:  222.3,   Eta:   0.894,   Phi:   1.906
+        Constituent properties: Constituent type:   1,   Pt:   58.8,   Eta:  -0.026,   Phi:   1.278
+
+Event #: 5
+    N tops: 0
+
+Event #: 6
+    N tops: 1
+    Top properties: N constituents:   3,   Pt:  263.3,   Eta:   0.794,   Phi:   0.973
+        Constituent properties: Constituent type:   1,   Pt:  170.3,   Eta:   0.837,   Phi:   1.376
+        Constituent properties: Constituent type:   1,   Pt:  101.7,   Eta:   0.713,   Phi:   0.224
+        Constituent properties: Constituent type:   1,   Pt:   32.3,   Eta:  -0.213,   Phi:   1.050
+
+Event #: 7
+    N tops: 1
+    Top properties: N constituents:   3,   Pt:  304.1,   Eta:   1.307,   Phi:   2.279
+        Constituent properties: Constituent type:   1,   Pt:  236.9,   Eta:   1.108,   Phi:   2.299
+        Constituent properties: Constituent type:   1,   Pt:   44.2,   Eta:   2.120,   Phi:   2.638
+        Constituent properties: Constituent type:   1,   Pt:   32.9,   Eta:   0.581,   Phi:   1.615
+
+Event #: 8
+    N tops: 1
+    Top properties: N constituents:   3,   Pt:  287.8,   Eta:  -0.986,   Phi:  -0.040
+        Constituent properties: Constituent type:   1,   Pt:  180.6,   Eta:  -1.159,   Phi:  -0.052
+        Constituent properties: Constituent type:   1,   Pt:   89.2,   Eta:  -0.561,   Phi:  -0.407
+        Constituent properties: Constituent type:   1,   Pt:   41.7,   Eta:  -0.466,   Phi:   0.919
+
+Event #: 9
+    N tops: 0
+
+Event #: 10
+    N tops: 1
+    Top properties: N constituents:   1,   Pt:  595.5,   Eta:  -1.099,   Phi:  -2.877
+        Constituent properties: Constituent type:   3,   Pt:  595.5,   Eta:  -1.099,   Phi:  -2.877
+
+Event #: 11
+    N tops: 0
+
+Event #: 12
+    N tops: 0
+
+Event #: 13
+    N tops: 2
+    Top properties: N constituents:   1,   Pt:  842.7,   Eta:   1.076,   Phi:  -1.628
+        Constituent properties: Constituent type:   3,   Pt:  842.7,   Eta:   1.076,   Phi:  -1.628
+    Top properties: N constituents:   1,   Pt:  500.0,   Eta:   0.036,   Phi:   2.106
+        Constituent properties: Constituent type:   3,   Pt:  500.0,   Eta:   0.036,   Phi:   2.106
+
+Event #: 14
+    N tops: 0
+
+Event #: 15
+    N tops: 1
+    Top properties: N constituents:   3,   Pt:  270.5,   Eta:   1.075,   Phi:  -2.798
+        Constituent properties: Constituent type:   1,   Pt:  198.3,   Eta:   0.922,   Phi:  -2.839
+        Constituent properties: Constituent type:   1,   Pt:   65.8,   Eta:   1.397,   Phi:   2.961
+            Constituent properties: Constituent type:   1,   Pt:   43.8,   Eta:   0.343,   Phi:  -1.584
+
+Event #: 16
+    N tops: 1
+    Top properties: N constituents:   2,   Pt:  328.4,   Eta:   0.448,   Phi:   1.430
+        Constituent properties: Constituent type:   3,   Pt:  274.4,   Eta:   0.552,   Phi:   1.261
+        Constituent properties: Constituent type:   1,   Pt:   74.0,   Eta:  -0.094,   Phi:   2.101
+
+Event #: 17
+    N tops: 0
+
+Event #: 18
+    N tops: 0
+
+Event #: 19
+    N tops: 1
+    Top properties: N constituents:   1,   Pt:  481.5,   Eta:   0.801,   Phi:  -1.754
+        Constituent properties: Constituent type:   3,   Pt:  481.5,   Eta:   0.801,   Phi:  -1.754
+
+Event #: 20
+    N tops: 0
+
+Event #: 21
+    N tops: 2
+    Top properties: N constituents:   1,   Pt:  766.0,   Eta:   0.976,   Phi:   2.027
+        Constituent properties: Constituent type:   3,   Pt:  766.0,   Eta:   0.976,   Phi:   2.027
+    Top properties: N constituents:   3,   Pt:  276.6,   Eta:  -1.545,   Phi:  -3.123
+        Constituent properties: Constituent type:   1,   Pt:  131.3,   Eta:  -1.386,   Phi:  -3.016
+        Constituent properties: Constituent type:   1,   Pt:   87.8,   Eta:  -2.097,   Phi:   3.081
+        Constituent properties: Constituent type:   1,   Pt:   59.0,   Eta:  -0.348,   Phi:   3.041
+
+Event #: 22
+    N tops: 0
+
+Event #: 23
+    N tops: 1
+    Top properties: N constituents:   1,   Pt:  400.8,   Eta:  -0.146,   Phi:   0.975
+        Constituent properties: Constituent type:   3,   Pt:  400.8,   Eta:  -0.146,   Phi:   0.975
+
+Event #: 24
+    N tops: 1
+    Top properties: N constituents:   1,   Pt:  491.4,   Eta:  -0.034,   Phi:  -1.783
+        Constituent properties: Constituent type:   3,   Pt:  491.4,   Eta:  -0.034,   Phi:  -1.783
+
+Event #: 25
+    N tops: 0
+
+Event #: 26
+    N tops: 0
+
+Event #: 27
+    N tops: 1
+    Top properties: N constituents:   3,   Pt:  211.7,   Eta:   1.589,   Phi:  -2.508
+        Constituent properties: Constituent type:   1,   Pt:   98.3,   Eta:   1.918,   Phi:  -2.720
+        Constituent properties: Constituent type:   1,   Pt:   94.3,   Eta:   1.034,   Phi:  -1.840
+        Constituent properties: Constituent type:   1,   Pt:   56.1,   Eta:   0.847,   Phi:   3.039
+
+Event #: 28
+    N tops: 0
+
+Event #: 29
+    N tops: 0
+
+```
 
  LocalWords:  doDijet boolean doTrijet AK4 trijet TTMOpenCVMVA openCV regressor
  LocalWords:  discCut modelFile TTMFilterBase TTMOverlapResolution AK8 subjets
