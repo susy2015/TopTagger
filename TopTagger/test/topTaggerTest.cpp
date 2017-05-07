@@ -19,7 +19,7 @@
 int main()
 {
     //Open input ntuple file 
-    TFile *tf = TFile::Open("minituple.root");
+    TFile *tf = TFile::Open("exampleInputs.root");
 
     //Get tree from file
     TTree *tree = (TTree*)tf->Get("taggerInputs");
@@ -107,6 +107,7 @@ int main()
             );
 
         //Create jets constituents list combining AK4 and AK8 jets, these are used to construct top candiates
+        //The vector of input constituents can also be constructed "by hand"
         std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
 
         //run the top tagger
