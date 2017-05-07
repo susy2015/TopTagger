@@ -6,6 +6,7 @@ CXX      = @CXX@
 LD       = @CXX@
 CXXFLAGS = @CXXFLAGS@
 LDFLAGS  = @LDFLAGS@
+PREFIX   = @prefix@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -91,5 +92,23 @@ topTaggerTest : libTopTagger.so $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
 
 clean:
 	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+
+install: libTopTagger.so
+	cp libTopTagger.so $(PREFIX)/lib/
+	chmod 644 $(PREFIX)/lib/libTopTagger.so
+	cd $(PREFIX)/lib/
+	ldconfig
+	mkdir -p $(PREFIX)/include/TopTagger/TopTagger/
+	cp -r $(TAGGERDIR)/../TopTagger/TopTagger/include $(PREFIX)/include/TopTagger/TopTagger/
+	chmod 644 $(PREFIX)/include/TopTagger/TopTagger/include/*.h
+	mkdir -p $(PREFIX)/include/TopTagger/CfgParser/
+	cp -r $(TAGGERDIR)/../TopTagger/CfgParser/include $(PREFIX)/include/TopTagger/CfgParser/
+	chmod 644 $(PREFIX)/include/TopTagger/CfgParser/include/*.h
+
+uninstall:
+	rm $(PREFIX)/lib/libTopTagger.so
+	cd $(PREFIX)/lib/
+	ldconfig
+	rm -r $(PREFIX)/include/TopTagger
 
 -include $(ODIR)/*.d

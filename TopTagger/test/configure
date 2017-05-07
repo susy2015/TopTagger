@@ -2487,7 +2487,7 @@ case "$CXXFLAGS" in
     # Do nothing
     ;;
   *)
-    CXXFLAGS+=" --std=c++11"
+    CXXFLAGS="$CXXFLAGS --std=c++11"
 esac
 
 # Extract the first word of "root-config", so it can be a program name with args.
