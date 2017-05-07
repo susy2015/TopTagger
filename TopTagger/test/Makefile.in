@@ -53,7 +53,7 @@ mkobj:
 	@mkdir -p $(ODIR)
 
 #special rule to make root reflex dictionary
-rootdict.cc : rootdict.h
+$(TTTDIR)/rootdict.cc : $(TTTDIR)/rootdict.h
 	rootcint -f $@ $^
 
 $(ODIR)/%.o : $(TTSDIR)/%.cc
@@ -90,6 +90,6 @@ topTaggerTest : libTopTagger.so $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
 	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBS) -o $@
 
 clean:
-	rm -f $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
 
 -include $(ODIR)/*.d
