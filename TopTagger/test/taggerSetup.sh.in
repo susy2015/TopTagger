@@ -1,0 +1,11 @@
+OPENCVPATH=@OPENCVDIR@
+TAGGERDIR=@TAGGERDIR@
+
+if [[ $LD_LIBRARY_PATH != *"${OPENCVPATH}/lib"* ]]; then
+    export LD_LIBRARY_PATH=${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
+fi
+
+if [[ $LD_LIBRARY_PATH != *"${TAGGERDIR}/test"* ]]; then
+    export LD_LIBRARY_PATH=${TAGGERDIR}/test:${LD_LIBRARY_PATH}
+fi
+

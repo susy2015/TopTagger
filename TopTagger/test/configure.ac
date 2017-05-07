@@ -50,3 +50,6 @@ AC_SUBST(TAGGERDIR, $TOPTAGGERDIR)
 
 dnl Process Makefile.in to create Makefile
 AC_OUTPUT(Makefile)
+
+dnl Process taggerSetup.sh.in to create taggerSetup.sh
+AC_OUTPUT(taggerSetup.sh)
