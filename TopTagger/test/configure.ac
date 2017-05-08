@@ -13,6 +13,16 @@ case "$CXXFLAGS" in
     CXXFLAGS="$CXXFLAGS --std=c++11" 
 esac
 
+dnl check for ldconfig
+AC_CHECK_PROG(ldconfigfound, ldconfig, yes, no)
+
+LDCONFIG=
+if test ${ldconfigfound} == yes; then
+   LDCONFIG="ldconfig"
+fi
+
+AC_SUBST(LDCONFIG, $LDCONFIG)
+
 dnl check for root
 AC_CHECK_PROG(rootconfigfound, root-config, yes, no)
 AC_CHECK_PROG(rootcintfound, rootcint, yes, no)

@@ -7,6 +7,7 @@ LD       = @CXX@
 CXXFLAGS = @CXXFLAGS@
 LDFLAGS  = @LDFLAGS@
 PREFIX   = @prefix@
+LDCONFIG = @LDCONFIG@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -94,7 +95,7 @@ install: libTopTagger.so
 	cp libTopTagger.so $(PREFIX)/lib/
 	chmod 644 $(PREFIX)/lib/libTopTagger.so
 	cd $(PREFIX)/lib/
-	ldconfig
+	$(LDCONFIG)
 	mkdir -p $(PREFIX)/include/TopTagger/TopTagger/
 	cp -r $(TAGGERDIR)/../TopTagger/TopTagger/include $(PREFIX)/include/TopTagger/TopTagger/
 	chmod 644 $(PREFIX)/include/TopTagger/TopTagger/include/*.h
@@ -105,7 +106,7 @@ install: libTopTagger.so
 uninstall:
 	rm $(PREFIX)/lib/libTopTagger.so
 	cd $(PREFIX)/lib/
-	ldconfig
+	$(LDCONFIG)
 	rm -r $(PREFIX)/include/TopTagger
 
 -include $(ODIR)/*.d
