@@ -27,7 +27,7 @@ dnl check if this is a mac
 LIBSUFFIX="so"
 OSNAME=$(uname -s)
 if [[ "$OSNAME" == "Darwin" ]]; then
-   OSNAME="dylib"
+   LIBSUFFIX="dylib"
 fi
 
 AC_SUBST(LIBSUFFIX, $LIBSUFFIX)
