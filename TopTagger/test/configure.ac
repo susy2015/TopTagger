@@ -40,11 +40,11 @@ if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
 fi
 
-AC_CHECK_HEADERS($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required])])
-AC_CHECK_HEADERS($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required])])
+AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required])])
+AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required])])
 
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.so, [], [AC_ERROR([OpenCV lobraries are required])])
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.so, [], [AC_ERROR([OpenCV lobraries are required])])
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.so, [], [AC_ERROR([OpenCV libraries are required])])
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.so, [], [AC_ERROR([OpenCV libraries are required])])
 
 AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
