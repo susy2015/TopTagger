@@ -42,7 +42,7 @@ LIBS       = $(shell root-config --glibs)
 # top tagger libraries
 LIBS      += -L$(TTTDIR) -lTopTagger
 # openCV libraries
-LIBS      += -L$(OPENCV_DIRECTORY)/libs -lopencv_ml -lopencv_core
+LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
 
 PROGRAMS = topTaggerTest
 
