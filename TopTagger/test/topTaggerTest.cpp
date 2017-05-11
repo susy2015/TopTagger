@@ -78,71 +78,82 @@ int main()
 
     //Create top tagger object
     TopTagger tt;
-    
-    //Set top tagger cfg file
-    tt.setCfgFile("TopTagger.cfg");
 
-    //Loop over events
-    int Nevt = 0;
-    while(tree->GetEntry(Nevt))
+    //try-catch on TTException which are thrown by the top tagger
+    try
     {
-        //increment event number
-        ++Nevt;
+        //Set top tagger cfg file
+        tt.setCfgFile("TopTagger.cfg");
 
-        //Print event number 
-        printf("Event #: %i\n", Nevt);
-
-        //Use helper function to create input list 
-        //Create AK4 inputs object
-        ttUtility::ConstAK4Inputs AK4Inputs = ttUtility::ConstAK4Inputs(**AK4JetLV, **AK4JetBtag);
-
-        //Create AK8 inputs object
-        ttUtility::ConstAK8Inputs AK8Inputs = ttUtility::ConstAK8Inputs(
-            **AK8JetLV,
-            **AK8JetTau1,
-            **AK8JetTau2,
-            **AK8JetTau3,
-            **AK8JetSoftdropMass,
-            **AK8JetLV
-            );
-
-        //Create jets constituents list combining AK4 and AK8 jets, these are used to construct top candiates
-        //The vector of input constituents can also be constructed "by hand"
-        std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
-
-        //run the top tagger
-        tt.runTagger(constituents);
-
-        //retrieve the top tagger results object
-        const TopTaggerResults& ttr = tt.getResults();
-
-        //get reconstructed top
-        const std::vector<TopObject*>& tops = ttr.getTops();
-
-        //print the number of tops found in the event 
-        printf("\tN tops: %ld\n", tops.size());
-
-        //print top properties
-        for(const TopObject* top : tops)
+        //Loop over events
+        int Nevt = 0;
+        while(tree->GetEntry(Nevt))
         {
-            //print basic top properties (top->p() gives a TLorentzVector)
-            //N constituents refers to the number of jets included in the top
-            //3 for resolved tops 
-            //2 for W+jet tops
-            //1 for fully merged AK8 tops
-            printf("\tTop properties: N constituents: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", top->getNConstituents(), top->p().Pt(), top->p().Eta(), top->p().Phi());
+            //increment event number
+            ++Nevt;
 
-            //get vector of top constituents 
-            const std::vector<Constituent const *>& constituents = top->getConstituents();
+            //Print event number 
+            printf("Event #: %i\n", Nevt);
 
-            //Print properties of individual top constituent jets 
-            for(const Constituent* constituent : constituents)
+            //Use helper function to create input list 
+            //Create AK4 inputs object
+            ttUtility::ConstAK4Inputs AK4Inputs = ttUtility::ConstAK4Inputs(**AK4JetLV, **AK4JetBtag);
+
+            //Create AK8 inputs object
+            ttUtility::ConstAK8Inputs AK8Inputs = ttUtility::ConstAK8Inputs(
+                **AK8JetLV,
+                **AK8JetTau1,
+                **AK8JetTau2,
+                **AK8JetTau3,
+                **AK8JetSoftdropMass,
+                **AK8JetLV
+                );
+
+            //Create jets constituents list combining AK4 and AK8 jets, these are used to construct top candiates
+            //The vector of input constituents can also be constructed "by hand"
+            std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
+
+            //run the top tagger
+            tt.runTagger(constituents);
+
+            //retrieve the top tagger results object
+            const TopTaggerResults& ttr = tt.getResults();
+
+            //get reconstructed top
+            const std::vector<TopObject*>& tops = ttr.getTops();
+
+            //print the number of tops found in the event 
+            printf("\tN tops: %ld\n", tops.size());
+
+            //print top properties
+            for(const TopObject* top : tops)
             {
-                printf("\t\tConstituent properties: Constituent type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", constituent->getType(), constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi());
+                //print basic top properties (top->p() gives a TLorentzVector)
+                //N constituents refers to the number of jets included in the top
+                //3 for resolved tops 
+                //2 for W+jet tops
+                //1 for fully merged AK8 tops
+                printf("\tTop properties: N constituents: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", top->getNConstituents(), top->p().Pt(), top->p().Eta(), top->p().Phi());
+
+                //get vector of top constituents 
+                const std::vector<Constituent const *>& constituents = top->getConstituents();
+
+                //Print properties of individual top constituent jets 
+                for(const Constituent* constituent : constituents)
+                {
+                    printf("\t\tConstituent properties: Constituent type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", constituent->getType(), constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi());
+                }
             }
-        }
         
-        printf("\n");
+            printf("\n");
+        }
+    }
+    catch(const TTException& e)
+    {
+        //Print exception message
+        e.print();
+        printf("Terminating run\n");
+        fflush(stdout);
     }
     
     //clean up pointers 
