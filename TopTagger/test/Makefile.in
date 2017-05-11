@@ -41,7 +41,7 @@ CXXDEPFLAGS = -MMD -MP
 # ROOT libraries
 LIBS       = $(shell root-config --glibs)
 # top tagger libraries
-LIBS      += -L$(TTTDIR) -lTopTagger
+LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
 # openCV libraries
 LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
 
@@ -90,7 +90,7 @@ libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst 
 
 #compile topTaggerTest code
 topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
-	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBS) -o $@
+	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBSTOPTAGGER) $(LIBS) -o $@
 
 clean:
 	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
