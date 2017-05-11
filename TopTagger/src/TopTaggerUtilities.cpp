@@ -107,7 +107,7 @@ namespace ttUtility
                     for (unsigned int k=j+1; k<subjets.size(); ++k)
                     {
                         TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
-                        double diff = abs(diff_LV.M());
+                        double diff = fabs(diff_LV.M());
                         if(diff < min_diff)
                         {
                             min_diff = diff;
