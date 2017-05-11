@@ -627,6 +627,7 @@ CXXCPP
 OPENCVDIR
 rootcintfound
 rootconfigfound
+LIBSUFFIX
 LDCONFIG
 ldconfigfound
 OBJEXT
@@ -2551,6 +2552,15 @@ fi
 LDCONFIG=$LDCONFIG
 
 
+LIBSUFFIX="so"
+OSNAME=$(uname -s)
+if [ "$OSNAME" == "DARWIN" ]; then
+   OSNAME="dylib"
+fi
+
+LIBSUFFIX=$LIBSUFFIX
+
+
 # Extract the first word of "root-config", so it can be a program name with args.
 set dummy root-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -2660,7 +2670,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  as_fn_error $? "OpenCV includes are required" "$LINENO" 5
+  as_fn_error $? "OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
 as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/include/opencv/ml.h" | $as_tr_sh`
@@ -2683,19 +2693,19 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  as_fn_error $? "OpenCV includes are required" "$LINENO" 5
+  as_fn_error $? "OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_ml.so" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_ml.so" >&5
-$as_echo_n "checking for $OPENCVDIR/lib/libopencv_ml.so... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}" >&5
+$as_echo_n "checking for $OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/lib/libopencv_ml.so"; then
+if test -r "$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2707,18 +2717,18 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  as_fn_error $? "OpenCV libraries are required" "$LINENO" 5
+  as_fn_error $? "OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_core.so" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_core.so" >&5
-$as_echo_n "checking for $OPENCVDIR/lib/libopencv_core.so... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}" >&5
+$as_echo_n "checking for $OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/lib/libopencv_core.so"; then
+if test -r "$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2730,7 +2740,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  as_fn_error $? "OpenCV libraries are required" "$LINENO" 5
+  as_fn_error $? "OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
 

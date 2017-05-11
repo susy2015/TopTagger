@@ -2,12 +2,13 @@
 OPENCV_DIRECTORY = @OPENCVDIR@
 TAGGERDIR        = @TAGGERDIR@
 
-CXX      = @CXX@
-LD       = @CXX@
-CXXFLAGS = @CXXFLAGS@
-LDFLAGS  = @LDFLAGS@
-PREFIX   = @prefix@
-LDCONFIG = @LDCONFIG@
+CXX       = @CXX@
+LD        = @CXX@
+CXXFLAGS  = @CXXFLAGS@
+LDFLAGS   = @LDFLAGS@
+PREFIX    = @prefix@
+LDCONFIG  = @LDCONFIG@
+LIBSUFFIX = @LIBSUFFIX@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -77,10 +78,10 @@ $(ODIR)/%.o : $(TPSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 #Compile top tagger library
-TopTagger : libTopTagger.so libTopTagger.a
+TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
 
 #link shared library
-libTopTagger.so: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
+libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
 	${LD} -shared -o $@ $^
 
 #create static library
@@ -88,15 +89,15 @@ libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst 
 	ar rcs $@ $^
 
 #compile topTaggerTest code
-topTaggerTest : libTopTagger.so $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
+topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
 	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBS) -o $@
 
 clean:
-	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .so, $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
 
-install: libTopTagger.so
-	cp libTopTagger.so $(PREFIX)/lib/
-	chmod 644 $(PREFIX)/lib/libTopTagger.so
+install: libTopTagger.$(LIBSUFFIX)
+	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/
+	chmod 644 $(PREFIX)/lib/libTopTagger.$(LIBSUFFIX)
 	cd $(PREFIX)/lib/
 	$(LDCONFIG)
 	mkdir -p $(PREFIX)/include/TopTagger/TopTagger/
@@ -107,7 +108,7 @@ install: libTopTagger.so
 	chmod 644 $(PREFIX)/include/TopTagger/CfgParser/include/*.h
 
 uninstall:
-	rm $(PREFIX)/lib/libTopTagger.so
+	rm $(PREFIX)/lib/libTopTagger.$(LIBSUFFIX)
 	cd $(PREFIX)/lib/
 	$(LDCONFIG)
 	rm -r $(PREFIX)/include/TopTagger

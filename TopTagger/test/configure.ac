@@ -23,6 +23,15 @@ fi
 
 AC_SUBST(LDCONFIG, $LDCONFIG)
 
+dnl check if this is a mac
+LIBSUFFIX="so"
+OSNAME=$(uname -s)
+if [[ "$OSNAME" == "DARWIN" ]]; then
+   OSNAME="dylib"
+fi
+
+AC_SUBST(LIBSUFFIX, $LIBSUFFIX)
+
 dnl check for root
 AC_CHECK_PROG(rootconfigfound, root-config, yes, no)
 AC_CHECK_PROG(rootcintfound, rootcint, yes, no)
@@ -40,11 +49,11 @@ if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
 fi
 
-AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required])])
-AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required])])
+AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
+AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
 
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.so, [], [AC_ERROR([OpenCV libraries are required])])
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.so, [], [AC_ERROR([OpenCV libraries are required])])
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
+AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
 
 AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
