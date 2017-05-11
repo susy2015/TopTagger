@@ -1,11 +1,21 @@
 OPENCVPATH=@OPENCVDIR@/lib
 TAGGERDIR=@TAGGERDIR@/TopTagger/test
 
-if [[ $LD_LIBRARY_PATH != *"${OPENCVPATH}"* ]]; then
-    export LD_LIBRARY_PATH=${OPENCVPATH}:${LD_LIBRARY_PATH}
+OSNAME=$(uname -s)
+if [[ "$OSNAME" == "Darwin" ]]; then
+    if [[ $DYLD_LIBRARY_PATH != *"${OPENCVPATH}"* ]]; then
+	export DYLD_LIBRARY_PATH=${OPENCVPATH}:${LD_LIBRARY_PATH}
+    fi
+    
+    if [[ $DYLD_LIBRARY_PATH != *"${TAGGERDIR}"* ]]; then
+	export DYLD_LIBRARY_PATH=${TAGGERDIR}:${LD_LIBRARY_PATH}
+    fi
+else
+    if [[ $LD_LIBRARY_PATH != *"${OPENCVPATH}"* ]]; then
+	export LD_LIBRARY_PATH=${OPENCVPATH}:${LD_LIBRARY_PATH}
+    fi
+    
+    if [[ $LD_LIBRARY_PATH != *"${TAGGERDIR}"* ]]; then
+	export LD_LIBRARY_PATH=${TAGGERDIR}:${LD_LIBRARY_PATH}
+    fi
 fi
-
-if [[ $LD_LIBRARY_PATH != *"${TAGGERDIR}"* ]]; then
-    export LD_LIBRARY_PATH=${TAGGERDIR}:${LD_LIBRARY_PATH}
-fi
-

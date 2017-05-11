@@ -2554,7 +2554,7 @@ LDCONFIG=$LDCONFIG
 
 LIBSUFFIX="so"
 OSNAME=$(uname -s)
-if [ "$OSNAME" == "DARWIN" ]; then
+if [ "$OSNAME" == "Darwin" ]; then
    OSNAME="dylib"
 fi
 

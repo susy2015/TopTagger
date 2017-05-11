@@ -26,7 +26,7 @@ AC_SUBST(LDCONFIG, $LDCONFIG)
 dnl check if this is a mac
 LIBSUFFIX="so"
 OSNAME=$(uname -s)
-if [[ "$OSNAME" == "DARWIN" ]]; then
+if [[ "$OSNAME" == "Darwin" ]]; then
    OSNAME="dylib"
 fi
 
