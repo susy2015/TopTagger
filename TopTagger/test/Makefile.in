@@ -14,7 +14,7 @@ LDCONFIG = @LDCONFIG@
 ODIR       = obj
 
 # Top tagger includes
-INCLUDESDIRS  += -I$(TAGGERDIR)/..
+INCLUDESDIRS  += -I. -I$(TAGGERDIR)/..
 
 # Top tagger source diretoriess
 TTSDIR     = $(TAGGERDIR)/TopTagger/src
@@ -22,7 +22,10 @@ TTTDIR     = $(TAGGERDIR)/TopTagger/test
 TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
 #openCV include dirs
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
