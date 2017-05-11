@@ -82,7 +82,7 @@ TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
 
 #link shared library
 libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
-	${LD} -shared -o $@ $^
+	${LD} -shared -o $@ $^ $(LIBS)
 
 #create static library
 libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
