@@ -1,6 +1,7 @@
 import os
 import ROOT
 import numpy
+import pandas as pd
 import math
 import tensorflow as tf
 from tensorflow.python.framework import graph_io
@@ -16,108 +17,46 @@ from math import sqrt
 #
 #options, args = parser.parse_args()
 
+def prescaleBackground(input, answer, prescale):
+  return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
+
 def importData():
-  dg = DataGetter()
+  #variables to train
+  vars = DataGetter().getList()
   
   print "PROCESSING TRAINING DATA"
-  
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.root", "trainingTuple_division_0_ZJetsToNuNu_training.root"]
-  
-  inputData = []
-  inputAnswer = []
-  inputWgts = []
-  inputSampleWgts = []
-  
-  for datasetName in samplesToRun:
-      dataset = ROOT.TFile.Open(datasetName)
-      print datasetName
 
-      hPtMatch   = ROOT.TH1D("hPtMatch" + datasetName, "hPtMatch", 50, 0.0, 2000.0)
-      hPtMatch.Sumw2()
-      hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
-      hPtNoMatch.Sumw2()
-      
-      Nevts = 0
-      for event in dataset.slimmedTuple:
-          if Nevts >= NEVTS:
-              break
-          Nevts +=1
-          for i in xrange(len(event.genConstiuentMatchesVec)):
-              nmatch = event.genConstiuentMatchesVec[i]
-              if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-                  if nmatch == 3 and event.genTopMatchesVec[i]:
-                      #            if event.genTopMatchesVec[i]:
-                      hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
-                  else:
-                      hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
+  #files to use for inputs
+  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl", "trainingTuple_division_0_ZJetsToNuNu_training.pkl"]
 
-      Nevts = 0
-      count = 0
-      for event in dataset.slimmedTuple:
-          if Nevts >= NEVTS:
-              break
-          Nevts +=1
+  inputData = numpy.empty([0])
+  
+  for sample in samplesToRun:
+    data = pd.read_pickle(sample)
+    if len(inputData) == 0:
+      inputData = data
+    else:
+      pd.concat([inputData, data])
 
-          genConstiuentMatchesVec = event.genConstiuentMatchesVec
-          genTopMatchesVec = event.genTopMatchesVec
-          sampleWgt = event.sampleWgt
-          cand_m = event.cand_m
-          data = dg.getData(event)
+  #parse pandas dataframe into training data
+  npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
+  npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+  npyInputAnswer = (npyInputLabels[:,0] == 3) & npyInputLabels[:,1]
+  npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
+  npyInputWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
+  npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
 
-          for i in xrange(len(cand_m)):
-              nmatch = genConstiuentMatchesVec[i]
-              if (int(nmatch == 3) and genTopMatchesVec[i]) or (int(nmatch == 0) and not genTopMatchesVec[i]):
-                  #Only accept some background
-                  if (int(nmatch != 3) or not genTopMatchesVec[i]):
-                      count += 1
-                      if count%10:
-                          continue
-                  answer = nmatch == 3 and genTopMatchesVec[i]
-                  inputData.append(data[i])
-                  #inputAnswer.append([float(answer), float((nmatch == 3 and not event.genTopMatchesVec[i]) or nmatch == 2), float(nmatch == 1), float(nmatch == 0)])
-                  inputAnswer.append([float(answer), float(not answer)])
-                  #inputWgts.append(sampleWgt)
-                  inputSampleWgts.append(sampleWgt)
-                  if int(nmatch == 3) and event.genTopMatchesVec[i]:
-                      if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-                          inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
-                      else:
-                          inputWgts.append(0.0)
-                  else:
-                      if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-                          inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
-                      else:
-                          inputWgts.append(0.0)
+  #Remove background events so that bg and signal are roughly equally represented
+  prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
+  npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
+  npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
+  npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
+  npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
 
-                  
-  npyInputData = numpy.array(inputData, numpy.float32)
-  npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
-  npyInputWgts = numpy.array(inputWgts, numpy.float32)
-  npyInputSampleWgts = numpy.array(inputSampleWgts, numpy.float32)
+  #ensure data is all greater than one
+  npyInputData[npyInputData < 0] = 0.0
   
-  nSig = npyInputWgts[npyInputAnswer[:,0]==1].sum()
-  nBg = npyInputWgts[npyInputAnswer[:,0]==0].sum()
-  
-  print nSig
-  print nBg
-  
-  #Equalize the relative weights of signal and bg
-  npyInputWgts[npyInputAnswer[:,0]==0] *= nSig/nBg
-  
-  nSig = npyInputWgts[npyInputAnswer[:,0]==1].sum()
-  nBg = npyInputWgts[npyInputAnswer[:,0]==0].sum()
-  
-  print nSig
-  print nBg
-  
-  #randomize input data
-  perms = numpy.random.permutation(npyInputData.shape[0])
-  npyInputData = npyInputData[perms]
-  npyInputAnswer = npyInputAnswer[perms]
-  npyInputWgts = npyInputWgts[perms]
-  npyInputSampleWgts = npyInputSampleWgts[perms]
-
-  return npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts
+  return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
 
 def main(_):
@@ -130,11 +69,11 @@ def main(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   # Build the graph
-  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
+  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
 
   reg = tf.placeholder(tf.float32)
 
-  wgt = tf.placeholder(tf.float32, [None])
+  wgt = tf.placeholder(tf.float32, [None, 1])
 
   tf.add_to_collection('TrainInfo', x)
   tf.add_to_collection('TrainInfo', y)
@@ -170,8 +109,8 @@ def main(_):
     sess.run(tf.global_variables_initializer())
 
     #Training parameters
-    trainThreshold = 1e-5
-    NSteps = 10
+    trainThreshold = 1e-6
+    NSteps = 100
     MaxEpoch = 500
 
     stopCnt = 0
@@ -179,6 +118,14 @@ def main(_):
     NData = len(npyInputData)
     stepSize = NData/NSteps
     for epoch in xrange(0, MaxEpoch):
+
+      #randomize input data
+      perms = numpy.random.permutation(npyInputData.shape[0])
+      npyInputData = npyInputData[perms]
+      npyInputAnswer = npyInputAnswer[perms]
+      npyInputWgts = npyInputWgts[perms]
+      npyInputSampleWgts = npyInputSampleWgts[perms]
+      
       losses = []
       accs = []
       for i in xrange(NSteps):
@@ -194,8 +141,8 @@ def main(_):
         stopCnt += 1
       else:
         stopCnt = 0
-      if stopCnt >= 3:
-        break
+      #if stopCnt >= 3:
+      #  break
       lastLoss = currentLoss
 
     #Save training checkpoint (contains a copy of the model and the weights 
