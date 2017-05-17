@@ -36,12 +36,12 @@ y_train = trainInfo[1]
 #Get data transformation
 mins = []
 ptps = []
-with open("DataScales.txt", "r") as f:
-    for line in f:
-        if line[0:5] == "mins:":
-            mins = [float(s) for s in line[5:].split()]
-        if line[0:5] == "ptps:":
-            ptps = [float(s) for s in line[5:].split()]
+#with open("DataScales.txt", "r") as f:
+#    for line in f:
+#        if line[0:5] == "mins:":
+#            mins = [float(s) for s in line[5:].split()]
+#        if line[0:5] == "ptps:":
+#            ptps = [float(s) for s in line[5:].split()]
 
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
 
