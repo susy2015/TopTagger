@@ -21,14 +21,14 @@ namespace ttUtility
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
         puppisd_corrRECO_for_ = nullptr;
     }
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
@@ -45,7 +45,7 @@ namespace ttUtility
         {
             THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
         }
-        
+
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
@@ -83,7 +83,7 @@ namespace ttUtility
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            //Calculate matching subjets 
+            //Calculate matching subjets
             // For each tagged top/W, find the corresponding subjets
             std::vector<TLorentzVector> subjets;
             for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
@@ -95,7 +95,7 @@ namespace ttUtility
                 }
             }
             // If more than 2 matches, find the best combination of two subjets
-            if (subjets.size() > 2) 
+            if (subjets.size() > 2)
             {
                 double min_diff = 999999.;
                 int min_j=0, min_k=1;
@@ -140,7 +140,7 @@ namespace ttUtility
         }
     }
 
-    std::vector<TLorentzVector> ConstAK8Inputs::denominator(const double ptCut) const 
+    std::vector<TLorentzVector> ConstAK8Inputs::denominator(const double ptCut) const
     {
         std::vector<TLorentzVector> returnVector;
         for(auto& jet : *jetsLVec_)
@@ -155,9 +155,9 @@ namespace ttUtility
         double genCorr  = 1.;
         double recoCorr = 1.;
 
-        //The correction is derived for jet > 200GeV. 
+        //The correction is derived for jet > 200GeV.
         //It would return negative weight for low PT jet
-        if (puppipt < 200) return 1.; 
+        if (puppipt < 200) return 1.;
         if(puppisd_corrGEN_ && puppisd_corrRECO_cen_ && puppisd_corrRECO_for_)
         {
             genCorr =  puppisd_corrGEN_->Eval( puppipt );
@@ -232,14 +232,36 @@ namespace ttUtility
         varMap["cand_dRMax"] = topCand.getDRmax();
 
         //Get Constituents
-        const std::vector<Constituent const *>& top_constituents = topCand.getConstituents();
-            
+        //Get a copy instead of the reference
+        std::vector<Constituent const *> top_constituents = topCand.getConstituents();
+
+        //resort by CSV
+        std::sort(top_constituents.begin(), top_constituents.end(), [](const Constituent * const c1, const Constituent * const c2){ return c1->getBTagDisc() > c2->getBTagDisc(); });
+
         //Get constituent variables before deboost
         for(unsigned int i = 0; i < top_constituents.size(); ++i)
         {
             varMap["j" + std::to_string(i + 1) + "_phi_lab"] = top_constituents[i]->p().Phi();
             varMap["j" + std::to_string(i + 1) + "_eta_lab"] = top_constituents[i]->p().Eta();
             varMap["j" + std::to_string(i + 1) + "_pt_lab"]  = top_constituents[i]->p().Pt();
+            varMap["j" + std::to_string(i + 1) + "_m_lab"]   = top_constituents[i]->p().M();
+            varMap["j" + std::to_string(i + 1) + "_CSV_lab"] = top_constituents[i]->getBTagDisc();
+            //Here we fake the QGL if it is a b jet
+            varMap["j" + std::to_string(i + 1) + "_QGL_lab"] = (top_constituents[i]->getBTagDisc() > csvThresh)?(1.0):(top_constituents[i]->getQGLikelihood());
+
+            //index of next jet (assumes < 4 jets)
+            unsigned int iNext = (i + 1) % top_constituents.size();
+            unsigned int iNNext = (i + 2) % top_constituents.size();
+            unsigned int iMin = std::min(i, iNext);
+            unsigned int iMax = std::max(i, iNext);
+
+            //Calculate the angle variables
+            varMap["dR" + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_lab"] = ROOT::Math::VectorUtil::DeltaR(top_constituents[i]->p(), top_constituents[iNext]->p());
+            varMap["dR" + std::to_string(iNNext + 1) + "_" + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_lab"] = ROOT::Math::VectorUtil::DeltaR(top_constituents[iNNext]->p(), top_constituents[i]->p() + top_constituents[iNext]->p());
+
+            //calculate pair masses
+            auto jetPair = top_constituents[i]->p() + top_constituents[iNext]->p();
+            varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m_lab"] = jetPair.M();
         }
 
         std::vector<Constituent> RF_constituents;
@@ -250,7 +272,7 @@ namespace ttUtility
             p4.Boost(-topCand.p().BoostVector());
             RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
         }
-            
+
         //re-sort constituents by p after deboosting
         std::sort(RF_constituents.begin(), RF_constituents.end(), [](const Constituent& c1, const Constituent& c2){ return c1.p().P() > c2.p().P(); });
 
@@ -258,10 +280,9 @@ namespace ttUtility
         for(unsigned int i = 0; i < RF_constituents.size(); ++i)
         {
             varMap["j" + std::to_string(i + 1) + "_p"]     = RF_constituents[i].p().P();
-            //varMap["j" + std::to_string(i + 1) + "_theta"] = RF_constituents[i].p().Angle(topCand.p().Vect());
-            varMap["j" + std::to_string(i + 1) + "_phi"]   = RF_constituents[i].p().Phi();
-            varMap["j" + std::to_string(i + 1) + "_eta"]   = RF_constituents[i].p().Eta();
-            varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
+            //varMap["j" + std::to_string(i + 1) + "_phi"]   = RF_constituents[i].p().Phi();
+            //varMap["j" + std::to_string(i + 1) + "_eta"]   = RF_constituents[i].p().Eta();
+            //varMap["j" + std::to_string(i + 1) + "_pt"]    = RF_constituents[i].p().Pt();
             varMap["j" + std::to_string(i + 1) + "_m"]     = RF_constituents[i].p().M();
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
             //Here we fake the QGL if it is a b jet
@@ -306,7 +327,7 @@ namespace ttUtility
                             int flag = 0;
                             for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
                             {
-                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 
+                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) )
                                 {
                                     int pdgid = genDecayPdgIdVec.at(iq);
                                     if(abs(pdgid)== 11 || abs(pdgid)== 13 || abs(pdgid)== 15) flag++;
@@ -335,10 +356,10 @@ namespace ttUtility
                         if(abs(pdgId)==5) topdauLVec.push_back(&(genDecayLVec[ig]));
                         if(abs(pdgId)==24)
                         {
-                            //topdauLVec.push_back(genDecayLVec[ig]);	 
+                            //topdauLVec.push_back(genDecayLVec[ig]);
                             for(unsigned iq=0; iq<genDecayLVec.size(); iq++)
                             {
-                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) ) 
+                                if( genDecayMomIdxVec.at(iq) == genDecayIdxVec.at(ig) )
                                 {
                                     int pdgid = genDecayPdgIdVec.at(iq);
                                     if(abs(pdgid)!= 11 && abs(pdgid)!= 13 && abs(pdgid)!= 15) topdauLVec.push_back(&(genDecayLVec[iq]));

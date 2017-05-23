@@ -23,6 +23,7 @@
 #include <map>
 #include <set>
 #include <math.h>
+#include <memory>
 
 class PrepVariables
 {
@@ -170,9 +171,9 @@ private:
 
             std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, AnaConsts::cutCSVS);
 
-            for(auto& var : varMap)
+            for(auto& var : allowedVarsD_)
             {
-                vh.add(var.first, var.second);
+                vh.add(var, varMap[var]);
             }
         }
 
@@ -208,7 +209,7 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab","j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "MET", "N_CSV"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab", "j1_CSV_lab", "j1_QGL_lab", "j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "j3_CSV_lab", "j3_QGL_lab", "MET", "N_CSV", "dR12_lab", "dR13_lab", "dR23_lab", "dR3_12_lab", "dR2_13_lab", "dR1_23_lab"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
@@ -325,7 +326,7 @@ int main(int argc, char* argv[])
     }
 
     //parse sample splitting and set up minituples
-    vector<pair<MiniTupleMaker *, int>> mtmVec;
+    vector<pair<std::unique_ptr<MiniTupleMaker>, int>> mtmVec;
     int sumRatio = 0;
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
     {
@@ -335,7 +336,7 @@ int main(int argc, char* argv[])
         if(iter == 0)      ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_training" + ".root";
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
         else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
-        mtmVec.emplace_back(new MiniTupleMaker(ofname, "slimmedTuple"), splitNum);
+        mtmVec.emplace_back(std::unique_ptr<MiniTupleMaker>(new MiniTupleMaker(ofname, "slimmedTuple")), splitNum);
     }
 
     for(auto& fileVec : fileMap)
@@ -445,5 +446,5 @@ int main(int argc, char* argv[])
         }
     }
 
-    for(auto& mtm : mtmVec) delete mtm.first;
+    for(auto& mtm : mtmVec) mtm.first.reset();
 }
