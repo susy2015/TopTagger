@@ -132,9 +132,9 @@ class simpleTopCand:
         self.j1 = ROOT.TLorentzVector()
         self.j2 = ROOT.TLorentzVector()
         self.j3 = ROOT.TLorentzVector()
-        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
-        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
-        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.j1.SetPtEtaPhiM(event.j1_pt_lab[i], event.j1_eta_lab[i], event.j1_phi_lab[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_pt_lab[i], event.j2_eta_lab[i], event.j2_phi_lab[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_pt_lab[i], event.j3_eta_lab[i], event.j3_phi_lab[i], event.j3_m[i])
         self.discriminator = discriminator
 
     def __lt__(self, other):
@@ -147,7 +147,7 @@ def jetInList(jet, jlist):
     return False
 
 def resolveOverlap(event, discriminators, threshold):
-    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(len(event.j1_pt))]
+    topCands = [simpleTopCand(event, i, discriminators[i]) for i in xrange(len(event.j1_pt_lab))]
     topCands.sort(reverse=True)
 
     finalTops = []
@@ -166,9 +166,9 @@ class simpleTopCandHEP:
         self.j1 = ROOT.TLorentzVector()
         self.j2 = ROOT.TLorentzVector()
         self.j3 = ROOT.TLorentzVector()
-        self.j1.SetPtEtaPhiM(event.j1_pt[i], event.j1_eta[i], event.j1_phi[i], event.j1_m[i])
-        self.j2.SetPtEtaPhiM(event.j2_pt[i], event.j2_eta[i], event.j2_phi[i], event.j2_m[i])
-        self.j3.SetPtEtaPhiM(event.j3_pt[i], event.j3_eta[i], event.j3_phi[i], event.j3_m[i])
+        self.j1.SetPtEtaPhiM(event.j1_pt_lab[i], event.j1_eta_lab[i], event.j1_phi_lab[i], event.j1_m[i])
+        self.j2.SetPtEtaPhiM(event.j2_pt_lab[i], event.j2_eta_lab[i], event.j2_phi_lab[i], event.j2_m[i])
+        self.j3.SetPtEtaPhiM(event.j3_pt_lab[i], event.j3_eta_lab[i], event.j3_phi_lab[i], event.j3_m[i])
         self.cand_m = event.cand_m[i]
         self.passHEP = passFail
 
@@ -176,7 +176,7 @@ class simpleTopCandHEP:
         return abs(self.cand_m - 173.4) < abs(other.cand_m - 173.4)
 
 def resolveOverlapHEP(event, passFail):
-    topCands = [simpleTopCandHEP(event, i, passFail[i]) for i in xrange(len(event.j1_pt))]
+    topCands = [simpleTopCandHEP(event, i, passFail[i]) for i in xrange(len(event.j1_pt_lab))]
     topCands.sort(reverse=True)
 
     finalTops = []

@@ -83,7 +83,6 @@ def main(_):
   l2_norm = tf.constant(0.0)
   for w in w_fc.values():
     l2_norm += tf.nn.l2_loss(w)
-  #  l2_norm = tf.divide(tf.reduce_sum(tf.multiply(tf.reduce_sum(tf.pow(w, tf.constant(2.0)), 2), wgt)) * tf.constant(0.5), tf.reduce_sum(wgt))
   loss = cross_entropy + l2_norm*reg
   #train_step = tf.train.GradientDescentOptimizer(1.0).minimize(cross_entropy)
   train_step = tf.train.AdamOptimizer(1e-3).minimize(loss, var_list=w_fc.values() + b_fc.values())
@@ -130,7 +129,6 @@ def main(_):
       accs = []
       for i in xrange(NSteps):
         batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        #train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
         step_loss, _, acc, summary = sess.run([loss, train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: 0.0001})
         losses.append(step_loss)
         accs.append(acc)
