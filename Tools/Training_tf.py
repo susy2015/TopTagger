@@ -52,8 +52,6 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
   #calculate pt weights
   ptHist, ptBins = numpy.histogram(inputData["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]]), weights=npyInputSampleWgts[:,0])
 
-  print ptHist
-
   npyInputWgts = (1.0/ptHist[numpy.digitize(inputData["cand_pt"], ptBins) - 1]).reshape([-1,1])
 
   if prescale:
