@@ -64,8 +64,8 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
 
   if bgnorm:
     #equalize bg and signal weights 
-    nsig = npyInputWgts[npyInputAnswer].sum()
-    nbg = npyInputWgts[~npyInputAnswer].sum()
+    nsig = npyInputWgts[npyInputAnswer == 1].sum()
+    nbg  = npyInputWgts[npyInputAnswer != 1].sum()
     npyInputWgts[~npyInputAnswer] *= nsig / nbg
 
   if reluInputs:

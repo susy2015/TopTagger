@@ -62,10 +62,31 @@ else:
 
 print "CREATING HISTOGRAMS"
 
+#Discriminator plot
+
+inputLabels = dataTTbar.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+genMatches = (inputLabels[:,0] == 3) & inputLabels[:,1]
+
+plt.clf()
+plt.figure()
+plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig("discriminator.png")
+plt.close()
+
+#plot efficiency
+
+#ptNum, ptNumBins = numpy.histogram(dataTTbar[]["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 1000]]), weights=npyInputSampleWgts[:,0])
+
+#input variable histograms
+
+genTopData = dataTTbar[genMatches == 1]
+genBGData = dataTTbar[genMatches != 1]
 recoTopData = dataTTbar[dataTTbarAns > discCut]
 recoBGData = dataTTbar[dataTTbarAns < discCut]
-genTopData = dataTTbar[~(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)]
-genBGData = dataTTbar[(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)]
 
 for var in varsname:
     plt.clf()
