@@ -5,6 +5,7 @@ import math
 from MVAcommon_tf import *
 import optparse
 import matplotlib.pyplot as plt
+import pickle
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
@@ -22,7 +23,6 @@ print "RETRIEVING MODEL FILE"
 
 if options.sklrf:
     from sklearn.ensemble import RandomForestClassifier
-    import pickle
     
     fileTraining = open("TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
@@ -134,8 +134,15 @@ for cut in cuts:
     TPR.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec==3)].sum() / NevtTPR    )
     FPRZ.append( evtwgtZnunu[(dataZnunuAns > cut) & (dataZnunu.genConstiuentMatchesVec!=3)].sum() / NevtZ )
 
+#Dump roc to file
+fileObject = open("roc.pkl",'wb')
+pickle.dump(TPR, fileObject)
+pickle.dump(FPR, fileObject)
+pickle.dump(FPRZ, fileObject)
+fileObject.close()
+
 plt.clf()
-plt.figure()
+ax = plt.figure()
 plt.plot(FPR,TPR)
 plt.xlabel("FPR (ttbar)")
 plt.ylabel("TPR (ttbar)")
@@ -149,5 +156,7 @@ plt.xlabel("FPR (Znunu)")
 plt.ylabel("TPR (ttbar)")
 plt.savefig("rocZ.png")
 plt.close()
+
+
 
 print "VALIDATION DONE!"
