@@ -54,14 +54,6 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
 
   npyInputWgts = (1.0/ptHist[numpy.digitize(inputData["cand_pt"], ptBins) - 1]).reshape([-1,1])
 
-  if prescale:
-    #Remove background events so that bg and signal are roughly equally represented
-    prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
-    npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
-    npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
-    npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
-    npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
-
   if bgnorm:
     #equalize bg and signal weights 
     nsig = npyInputWgts[npyInputAnswer == 1].sum()
@@ -72,6 +64,14 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
     #ensure data is all greater than one
     npyInputData[npyInputData < 0] = 0.0
   
+  if prescale:
+    #Remove background events so that bg and signal are roughly equally represented
+    prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
+    npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
+    npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
+    npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
+    npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
+
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
 
