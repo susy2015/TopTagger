@@ -62,13 +62,18 @@ else:
 
 print "CREATING HISTOGRAMS"
 
+recoTopData = dataTTbar[dataTTbarAns > discCut]
+recoBGData = dataTTbar[dataTTbarAns < discCut]
+genTopData = dataTTbar[~(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)]
+genBGData = dataTTbar[(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)]
+
 for var in varsname:
     plt.clf()
     plt.figure()
-    ax = dataTTbar[dataTTbarAns > discCut]                                            .hist(column=var, bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco top")
-    dataTTbar[dataTTbarAns < discCut]                                                 .hist(column=var, bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco bg", ax=ax)
-    dataTTbar[~(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)] .hist(column=var, bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen top", ax=ax)
-    dataTTbar[(dataTTbar.genConstiuentMatchesVec == 3 & dataTTbar.genTopMatchesVec)]  .hist(column=var, bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen bkg", ax=ax)
+    ax = recoTopData .hist(column=var, weights=recoTopData["sampleWgt"], bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco top")
+    recoBGData       .hist(column=var, weights=recoBGData["sampleWgt"],  bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco bg", ax=ax)
+    genTopData       .hist(column=var, weights=genTopData["sampleWgt"],  bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen top", ax=ax)
+    genBGData        .hist(column=var, weights=genBGData["sampleWgt"],   bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen bkg", ax=ax)
     plt.legend()
     plt.xlabel(var)
     plt.ylabel("Normalized events")
