@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import math
 from MVAcommon_tf import *
-import tensorflow as tf
 import optparse
 import matplotlib.pyplot as plt
 
@@ -12,6 +11,7 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 #parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
 #parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
 parser.add_option ('-d', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
+parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
 
 options, args = parser.parse_args()
 
@@ -20,15 +20,27 @@ discCut = options.discCut
 
 print "RETRIEVING MODEL FILE"
 
-#Get training output
-saver = tf.train.import_meta_graph('models/model.ckpt.meta')
-sess = tf.Session()
-# To initialize values with saved data
-saver.restore(sess, './models/model.ckpt')
-# Restrieve useful variables
-trainInfo = tf.get_collection('TrainInfo')
-x = trainInfo[0]
-y_train = trainInfo[1]
+if options.sklrf:
+    from sklearn.ensemble import RandomForestClassifier
+    import pickle
+    
+    fileTraining = open("TrainingOutput.pkl",'r')
+    clf1 = pickle.load(fileTraining)
+    fileTraining.close()
+
+else:
+    import tensorflow as tf
+
+    #Get training output
+    saver = tf.train.import_meta_graph('models/model.ckpt.meta')
+    sess = tf.Session()
+    # To initialize values with saved data
+    saver.restore(sess, './models/model.ckpt')
+    # Restrieve useful variables
+    trainInfo = tf.get_collection('TrainInfo')
+    x = trainInfo[0]
+    y_train = trainInfo[1]
+
 
 print "PROCESSING TTBAR VALIDATION DATA"
 
@@ -43,7 +55,10 @@ dataTTbar = dataTTbar[dataTTbar.Njet >= 4]
 
 print "CALCULATING TTBAR DISCRIMINATORS"
 
-dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
+if options.sklrf:
+    dataTTbarAns = clf1.predict_proba(dataTTbar.as_matrix(varsname))[:,1]
+else:
+    dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
 
 print "CREATING HISTOGRAMS"
 
@@ -68,7 +83,10 @@ numDataZnunu[numDataZnunu < 0.0] = 0.0
 
 print "CALCULATING ZNUNU DISCRIMINATORS"
 
-dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
+if options.sklrf:
+    dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
+else:
+    dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
 
 print "CALCULATING ROC CURVES"
 

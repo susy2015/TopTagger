@@ -3,24 +3,28 @@ import ROOT
 import numpy
 import pandas as pd
 import math
-import tensorflow as tf
-from tensorflow.python.framework import graph_io
-from tensorflow.python.tools import freeze_graph
 from MVAcommon_tf import *
 import optparse
 from math import sqrt
 
-#parser = optparse.OptionParser("usage: %prog [options]\n")
-#
-#parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
-#parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
-#
-#options, args = parser.parse_args()
+parser = optparse.OptionParser("usage: %prog [options]\n")
+
+parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true', help="Run using sklearn RF")
+
+options, args = parser.parse_args()
+
+if options.sklearnrf:
+  from sklearn.ensemble import RandomForestClassifier
+  import pickle
+else:
+  import tensorflow as tf
+  from tensorflow.python.framework import graph_io
+  from tensorflow.python.tools import freeze_graph
 
 def prescaleBackground(input, answer, prescale):
   return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
 
-def importData():
+def importData(prescale = True, bgnorm=True, reluInputs=True):
   #variables to train
   vars = DataGetter().getList()
   
@@ -43,23 +47,69 @@ def importData():
   npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
   npyInputAnswer = (npyInputLabels[:,0] == 3) & npyInputLabels[:,1]
   npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
-  npyInputWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
   npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
 
-  #Remove background events so that bg and signal are roughly equally represented
-  prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
-  npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
-  npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
-  npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
-  npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
+  #calculate pt weights
+  ptHist, ptBins = numpy.histogram(inputData["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]]), weights=npyInputSampleWgts[:,0])
 
-  #ensure data is all greater than one
-  npyInputData[npyInputData < 0] = 0.0
+  print ptHist
+
+  npyInputWgts = (1.0/ptHist[numpy.digitize(inputData["cand_pt"], ptBins) - 1]).reshape([-1,1])
+
+  if prescale:
+    #Remove background events so that bg and signal are roughly equally represented
+    prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
+    npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
+    npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
+    npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
+    npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
+
+  if bgnorm:
+    #equalize bg and signal weights 
+    nsig = npyInputWgts[npyInputAnswer].sum()
+    nbg = npyInputWgts[~npyInputAnswer].sum()
+    npyInputWgts[~npyInputAnswer] *= nsig / nbg
+
+  if reluInputs:
+    #ensure data is all greater than one
+    npyInputData[npyInputData < 0] = 0.0
   
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
 
-def main(_):
+def mainSKL():
+
+  # Import data
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(False)
+
+  # Create random forest
+  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
+  
+  print "TRAINING RF"
+
+  # Train random forest 
+  clf = clf.fit(npyInputData, npyInputAnswer[:,0], sample_weight=npyInputWgts[:,0])
+  
+  #Dump output from training
+  fileObject = open("TrainingOutput.pkl",'wb')
+  out = pickle.dump(clf, fileObject)
+  fileObject.close()
+      
+  output = clf.predict_proba(npyInputData)[:,1]
+  
+  fout = ROOT.TFile("TrainingOut.root", "RECREATE")
+  hDiscNoMatch = ROOT.TH1D("discNoMatch", "discNoMatch", 100, 0, 1.0)
+  hDiscMatch   = ROOT.TH1D("discMatch",   "discMatch", 100, 0, 1.0)
+  for i in xrange(len(output)):
+      if npyInputAnswer[i,0] == 1:
+          hDiscMatch.Fill(output[i], npyInputSampleWgts[i])
+      else:
+          hDiscNoMatch.Fill(output[i], npyInputSampleWgts[i])
+  hDiscNoMatch.Write()
+  hDiscMatch.Write()
+
+
+def mainTF(_):
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData()
 
@@ -98,7 +148,7 @@ def main(_):
   # Merge all summaries into a single op
   merged_summary_op = tf.summary.merge_all()
 
-  print "TRAINING MVA"
+  print "TRAINING MLP"
 
   #Create saver object to same variables 
   saver = tf.train.Saver()
@@ -200,6 +250,9 @@ def main(_):
     #  print "matplotlib not found"
 
 if __name__ == '__main__':
-  tf.app.run(main=main)
+  if options.sklearnrf:
+    mainSKL()
+  else:
+    tf.app.run(main=mainTF)
 
   print "TRAINING DONE!"
