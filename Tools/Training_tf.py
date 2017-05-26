@@ -24,7 +24,7 @@ else:
 def prescaleBackground(input, answer, prescale):
   return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
 
-def importData(prescale = True, bgnorm=True, reluInputs=True):
+def importData(prescale = True, reluInputs=True, ptReweight=True):
   #variables to train
   vars = DataGetter().getList()
   
@@ -48,21 +48,23 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
   npyInputAnswer = (npyInputLabels[:,0] == 3) & npyInputLabels[:,1]
   npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
   npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
-
-  #calculate pt weights
-  ptHist, ptBins = numpy.histogram(inputData["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]]), weights=npyInputSampleWgts[:,0])
-
-  npyInputWgts = (1.0/ptHist[numpy.digitize(inputData["cand_pt"], ptBins) - 1]).reshape([-1,1])
-
-  if bgnorm:
-    #equalize bg and signal weights 
-    nsig = npyInputWgts[npyInputAnswer == 1].sum()
-    nbg  = npyInputWgts[npyInputAnswer != 1].sum()
-    npyInputWgts[~npyInputAnswer] *= nsig / nbg
+  npyInputWgts = npyInputSampleWgts
 
   if reluInputs:
     #ensure data is all greater than one
     npyInputData[npyInputData < 0] = 0.0
+
+  if ptReweight:
+    #calculate pt weights
+    #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
+    ptBins = numpy.linspace(0, 2000, 51)
+    print ptBins
+    ptHistSig, _ = numpy.histogram(inputData["cand_pt"][npyInputAnswer == 1], bins=ptBins, weights=npyInputSampleWgts[:,0][npyInputAnswer == 1])
+    ptHistBg,  _ = numpy.histogram(inputData["cand_pt"][npyInputAnswer != 1], bins=ptBins, weights=npyInputSampleWgts[:,0][npyInputAnswer != 1])
+    ptHistSig[ptHistSig < 0.00001] = 100000
+    ptHistBg[ptHistBg < 0.00001] = 100000
+    npyInputWgts[npyInputAnswer == 1] = (1.0/ptHistSig[numpy.digitize(inputData["cand_pt"][npyInputAnswer == 1], ptBins) - 1]).reshape([-1,1])
+    npyInputWgts[npyInputAnswer != 1] = (1.0/ptHistBg[numpy.digitize(inputData["cand_pt"][npyInputAnswer != 1], ptBins) - 1]).reshape([-1,1])
   
   if prescale:
     #Remove background events so that bg and signal are roughly equally represented
@@ -71,6 +73,12 @@ def importData(prescale = True, bgnorm=True, reluInputs=True):
     npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
     npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
     npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
+  else:
+    #equalize bg and signal weights 
+    nsig = npyInputWgts[npyInputAnswer == 1].sum()
+    nbg  = npyInputWgts[npyInputAnswer != 1].sum()
+    npyInputWgts[~npyInputAnswer] *= nsig / nbg
+
 
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
@@ -79,6 +87,13 @@ def mainSKL():
 
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(False)
+
+  #randomize input data
+  perms = numpy.random.permutation(npyInputData.shape[0])
+  npyInputData = npyInputData[perms]
+  npyInputAnswer = npyInputAnswer[perms]
+  npyInputWgts = npyInputWgts[perms]
+  npyInputSampleWgts = npyInputSampleWgts[perms]
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)

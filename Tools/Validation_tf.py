@@ -50,6 +50,8 @@ dataTTbar = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.p
 numDataTTbar = dataTTbar._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
 
+#print list(dataTTbar.columns.values)
+
 #Apply baseline cuts
 dataTTbar = dataTTbar[dataTTbar.Njet >= 4]
 
@@ -101,6 +103,26 @@ for var in varsname:
     plt.savefig(var + ".png")
     plt.close()
 
+
+#purity plots
+#dataTTbar.genConstMatchGenPtVec
+
+plt.clf()
+plt.figure()
+
+ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 15), numpy.linspace(450, 700, 6), [800, 1000]])
+purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][genMatches == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][genMatches == 1])
+purityDen,_  = numpy.histogram(dataTTbar["cand_pt"],                  bins=ptBins, weights=dataTTbar["sampleWgt"])
+
+purity = purityNum/purityDen
+
+plt.hist(ptBins[:-1], bins=ptBins, weights=purity, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("pT [GeV]")
+plt.ylabel("Purity")
+plt.savefig("purity.png")
+plt.close()
+
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 dataZnunu = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl")
@@ -122,6 +144,10 @@ FPR = []
 TPR = []
 FPRZ = []
 
+FPRPtCut = []
+TPRPtCut = []
+FPRZPtCut = []
+
 evtwgt = dataTTbar["sampleWgt"]
 evtwgtZnunu = dataZnunu["sampleWgt"]
 
@@ -129,16 +155,32 @@ NevtTPR = evtwgt[dataTTbar.genConstiuentMatchesVec==3].sum()
 NevtFPR = evtwgt[dataTTbar.genConstiuentMatchesVec!=3].sum()
 NevtZ = evtwgtZnunu.sum()
 
+ptCut = 200
+
+candPtTTbar = dataTTbar["cand_pt"]
+cantPtZnunu = dataZnunu["cand_pt"]
+
+NevtTPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar>ptCut)].sum()
+NevtFPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar>ptCut)].sum()
+NevtZPtCut = evtwgtZnunu[cantPtZnunu > ptCut].sum()
+
 for cut in cuts:
     FPR.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec!=3)].sum() / NevtFPR    )
     TPR.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec==3)].sum() / NevtTPR    )
-    FPRZ.append( evtwgtZnunu[(dataZnunuAns > cut) & (dataZnunu.genConstiuentMatchesVec!=3)].sum() / NevtZ )
+    FPRZ.append( evtwgtZnunu[(dataZnunuAns > cut)].sum() / NevtZ )
+
+    FPRPtCut.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar > ptCut)].sum() / NevtFPRPtCut    )
+    TPRPtCut.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar > ptCut)].sum() / NevtTPRPtCut    )
+    FPRZPtCut.append( evtwgtZnunu[(dataZnunuAns > cut) & (cantPtZnunu > ptCut)].sum() / NevtZPtCut )
 
 #Dump roc to file
 fileObject = open("roc.pkl",'wb')
 pickle.dump(TPR, fileObject)
 pickle.dump(FPR, fileObject)
 pickle.dump(FPRZ, fileObject)
+pickle.dump(TPRPtCut, fileObject)
+pickle.dump(FPRPtCut, fileObject)
+pickle.dump(FPRZPtCut, fileObject)
 fileObject.close()
 
 plt.clf()
