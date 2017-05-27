@@ -79,6 +79,9 @@ plt.ylabel("Normalized events")
 plt.savefig("discriminator.png")
 plt.close()
 
+print dataTTbarAns[genMatches == 1]
+print dataTTbar["sampleWgt"][genMatches == 1]
+
 #plot efficiency
 
 #ptNum, ptNumBins = numpy.histogram(dataTTbar[]["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 1000]]), weights=npyInputSampleWgts[:,0])

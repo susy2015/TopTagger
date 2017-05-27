@@ -34,13 +34,40 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl", "trainingTuple_division_0_ZJetsToNuNu_training.pkl"]
 
   inputData = numpy.empty([0])
-  
+  npyInputWgts = numpy.empty([0])
+
   for sample in samplesToRun:
+    print sample
     data = pd.read_pickle(sample)
+    #remove partial tops 
+    inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+    inputAnswer = (inputLabels[:,0] == 3) & inputLabels[:,1]
+    inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
+    data = data[(inputAnswer == 1) | (inputBackground == 1)]
+    inputAnswer = inputAnswer[(inputAnswer == 1) | (inputBackground == 1)]
+    
+    if ptReweight:
+      #calculate pt weights
+      inputWgts = numpy.empty([len(inputAnswer), 1])
+      #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
+      ptBins = numpy.hstack([numpy.linspace(0, 2000, 51), [10000]])
+      dataPt = data["cand_pt"]
+      inputSampleWgts = data["sampleWgt"]
+      ptHistSig, _ = numpy.histogram(dataPt[inputAnswer == 1], bins=ptBins, weights=inputSampleWgts[inputAnswer == 1])
+      ptHistBg,  _ = numpy.histogram(dataPt[inputAnswer != 1], bins=ptBins, weights=inputSampleWgts[inputAnswer != 1])
+      ptHistSig[ptHistSig < 10] = ptHistSig.max()
+      ptHistBg[ptHistBg < 10] = ptHistBg.max()
+      inputWgts[inputAnswer == 1] = (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
+      inputWgts[inputAnswer != 1] = (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
+    else:
+      inputWgts = data.as_matrix(["sampleWgt"]).astype(numpy.float32)
+
     if len(inputData) == 0:
       inputData = data
+      npyInputWgts = inputWgts
     else:
-      pd.concat([inputData, data])
+      inputData = pd.concat([inputData, data])
+      npyInputWgts = numpy.vstack([npyInputWgts, inputWgts])
 
   #parse pandas dataframe into training data
   npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
@@ -48,23 +75,10 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   npyInputAnswer = (npyInputLabels[:,0] == 3) & npyInputLabels[:,1]
   npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
   npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
-  npyInputWgts = npyInputSampleWgts
 
   if reluInputs:
     #ensure data is all greater than one
     npyInputData[npyInputData < 0] = 0.0
-
-  if ptReweight:
-    #calculate pt weights
-    #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
-    ptBins = numpy.linspace(0, 2000, 51)
-    print ptBins
-    ptHistSig, _ = numpy.histogram(inputData["cand_pt"][npyInputAnswer == 1], bins=ptBins, weights=npyInputSampleWgts[:,0][npyInputAnswer == 1])
-    ptHistBg,  _ = numpy.histogram(inputData["cand_pt"][npyInputAnswer != 1], bins=ptBins, weights=npyInputSampleWgts[:,0][npyInputAnswer != 1])
-    ptHistSig[ptHistSig < 0.00001] = 100000
-    ptHistBg[ptHistBg < 0.00001] = 100000
-    npyInputWgts[npyInputAnswer == 1] = (1.0/ptHistSig[numpy.digitize(inputData["cand_pt"][npyInputAnswer == 1], ptBins) - 1]).reshape([-1,1])
-    npyInputWgts[npyInputAnswer != 1] = (1.0/ptHistBg[numpy.digitize(inputData["cand_pt"][npyInputAnswer != 1], ptBins) - 1]).reshape([-1,1])
   
   if prescale:
     #Remove background events so that bg and signal are roughly equally represented
@@ -77,8 +91,7 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
     #equalize bg and signal weights 
     nsig = npyInputWgts[npyInputAnswer == 1].sum()
     nbg  = npyInputWgts[npyInputAnswer != 1].sum()
-    npyInputWgts[~npyInputAnswer] *= nsig / nbg
-
+    npyInputWgts[npyInputAnswer != 1] *= nsig / nbg
 
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
