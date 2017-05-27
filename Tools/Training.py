@@ -19,11 +19,11 @@ except ImportError:
     print "SK-learn not found, hope you don't need it"
 import pickle
 from MVAcommon import *
-try:
-    import cv2
-except ImportError:
-    sys.path.append("../../opencv/lib/")
-    import cv2
+#try:
+#    import cv2
+#except ImportError:
+#    sys.path.append("../../opencv/lib/")
+#    import cv2
 import optparse
 from math import sqrt
 
@@ -55,20 +55,22 @@ for datasetName in samplesToRun:
     hPtNoMatch = ROOT.TH1D("hPtNoMatch" + datasetName, "hPtNoMatch", 50, 0.0, 2000.0)
     hPtNoMatch.Sumw2()
 
-    #Nevts = 0
-    #for event in dataset.slimmedTuple:
-    #    if Nevts >= NEVTS:
-    #        break
-    #    Nevts +=1
-    #    for i in xrange(len(event.genConstiuentMatchesVec)):
-    #        nmatch = event.genConstiuentMatchesVec[i]
-    #        if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-    #            if nmatch == 3 and event.genTopMatchesVec[i]:
-    #                #            if event.genTopMatchesVec[i]:
-    #                hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
-    #            else:
-    #                hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
+    Nevts = 0
+    for event in dataset.slimmedTuple:
+        if Nevts >= NEVTS:
+            break
+        Nevts +=1
+        for i in xrange(len(event.genConstiuentMatchesVec)):
+            nmatch = event.genConstiuentMatchesVec[i]
+            if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
+                if nmatch == 3 and event.genTopMatchesVec[i]:
+                    #            if event.genTopMatchesVec[i]:
+                    hPtMatch.Fill(event.cand_pt[i], event.sampleWgt)
+                else:
+                    hPtNoMatch.Fill(event.cand_pt[i], event.sampleWgt)
     
+    print hPtMatch.GetEntries(), hPtNoMatch.GetEntries()
+
     Nevts = 0
     count = 0
     for event in dataset.slimmedTuple:
@@ -78,25 +80,39 @@ for datasetName in samplesToRun:
         for i in xrange(len(event.cand_m)):
             nmatch = event.genConstiuentMatchesVec[i]
             if (int(nmatch == 3) and event.genTopMatchesVec[i]) or (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-                if (int(nmatch == 0) and not event.genTopMatchesVec[i]):
-                    count += 1
-                    if count%10:
-                        continue
+                #if (int(nmatch == 0) and not event.genTopMatchesVec[i]):
+                #    count += 1
+                #    if count%10:
+                #        continue
                 inputData.append(dg.getData(event, i))
                 answer = nmatch == 3 and event.genTopMatchesVec[i]
                 inputAnswer.append(answer)
-                inputWgts.append(event.sampleWgt)
+                #inputWgts.append(event.sampleWgt)
                 inputSampleWgts.append(event.sampleWgt)
-#                if int(nmatch == 3) and event.genTopMatchesVec[i]:
-#                    if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-#                        inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
-#                    else:
-#                        inputWgts.append(0.0)
-#                else:
-#                    if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-#                        inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
-#                    else:
-#                        inputWgts.append(0.0)
+                if int(nmatch == 3) and event.genTopMatchesVec[i]:
+                    if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
+                        inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                    else:
+                        inputWgts.append(0.0)
+                else:
+                    if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
+                        inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                    else:
+                        print "HELLO", hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i]))
+                        inputWgts.append(0.0)
+
+    npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
+    npyInputWgts = numpy.array(inputWgts, numpy.float32)
+
+    nSig = len(npyInputWgts[npyInputAnswer==1])#sum()
+    nBg = len(npyInputWgts[npyInputAnswer==0])#sum()
+
+    print nSig, nBg
+
+    nSig = npyInputWgts[npyInputAnswer==1].sum()
+    nBg = npyInputWgts[npyInputAnswer==0].sum()
+
+    print nSig, nBg
 
                 
 npyInputData = numpy.array(inputData, numpy.float32)
@@ -104,22 +120,25 @@ npyInputAnswer = numpy.array(inputAnswer, numpy.float32)
 npyInputWgts = numpy.array(inputWgts, numpy.float32)
 npyInputSampleWgts = numpy.array(inputSampleWgts, numpy.float32)
 
-#nSig = len(npyInputWgts[npyInputAnswer==1])#sum()
-#nBg = len(npyInputWgts[npyInputAnswer==0])#sum()
-#
-#print nSig
-#print nBg
-#
-##Equalize the relative weights of signal and bg
-#for i in xrange(len(npyInputAnswer)):
-#    if npyInputAnswer[i] == 0:
-#        npyInputWgts[i] *= nSig/nBg
-#
-#nSig = npyInputWgts[npyInputAnswer==1].sum()
-#nBg = npyInputWgts[npyInputAnswer==0].sum()
-#
-#print nSig
-#print nBg
+nSig = len(npyInputWgts[npyInputAnswer==1])#sum()
+nBg = len(npyInputWgts[npyInputAnswer==0])#sum()
+
+print nSig, nBg
+
+nSig = npyInputWgts[npyInputAnswer==1].sum()
+nBg = npyInputWgts[npyInputAnswer==0].sum()
+
+print nSig, nBg
+
+#Equalize the relative weights of signal and bg
+for i in xrange(len(npyInputAnswer)):
+    if npyInputAnswer[i] == 0:
+        npyInputWgts[i] *= nSig/nBg
+
+nSig = npyInputWgts[npyInputAnswer==1].sum()
+nBg = npyInputWgts[npyInputAnswer==0].sum()
+
+print nSig, nBg
 
 #randomize input data
 perms = numpy.random.permutation(npyInputData.shape[0])
@@ -169,8 +188,8 @@ if options.opencv:
     #fout.Close()
 
 else:
-    clf = MLPClassifier(hidden_layer_sizes=(50, ), verbose=False)
-    #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
+    #clf = MLPClassifier(hidden_layer_sizes=(50, ), verbose=False)
+    clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
     #clf = GradientBoostingClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=0)
@@ -179,15 +198,15 @@ else:
     #clf = DecisionTreeClassifier()
     #clf = svm.SVC()
 
-    dataScaler = MinMaxScaler()
-    dataScaler.fit(npyInputData)
-    npyInputData = dataScaler.transform(npyInputData)
-    clf = clf.fit(npyInputData, npyInputAnswer)#, sample_weight=npyInputWgts)
+    #dataScaler = MinMaxScaler()
+    #dataScaler.fit(npyInputData)
+    #npyInputData = dataScaler.transform(npyInputData)
+    clf = clf.fit(npyInputData, npyInputAnswer, sample_weight=npyInputWgts)
     
     #Dump data transformation
-    fileObject = open("TrainingTransform.pkl",'wb')
-    out = pickle.dump(dataScaler, fileObject)
-    fileObject.close()
+    #fileObject = open("TrainingTransform.pkl",'wb')
+    #out = pickle.dump(dataScaler, fileObject)
+    #fileObject.close()
 
     #Dump output from training
     fileObject = open("TrainingOutput.pkl",'wb')
@@ -257,27 +276,27 @@ else:
 
     fout.Close()
 
-    try:
-       #try to plot it with matplotlib
-        try:
-            import matplotlib.pyplot as plt
-            
-            # make importances relative to max importance
-            pos = numpy.arange(sorted_idx.shape[0]) + .5
-            #plt.subplot(1, 2, 2)
-            plt.barh(pos, feature_importance[sorted_idx], align='center')
-            plt.yticks(pos, feature_names[sorted_idx])
-            plt.xlabel('Relative Importance')
-            plt.title('Variable Importance')
-            #plt.show()
-            plt.savefig("feature_importance.png")
-        except ImportError:
-            #I guess no matplotlib is installed, just print to screen?
-            featureImportanceandNames = zip(feature_names, feature_importance)
-            print [featureImportanceandNames[a] for a in sorted_idx].reverse()
-    except AttributeError:
-        pass
-    except NameError:
-        pass
+    #try:
+    #   #try to plot it with matplotlib
+    #    try:
+    #        import matplotlib.pyplot as plt
+    #        
+    #        # make importances relative to max importance
+    #        pos = numpy.arange(sorted_idx.shape[0]) + .5
+    #        #plt.subplot(1, 2, 2)
+    #        plt.barh(pos, feature_importance[sorted_idx], align='center')
+    #        plt.yticks(pos, feature_names[sorted_idx])
+    #        plt.xlabel('Relative Importance')
+    #        plt.title('Variable Importance')
+    #        #plt.show()
+    #        plt.savefig("feature_importance.png")
+    #    except ImportError:
+    #        #I guess no matplotlib is installed, just print to screen?
+    #        featureImportanceandNames = zip(feature_names, feature_importance)
+    #        print [featureImportanceandNames[a] for a in sorted_idx].reverse()
+    #except AttributeError:
+    #    pass
+    #except NameError:
+    #    pass
 
 print "TRAINING DONE!"
