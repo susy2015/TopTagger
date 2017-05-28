@@ -41,10 +41,12 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
     data = pd.read_pickle(sample)
     #remove partial tops 
     inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-    inputAnswer = (inputLabels[:,0] == 3) & inputLabels[:,1]
+    inputAnswer = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
     inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
-    data = data[(inputAnswer == 1) | (inputBackground == 1)]
-    inputAnswer = inputAnswer[(inputAnswer == 1) | (inputBackground == 1)]
+    filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
+    data = data[filterArray]
+    inputAnswer = inputAnswer[filterArray]
+    inputWgts = numpy.copy(data.as_matrix(["sampleWgt"]).astype(numpy.float32))
     
     if ptReweight:
       #calculate pt weights
@@ -57,10 +59,8 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
       ptHistBg,  _ = numpy.histogram(dataPt[inputAnswer != 1], bins=ptBins, weights=inputSampleWgts[inputAnswer != 1])
       ptHistSig[ptHistSig < 10] = ptHistSig.max()
       ptHistBg[ptHistBg < 10] = ptHistBg.max()
-      inputWgts[inputAnswer == 1] = (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
-      inputWgts[inputAnswer != 1] = (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
-    else:
-      inputWgts = data.as_matrix(["sampleWgt"]).astype(numpy.float32)
+      inputWgts[inputAnswer == 1] *= (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
+      inputWgts[inputAnswer != 1] *= (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
 
     if len(inputData) == 0:
       inputData = data
@@ -72,7 +72,7 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   #parse pandas dataframe into training data
   npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
   npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-  npyInputAnswer = (npyInputLabels[:,0] == 3) & npyInputLabels[:,1]
+  npyInputAnswer = (npyInputLabels[:,0] == 3) & (npyInputLabels[:,1] == 1)
   npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
   npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
 
@@ -154,8 +154,8 @@ def mainTF(_):
   tf.add_to_collection('TrainInfo', x)
   tf.add_to_collection('TrainInfo', y)
 
-  #cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
-  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt))
+  cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
+  #cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt))
   l2_norm = tf.constant(0.0)
   for w in w_fc.values():
     l2_norm += tf.nn.l2_loss(w)

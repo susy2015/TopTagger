@@ -67,10 +67,9 @@ print "CREATING HISTOGRAMS"
 #Discriminator plot
 
 inputLabels = dataTTbar.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-genMatches = (inputLabels[:,0] == 3) & inputLabels[:,1]
+genMatches = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
 
 plt.clf()
-plt.figure()
 plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
 plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
 plt.legend(loc='upper right')
@@ -78,9 +77,6 @@ plt.xlabel("Discriminator")
 plt.ylabel("Normalized events")
 plt.savefig("discriminator.png")
 plt.close()
-
-print dataTTbarAns[genMatches == 1]
-print dataTTbar["sampleWgt"][genMatches == 1]
 
 #plot efficiency
 
@@ -92,14 +88,16 @@ genTopData = dataTTbar[genMatches == 1]
 genBGData = dataTTbar[genMatches != 1]
 recoTopData = dataTTbar[dataTTbarAns > discCut]
 recoBGData = dataTTbar[dataTTbarAns < discCut]
+minTTbar = dataTTbar.min()
+maxTTbar = dataTTbar.max()
 
 for var in varsname:
     plt.clf()
-    plt.figure()
-    ax = recoTopData .hist(column=var, weights=recoTopData["sampleWgt"], bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco top")
-    recoBGData       .hist(column=var, weights=recoBGData["sampleWgt"],  bins=20, grid=False, normed=True, fill=False, histtype='step',                     label="reco bg", ax=ax)
-    genTopData       .hist(column=var, weights=genTopData["sampleWgt"],  bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen top", ax=ax)
-    genBGData        .hist(column=var, weights=genBGData["sampleWgt"],   bins=20, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen bkg", ax=ax)
+    bins = numpy.linspace(minTTbar[var], maxTTbar[var], 21)
+    ax = recoTopData .hist(column=var, weights=recoTopData["sampleWgt"], bins=bins, grid=False, normed=True, fill=False, histtype='step',                     label="reco top")
+    recoBGData       .hist(column=var, weights=recoBGData["sampleWgt"],  bins=bins, grid=False, normed=True, fill=False, histtype='step',                     label="reco bg", ax=ax)
+    genTopData       .hist(column=var, weights=genTopData["sampleWgt"],  bins=bins, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen top", ax=ax)
+    genBGData        .hist(column=var, weights=genBGData["sampleWgt"],   bins=bins, grid=False, normed=True, fill=False, histtype='step', linestyle="dotted", label="gen bkg", ax=ax)
     plt.legend()
     plt.xlabel(var)
     plt.ylabel("Normalized events")
@@ -111,7 +109,6 @@ for var in varsname:
 #dataTTbar.genConstMatchGenPtVec
 
 plt.clf()
-plt.figure()
 
 ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 15), numpy.linspace(450, 700, 6), [800, 1000]])
 purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][genMatches == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][genMatches == 1])
@@ -126,6 +123,21 @@ plt.ylabel("Purity")
 plt.savefig("purity.png")
 plt.close()
 
+plt.clf()
+
+discBins = numpy.linspace(0, 1, 21)
+purityDiscNum, _ = numpy.histogram(dataTTbarAns[genMatches == 1], bins=discBins, weights=dataTTbar["sampleWgt"][genMatches == 1])
+purityDiscDen,_  = numpy.histogram(dataTTbarAns,                  bins=discBins, weights=dataTTbar["sampleWgt"])
+
+purityDisc = purityDiscNum/purityDiscDen
+
+plt.hist(discBins[:-1], bins=discBins, weights=purityDisc, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Purity")
+plt.savefig("purity_disc.png")
+plt.close()
+
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 dataZnunu = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl")
@@ -138,6 +150,42 @@ if options.sklrf:
     dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
+
+#calculate fake rate 
+
+plt.clf()
+
+metBins = numpy.linspace(0, 1000, 21)
+frMETNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["MET"].ix[:,0], bins=metBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frMETDen,_  = numpy.histogram(dataZnunu["MET"].ix[:,0],                         bins=metBins, weights=dataZnunu["sampleWgt"].ix[:,0])
+
+frMETNum[frMETDen < 1e-10] = 0.0
+frMETDen[frMETDen < 1e-10] = 1.0
+frMET = frMETNum/frMETDen
+
+plt.hist(metBins[:-1], bins=metBins, weights=frMET, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("MET [GeV]")
+plt.ylabel("Fake rate")
+plt.savefig("fakerate_met.png")
+plt.close()
+
+plt.clf()
+
+njBins = numpy.linspace(0, 20, 21)
+frNjNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["Njet"].ix[:,0], bins=njBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frNjDen,_  = numpy.histogram(dataZnunu["Njet"].ix[:,0],                         bins=njBins, weights=dataZnunu["sampleWgt"].ix[:,0])
+
+frNjNum[frNjDen < 1e-10] = 0.0
+frNjDen[frNjDen < 1e-10] = 1.0
+frNj = frNjNum/frNjDen
+
+plt.hist(njBins[:-1], bins=njBins, weights=frNj, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("N jets")
+plt.ylabel("Fake rate")
+plt.savefig("fakerate_njets.png")
+plt.close()
 
 print "CALCULATING ROC CURVES"
 
@@ -187,7 +235,6 @@ pickle.dump(FPRZPtCut, fileObject)
 fileObject.close()
 
 plt.clf()
-ax = plt.figure()
 plt.plot(FPR,TPR)
 plt.xlabel("FPR (ttbar)")
 plt.ylabel("TPR (ttbar)")
@@ -195,7 +242,6 @@ plt.savefig("roc.png")
 plt.close()
 
 plt.clf()
-plt.figure()
 plt.plot(FPRZ,TPR)
 plt.xlabel("FPR (Znunu)")
 plt.ylabel("TPR (ttbar)")
