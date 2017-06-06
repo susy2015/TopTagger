@@ -81,12 +81,12 @@ for datasetName in samplesToRun:
                 if int(nmatch == 3) and event.genTopMatchesVec[i]:
 #           # if event.genTopMatchesVec[i]:
                     if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-                        inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                        inputWgts.append(event.sampleWgt / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
                     else:
                         inputWgts.append(0.0)
                 else:
                     if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-                        inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                        inputWgts.append(event.sampleWgt / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
                     else:
                         inputWgts.append(0.0)
 
@@ -153,7 +153,7 @@ if options.opencv:
     fout.Close()
 
 else:
-    clf = RandomForestClassifier(n_estimators=100, max_depth=14, n_jobs = 4, verbose = True)
+    clf = RandomForestClassifier(n_estimators=200, max_depth=10, n_jobs = 4, verbose = True)
     #clf = RandomForestRegressor(n_estimators=100, max_depth=10, n_jobs = 4)
     #clf = AdaBoostRegressor(n_estimators=100)
     #clf = GradientBoostingClassifier(n_estimators=100, max_depth=10, learning_rate=0.1, random_state=0)
@@ -188,39 +188,39 @@ else:
     hDiscNoMatch.Write()
     hDiscMatch.Write()
 
-    cv = KFold(n=len(npyInputData), n_folds=10)
-    cv_disc = 0.65
-    cv_i = 1
-    cv_clf = RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs = 4)
-    for train, test in cv:#.split(npyInputData):
-        cv_clf.fit(npyInputData[train], npyInputAnswer[train], npyInputWgts[train])
-        outTrain = cv_clf.predict_proba(npyInputData[train])[:,1]
-        outValid = cv_clf.predict_proba(npyInputData[test])[:,1]
-
-        print "fold: ", cv_i
-        #train
-        train_acc_num = (npyInputSampleWgts[train][outTrain>cv_disc]).sum()
-        train_acc_num_err = sqrt(((npyInputSampleWgts[train][outTrain>cv_disc])**2).sum())/train_acc_num
-        train_acc_den = npyInputSampleWgts[train].sum()
-        train_acc_den_err = sqrt(((npyInputSampleWgts[train])**2).sum())/train_acc_den
-        print "Train:", train_acc_num/train_acc_den, " +/- ", train_acc_num/train_acc_den * sqrt((train_acc_num_err/train_acc_num)**2)# + (train_acc_den_err/train_acc_num_err)**2)
-        #valid
-        valid_acc_num = (npyInputSampleWgts[test][outValid>cv_disc]).sum()
-        valid_acc_num_err = sqrt(((npyInputSampleWgts[test][outValid>cv_disc])**2).sum())/valid_acc_num
-        valid_acc_den = npyInputSampleWgts[test].sum()
-        valid_acc_den_err = sqrt(((npyInputSampleWgts[test])**2).sum())/valid_acc_den
-        print "Validation: ", valid_acc_num/valid_acc_den, " +/- ", valid_acc_num/valid_acc_den * sqrt((valid_acc_num_err/valid_acc_num)**2)# + (valid_acc_den_err/valid_acc_num_err)**2)
-        
-        hDiscNoMatchi = ROOT.TH1D("discNoMatch_%i"%cv_i, "discNoMatch_%i"%cv_i, 100, 0, 1.0)
-        hDiscMatchi   = ROOT.TH1D("discMatch_%i"%cv_i,   "discMatch_%i"%cv_i, 100, 0, 1.0)
-        for i in xrange(len(outValid)):
-            if npyInputAnswer[test][i] == 1:
-                hDiscMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])
-            else:
-                hDiscNoMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])
-        hDiscNoMatchi.Write()
-        hDiscMatchi.Write()
-        cv_i += 1
+    #cv = KFold(n=len(npyInputData), n_folds=10)
+    #cv_disc = 0.65
+    #cv_i = 1
+    #cv_clf = RandomForestClassifier(n_estimators=100, max_depth=10, n_jobs = 4)
+    #for train, test in cv:#.split(npyInputData):
+    #    cv_clf.fit(npyInputData[train], npyInputAnswer[train], npyInputWgts[train])
+    #    outTrain = cv_clf.predict_proba(npyInputData[train])[:,1]
+    #    outValid = cv_clf.predict_proba(npyInputData[test])[:,1]
+    #
+    #    print "fold: ", cv_i
+    #    #train
+    #    train_acc_num = (npyInputSampleWgts[train][outTrain>cv_disc]).sum()
+    #    train_acc_num_err = sqrt(((npyInputSampleWgts[train][outTrain>cv_disc])**2).sum())/train_acc_num
+    #    train_acc_den = npyInputSampleWgts[train].sum()
+    #    train_acc_den_err = sqrt(((npyInputSampleWgts[train])**2).sum())/train_acc_den
+    #    print "Train:", train_acc_num/train_acc_den, " +/- ", train_acc_num/train_acc_den * sqrt((train_acc_num_err/train_acc_num)**2)# + (train_acc_den_err/train_acc_num_err)**2)
+    #    #valid
+    #    valid_acc_num = (npyInputSampleWgts[test][outValid>cv_disc]).sum()
+    #    valid_acc_num_err = sqrt(((npyInputSampleWgts[test][outValid>cv_disc])**2).sum())/valid_acc_num
+    #    valid_acc_den = npyInputSampleWgts[test].sum()
+    #    valid_acc_den_err = sqrt(((npyInputSampleWgts[test])**2).sum())/valid_acc_den
+    #    print "Validation: ", valid_acc_num/valid_acc_den, " +/- ", valid_acc_num/valid_acc_den * sqrt((valid_acc_num_err/valid_acc_num)**2)# + (valid_acc_den_err/valid_acc_num_err)**2)
+    #    
+    #    hDiscNoMatchi = ROOT.TH1D("discNoMatch_%i"%cv_i, "discNoMatch_%i"%cv_i, 100, 0, 1.0)
+    #    hDiscMatchi   = ROOT.TH1D("discMatch_%i"%cv_i,   "discMatch_%i"%cv_i, 100, 0, 1.0)
+    #    for i in xrange(len(outValid)):
+    #        if npyInputAnswer[test][i] == 1:
+    #            hDiscMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])
+    #        else:
+    #            hDiscNoMatchi.Fill(outValid[i], npyInputSampleWgts[test][i])
+    #    hDiscNoMatchi.Write()
+    #    hDiscMatchi.Write()
+    #    cv_i += 1
 
 
     fout.Close()
