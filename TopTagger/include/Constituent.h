@@ -21,6 +21,7 @@ private:
 
     //AK4 specific variables 
     double bTagDisc_, qgLikelihood_;
+    double qgMult_, qgPtD_, qgAxis1_, qgAxis2_;
 
     //AK8 specific variables 
     double tau1_, tau2_, tau3_, softDropMass_;
@@ -45,6 +46,7 @@ public:
     void setTau3(const double& tau3);
     void setSoftDropMass(const double& softDropMass);
     void setSubJets(const std::vector<TLorentzVector>& subjets);
+    void setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2);
     void setWMassCorr(const double& wMassCorr);
 
     void addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter);
@@ -62,6 +64,10 @@ public:
     const std::vector<TLorentzVector>& getSubjets() const { return subjets_; }
     const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
     const double getWMassCorr() const                     { return wMassCorr_; }
+    const double getQGMult() const                        { return qgMult_; }
+    const double getQGPtD() const                         { return qgPtD_; }
+    const double getQGAxis1() const                       { return qgAxis1_; }
+    const double getQGAxis2() const                       { return qgAxis2_; }
 };
 
 #endif

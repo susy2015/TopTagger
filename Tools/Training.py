@@ -91,12 +91,12 @@ for datasetName in samplesToRun:
                 inputSampleWgts.append(event.sampleWgt)
                 if int(nmatch == 3) and event.genTopMatchesVec[i]:
                     if hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])) > 10:
-                        inputWgts.append(1.0 / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
+                        inputWgts.append(event.sampleWgt / hPtMatch.GetBinContent(hPtMatch.FindBin(event.cand_pt[i])))
                     else:
                         inputWgts.append(0.0)
                 else:
                     if hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])) > 10:
-                        inputWgts.append(1.0 / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
+                        inputWgts.append(event.sampleWgt / hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i])))
                     else:
                         print "HELLO", hPtNoMatch.GetBinContent(hPtNoMatch.FindBin(event.cand_pt[i]))
                         inputWgts.append(0.0)

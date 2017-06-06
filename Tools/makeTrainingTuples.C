@@ -84,6 +84,11 @@ private:
         const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
         const std::vector<double>& recoJetsCharge      = tr.getVec<double>("recoJetsCharge_0");
 
+        const std::vector<double>& qgMult  = tr.getVec<double>("qgMult");
+        const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
+        const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis2");
+        const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
+
         const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
         const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
         const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
@@ -121,6 +126,7 @@ private:
             hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
         }
         ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, hadGenTops, hadGenTopDaughters);
+        myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
         //run tagger
@@ -209,7 +215,7 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_theta", "j1_m", "j1_CSV", "j2_p", "j2_theta",  "j2_m", "j2_CSV", "j3_p", "j3_theta", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab", "j1_CSV_lab", "j1_QGL_lab", "j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "j3_CSV_lab", "j3_QGL_lab", "MET", "N_CSV", "dR12_lab", "dR13_lab", "dR23_lab", "dR3_12_lab", "dR2_13_lab", "dR1_23_lab"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_m", "j1_CSV", "j2_p",  "j2_m", "j2_CSV", "j3_p", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab", "j1_CSV_lab", "j1_QGL_lab", "j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "j3_CSV_lab", "j3_QGL_lab", "MET", "N_CSV", "dR12_lab", "dR13_lab", "dR23_lab", "dR3_12_lab", "dR2_13_lab", "dR1_23_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j1_qgAxis1_lab", "j1_qgAxis2_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgAxis2_lab", "j3_qgMult_lab", "j3_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgAxis2_lab", "dRPtTop", "dRPtW", "sd_n2", "j1_m_lab", "j2_m_lab", "j3_m_lab"};
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    

@@ -57,7 +57,7 @@ else:
 fileValidation = ROOT.TFile.Open("trainingTuple_division_1_TTbarSingleLep_validation.root")
 
 #cut = numpy.concatenate((numpy.arange(0.01, 0.05, 0.01), numpy.arange(0.05, 1, 0.05)))
-cut = numpy.arange(0.0, 1.0, 0.01)
+cut = numpy.arange(0.0, 1.01, 0.01)
 EffNumroc = len(cut) * [0]
 Effroc =    len(cut) * [0]
 EffDenroc = 0
@@ -288,12 +288,14 @@ if not options.noROC:
         for j in xrange(len(cut)):
             discpass = (rocOutput[i]>cut[j] or rocOutput[i]==cut[j]) if(j==0) else (rocOutput[i]>cut[j])
             if(discpass):
-                if(rocScore[i]):TP[j] = TP[j]+1*evtwgt[i]
-                else:FP[j] = FP[j]+1*evtwgt[i]
+                if(rocScore[i]):
+                    TP[j] = TP[j]+1*evtwgt[i]
+                else:
+                    FP[j] = FP[j]+1*evtwgt[i]
     
     for j in xrange(len(cut)):
-        TPR[j] = round(float(TP[j])/Nmatch, 2)
-        FPR[j] = round(float(FP[j])/Nnomatch, 2)
+        TPR[j] = float(TP[j])/Nmatch
+        FPR[j] = float(FP[j])/Nnomatch
         hroc.Fill(FPR[j],TPR[j])
     TPRHEP = float(TPHEP)/Nmatch
     FPRHEP = float(FPHEP)/Nnomatch
