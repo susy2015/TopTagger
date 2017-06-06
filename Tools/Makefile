@@ -32,7 +32,7 @@ OPENVCLIBS = -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
 
-PROGRAMS = makeTrainingTuples openCVTest TagTest1 MVAstuff
+PROGRAMS = makeTrainingTuples TagTest1 MVAstuff
 
 all: mkobj sampPyWrap $(PROGRAMS)
 
