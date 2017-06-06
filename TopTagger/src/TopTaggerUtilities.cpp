@@ -17,9 +17,9 @@ namespace ttUtility
 
     ConstGenInputs::ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : hadGenTops_(&hadGenTops), hadGenTopDaughters_(&hadGenTopDaughters) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
     ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
     {
@@ -33,6 +33,14 @@ namespace ttUtility
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
         puppisd_corrRECO_for_ = nullptr;
+    }
+
+    void ConstAK4Inputs::addQGLVectors(const std::vector<double>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
+    {
+        qgMult_ = &qgMult;
+        qgPtD_ = &qgPtD;
+        qgAxis1_ = &qgAxis1;
+        qgAxis2_ = &qgAxis2;
     }
 
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
@@ -50,6 +58,9 @@ namespace ttUtility
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
             constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
+
+            //Add additional QGL info if it is provided 
+            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) constituents.back().setQGLVars((*qgMult_)[iJet], (*qgPtD_)[iJet], (*qgAxis1_)[iJet], (*qgAxis2_)[iJet]);
 
             //Get gen matches if the required info is provided
             if(hadGenTops_ && hadGenTopDaughters_)
@@ -248,6 +259,10 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_CSV_lab"] = top_constituents[i]->getBTagDisc();
             //Here we fake the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL_lab"] = (top_constituents[i]->getBTagDisc() > csvThresh)?(1.0):(top_constituents[i]->getQGLikelihood());
+            varMap["j" + std::to_string(i + 1) + "_qgMult_lab"]  = top_constituents[i]->getQGMult();
+            varMap["j" + std::to_string(i + 1) + "_qgPtD_lab"]   = top_constituents[i]->getQGPtD();
+            varMap["j" + std::to_string(i + 1) + "_qgAxis1_lab"] = top_constituents[i]->getQGAxis1();
+            varMap["j" + std::to_string(i + 1) + "_qgAxis2_lab"] = top_constituents[i]->getQGAxis2();
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % top_constituents.size();
@@ -263,6 +278,21 @@ namespace ttUtility
             auto jetPair = top_constituents[i]->p() + top_constituents[iNext]->p();
             varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m_lab"] = jetPair.M();
         }
+
+        varMap["dRPtTop"] = varMap["dR1_23_lab"] * varMap["cand_pt"];
+        if( top_constituents.size() >= 3)
+        {
+            varMap["dRPtW"] = varMap["dR23_lab"] * (top_constituents[1]->p() + top_constituents[2]->p()).Pt();
+            double var_sd_0 = top_constituents[2]->p().Pt()/(top_constituents[1]->p().Pt()+top_constituents[2]->p().Pt());
+            varMap["sd_n2"] = var_sd_0/std::pow(varMap["dR23_lab"], -2);
+        }
+        else
+        {
+            varMap["dRPtW"] = 0.0;
+            varMap["sd_n2"] = 0.0;
+        }
+
+
 
         std::vector<Constituent> RF_constituents;
 
@@ -287,7 +317,10 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_CSV"]   = RF_constituents[i].getBTagDisc();
             //Here we fake the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL"]   = (RF_constituents[i].getBTagDisc() > csvThresh)?(1.0):(RF_constituents[i].getQGLikelihood());
-            varMap["j" + std::to_string(i + 1) + "_QGL_noMod"]   = RF_constituents[i].getQGLikelihood();
+            varMap["j" + std::to_string(i + 1) + "_qgMult"]   = RF_constituents[i].getQGMult();
+            varMap["j" + std::to_string(i + 1) + "_qgPtD"]   = RF_constituents[i].getQGPtD();
+            varMap["j" + std::to_string(i + 1) + "_qgAxis1"]   = RF_constituents[i].getQGAxis1();
+            varMap["j" + std::to_string(i + 1) + "_qgAxis2"]   = RF_constituents[i].getQGAxis2();
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();

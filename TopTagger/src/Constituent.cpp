@@ -73,3 +73,11 @@ void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector
 {
     genMatches_[&genTop].insert(genDaughter);
 }
+
+void Constituent::setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2)
+{
+    qgMult_ = qgMult;
+    qgPtD_ = qgPtD;
+    qgAxis1_ = qgAxis1;
+    qgAxis2_ = qgAxis2;
+}
