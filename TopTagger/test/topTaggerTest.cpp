@@ -142,8 +142,13 @@ int main()
                 for(const Constituent* constituent : constituents)
                 {
                     printf("\t\tConstituent properties: Constituent type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", constituent->getType(), constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi());
-                }
+                }                
             }
+
+            //Print properties of the remaining system
+            //the remaining system is used as the second portion of the visible system to calculate MT2 in the NT = 1 bin
+            const TopObject& rsys = ttr.getRsys();
+            printf("\tRsys properties: N constituents: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", rsys.getNConstituents(), rsys.p().Pt(), rsys.p().Eta(), rsys.p().Phi());
         
             printf("\n");
         }
