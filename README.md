@@ -45,10 +45,10 @@ A basic standalone example using the top tagging code is provided in "TopTagger/
 
 ### Running the example
 
-The example executable is compiled along with the standalone library as described above.  If the tagger and openCV were installed centrally then there are no further steps required after installation to run the example code.  If either package was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
+The example executable is compiled along with the standalone library as described above.  If either openCV or the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
 
 ```
-#do once per terminal if the opencv now the top tagger are not installed system wide
+#do once per terminal if opencv or the top tagger are not installed system wide
 source taggerSetup.sh
 #do once in any directory where you will run the top tagger example
 ../../Tools/getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
