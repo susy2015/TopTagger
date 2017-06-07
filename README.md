@@ -3,29 +3,11 @@
 
 ## Compiling the tagger
 
-The code is provided with full support for usage in CMSSW as well as with standalone root.  Note that with the latest release, openCV is required to be installed to build top tagger code.  
-
-#### CMSSW Installation instructions
-
-Instructions for installing openCV on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.
+Note that with the latest release, openCV is required to be installed to build top tagger code.  
 
 #### Standalone installation instructions
 
-To compile the standalone library requires the ROOT 6 [1] and OpenCV 3.1 (or newer) [2] packages.  After ROOT and OpenCV are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root)
-
-```
-git clone -b standaloneTesting git@github.com:susy2015/TopTagger.git
-#Alternately the code may be downloaded as a tarball here INSERTLINK
-cd TopTagger/TopTagger/test
-./configure OPENCVDIR=/path/to/opencv
-make -j4
-#optional for system wide install (will require sudo rights)
-#To install in a non-standard directory add PREFIX=/install/path to the configure command
-make install
-```
-
-This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code.  This will also compile a standalone example called ``topTaggerTest''.  
-
+To compile the standalone library requires the ROOT 6 [1] and OpenCV 3.1 (or newer) [2] packages.  
 
 [1] https://root.cern.ch/downloading-root
 
@@ -42,19 +24,24 @@ make -j4
 make install
 ```
 
+After ROOT and OpenCV are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root)
+
+```
+git clone -b standaloneTesting git@github.com:susy2015/TopTagger.git
+#Alternately the code may be downloaded as a tarball here INSERTLINK
+cd TopTagger/TopTagger/test
+./configure OPENCVDIR=/path/to/opencv
+make -j4
+#optional for system wide install (will require sudo rights)
+#To install in a non-standard directory add PREFIX=/install/path to the configure command
+make install
+```
+
+This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code.  This will also compile a standalone example called ``topTaggerTest''.  
+
 ## Example code
 
 A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seem at the end of this readme.  
-
-### Getting a configuration file
-
-Before the top tagger can be used the top tagger configuration file must be checked out.  Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the standard working point for use with the example code (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
-
-```
-./getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
-```
-
-This will download the configuration file along with the MVA training file if appropriate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option (Multiple run directories can point to the same directory, this can be helpful to save space as the random forest training files are quite large).  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating the softlinks use the "-n" option.
 
 ### Running the example
 
@@ -68,6 +55,22 @@ source taggerSetup.sh
 #run the example code
 ./topTaggerTest
 ``` 
+
+### More about getting a configuration file
+
+Before the top tagger can be used the top tagger configuration file must be checked out.  Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the standard working point for use with the example code (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
+
+```
+./getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
+```
+
+This will download the configuration file along with the MVA training file if appropriate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option (Multiple run directories can point to the same directory, this can be helpful to save space as the random forest training files are quite large).  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating the softlinks use the "-n" option.
+
+
+## Installing the tagger in CMS software release
+
+Instructions for installing openCV on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.
+
 
 ## Top tagger structure
 
