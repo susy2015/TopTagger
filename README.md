@@ -1,11 +1,9 @@
 # TopTagger
 
 
-## Compiling the tagger
+## Standalone installation instructions
 
-Note that with the latest release, openCV is required to be installed to build top tagger code.  
-
-#### Standalone installation instructions
+### Installing prerequisites 
 
 To compile the standalone library requires the ROOT 6 [1] and OpenCV 3.1 (or newer) [2] packages.  
 
@@ -24,6 +22,8 @@ make -j4
 make install
 ```
 
+### Compiling the top tagger
+
 After ROOT and OpenCV are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root)
 
 ```
@@ -41,7 +41,7 @@ This command will produce a static and a shared library which contain all the ne
 
 ## Example code
 
-A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seem at the end of this readme.  
+A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seen at the end of this readme.  
 
 ### Running the example
 
@@ -500,6 +500,3 @@ Event #: 29
 
 ```
 
- LocalWords:  doDijet boolean doTrijet AK4 trijet TTMOpenCVMVA openCV regressor
- LocalWords:  discCut modelFile TTMFilterBase TTMOverlapResolution AK8 subjets
- LocalWords:  mvaDiscWithb indicies
