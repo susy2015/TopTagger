@@ -18,7 +18,7 @@ Download the source tarball and unpack (or check the code out from github) and r
 ```
 cmake .
 make -j4
-#optional for system wide install (will require sudo rights)
+#the command below is optional for system wide install (will require sudo rights)
 make install
 ```
 
@@ -27,12 +27,11 @@ make install
 After ROOT and OpenCV are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root)
 
 ```
-git clone -b standaloneTesting git@github.com:susy2015/TopTagger.git
-#Alternately the code may be downloaded as a tarball here INSERTLINK
+#After downloading the code from github or untaring the standalone tarball 
 cd TopTagger/TopTagger/test
 ./configure OPENCVDIR=/path/to/opencv
 make -j4
-#optional for system wide install (will require sudo rights)
+#the command below is optional for system wide install (will require sudo rights)
 #To install in a non-standard directory add PREFIX=/install/path to the configure command
 make install
 ```
@@ -42,6 +41,19 @@ This command will produce a static and a shared library which contain all the ne
 ## Example code
 
 A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seen at the end of this readme.  
+
+### Running the example
+
+The example executable is compiled along with the standalone library as described above.  If either openCV or the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
+
+```
+#do once per terminal if opencv or the top tagger are not installed system wide
+source taggerSetup.sh
+#do once in any directory where you will run the top tagger example
+../../Tools/getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
+#run the example code
+./topTaggerTest
+``` 
 
 ### Tagger input variables
 
@@ -79,29 +91,16 @@ A vector of TLorentzVectors for each AK8 jet in the event.  This vector should c
 
 #### AK8SubjetLV
 
-A vector of TLorentzVectors containg the CA subjets (two per AK8 jet) produced when calculating the soft-drop mass correction, using angular exponent $\beta = 0$, soft cutoff threshold $z_{\mathrm{cut}}<0.1$, and characteristic radius $R_{0} = 0.8$.  All subjets are stored in this vector, and they are associated to the approperiate AK8 jet with dR matching.
+A vector of TLorentzVectors containg the CA subjets (two per AK8 jet) produced when calculating the soft-drop mass correction, using angular exponent beta = 0, soft cutoff threshold z_cut<0.1, and characteristic radius R_0 = 0.8.  All subjets are stored in this vector, and they are associated to the approperiate AK8 jet with dR matching.
 
 #### AK8JetTau1, AK8JetTau2, AK8JetTau3
 
-These three vectors hold the n-subjettiness variables for each jet in "AK8JetLV".  The ratios are calculated inside the top tagger.    
+These three vectors hold the n-subjettiness variables for each jet in "AK8JetLV".  The ratios (tau3/tau2 or tau2/tau1) are calculated inside the top tagger.    
 
 #### AK8JetSoftdropMass
 
-The mass of each AK8 jet in "AK8JetLV" corrected with the soft-drop, using angular exponent $\beta = 0$, soft cutoff threshold $z_{\mathrm{cut}}<0.1$, and characteristic radius $R_{0} = 0.8$.
+The mass of each AK8 jet in "AK8JetLV" corrected with the soft-drop, using angular exponent beta = 0, soft cutoff threshold z_cut<0.1, and characteristic radius R_0 = 0.8.
 
-
-### Running the example
-
-The example executable is compiled along with the standalone library as described above.  If either openCV or the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
-
-```
-#do once per terminal if opencv or the top tagger are not installed system wide
-source taggerSetup.sh
-#do once in any directory where you will run the top tagger example
-../../Tools/getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
-#run the example code
-./topTaggerTest
-``` 
 
 ### Output of example code
 
