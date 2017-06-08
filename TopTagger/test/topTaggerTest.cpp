@@ -29,7 +29,7 @@ int main()
 
     //Variables to hold inputs
     //AK4 jet variables
-    //Each entry in these vectors revers to information for 1 AK4 jet
+    //Each entry in these vectors refers to information for 1 AK4 jet
     std::vector<TLorentzVector>** AK4JetLV = new std::vector<TLorentzVector>*();
     std::vector<double>** AK4JetBtag = new std::vector<double>*();
 
