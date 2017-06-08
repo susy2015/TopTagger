@@ -79,7 +79,7 @@ A vector of TLorentzVectors for each AK8 jet in the event.  This vector should c
 
 #### AK8SubjetLV
 
-A vector of TLorentzVectors containg teh CA subjets (two per AK8 jet) produced when calculating the soft-drop mass correction, using angular exponent $\beta = 0$, soft cutoff threshold $z_{\mathrm{cut}}<0.1$, and characteristic radius $R_{0} = 0.8$.  All subjets are stored in this vector, and they are associated to the approperiate AK8 jet with dR matching.
+A vector of TLorentzVectors containg the CA subjets (two per AK8 jet) produced when calculating the soft-drop mass correction, using angular exponent $\beta = 0$, soft cutoff threshold $z_{\mathrm{cut}}<0.1$, and characteristic radius $R_{0} = 0.8$.  All subjets are stored in this vector, and they are associated to the approperiate AK8 jet with dR matching.
 
 #### AK8JetTau1, AK8JetTau2, AK8JetTau3
 
