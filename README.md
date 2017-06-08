@@ -13,7 +13,7 @@ Follow the instructions to install ROOT on your system
 
 [2] http://opencv.org/releases.html
 
-Download the source tarball and unpack (or check the code out from github) and run the following inside the opencv source folder
+Download the opencv source zip file and unpack (or check the code out from github) and run the following inside the opencv source folder
 
 ```
 cmake .
