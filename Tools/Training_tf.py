@@ -18,7 +18,7 @@ if options.sklearnrf:
   from sklearn.ensemble import RandomForestClassifier
   import pickle
 elif options.xgboost:
-  import xgboost
+  import xgboost as xgb
 else:
   import tensorflow as tf
   from tensorflow.python.framework import graph_io
@@ -34,7 +34,7 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   print "PROCESSING TRAINING DATA"
 
   #files to use for inputs
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl", "trainingTuple_division_0_ZJetsToNuNu_training.pkl"]
+  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
 
   inputData = numpy.empty([0])
   npyInputWgts = numpy.empty([0])
@@ -126,6 +126,31 @@ def mainSKL():
   fileObject.close()
       
   output = clf.predict_proba(npyInputData)[:,1]
+
+def mainXGB():
+
+  # Import data
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(False)
+
+  #randomize input data
+  perms = numpy.random.permutation(npyInputData.shape[0])
+  npyInputData = npyInputData[perms]
+  npyInputAnswer = npyInputAnswer[perms]
+  npyInputWgts = npyInputWgts[perms]
+  npyInputSampleWgts = npyInputSampleWgts[perms]
+
+  print "TRAINING XGB"
+
+  # Create xgboost classifier
+  # Train random forest 
+  xgData = xgb.DMatrix(npyInputData, label=npyInputAnswer[:,0], weight=npyInputWgts)
+  param = {'max_depth':4 }
+  gbm = xgb.train(param, xgData, num_boost_round=1000)
+  
+  #Dump output from training
+  gbm.save_model('TrainingModel.xgb')
+
+  output = gbm.predict(xgData)
 
 
 def mainTF(_):
@@ -260,6 +285,8 @@ def mainTF(_):
 if __name__ == '__main__':
   if options.sklearnrf:
     mainSKL()
+  elif options.xgboost:
+    mainXGB()
   else:
     tf.app.run(main=mainTF)
 

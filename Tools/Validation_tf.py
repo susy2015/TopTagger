@@ -13,6 +13,7 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 #parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
 parser.add_option ('-d', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
 parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
+parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 
 options, args = parser.parse_args()
 
@@ -27,6 +28,11 @@ if options.sklrf:
     fileTraining = open("TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
     fileTraining.close()
+
+elif options.xgboost:
+    import xgboost as xgb
+
+    bst = xgb.Booster(model_file="./TrainingModel.xgb") # load data
 
 else:
     import tensorflow as tf
@@ -46,7 +52,7 @@ print "PROCESSING TTBAR VALIDATION DATA"
 
 varsname = DataGetter().getList()
 
-dataTTbar = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl")
+dataTTbar = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
 numDataTTbar = dataTTbar._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
 
@@ -59,6 +65,9 @@ print "CALCULATING TTBAR DISCRIMINATORS"
 
 if options.sklrf:
     dataTTbarAns = clf1.predict_proba(dataTTbar.as_matrix(varsname))[:,1]
+elif options.xgboost:
+    xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
+    dataTTbarAns = bst.predict(xgData)
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
 
@@ -140,7 +149,7 @@ plt.close()
 
 print "PROCESSING ZNUNU VALIDATION DATA"
 
-dataZnunu = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl")
+dataZnunu = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
 numDataZnunu = dataZnunu._get_numeric_data()
 numDataZnunu[numDataZnunu < 0.0] = 0.0
 
@@ -148,6 +157,9 @@ print "CALCULATING ZNUNU DISCRIMINATORS"
 
 if options.sklrf:
     dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
+elif options.xgboost:
+    xgData = xgb.DMatrix(dataZnunu.as_matrix(varsname))
+    dataZnunuAns = bst.predict(xgData)
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
 
