@@ -50,7 +50,7 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
     
     if ptReweight:
       #calculate pt weights
-      inputWgts = numpy.empty([len(inputAnswer), 1])
+      #inputWgts = numpy.empty([len(inputAnswer), 1])
       #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
       ptBins = numpy.hstack([numpy.linspace(0, 2000, 51), [10000]])
       dataPt = data["cand_pt"]
@@ -79,19 +79,20 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   if reluInputs:
     #ensure data is all greater than one
     npyInputData[npyInputData < 0] = 0.0
-  
+
   if prescale:
     #Remove background events so that bg and signal are roughly equally represented
-    prescale = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
-    npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescale)
-    npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescale)
-    npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescale)
-    npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescale)
-  else:
-    #equalize bg and signal weights 
-    nsig = npyInputWgts[npyInputAnswer == 1].sum()
-    nbg  = npyInputWgts[npyInputAnswer != 1].sum()
-    npyInputWgts[npyInputAnswer != 1] *= nsig / nbg
+    prescaleRatio = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
+
+    npyInputData = prescaleBackground(npyInputData, npyInputAnswer, prescaleRatio)
+    npyInputAnswers = prescaleBackground(npyInputAnswers, npyInputAnswer, prescaleRatio)
+    npyInputWgts = prescaleBackground(npyInputWgts, npyInputAnswer, prescaleRatio)
+    npyInputSampleWgts = prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescaleRatio)
+
+  #equalize bg and signal weights 
+  nsig = npyInputWgts[npyInputAnswers[:,0] == 1].sum()
+  nbg  = npyInputWgts[npyInputAnswers[:,0] != 1].sum()
+  npyInputWgts[npyInputAnswers[:,0] != 1] *= nsig / nbg
 
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
@@ -145,7 +146,7 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   # Build the graph
-  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
+  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
 
   reg = tf.placeholder(tf.float32)
 
@@ -186,7 +187,7 @@ def mainTF(_):
     #Training parameters
     trainThreshold = 1e-6
     NSteps = 100
-    MaxEpoch = 500
+    MaxEpoch = 100
 
     stopCnt = 0
     lastLoss = 10e10
@@ -200,12 +201,12 @@ def mainTF(_):
       npyInputAnswer = npyInputAnswer[perms]
       npyInputWgts = npyInputWgts[perms]
       npyInputSampleWgts = npyInputSampleWgts[perms]
-      
+
       losses = []
       accs = []
       for i in xrange(NSteps):
         batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        step_loss, _, acc, summary = sess.run([loss, train_step, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: 0.0001})
+        _, step_loss, acc, summary = sess.run([train_step, loss, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: 0.0001})
         losses.append(step_loss)
         accs.append(acc)
         summary_writer.add_summary(summary, epoch*NSteps + i)
