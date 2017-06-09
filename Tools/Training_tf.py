@@ -10,12 +10,15 @@ from math import sqrt
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
 parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true', help="Run using sklearn RF")
+parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 
 options, args = parser.parse_args()
 
 if options.sklearnrf:
   from sklearn.ensemble import RandomForestClassifier
   import pickle
+elif options.xgboost:
+  import xgboost
 else:
   import tensorflow as tf
   from tensorflow.python.framework import graph_io
@@ -123,17 +126,6 @@ def mainSKL():
   fileObject.close()
       
   output = clf.predict_proba(npyInputData)[:,1]
-  
-  fout = ROOT.TFile("TrainingOut.root", "RECREATE")
-  hDiscNoMatch = ROOT.TH1D("discNoMatch", "discNoMatch", 100, 0, 1.0)
-  hDiscMatch   = ROOT.TH1D("discMatch",   "discMatch", 100, 0, 1.0)
-  for i in xrange(len(output)):
-      if npyInputAnswer[i,0] == 1:
-          hDiscMatch.Fill(output[i], npyInputSampleWgts[i])
-      else:
-          hDiscNoMatch.Fill(output[i], npyInputSampleWgts[i])
-  hDiscNoMatch.Write()
-  hDiscMatch.Write()
 
 
 def mainTF(_):
@@ -250,17 +242,6 @@ def mainTF(_):
 
     y_out, yt_out = sess.run([y, yt], feed_dict={x: npyInputData, y_: npyInputAnswer, reg: 0.0001})
     
-    fout = ROOT.TFile("TrainingOut.root", "RECREATE")
-    hDiscNoMatch = ROOT.TH1D("discNoMatch", "discNoMatch", 100, 0, 1.0)
-    hDiscMatch   = ROOT.TH1D("discMatch",   "discMatch", 100, 0, 1.0)
-    output = y_out[:,0]
-    for i in xrange(len(output)):
-        if npyInputAnswer[i,0] == 1:
-            hDiscMatch.Fill(output[i], npyInputSampleWgts[i])
-        else:
-            hDiscNoMatch.Fill(output[i], npyInputSampleWgts[i])
-    hDiscNoMatch.Write()
-    hDiscMatch.Write()
 
     #try:
     #  import matplotlib.pyplot as plt
