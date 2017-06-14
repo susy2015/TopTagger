@@ -1,4 +1,5 @@
 import os
+import errno
 import ROOT
 import numpy
 import pandas as pd
@@ -11,8 +12,21 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 
 parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true', help="Run using sklearn RF")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
+parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
 
 options, args = parser.parse_args()
+
+outputDirectory = ""
+if len(options.directory):
+  outputDirectory = options.directory + "/"
+  try:
+      os.mkdir(outputDirectory)
+  except OSError as exc:
+      if exc.errno == errno.EEXIST and os.path.isdir(outputDirectory):
+          pass
+      else:
+          raise
+
 
 if options.sklearnrf:
   from sklearn.ensemble import RandomForestClassifier
@@ -34,7 +48,8 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   print "PROCESSING TRAINING DATA"
 
   #files to use for inputs
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_2bseed.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
 
   inputData = numpy.empty([0])
   npyInputWgts = numpy.empty([0])
@@ -103,7 +118,7 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
 def mainSKL():
 
   # Import data
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(False)
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(prescale=False, ptReweight=True)
 
   #randomize input data
   perms = numpy.random.permutation(npyInputData.shape[0])
@@ -121,7 +136,7 @@ def mainSKL():
   clf = clf.fit(npyInputData, npyInputAnswer[:,0], sample_weight=npyInputWgts[:,0])
   
   #Dump output from training
-  fileObject = open("TrainingOutput.pkl",'wb')
+  fileObject = open(outputDirectory + "TrainingOutput.pkl",'wb')
   out = pickle.dump(clf, fileObject)
   fileObject.close()
       
@@ -130,7 +145,7 @@ def mainSKL():
 def mainXGB():
 
   # Import data
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(False)
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(prescale=False, ptReweight=True)
 
   #randomize input data
   perms = numpy.random.permutation(npyInputData.shape[0])
@@ -148,7 +163,7 @@ def mainXGB():
   gbm = xgb.train(param, xgData, num_boost_round=1000)
   
   #Dump output from training
-  gbm.save_model('TrainingModel.xgb')
+  gbm.save_model(outputDirectory + 'TrainingModel.xgb')
 
   output = gbm.predict(xgData)
 
@@ -239,13 +254,13 @@ def mainTF(_):
 
     #Save training checkpoint (contains a copy of the model and the weights 
     try:
-      os.mkdir("models")
+      os.mkdir(outputDirectory + "models")
     except OSError:
       pass
-    checkpoint_path = "models/model.ckpt"
+    checkpoint_path = outputDirectory + "models/model.ckpt"
     save_path = saver.save(sess, checkpoint_path)
 
-    input_graph_path = "tfModel.pb"
+    input_graph_path = outputDirectory + "tfModel.pb"
     graph_io.write_graph(sess.graph, "./", input_graph_path)
 
     #create frozen version of graph for distribution
@@ -254,7 +269,7 @@ def mainTF(_):
     output_node_names = "y"
     restore_op_name = "save/restore_all"
     filename_tensor_name = "save/Const:0"
-    output_graph_path = "tfModel_frozen.pb"
+    output_graph_path = outputDirectory + "tfModel_frozen.pb"
     clear_devices = False
 
     freeze_graph.freeze_graph(input_graph_path, input_saver_def_path,

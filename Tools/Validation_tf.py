@@ -1,4 +1,6 @@
 import sys
+import os
+import errno
 import pandas as pd
 import numpy as np
 import math
@@ -7,15 +9,48 @@ import optparse
 import matplotlib.pyplot as plt
 import pickle
 
+def load_graph(frozen_graph_filename):
+    # We load the protobuf file from the disk and parse it to retrieve the 
+    # unserialized graph_def
+    with tf.gfile.GFile(frozen_graph_filename, "rb") as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+
+    # Then, we can use again a convenient built-in function to import a graph_def into the 
+    # current default Graph
+    with tf.Graph().as_default() as graph:
+        tf.import_graph_def(
+            graph_def, 
+            input_map=None, 
+            return_elements=None, 
+            name="", 
+            op_dict=None, 
+            producer_op_list=None
+        )
+    return graph
+
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
 #parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
 #parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
-parser.add_option ('-d', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
+parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
 parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
+parser.add_option ('-f', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
+parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
 
 options, args = parser.parse_args()
+
+outputDirectory = ""
+if len(options.directory):
+  outputDirectory = options.directory + "/"
+  try:
+      os.mkdir(outputDirectory)
+  except OSError as exc:
+      if exc.errno == errno.EEXIST and os.path.isdir(outputDirectory):
+          pass
+      else:
+          raise
 
 #disc cut
 discCut = options.discCut
@@ -25,41 +60,66 @@ print "RETRIEVING MODEL FILE"
 if options.sklrf:
     from sklearn.ensemble import RandomForestClassifier
     
-    fileTraining = open("TrainingOutput.pkl",'r')
+    if len(options.mvaFile):
+        fileTraining = open(options.mvaFile,'r')
+    else:
+        fileTraining = open("TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
     fileTraining.close()
 
 elif options.xgboost:
     import xgboost as xgb
 
-    bst = xgb.Booster(model_file="./TrainingModel.xgb") # load data
+    if len(options.mvaFile):
+        bst = xgb.Booster(model_file=options.mvaFile) # load data
+    else:
+        bst = xgb.Booster(model_file="./TrainingModel.xgb") # load data
+
+
 
 else:
     import tensorflow as tf
 
-    #Get training output
-    saver = tf.train.import_meta_graph('models/model.ckpt.meta')
-    sess = tf.Session()
-    # To initialize values with saved data
-    saver.restore(sess, './models/model.ckpt')
-    # Restrieve useful variables
-    trainInfo = tf.get_collection('TrainInfo')
-    x = trainInfo[0]
-    y_train = trainInfo[1]
+    ##TODO: Switchen to frozen model file 
+    ##Get training output
+    #saver = tf.train.import_meta_graph('models/model.ckpt.meta')
+    #sess = tf.Session()
+    ## To initialize values with saved data
+    #saver.restore(sess, './models/model.ckpt')
+    ## Restrieve useful variables
+    #trainInfo = tf.get_collection('TrainInfo')
+    #x = trainInfo[0]
+    #y_train = trainInfo[1]
+
+    # We use our "load_graph" function
+    if len(options.mvaFile):
+        graph = load_graph(options.mvaFile)
+    else:
+        graph = load_graph("./tfModel_frozen.pb")
+
+    # create the tf session
+    sess = tf.Session(graph=graph)
+
+    # We access the input and output nodes 
+    x = graph.get_tensor_by_name('x:0')
+    y_train = graph.get_tensor_by_name('y:0')
+
 
 
 print "PROCESSING TTBAR VALIDATION DATA"
 
 varsname = DataGetter().getList()
 
-dataTTbar = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
-numDataTTbar = dataTTbar._get_numeric_data()
+dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
+#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
+numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
 
 #print list(dataTTbar.columns.values)
 
 #Apply baseline cuts
-dataTTbar = dataTTbar[dataTTbar.Njet >= 4]
+dataTTbarAll = dataTTbarAll[dataTTbarAll.Njet >= 4]
+dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 print "CALCULATING TTBAR DISCRIMINATORS"
 
@@ -84,7 +144,7 @@ plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatche
 plt.legend(loc='upper right')
 plt.xlabel("Discriminator")
 plt.ylabel("Normalized events")
-plt.savefig("discriminator.png")
+plt.savefig(outputDirectory + "discriminator.png")
 plt.close()
 
 #plot efficiency
@@ -110,7 +170,7 @@ for var in varsname:
     plt.legend()
     plt.xlabel(var)
     plt.ylabel("Normalized events")
-    plt.savefig(var + ".png")
+    plt.savefig(outputDirectory + var + ".png")
     plt.close()
 
 
@@ -129,7 +189,7 @@ plt.hist(ptBins[:-1], bins=ptBins, weights=purity, fill=False, histtype='step')
 #plt.legend(loc='upper right')
 plt.xlabel("pT [GeV]")
 plt.ylabel("Purity")
-plt.savefig("purity.png")
+plt.savefig(outputDirectory + "purity.png")
 plt.close()
 
 plt.clf()
@@ -144,14 +204,18 @@ plt.hist(discBins[:-1], bins=discBins, weights=purityDisc, fill=False, histtype=
 #plt.legend(loc='upper right')
 plt.xlabel("Discriminator")
 plt.ylabel("Purity")
-plt.savefig("purity_disc.png")
+plt.savefig(outputDirectory + "purity_disc.png")
 plt.close()
 
 print "PROCESSING ZNUNU VALIDATION DATA"
 
-dataZnunu = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
-numDataZnunu = dataZnunu._get_numeric_data()
+dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_2bseed.pkl.gz")
+#dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
+numDataZnunu = dataZnunuAll._get_numeric_data()
 numDataZnunu[numDataZnunu < 0.0] = 0.0
+
+dataZnunuAll = dataZnunuAll[dataZnunuAll.Njet >= 4]
+dataZnunu = dataZnunuAll[dataZnunuAll.ncand > 0]
 
 print "CALCULATING ZNUNU DISCRIMINATORS"
 
@@ -169,7 +233,7 @@ plt.clf()
 
 metBins = numpy.linspace(0, 1000, 21)
 frMETNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["MET"].ix[:,0], bins=metBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
-frMETDen,_  = numpy.histogram(dataZnunu["MET"].ix[:,0],                         bins=metBins, weights=dataZnunu["sampleWgt"].ix[:,0])
+frMETDen,_  = numpy.histogram(dataZnunuAll["MET"].ix[:,0],                      bins=metBins, weights=dataZnunuAll["sampleWgt"].ix[:,0])
 
 frMETNum[frMETDen < 1e-10] = 0.0
 frMETDen[frMETDen < 1e-10] = 1.0
@@ -179,14 +243,14 @@ plt.hist(metBins[:-1], bins=metBins, weights=frMET, fill=False, histtype='step')
 #plt.legend(loc='upper right')
 plt.xlabel("MET [GeV]")
 plt.ylabel("Fake rate")
-plt.savefig("fakerate_met.png")
+plt.savefig(outputDirectory + "fakerate_met.png")
 plt.close()
 
 plt.clf()
 
 njBins = numpy.linspace(0, 20, 21)
 frNjNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["Njet"].ix[:,0], bins=njBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
-frNjDen,_  = numpy.histogram(dataZnunu["Njet"].ix[:,0],                         bins=njBins, weights=dataZnunu["sampleWgt"].ix[:,0])
+frNjDen,_  = numpy.histogram(dataZnunuAll["Njet"].ix[:,0],                      bins=njBins, weights=dataZnunuAll["sampleWgt"].ix[:,0])
 
 frNjNum[frNjDen < 1e-10] = 0.0
 frNjDen[frNjDen < 1e-10] = 1.0
@@ -196,7 +260,7 @@ plt.hist(njBins[:-1], bins=njBins, weights=frNj, fill=False, histtype='step')
 #plt.legend(loc='upper right')
 plt.xlabel("N jets")
 plt.ylabel("Fake rate")
-plt.savefig("fakerate_njets.png")
+plt.savefig(outputDirectory + "fakerate_njets.png")
 plt.close()
 
 print "CALCULATING ROC CURVES"
@@ -227,17 +291,20 @@ NevtTPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar>ptCu
 NevtFPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar>ptCut)].sum()
 NevtZPtCut = evtwgtZnunu[cantPtZnunu > ptCut].sum()
 
-for cut in cuts:
-    FPR.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec!=3)].sum() / NevtFPR    )
-    TPR.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec==3)].sum() / NevtTPR    )
-    FPRZ.append( evtwgtZnunu[(dataZnunuAns > cut)].sum() / NevtZ )
+dataTTbarAnsRoc = (dataTTbarAns - dataTTbarAns.min()) / dataTTbarAns.ptp()
+dataZnunuAnsRoc = (dataZnunuAns - dataZnunuAns.min()) / dataZnunuAns.ptp()
 
-    FPRPtCut.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar > ptCut)].sum() / NevtFPRPtCut    )
-    TPRPtCut.append(  evtwgt[(dataTTbarAns > cut) & (dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar > ptCut)].sum() / NevtTPRPtCut    )
-    FPRZPtCut.append( evtwgtZnunu[(dataZnunuAns > cut) & (cantPtZnunu > ptCut)].sum() / NevtZPtCut )
+for cut in cuts:
+    FPR.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec!=3)].sum() / NevtFPR    )
+    TPR.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec==3)].sum() / NevtTPR    )
+    FPRZ.append( evtwgtZnunu[(dataZnunuAnsRoc > cut)].sum() / NevtZ )
+
+    FPRPtCut.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar > ptCut)].sum() / NevtFPRPtCut    )
+    TPRPtCut.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar > ptCut)].sum() / NevtTPRPtCut    )
+    FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (cantPtZnunu > ptCut)].sum() / NevtZPtCut )
 
 #Dump roc to file
-fileObject = open("roc.pkl",'wb')
+fileObject = open(outputDirectory + "roc.pkl",'wb')
 pickle.dump(TPR, fileObject)
 pickle.dump(FPR, fileObject)
 pickle.dump(FPRZ, fileObject)
@@ -250,14 +317,14 @@ plt.clf()
 plt.plot(FPR,TPR)
 plt.xlabel("FPR (ttbar)")
 plt.ylabel("TPR (ttbar)")
-plt.savefig("roc.png")
+plt.savefig(outputDirectory + "roc.png")
 plt.close()
 
 plt.clf()
 plt.plot(FPRZ,TPR)
 plt.xlabel("FPR (Znunu)")
 plt.ylabel("TPR (ttbar)")
-plt.savefig("rocZ.png")
+plt.savefig(outputDirectory + "rocZ.png")
 plt.close()
 
 
