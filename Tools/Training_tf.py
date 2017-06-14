@@ -48,8 +48,10 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   print "PROCESSING TRAINING DATA"
 
   #files to use for inputs
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_2bseed.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_2bseed.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_TeamASel.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_jpt20_nocone.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
 
   inputData = numpy.empty([0])
   npyInputWgts = numpy.empty([0])

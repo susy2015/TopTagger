@@ -20,21 +20,40 @@ import numpy as np
 #files =  ["roc_mlp_nominal_2.pkl", "roc_mlp_TeamAVars_3.pkl", "roc_mlp_nominal_dRVars_3.pkl", "roc.pkl"]
 #labels = ["MLP Nominal 2",         "MLP TeamA 3",             "MPL Nominal + dR Vars 3",      "New"]
 
-inputs = {"rf_2bseed": {"files":  ["roc_rf_2bseed_teamAlpha.pkl", "roc_rf_2bseed_teamA.pkl", "roc_rf_2bseed_mixedvars.pkl"],# "roc_rf_2bseed_TeamA_noPtWgt.pkl", "roc_rf_2bseed_TeamAlpha_noPtWgt.pkl"],
-                        "labels": ["Team Alpha",                  "Team A",                  "Mixed",                     ],#  "Team Alpha no pT wgt",            "Team A no pT wgt"]
+inputs = {"rf_2bseed": {"files":  ["RF_TeamAlpha_2BSelection/roc.pkl", "RF_TeamA_2BSelection/roc.pkl", "RF_Mixed_2BSelection/roc.pkl"],
+                        "labels": ["Team Alpha",                       "Team A",                  "Mixed",                     ],
                     },
 #          "xgb_2bseed": {"files":  ["roc_xgb_2bseed_TeamAlpha.pkl", "roc_xgb_2bseed_TeamA.pkl"],# "roc_xgb_2bseed_TeamA_noPtWgt.pkl", "roc_xgb_2bseed_TeamAlpha_noPtWgt.pkl"],
 #                         "labels": ["Team Alpha",                   "Team A",                 ],#  "Team Alpha no pT wgt",             "Team A no pT wgt"]
 #                     },
-          "MVAcomp": {"files":  ["roc_xgb.pkl", "roc_rf.pkl",   "roc_mlp.pkl"],
+          "MVAcomp": {"files":  ["XGB_TeamAlpha_Nominal/roc.pkl", "RF_TeamAlpha_Nominal/roc.pkl",   "MLP_TeamAlpha_Nominal/roc.pkl"],
                       "labels": ["xgboot",      "random forest", "Multi-layer perceptron"]
                   },
-          "rf_nomSel": {"files":  ["RF_TeamA_Nominal/roc.pkl", "RF_Mixed_Nominal/roc.pkl", "RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamAMoreQGL_Nominal/roc.pkl", "RF_TeamAlphaMoreQGL_Nominal/roc.pkl"],
-                        "labels": ["Team A",  "Mixed Variables",         "Team Alpha",           "A + QGL vars",   "Alpha + QGL Vars"],
+          "MVAcompWithZ": {"files":  ["XGB_TeamAlpha_NominalWithZ/roc.pkl", "RF_TeamAlpha_NominalWithZ/roc.pkl",   "MLP_TeamAlpha_NominalWithZ/roc.pkl"],
+                           "labels": ["xgboot",      "random forest", "Multi-layer perceptron"]
+                  },
+          "rf_nomSel": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl","RF_TeamA_Nominal/roc.pkl", "RF_Mixed_Nominal/roc.pkl"],
+                        "labels": ["Team Alpha",  "Team A",         "Mixed Variables"]
                     },
-          "rf_withZ": {"files":  ["RF_TeamA_Nominal/roc.pkl", "RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamA_NominalWithZ/roc.pkl", "RF_TeamAlpha_NominalWithZ/roc.pkl"],
-                       "labels": ["Team A top only",           "Team Alpha top only", "Team A top + Z",           "Team Alpha top + Z"]
+          "rf_moreQGL": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamA_Nominal/roc.pkl", "RF_TeamAlphaMoreQGL_Nominal/roc.pkl", "RF_TeamAMoreQGL_Nominal/roc.pkl"],
+                         "labels": ["Team Alpha", "Team A",   "Alpha + QGL Vars",                   "A + QGL vars"],
                     },
+          "rf_withZ": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamA_Nominal/roc.pkl", "RF_TeamAlpha_NominalWithZ/roc.pkl", "RF_TeamA_NominalWithZ/roc.pkl"],
+                       "labels": ["Team Alpha top only", "Team A top only",                  "Team Alpha top + Z",   "Team A top + Z"]
+                    },
+          "rf_teamAsel": {"files":  ["RF_TeamAlpha_TeamASel/roc.pkl", "RF_TeamA_TeamASel/roc.pkl", "RF_Mixed_TeamASel/roc.pkl"],
+                          "labels": ["Team Alpha",                       "Team A",                  "Mixed",                     ],
+                    },
+          "rf_pt20NoCone": {"files":  ["RF_TeamAlpha_pt20NoCone/roc.pkl", "RF_TeamA_pt20NoCone/roc.pkl"],
+                          "labels": ["Team Alpha",                       "Team A"]
+                    },
+          "rfvsmlp_pt20NoCone": {"files":  ["RF_TeamAlpha_pt20NoCone/roc.pkl", "MLP_TeamAlpha_pt20NoCone/roc.pkl", "MLP_TeamAlphaWithCandPt_pt20NoCone/roc.pkl"],
+                                 "labels": ["Random Forest",                   "Multi-layer perceptron",           "MLP with candidate pt"]
+                    },
+          "rf_withZvsWithoutZ": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamAlpha_NominalWithZ/roc.pkl"],
+                                 "labels": ["Top only", "Top +Z"]
+                    },
+
 }
           
 
@@ -59,7 +78,7 @@ for name, filelist in inputs.iteritems():
         FPRZPtCut = pickle.load(f1)
     
         plt.plot(FPR, TPR, label=label, color=color, alpha=0.6)
-        plt.plot(FPRPtCut, TPRPtCut, label=label+" Pt cut", linestyle="dotted", color=color, alpha=0.8)
+        plt.plot(FPRPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=0.8)
     
     plt.legend(loc="lower right")
     plt.xlabel("FPR (ttbar)")
@@ -86,7 +105,7 @@ for name, filelist in inputs.iteritems():
         FPRZPtCut = pickle.load(f1)
     
         plt.plot(FPRZ, TPR, label=label, color=color, alpha=0.6)
-        plt.plot(FPRZPtCut, TPRPtCut, label=label+" Pt cut", linestyle="dotted", color=color, alpha=0.8)
+        plt.plot(FPRZPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=0.8)
     
     plt.legend(loc="lower right")
     plt.xlabel("FPR (Znunu)")

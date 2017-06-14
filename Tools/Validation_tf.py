@@ -110,7 +110,9 @@ print "PROCESSING TTBAR VALIDATION DATA"
 
 varsname = DataGetter().getList()
 
-dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
+#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
+#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_TeamASel.pkl.gz")
+dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
 numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
@@ -209,8 +211,8 @@ plt.close()
 
 print "PROCESSING ZNUNU VALIDATION DATA"
 
-dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_2bseed.pkl.gz")
-#dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
+#dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_2bseed.pkl.gz")
+dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
 numDataZnunu = dataZnunuAll._get_numeric_data()
 numDataZnunu[numDataZnunu < 0.0] = 0.0
 
