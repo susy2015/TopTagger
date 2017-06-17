@@ -50,7 +50,8 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
   #files to use for inputs
   #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_2bseed.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
   #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_TeamASel.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_jpt20_nocone.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_jpt20_nocone.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
+  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training_700K.pkl.gz"]
   #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
 
   inputData = numpy.empty([0])
@@ -180,7 +181,7 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   # Build the graph
-  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
+  x, y_, y, yt, w_fc, b_fc = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
 
   reg = tf.placeholder(tf.float32)
 
@@ -189,8 +190,8 @@ def mainTF(_):
   tf.add_to_collection('TrainInfo', x)
   tf.add_to_collection('TrainInfo', y)
 
-  cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
-  #cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt))
+  #cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
+  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt))
   l2_norm = tf.constant(0.0)
   for w in w_fc.values():
     l2_norm += tf.nn.l2_loss(w)
@@ -215,18 +216,19 @@ def mainTF(_):
   saver = tf.train.Saver()
 
   with tf.Session() as sess:
-    summary_writer = tf.summary.FileWriter("log_graph", graph=tf.get_default_graph())
+    summary_writer = tf.summary.FileWriter(outputDirectory + "log_graph", graph=tf.get_default_graph())
     sess.run(tf.global_variables_initializer())
 
     #Training parameters
     trainThreshold = 1e-6
-    NSteps = 100
+    NSteps = 1000
     MaxEpoch = 100
 
     stopCnt = 0
     lastLoss = 10e10
     NData = len(npyInputData)
     stepSize = NData/NSteps
+    print stepSize
     for epoch in xrange(0, MaxEpoch):
 
       #randomize input data

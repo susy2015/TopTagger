@@ -50,9 +50,19 @@ inputs = {"rf_2bseed": {"files":  ["RF_TeamAlpha_2BSelection/roc.pkl", "RF_TeamA
           "rfvsmlp_pt20NoCone": {"files":  ["RF_TeamAlpha_pt20NoCone/roc.pkl", "MLP_TeamAlpha_pt20NoCone/roc.pkl", "MLP_TeamAlphaWithCandPt_pt20NoCone/roc.pkl"],
                                  "labels": ["Random Forest",                   "Multi-layer perceptron",           "MLP with candidate pt"]
                     },
-          "rf_withZvsWithoutZ": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamAlpha_NominalWithZ/roc.pkl"],
-                                 "labels": ["Top only", "Top +Z"]
+#          "mlp_comp": {"files":  ["MLP_TeamAlpha_100_50_50_1M/roc.pkl", "MLP_TeamAlphaWithCandPt_100_50_50_1M/roc.pkl", "MLP_TeamAlphaMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlpha_50_50_1M/roc.pkl", "MLP_Mixed_100_50_50_1M/roc.pkl", "MLP_MixedWithCandPt_100_50_50_1M/roc.pkl", "MLP_MixedWithCandPtAndMoreQGL_100_50_50_1M/roc.pkl"],
+#                       "labels": ["Team Alpha", "Team Alpha + cand pt", "Team Alpha + More QGL", "Team Alpha 50,50", "Mixed", "Mixed + cand Pt", "Mixed + cand pt + more QGL"]
+#                    },
+#          "mlp_comp": {"files":  ["RF_TeamAlphaMoreQGL_Nominal/roc.pkl", "MLP_TeamAlphaMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaMoreQGL_100_50_50_1MWithZ/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1MWithZ/roc.pkl", "MLP_noPtWgt_TeamAlphaMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1M/roc.pkl"],
+#                       "labels": ["RF More QGL", "More QGL", "Cand pt + More QGL", "More QGL With Z", "cand pt + More QGL With Z", "More QGL no wgt", "Cand pt + More QGL no wgt"]
+#                    },
+          "mlp_comp": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "MLP_noPtWgt_TeamAlpha_100_50_50_1M_NSTEP_1000_NEPOCH_100_LEARNINGRATE_1em3/roc.pkl", "MLP_noPtWgt_TeamAlphaWitCandPt_100_50_50_1M_NSTEP_1000_NEPOCH_100_LEARNINGRATE_1em3/roc.pkl", "MLP_noPtWgt_TeamAlphaMoreQGL_100_50_50_1M_NSTEP_1000_NEPOCH_100_LEARNINGRATE_1em3/roc.pkl", "MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M_NSTEP_1000_NEPOCH_100_LEARNINGRATE_1em3/roc.pkl"],
+                       "labels": ["RF Nominal", "MLP Nominal", "Cand pt", "More QGL", "Cand pt + more QGL"]
                     },
+          "mlp_nepochs": {"files":  ["MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M/roc.pkl", "MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M_NSTEP_1000/roc.pkl", "MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M_NSTEP_1000_NEPOCH_30/roc.pkl", "MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M_NSTEP_1000_NEPOCH_50_LEARNINGRATE_1em3/roc.pkl", "MLP_noPtWgt_TeamAlphaWithCandPtMoreQGL_100_50_50_1M_NSTEP_1000_NEPOCH_100_LEARNINGRATE_1em3/roc.pkl"],
+                          "labels": ["15 Epoch, 5000 minibatches", "15 Epoch, 1000 minibatches", "30 Epoch, 1000 minibatches", "50 Epoch, 1000 minibatches", "100 Epoch, 1000 minibatches"]
+                    },
+          
 
 }
           
@@ -77,8 +87,8 @@ for name, filelist in inputs.iteritems():
         FPRPtCut = pickle.load(f1)
         FPRZPtCut = pickle.load(f1)
     
-        plt.plot(FPR, TPR, label=label, color=color, alpha=0.6)
-        plt.plot(FPRPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=0.8)
+        plt.plot(FPR, TPR, label=label, color=color, alpha=1.0)
+        plt.plot(FPRPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=1.0)
     
     plt.legend(loc="lower right")
     plt.xlabel("FPR (ttbar)")
@@ -104,8 +114,8 @@ for name, filelist in inputs.iteritems():
         FPRPtCut = pickle.load(f1)
         FPRZPtCut = pickle.load(f1)
     
-        plt.plot(FPRZ, TPR, label=label, color=color, alpha=0.6)
-        plt.plot(FPRZPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=0.8)
+        plt.plot(FPRZ, TPR, label=label, color=color, alpha=1.0)
+        plt.plot(FPRZPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=1.0)
     
     plt.legend(loc="lower right")
     plt.xlabel("FPR (Znunu)")

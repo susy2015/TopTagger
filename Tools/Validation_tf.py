@@ -112,8 +112,8 @@ varsname = DataGetter().getList()
 
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_TeamASel.pkl.gz")
-dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
-#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
+#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
+dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
 numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
 
