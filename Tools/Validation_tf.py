@@ -63,7 +63,7 @@ if options.sklrf:
     if len(options.mvaFile):
         fileTraining = open(options.mvaFile,'r')
     else:
-        fileTraining = open("TrainingOutput.pkl",'r')
+        fileTraining = open(outputDirectory + "TrainingOutput.pkl",'r')
     clf1 = pickle.load(fileTraining)
     fileTraining.close()
 
@@ -73,9 +73,7 @@ elif options.xgboost:
     if len(options.mvaFile):
         bst = xgb.Booster(model_file=options.mvaFile) # load data
     else:
-        bst = xgb.Booster(model_file="./TrainingModel.xgb") # load data
-
-
+        bst = xgb.Booster(model_file=outputDirectory+"./TrainingModel.xgb") # load data
 
 else:
     import tensorflow as tf
@@ -95,7 +93,7 @@ else:
     if len(options.mvaFile):
         graph = load_graph(options.mvaFile)
     else:
-        graph = load_graph("./tfModel_frozen.pb")
+        graph = load_graph(outputDirectory + "./tfModel_frozen.pb")
 
     # create the tf session
     sess = tf.Session(graph=graph)
@@ -113,15 +111,28 @@ varsname = DataGetter().getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_TeamASel.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
-dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
+#dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
+
+if options.sklrf:
+    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
+elif options.xgboost:
+    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
+else:
+    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
+
 numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
+
+#dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k_gen.pkl.gz")
+dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
 
 #print list(dataTTbar.columns.values)
 
 #Apply baseline cuts
 dataTTbarAll = dataTTbarAll[dataTTbarAll.Njet >= 4]
 dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
+
+dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
 print "CALCULATING TTBAR DISCRIMINATORS"
 
@@ -151,7 +162,33 @@ plt.close()
 
 #plot efficiency
 
-#ptNum, ptNumBins = numpy.histogram(dataTTbar[]["cand_pt"], bins=numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 1000]]), weights=npyInputSampleWgts[:,0])
+effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 700, 10), [800, 1000]])
+ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["sampleWgt"])
+ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
+
+effPt = ptNum/ptDen
+
+plt.clf()
+plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("Candidate Pt [GeV]")
+plt.ylabel("Efficiency")
+plt.savefig(outputDirectory + "efficiency.png")
+plt.close()
+
+effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
+ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["sampleWgt"])
+ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
+
+effPt = ptNum/ptDen
+
+plt.clf()
+plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("Candidate Pt [GeV]")
+plt.ylabel("Efficiency")
+plt.savefig(outputDirectory + "efficiency.png")
+plt.close()
 
 #input variable histograms
 
@@ -181,9 +218,9 @@ for var in varsname:
 
 plt.clf()
 
-ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 15), numpy.linspace(450, 700, 6), [800, 1000]])
-purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][genMatches == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][genMatches == 1])
-purityDen,_  = numpy.histogram(dataTTbar["cand_pt"],                  bins=ptBins, weights=dataTTbar["sampleWgt"])
+ptBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
+purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCut][genMatches[dataTTbarAns > discCut] == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCut][genMatches[dataTTbarAns > discCut] == 1])
+purityDen,_  = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCut],                  bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCut])
 
 purity = purityNum/purityDen
 
@@ -211,8 +248,14 @@ plt.close()
 
 print "PROCESSING ZNUNU VALIDATION DATA"
 
+if options.sklrf:
+    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+elif options.xgboost:
+    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+else:
+    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+
 #dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_2bseed.pkl.gz")
-dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz")
 numDataZnunu = dataZnunuAll._get_numeric_data()
 numDataZnunu[numDataZnunu < 0.0] = 0.0
 

@@ -41,19 +41,10 @@ else:
 def prescaleBackground(input, answer, prescale):
   return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
 
-def importData(prescale = True, reluInputs=True, ptReweight=True):
+def importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, reluInputs=True, ptReweight=True):
   #variables to train
   vars = DataGetter().getList()
   
-  print "PROCESSING TRAINING DATA"
-
-  #files to use for inputs
-  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_2bseed.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_TeamASel.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_jpt20_nocone.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-  samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"]#, "trainingTuple_division_0_ZJetsToNuNu_training_700K.pkl.gz"]
-  #samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_0_ZJetsToNuNu_training.pkl.gz"]
-
   inputData = numpy.empty([0])
   npyInputWgts = numpy.empty([0])
 
@@ -120,8 +111,10 @@ def importData(prescale = True, reluInputs=True, ptReweight=True):
 
 def mainSKL():
 
+  print "PROCESSING TRAINING DATA"
+
   # Import data
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(prescale=False, ptReweight=True)
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale=True, ptReweight=True)
 
   #randomize input data
   perms = numpy.random.permutation(npyInputData.shape[0])
@@ -146,6 +139,8 @@ def mainSKL():
   output = clf.predict_proba(npyInputData)[:,1]
 
 def mainXGB():
+
+  print "PROCESSING TRAINING DATA"
 
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(prescale=False, ptReweight=True)
@@ -172,8 +167,12 @@ def mainXGB():
 
 
 def mainTF(_):
+
+  print "PROCESSING TRAINING DATA"
+
   # Import data
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData()
+  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
+  npyValidData, npyValidAnswer, _, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz"])
 
   #scale data inputs to range 0-1
   mins = npyInputData.min(0)
@@ -202,13 +201,15 @@ def mainTF(_):
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
   # Create a summary to monitor cost tensor
-  tf.summary.scalar("cross_entropy", cross_entropy)
-  tf.summary.scalar("l2_norm", l2_norm)
-  tf.summary.scalar("loss", loss)
+  summary_ce = tf.summary.scalar("cross_entropy", cross_entropy)
+  summary_l2n = tf.summary.scalar("l2_norm", l2_norm)
+  summary_loss = tf.summary.scalar("loss", loss)
+  summary_tloss = tf.summary.scalar("train_loss", loss)
+  summary_vloss = tf.summary.scalar("valid_loss", loss)
   # Create a summary to monitor accuracy tensor
-  tf.summary.scalar("accuracy", accuracy)
+  #tf.summary.scalar("accuracy", accuracy)
   # Merge all summaries into a single op
-  merged_summary_op = tf.summary.merge_all()
+  merged_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss])
 
   print "TRAINING MLP"
 
@@ -221,14 +222,13 @@ def mainTF(_):
 
     #Training parameters
     trainThreshold = 1e-6
-    NSteps = 1000
+    stepSize = 300
     MaxEpoch = 100
 
     stopCnt = 0
     lastLoss = 10e10
     NData = len(npyInputData)
-    stepSize = NData/NSteps
-    print stepSize
+    NSteps = NData/stepSize
     for epoch in xrange(0, MaxEpoch):
 
       #randomize input data
@@ -236,27 +236,22 @@ def mainTF(_):
       npyInputData = npyInputData[perms]
       npyInputAnswer = npyInputAnswer[perms]
       npyInputWgts = npyInputWgts[perms]
-      npyInputSampleWgts = npyInputSampleWgts[perms]
+      #npyInputSampleWgts = npyInputSampleWgts[perms]
 
-      losses = []
-      accs = []
+      l2Reg = 0.0001
       for i in xrange(NSteps):
         batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        _, step_loss, acc, summary = sess.run([train_step, loss, accuracy, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: 0.0001})
-        losses.append(step_loss)
-        accs.append(acc)
+        _, summary = sess.run([train_step, merged_summary_op], feed_dict={x: batch[0], y_: batch[1], wgt: batch[2], reg: l2Reg})
         summary_writer.add_summary(summary, epoch*NSteps + i)
-      currentLoss = numpy.mean(losses)
-      print('epoch %d, training accuracy %0.6f, training loss %0.6f' % (epoch, numpy.mean(accs), currentLoss))
-      if (lastLoss - currentLoss) < trainThreshold or (lastLoss - currentLoss) < 0:
-        stopCnt += 1
-      else:
-        stopCnt = 0
-      #if stopCnt >= 3:
-      #  break
-      lastLoss = currentLoss
 
-    #Save training checkpoint (contains a copy of the model and the weights 
+      train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={x: npyInputData, y_: npyInputAnswer, reg: l2Reg})
+      validation_loss, summary_vl = sess.run([loss, summary_vloss], feed_dict={x: npyValidData, y_: npyValidAnswer, reg: l2Reg})
+      summary_writer.add_summary(summary_tl, epoch)
+      summary_writer.add_summary(summary_vl, epoch)
+      print('epoch %d, training loss %0.6f, validation loss %0.6f' % (epoch, train_loss, validation_loss))
+
+
+    #Save training checkpoint (contains a copy of the model and the weights)
     try:
       os.mkdir(outputDirectory + "models")
     except OSError:
@@ -286,7 +281,6 @@ def mainTF(_):
 
     y_out, yt_out = sess.run([y, yt], feed_dict={x: npyInputData, y_: npyInputAnswer, reg: 0.0001})
     
-
     #try:
     #  import matplotlib.pyplot as plt
     #  

@@ -5,7 +5,8 @@ import optparse
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
-parser.add_option ('-f', "--file", dest='fileNum', action='store', help="Input file")
+parser.add_option ('-f', "--file",      dest='fileNum', action='store',      help="Input file")
+parser.add_option ('-g', "--genPtOnly", dest='gptOnly', action='store_true', help="Only produce the gen pt file")
 
 options, args = parser.parse_args()
 
@@ -14,6 +15,7 @@ def main():
     dataset = ROOT.TFile.Open(datasetFile)
 
     data = []
+    genData = []
 
     branchNames = [b.GetName() for b in dataset.slimmedTuple.GetListOfBranches()]
     #print branchNames
@@ -43,20 +45,33 @@ def main():
             evalStrNoCand = "{\"eventNum\":%(nevt)i, \"candNum\":%(i)i, \"ncand\":%(ncand)i, " + ",".join(bnListNoCand) + "}"
             #print evalStr
         ncands = len(dataset.slimmedTuple.cand_m)
-        for i in xrange(0, ncands):
-            data.append( eval(evalStr%{"i":i, "nevt":nevt, "ncand":ncands}) )
-        if ncands == 0:
-            data.append( eval(evalStrNoCand%{"i":0, "nevt":nevt, "ncand":ncands}) )
+        if not options.gptOnly:
+            for i in xrange(0, ncands):
+                data.append( eval(evalStr%{"i":i, "nevt":nevt, "ncand":ncands}) )
+            if ncands == 0:
+                data.append( eval(evalStrNoCand%{"i":0, "nevt":nevt, "ncand":ncands}) )
+        
+        for i in xrange(0, len(event.genTopPt)):
+            genData.append({"eventNum":nevt, "candNum":i, "genTopPt":event.genTopPt[i], "sampleWgt":event.sampleWgt, "Njet":event.Njet})
 
-    pdData = pd.DataFrame(data)
+    if not options.gptOnly:
+        pdData = pd.DataFrame(data)
 
-    indices = [pdData.as_matrix(["eventNum"]).reshape([-1]), pdData.as_matrix(["candNum"]).reshape([-1])]
+        indices = [pdData.as_matrix(["eventNum"]).reshape([-1]), pdData.as_matrix(["candNum"]).reshape([-1])]
     
-    fullBranchNames = np.hstack([["ncand"], branchNames] )
-    pdData = pd.DataFrame(pdData.as_matrix(fullBranchNames), index=pd.MultiIndex.from_arrays(indices), columns=fullBranchNames)
+        fullBranchNames = np.hstack([["ncand"], branchNames] )
+        pdData = pd.DataFrame(pdData.as_matrix(fullBranchNames), index=pd.MultiIndex.from_arrays(indices), columns=fullBranchNames)
 
-    #pdData.to_csv(datasetFile[0:-5] + ".csv")
-    pdData.to_pickle(datasetFile[0:-5] + ".pkl.gz")
+        #pdData.to_csv(datasetFile[0:-5] + ".csv")
+        pdData.to_pickle(datasetFile[0:-5] + ".pkl.gz")
+
+    pdGenData = pd.DataFrame(genData)
+
+    genIndices = [pdGenData.as_matrix(["eventNum"]).reshape([-1]), pdGenData.as_matrix(["candNum"]).reshape([-1])]
+
+    fullBranchNames = ["genTopPt", "sampleWgt", "Njet"]
+    pdGenData = pd.DataFrame(pdGenData.as_matrix(fullBranchNames), index=pd.MultiIndex.from_arrays(genIndices), columns=fullBranchNames)
+    pdGenData.to_pickle(datasetFile[0:-5] + "_gen.pkl.gz")
 
 if __name__ == '__main__':
     main()
