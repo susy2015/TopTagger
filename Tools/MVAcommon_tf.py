@@ -57,9 +57,15 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     if len(nnStruct) < 2:
         throw
     
+    #Define input queues
+    inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[16], dtypes=tf.float32)
+    inputAnsQueue = tf.FIFOQueue(capacity=512, shapes=[2], dtypes=tf.float32)
+
     #Define inputs and training inputs
-    x = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
-    y_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
+    x_ph = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
+    y_ph_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
+    x = inputDataQueue.dequeue_many(n=128)
+    y_ = inputAnsQueue.dequeue_many(n=128)
 
     #variables for pre-transforming data
     offset = tf.constant(offset_initial, name="offest")
@@ -70,15 +76,20 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     b_fc = {}
     h_fc = {}
 
+    h_fc_ph = {}
+
     # Fully connected input layer
     w_fc[0] = weight_variable([nnStruct[0], nnStruct[1]], name="w_fc0")
     b_fc[0] = bias_variable([nnStruct[1]], name="b_fc0")
     h_fc[0] = tf.multiply(x-offset,scale)
+
+    h_fc_ph[0] = tf.multiply(x_ph-offset,scale)
     
     # create hidden layers 
     for layer in xrange(1, NLayer - 1):
         #use relu for hidden layers as this seems to give best result
         h_fc[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i"%(layer)),  b_fc[layer - 1], name="a_fc%i"%(layer)), name="h_fc%i"%(layer))
+        h_fc_ph[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc_ph[layer - 1], w_fc[layer - 1], name="z_fc%i"%(layer)),  b_fc[layer - 1], name="a_fc_ph%i"%(layer)), name="h_fc_ph%i"%(layer))
     
         # Map the features to next layer
         w_fc[layer] = weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
@@ -86,11 +97,13 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     
     #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the less function will do this)
     yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt")
+    yt_ph = tf.add(tf.matmul(h_fc_ph[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt_ph")
     #create output y which is conditioned to be between 0 and 1 and have nice distinct peaks for the end user
     #y = tf.multiply(tf.constant(0.5), (tf.nn.tanh(tf.constant(3.0)*yt)+tf.constant(1.0)), name="y")
     y = tf.nn.softmax(yt, name="y")
+    y_ph = tf.nn.softmax(yt_ph, name="y_ph")
 
-    return x, y_, y, yt, w_fc, b_fc
+    return x, y_, y, yt, w_fc, b_fc, inputDataQueue, inputAnsQueue, x_ph, y_ph_, yt_ph, y_ph
     
 
 def HEPReqs(event, i):

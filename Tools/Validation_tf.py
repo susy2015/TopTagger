@@ -100,7 +100,7 @@ else:
 
     # We access the input and output nodes 
     x = graph.get_tensor_by_name('x:0')
-    y_train = graph.get_tensor_by_name('y:0')
+    y_train = graph.get_tensor_by_name('y_ph:0')
 
 
 
