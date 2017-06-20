@@ -44,7 +44,7 @@ class CustomRunner(object):
     This class manages the the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, data, answers, queueX, queueY):
+    def __init__(self, batchSize, data, answers, queueX):
         self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16])
         self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2])
 
@@ -232,7 +232,7 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   # Build the graph
-  x, y_, y, yt, w_fc, b_fc, inputDataQueue, inputAnsQueue, x_ph, y_ph_, yt_ph, y_ph = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
+  x, y_, y, yt, w_fc, b_fc, inputDataQueue, x_ph, y_ph_, yt_ph, y_ph = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
 
   #randomize input data
   perms = numpy.random.permutation(npyInputData.shape[0])
@@ -242,7 +242,7 @@ def mainTF(_):
   #npyInputSampleWgts = npyInputSampleWgts[perms]
 
   #Create cusromRunner object to manage data loading 
-  cr = CustomRunner(128, npyInputData, npyInputAnswer, inputDataQueue, inputAnsQueue)
+  cr = CustomRunner(128, npyInputData, npyInputAnswer, inputDataQueue)
 
   # other placeholders 
   reg = tf.placeholder(tf.float32)

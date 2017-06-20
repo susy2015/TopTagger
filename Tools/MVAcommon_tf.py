@@ -59,7 +59,6 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     
     #Define input queues
     inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[16], [2]], dtypes=[tf.float32, tf.float32])
-    inputAnsQueue = None
 
     #Define inputs and training inputs
     x_ph = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
