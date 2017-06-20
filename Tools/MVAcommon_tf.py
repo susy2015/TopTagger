@@ -58,14 +58,13 @@ def createMLP(nnStruct, offset_initial, scale_initial):
         throw
     
     #Define input queues
-    inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[16], dtypes=tf.float32)
-    inputAnsQueue = tf.FIFOQueue(capacity=512, shapes=[2], dtypes=tf.float32)
+    inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[16], [2]], dtypes=[tf.float32, tf.float32])
+    inputAnsQueue = None
 
     #Define inputs and training inputs
     x_ph = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
     y_ph_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
-    x = inputDataQueue.dequeue_many(n=128)
-    y_ = inputAnsQueue.dequeue_many(n=128)
+    x, y_ = inputDataQueue.dequeue_many(n=128)
 
     #variables for pre-transforming data
     offset = tf.constant(offset_initial, name="offest")
@@ -103,7 +102,7 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     y = tf.nn.softmax(yt, name="y")
     y_ph = tf.nn.softmax(yt_ph, name="y_ph")
 
-    return x, y_, y, yt, w_fc, b_fc, inputDataQueue, inputAnsQueue, x_ph, y_ph_, yt_ph, y_ph
+    return x, y_, y, yt, w_fc, b_fc, inputDataQueue, x_ph, y_ph_, yt_ph, y_ph
     
 
 def HEPReqs(event, i):

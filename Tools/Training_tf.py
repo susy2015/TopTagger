@@ -55,14 +55,9 @@ class CustomRunner(object):
         self.length = len(self.data)
         # The actual queue of data. 
         self.queueX = queueX
-        self.queueY = queueY
 
         # The symbolic operation to add data to the queue
-        # we could do some preprocessing here or do it in numpy. In this example
-        # we do the scaling in numpy
-        self.enqueue_opX = self.queueX.enqueue_many([self.dataX])
-        self.enqueue_opY = self.queueY.enqueue_many([self.dataY])
-
+        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY])
 
     def data_iterator(self):
       """ A simple data iterator """
@@ -78,13 +73,11 @@ class CustomRunner(object):
       Function run on alternate thread. Basically, keep adding data to the queue.
       """
       for dataX, dataY in self.data_iterator():
-        sess.run([self.enqueue_opX, self.enqueue_opY], feed_dict={self.dataX:dataX, self.dataY:dataY})
+        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY})
 
     def start_threads(self, sess, n_threads=1):
       qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
-      qry = tf.train.QueueRunner(self.queueY, [self.enqueue_opY] * n_threads)
       tf.train.add_queue_runner(qrx)
-      tf.train.add_queue_runner(qry)
       
       """ Start background threads to feed queue """
       threads = []
@@ -248,11 +241,8 @@ def mainTF(_):
   npyInputWgts = npyInputWgts[perms]
   #npyInputSampleWgts = npyInputSampleWgts[perms]
 
+  #Create cusromRunner object to manage data loading 
   cr = CustomRunner(128, npyInputData, npyInputAnswer, inputDataQueue, inputAnsQueue)
-  #create queue stuff
-  #enqueue_x_op = inputDataQueue.enqueue(npyInputData[0:100])
-  #enqueue_y_op = inputAnsQueue.enqueue(npyInputAnswer[0:100])
-  #numberOfThreads = 1
 
   # other placeholders 
   reg = tf.placeholder(tf.float32)
