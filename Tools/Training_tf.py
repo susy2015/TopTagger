@@ -306,8 +306,9 @@ def mainTF(_):
       l2Reg = 0.0001
       for i in xrange(NSteps):
         #batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
+        _, summary, summary2 = sess.run([train_step, merged_summary_op, "shuffle_batch/fraction_over_512_of_512_full:0"], feed_dict={reg: l2Reg})
         summary_writer.add_summary(summary, epoch*NSteps + i)
+        summary_writer.add_summary(summary2, epoch*NSteps + i)
 
       train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={reg: l2Reg})
       validation_loss, summary_vl = sess.run([loss_ph, summary_vloss], feed_dict={x_ph: npyValidData, y_ph_: npyValidAnswer, reg: l2Reg})
