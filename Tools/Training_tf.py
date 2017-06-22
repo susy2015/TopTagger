@@ -79,6 +79,9 @@ class CustomRunner(object):
       for dataX, dataY in self.data_iterator():
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY})
 
+      #The file is exhausted, close the queue 
+      sess.run(self.queueX.close())
+
     def start_threads(self, sess, n_threads=1):
       qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
       tf.train.add_queue_runner(qrx)
@@ -324,8 +327,16 @@ def mainTF(_):
       #for i in xrange(NSteps):
         #batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
         #_, summary, summary2 = sess.run([train_step, merged_summary_op, "shuffle_batch/fraction_over_512_of_512_full:0"], feed_dict={reg: l2Reg})
-        _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
-        summary_writer.add_summary(summary, epoch*NSteps + i)
+        try:
+          while not coord.should_stop():
+            _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
+        except tf.errors.OutOfRangeError:
+          print('Done training -- epoch limit reached')
+        finally:
+          # When done, ask the threads to stop.
+          coord.request_stop()
+
+        summary_writer.add_summary(summary, epoch*NSteps + i)        
         #summary_writer.add_summary(summary2, epoch*NSteps + i)
         i += 1
 
@@ -335,7 +346,7 @@ def mainTF(_):
       summary_writer.add_summary(summary_vl, epoch)
       print('epoch %d, training loss %0.6f, validation loss %0.6f' % (epoch, 0.0, validation_loss))
 
-    #coord.join(qrthreads)
+    coord.join(qrthreads)
     
 
     #Save training checkpoint (contains a copy of the model and the weights)
