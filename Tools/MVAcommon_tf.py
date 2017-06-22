@@ -63,7 +63,8 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     #Define inputs and training inputs
     x_ph = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
     y_ph_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
-    x, y_ = tf.train.shuffle_batch(inputDataQueue.dequeue_many(n=32), batch_size = 128, capacity = 1024, min_after_dequeue = 512, enqueue_many = True, shapes = [[16], [2]])    
+    x, y_ = inputDataQueue.dequeue_many(n=128)
+    #tf.train.shuffle_batch(inputDataQueue.dequeue_many(n=32), batch_size = 128, capacity = 1024, min_after_dequeue = 512, enqueue_many = True, shapes = [[16], [2]])    
 
     #variables for pre-transforming data
     offset = tf.constant(offset_initial, name="offest")

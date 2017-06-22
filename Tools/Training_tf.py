@@ -44,12 +44,13 @@ class CustomRunner(object):
     This class manages the the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, data, answers, queueX):
+    def __init__(self, maxEpoch, batchSize, data, answers, queueX):
         self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16])
         self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2])
 
         self.data = data
         self.answers = answers
+        self.maxEpochs = maxEpoch
 
         self.batch_size = batchSize
         self.length = len(self.data)
@@ -62,11 +63,15 @@ class CustomRunner(object):
     def data_iterator(self):
       """ A simple data iterator """
       batch_idx = 0
+      nEpoch = 0
       while True:
         yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size]
         batch_idx += self.batch_size
         if batch_idx + self.batch_size > self.length:
           batch_idx = 0
+          nEpoch += 1
+          if nEpoch >= self.maxEpochs:
+            return
 
     def thread_main(self, sess):
       """
@@ -85,7 +90,7 @@ class CustomRunner(object):
         t = threading.Thread(target=self.thread_main, args=(sess,))
         t.daemon = True # thread will close when parent quits
         t.start()
-      threads.append(t)
+        threads.append(t)
       return threads
 
 
@@ -242,7 +247,7 @@ def mainTF(_):
   #npyInputSampleWgts = npyInputSampleWgts[perms]
 
   #Create cusromRunner object to manage data loading 
-  cr = CustomRunner(128, npyInputData, npyInputAnswer, inputDataQueue)
+  cr = CustomRunner(10, 128, npyInputData, npyInputAnswer, inputDataQueue)
 
   # other placeholders 
   reg = tf.placeholder(tf.float32)
@@ -288,7 +293,7 @@ def mainTF(_):
     #start queue runners
     coord = tf.train.Coordinator()
     # start the tensorflow QueueRunner's
-    tf.train.start_queue_runners(coord=coord, sess=sess)
+    qrthreads = tf.train.start_queue_runners(coord=coord, sess=sess)
     # start our custom queue runner's threads
     cr.start_threads(sess)
 
@@ -296,26 +301,31 @@ def mainTF(_):
     trainThreshold = 1e-6
     stepSize = 128
     MaxEpoch = 100
+    l2Reg = 0.0001
 
     stopCnt = 0
-    lastLoss = 10e10
     NData = len(npyInputData)
     NSteps = NData/stepSize
     for epoch in xrange(0, MaxEpoch):
 
-      l2Reg = 0.0001
-      for i in xrange(NSteps):
+      i = 0
+      while not coord.should_stop():
+      #for i in xrange(NSteps):
         #batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        _, summary, summary2 = sess.run([train_step, merged_summary_op, "shuffle_batch/fraction_over_512_of_512_full:0"], feed_dict={reg: l2Reg})
+        #_, summary, summary2 = sess.run([train_step, merged_summary_op, "shuffle_batch/fraction_over_512_of_512_full:0"], feed_dict={reg: l2Reg})
+        _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
         summary_writer.add_summary(summary, epoch*NSteps + i)
-        summary_writer.add_summary(summary2, epoch*NSteps + i)
+        #summary_writer.add_summary(summary2, epoch*NSteps + i)
+        i += 1
 
-      train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={reg: l2Reg})
+      #train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={reg: l2Reg})
       validation_loss, summary_vl = sess.run([loss_ph, summary_vloss], feed_dict={x_ph: npyValidData, y_ph_: npyValidAnswer, reg: l2Reg})
-      summary_writer.add_summary(summary_tl, epoch)
+      #summary_writer.add_summary(summary_tl, epoch)
       summary_writer.add_summary(summary_vl, epoch)
-      print('epoch %d, training loss %0.6f, validation loss %0.6f' % (epoch, train_loss, validation_loss))
+      print('epoch %d, training loss %0.6f, validation loss %0.6f' % (epoch, 0.0, validation_loss))
 
+    #coord.join(qrthreads)
+    
 
     #Save training checkpoint (contains a copy of the model and the weights)
     try:
