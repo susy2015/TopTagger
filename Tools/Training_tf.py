@@ -106,7 +106,19 @@ def importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training
 
   for sample in samplesToRun:
     print sample
-    data = pd.read_pickle(sample)
+    if ".pkl" in sample:
+      data = pd.read_pickle(sample)
+    elif ".h5" in sample:
+      import h5py
+      f = h5py.File(sample, "r")
+      npData = f["reco_candidates"][:]
+      columnHeaders = f["reco_candidates"].attrs["column_headers"]
+
+      indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+    
+      data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+      f.close()
+
     #remove partial tops 
     inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
     inputAnswer = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
@@ -228,7 +240,7 @@ def mainTF(_):
 
   # Import data
   #npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
-  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
+  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
   npyValidData, npyValidAnswer, _, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz"])
 
   #scale data inputs to range 0-1
