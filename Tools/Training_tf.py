@@ -1,6 +1,5 @@
 import os
 import errno
-import ROOT
 import numpy
 import pandas as pd
 import math
