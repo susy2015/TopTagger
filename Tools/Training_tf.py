@@ -95,6 +95,9 @@ class CustomRunner(object):
         threads.append(t)
       return threads
 
+    def queue_size_op(self):
+      return self.queueX.size()
+
 
 def prescaleBackground(input, answer, prescale):
   return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
@@ -241,8 +244,8 @@ def mainTF(_):
   print "PROCESSING TRAINING DATA"
 
   # Import data
-  #npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
-  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
+  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
+  #npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
   npyValidData, npyValidAnswer, _, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz"])
 
   #scale data inputs to range 0-1
@@ -260,8 +263,16 @@ def mainTF(_):
   npyInputWgts = npyInputWgts[perms]
   #npyInputSampleWgts = npyInputSampleWgts[perms]
 
+  #Training parameters
+  l2Reg = 0.0001
+  MiniBatchSize = 128
+  NEpoch = 100
+  ReportInterval = 1000
+
   #Create cusromRunner object to manage data loading 
-  cr = CustomRunner(10, 128, npyInputData, npyInputAnswer, inputDataQueue)
+  cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, inputDataQueue)
+
+  queueSize = cr.queue_size_op()
 
   # other placeholders 
   reg = tf.placeholder(tf.float32)
@@ -288,19 +299,20 @@ def mainTF(_):
   summary_ce = tf.summary.scalar("cross_entropy", cross_entropy)
   summary_l2n = tf.summary.scalar("l2_norm", l2_norm)
   summary_loss = tf.summary.scalar("loss", loss)
+  summary_queueSize = tf.summary.scalar("queue_size", queueSize)
   summary_tloss = tf.summary.scalar("train_loss", loss)
   summary_vloss = tf.summary.scalar("valid_loss", loss_ph)
   # Create a summary to monitor accuracy tensor
   #tf.summary.scalar("accuracy", accuracy)
   # Merge all summaries into a single op
-  merged_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss])
+  merged_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
 
   print "TRAINING MLP"
 
   #Create saver object to same variables 
   saver = tf.train.Saver()
 
-  with tf.Session() as sess:
+  with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=4) ) as sess:
     summary_writer = tf.summary.FileWriter(outputDirectory + "log_graph", graph=tf.get_default_graph())
     sess.run(tf.global_variables_initializer())
 
@@ -311,43 +323,30 @@ def mainTF(_):
     # start our custom queue runner's threads
     cr.start_threads(sess)
 
-    #Training parameters
-    trainThreshold = 1e-6
-    stepSize = 128
-    MaxEpoch = 100
-    l2Reg = 0.0001
+    print "Reporting validation loss every %i batchces"%ReportInterval
 
-    stopCnt = 0
-    NData = len(npyInputData)
-    NSteps = NData/stepSize
-    for epoch in xrange(0, MaxEpoch):
-
-      i = 0
+    i = 0
+    try:
       while not coord.should_stop():
-      #for i in xrange(NSteps):
-        #batch = [npyInputData[0+i*stepSize:stepSize+i*stepSize,:], npyInputAnswer[0+i*stepSize:stepSize+i*stepSize,:], npyInputWgts[0+i*stepSize:stepSize+i*stepSize]]
-        #_, summary, summary2 = sess.run([train_step, merged_summary_op, "shuffle_batch/fraction_over_512_of_512_full:0"], feed_dict={reg: l2Reg})
-        try:
-          while not coord.should_stop():
-            _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
-        except tf.errors.OutOfRangeError:
-          print('Done training -- epoch limit reached')
-        finally:
-          # When done, ask the threads to stop.
-          coord.request_stop()
-
-        summary_writer.add_summary(summary, epoch*NSteps + i)        
-        #summary_writer.add_summary(summary2, epoch*NSteps + i)
+        _, summary = sess.run([train_step, merged_summary_op], feed_dict={reg: l2Reg})
+        summary_writer.add_summary(summary, i)
         i += 1
 
-      #train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={reg: l2Reg})
-      validation_loss, summary_vl = sess.run([loss_ph, summary_vloss], feed_dict={x_ph: npyValidData, y_ph_: npyValidAnswer, reg: l2Reg})
-      #summary_writer.add_summary(summary_tl, epoch)
-      summary_writer.add_summary(summary_vl, epoch)
-      print('epoch %d, training loss %0.6f, validation loss %0.6f' % (epoch, 0.0, validation_loss))
+        if not i % ReportInterval:
+          #train_loss, summary_tl = sess.run([loss, summary_tloss], feed_dict={reg: l2Reg})
+          validation_loss, summary_vl = sess.run([loss_ph, summary_vloss], feed_dict={x_ph: npyValidData, y_ph_: npyValidAnswer, reg: l2Reg})
+          #summary_writer.add_summary(summary_tl, epoch)
+          summary_writer.add_summary(summary_vl, i)
+          print('Interval %d, training loss %0.6f, validation loss %0.6f' % (i/ReportInterval, 0.0, validation_loss))
+          
+    except tf.errors.OutOfRangeError:
+      print('Done training -- epoch limit reached')
+    finally:
+      # When done, ask the threads to stop.
+      coord.request_stop()
 
     coord.join(qrthreads)
-    
+
 
     #Save training checkpoint (contains a copy of the model and the weights)
     try:
