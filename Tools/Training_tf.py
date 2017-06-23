@@ -6,7 +6,6 @@ import math
 from MVAcommon_tf import *
 import optparse
 from math import sqrt
-import threading
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
@@ -38,71 +37,11 @@ else:
   from tensorflow.python.framework import graph_io
   from tensorflow.python.tools import freeze_graph
 
-class CustomRunner(object):
-    """
-    This class manages the the background threads needed to fill
-        a queue full of data.
-    """
-    def __init__(self, maxEpoch, batchSize, data, answers, queueX):
-        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16])
-        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2])
-
-        self.data = data
-        self.answers = answers
-        self.maxEpochs = maxEpoch
-
-        self.batch_size = batchSize
-        self.length = len(self.data)
-        # The actual queue of data. 
-        self.queueX = queueX
-
-        # The symbolic operation to add data to the queue
-        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY])
-
-    def data_iterator(self):
-      """ A simple data iterator """
-      batch_idx = 0
-      nEpoch = 0
-      while True:
-        yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size]
-        batch_idx += self.batch_size
-        if batch_idx + self.batch_size > self.length:
-          batch_idx = 0
-          nEpoch += 1
-          if nEpoch >= self.maxEpochs:
-            return
-
-    def thread_main(self, sess):
-      """
-      Function run on alternate thread. Basically, keep adding data to the queue.
-      """
-      for dataX, dataY in self.data_iterator():
-        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY})
-
-      #The file is exhausted, close the queue 
-      sess.run(self.queueX.close())
-
-    def start_threads(self, sess, n_threads=1):
-      qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
-      tf.train.add_queue_runner(qrx)
-      
-      """ Start background threads to feed queue """
-      threads = []
-      for n in range(n_threads):
-        t = threading.Thread(target=self.thread_main, args=(sess,))
-        t.daemon = True # thread will close when parent quits
-        t.start()
-        threads.append(t)
-      return threads
-
-    def queue_size_op(self):
-      return self.queueX.size()
-
 
 def prescaleBackground(input, answer, prescale):
   return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
 
-def importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, reluInputs=True, ptReweight=True):
+def importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, reluInputs=True, ptReweight=True, randomize = True):
   #variables to train
   vars = DataGetter().getList()
   
@@ -179,6 +118,14 @@ def importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training
   nbg  = npyInputWgts[npyInputAnswers[:,0] != 1].sum()
   npyInputWgts[npyInputAnswers[:,0] != 1] *= nsig / nbg
 
+  if randomize:
+    #randomize input data
+    perms = numpy.random.permutation(npyInputData.shape[0])
+    npyInputData = npyInputData[perms]
+    npyInputAnswers = npyInputAnswers[perms]
+    npyInputWgts = npyInputWgts[perms]
+    npyInputSampleWgts = npyInputSampleWgts[perms]
+
   return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
     
 
@@ -188,13 +135,6 @@ def mainSKL():
 
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale=True, ptReweight=True)
-
-  #randomize input data
-  perms = numpy.random.permutation(npyInputData.shape[0])
-  npyInputData = npyInputData[perms]
-  npyInputAnswer = npyInputAnswer[perms]
-  npyInputWgts = npyInputWgts[perms]
-  npyInputSampleWgts = npyInputSampleWgts[perms]
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -218,13 +158,6 @@ def mainXGB():
   # Import data
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = importData(prescale=False, ptReweight=True)
 
-  #randomize input data
-  perms = numpy.random.permutation(npyInputData.shape[0])
-  npyInputData = npyInputData[perms]
-  npyInputAnswer = npyInputAnswer[perms]
-  npyInputWgts = npyInputWgts[perms]
-  npyInputSampleWgts = npyInputSampleWgts[perms]
-
   print "TRAINING XGB"
 
   # Create xgboost classifier
@@ -244,24 +177,9 @@ def mainTF(_):
   print "PROCESSING TRAINING DATA"
 
   # Import data
-  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
-  #npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
+  #npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
+  npyInputData, npyInputAnswer, npyInputWgts, _       = importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
   npyValidData, npyValidAnswer, _, npyInputSampleWgts = importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz"])
-
-  #scale data inputs to range 0-1
-  mins = npyInputData.min(0)
-  ptps = npyInputData.ptp(0)
-  #npyInputData = (npyInputData - mins)/ptps
-
-  # Build the graph
-  x, y_, y, yt, w_fc, b_fc, inputDataQueue, x_ph, y_ph_, yt_ph, y_ph = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], mins, 1.0/ptps)
-
-  #randomize input data
-  perms = numpy.random.permutation(npyInputData.shape[0])
-  npyInputData = npyInputData[perms]
-  npyInputAnswer = npyInputAnswer[perms]
-  npyInputWgts = npyInputWgts[perms]
-  #npyInputSampleWgts = npyInputSampleWgts[perms]
 
   #Training parameters
   l2Reg = 0.0001
@@ -269,10 +187,19 @@ def mainTF(_):
   NEpoch = 100
   ReportInterval = 1000
 
+  #scale data inputs to range 0-1
+  mins = npyInputData.min(0)
+  ptps = npyInputData.ptp(0)
+  #npyInputData = (npyInputData - mins)/ptps
+
+  #Define input queues
+  inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
+
+  # Build the graph
+  x, y_, y, yt, w_fc, b_fc, x_ph, y_ph_, yt_ph, y_ph = createMLP([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+
   #Create cusromRunner object to manage data loading 
   cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, inputDataQueue)
-
-  queueSize = cr.queue_size_op()
 
   # other placeholders 
   reg = tf.placeholder(tf.float32)
@@ -299,7 +226,7 @@ def mainTF(_):
   summary_ce = tf.summary.scalar("cross_entropy", cross_entropy)
   summary_l2n = tf.summary.scalar("l2_norm", l2_norm)
   summary_loss = tf.summary.scalar("loss", loss)
-  summary_queueSize = tf.summary.scalar("queue_size", queueSize)
+  summary_queueSize = tf.summary.scalar("queue_size", cr.queue_size_op())
   summary_tloss = tf.summary.scalar("train_loss", loss)
   summary_vloss = tf.summary.scalar("valid_loss", loss_ph)
   # Create a summary to monitor accuracy tensor

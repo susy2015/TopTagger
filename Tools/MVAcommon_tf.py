@@ -1,6 +1,7 @@
 import numpy
 import math
 import tensorflow as tf
+import threading
 
 class DataGetter:
 
@@ -41,20 +42,17 @@ def bias_variable(shape, name):
 #  yt - unscaled output for loss function
 #  w_fc - dictionary containing all weight variables
 #  b_fc - dictionary containing all bias variables 
-def createMLP(nnStruct, offset_initial, scale_initial):
+def createMLP(nnStruct, inputDataQueue, nBatch, offset_initial, scale_initial):
     #constants 
     NLayer = len(nnStruct)
 
     if len(nnStruct) < 2:
         throw
     
-    #Define input queues
-    inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[16], [2]], dtypes=[tf.float32, tf.float32])
-
     #Define inputs and training inputs
     x_ph = tf.placeholder(tf.float32, [None, nnStruct[0]], name="x")
     y_ph_ = tf.placeholder(tf.float32, [None, nnStruct[NLayer - 1]])
-    x, y_ = inputDataQueue.dequeue_many(n=128)
+    x, y_ = inputDataQueue.dequeue_many(n=nBatch)
     #tf.train.shuffle_batch(inputDataQueue.dequeue_many(n=32), batch_size = 128, capacity = 1024, min_after_dequeue = 512, enqueue_many = True, shapes = [[16], [2]])    
 
     #variables for pre-transforming data
@@ -93,6 +91,65 @@ def createMLP(nnStruct, offset_initial, scale_initial):
     y = tf.nn.softmax(yt, name="y")
     y_ph = tf.nn.softmax(yt_ph, name="y_ph")
 
-    return x, y_, y, yt, w_fc, b_fc, inputDataQueue, x_ph, y_ph_, yt_ph, y_ph
+    return x, y_, y, yt, w_fc, b_fc, x_ph, y_ph_, yt_ph, y_ph
     
 
+class CustomRunner(object):
+    """
+    This class manages the the background threads needed to fill
+        a queue full of data.
+    """
+    def __init__(self, maxEpoch, batchSize, data, answers, queueX):
+        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16])
+        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2])
+
+        self.data = data
+        self.answers = answers
+        self.maxEpochs = maxEpoch
+
+        self.batch_size = batchSize
+        self.length = len(self.data)
+        # The actual queue of data. 
+        self.queueX = queueX
+
+        # The symbolic operation to add data to the queue
+        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY])
+
+    def data_iterator(self):
+      """ A simple data iterator """
+      batch_idx = 0
+      nEpoch = 0
+      while True:
+        yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size]
+        batch_idx += self.batch_size
+        if batch_idx + self.batch_size > self.length:
+          batch_idx = 0
+          nEpoch += 1
+          if nEpoch >= self.maxEpochs:
+            return
+
+    def thread_main(self, sess):
+      """
+      Function run on alternate thread. Basically, keep adding data to the queue.
+      """
+      for dataX, dataY in self.data_iterator():
+        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY})
+
+      #The file is exhausted, close the queue 
+      sess.run(self.queueX.close())
+
+    def start_threads(self, sess, n_threads=1):
+      qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
+      tf.train.add_queue_runner(qrx)
+      
+      """ Start background threads to feed queue """
+      threads = []
+      for n in range(n_threads):
+        t = threading.Thread(target=self.thread_main, args=(sess,))
+        t.daemon = True # thread will close when parent quits
+        t.start()
+        threads.append(t)
+      return threads
+
+    def queue_size_op(self):
+      return self.queueX.size()
