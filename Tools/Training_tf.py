@@ -12,6 +12,7 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true', help="Run using sklearn RF")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
+parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha", help="Input features to use")
 
 options, args = parser.parse_args()
 
@@ -34,7 +35,7 @@ def mainSKL():
   print "PROCESSING TRAINING DATA"
 
   # Import data
-  dg = DataGetter()
+  dg = DataGetter(options.variables)
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"], prescale=True, ptReweight=True)
 
   # Create random forest
@@ -59,7 +60,7 @@ def mainXGB():
   print "PROCESSING TRAINING DATA"
 
   # Import data
-  dg = DataGetter()
+  dg = DataGetter(options.variables)
   npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(prescale=False, ptReweight=True)
 
   print "TRAINING XGB"
@@ -83,10 +84,10 @@ def mainTF(_):
   print "PROCESSING TRAINING DATA"
 
   # Import data
-  dg = DataGetter()
-  #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz"])
-  npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.pkl.gz"])
-  npyValidData, npyValidAnswer, _, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz"])
+  dg = DataGetter(options.variables)
+  npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
+  #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.h5"])
+  npyValidData, npyValidAnswer, _, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
 
   #Training parameters
   l2Reg = 0.0001
@@ -149,7 +150,7 @@ def mainTF(_):
     mlp.saveModel(sess, outputDirectory)
 
     y_out, yt_out = sess.run([mlp.y_ph, mlp.yt_ph], feed_dict={mlp.x_ph: npyInputData, mlp.y_ph_: npyInputAnswer, mlp.reg: l2Reg})
-    
+
     #try:
     #  import matplotlib.pyplot as plt
     #  

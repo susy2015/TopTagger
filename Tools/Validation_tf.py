@@ -38,6 +38,7 @@ parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 parser.add_option ('-f', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
 parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
+parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha", help="Input features to use")
 
 options, args = parser.parse_args()
 
@@ -78,7 +79,7 @@ elif options.xgboost:
 else:
     import tensorflow as tf
 
-    ##TODO: Switchen to frozen model file 
+    ##TODONE: Switchen to frozen model file 
     ##Get training output
     #saver = tf.train.import_meta_graph('models/model.ckpt.meta')
     #sess = tf.Session()
@@ -106,7 +107,7 @@ else:
 
 print "PROCESSING TTBAR VALIDATION DATA"
 
-varsname = DataGetter().getList()
+varsname = DataGetter(options.variables).getList()
 
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_TeamASel.pkl.gz")
@@ -114,11 +115,24 @@ varsname = DataGetter().getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
 
 if options.sklrf:
-    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
+    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"
 elif options.xgboost:
-    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz")
+    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
+    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"
+
+if ".pkl" in dataTTbarName:
+    dataTTbarAll = pd.read_pickle(dataTTbarName)
+elif ".h5" in dataTTbarName:
+    import h5py
+    f = h5py.File(dataTTbarName, "r")
+    npData = f["reco_candidates"][:]
+    columnHeaders = f["reco_candidates"].attrs["column_headers"]
+    
+    indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+    
+    dataTTbarAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+    f.close()
 
 numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
@@ -249,13 +263,25 @@ plt.close()
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 if options.sklrf:
-    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
 elif options.xgboost:
-    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
 else:
-    dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_700k.pkl.gz")
+    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
 
-#dataZnunuAll = pd.read_pickle("trainingTuple_division_1_ZJetsToNuNu_validation_2bseed.pkl.gz")
+if ".pkl" in dataZnunuName:
+    dataZnunuAll = pd.read_pickle(dataZnunuName)
+elif ".h5" in dataZnunuName:
+    import h5py
+    f = h5py.File(dataZnunuName, "r")
+    npData = f["reco_candidates"][:]
+    columnHeaders = f["reco_candidates"].attrs["column_headers"]
+    
+    indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+    
+    dataZnunuAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+    f.close()
+
 numDataZnunu = dataZnunuAll._get_numeric_data()
 numDataZnunu[numDataZnunu < 0.0] = 0.0
 
