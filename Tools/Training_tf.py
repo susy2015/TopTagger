@@ -9,10 +9,11 @@ from math import sqrt
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
-parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true', help="Run using sklearn RF")
-parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
-parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
-parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha", help="Input features to use")
+parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true',                             help="Run using sklearn RF")
+parser.add_option ('-x', "--xgboost",   dest='xgboost',   action='store_true',                             help="Run using xgboost")
+parser.add_option ('-d', "--directory", dest='directory', action='store', default="",                      help="Directory to store outputs")
+parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha",             help="Input features to use")
+parser.add_option ('-e', "--nepoch",    dest='nepoch',    action='store', default=100,         type="int", help="Number of training epoch")
 
 options, args = parser.parse_args()
 
@@ -85,14 +86,14 @@ def mainTF(_):
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5", "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
+  npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"])#, "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
   #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.h5"])
   npyValidData, npyValidAnswer, _, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
 
   #Training parameters
   l2Reg = 0.0001
   MiniBatchSize = 128
-  NEpoch = 10
+  NEpoch = options.nepoch
   ReportInterval = 1000
 
   #scale data inputs to range 0-1
@@ -101,7 +102,8 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Define input queues
-  inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
+  #inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
+  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
 
   #Create cusromRunner object to manage data loading 
   cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, inputDataQueue)
@@ -124,7 +126,7 @@ def mainTF(_):
     # start our custom queue runner's threads
     cr.start_threads(sess)
 
-    print "Reporting validation loss every %i batchces"%ReportInterval
+    print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
 
     i = 0
     try:
