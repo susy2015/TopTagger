@@ -18,10 +18,12 @@ class DataGetter:
             self.list = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
         elif variables == "TeamAMoreQGL":
             self.list = ["j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-        elif variables == "MixedMoreQGL":
-            self.list = ["cand_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "dRPtTop", "dRPtW", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
+        elif variables == "MixedMoreQGLCandPt":
+            self.list = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "dRPtTop", "dRPtW", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
         elif variables == "TeamAlphaMoreQGLCandPt":
             self.list = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
+        elif variables == "TeamAMoreQGLCandPt":
+            self.list = ["cand_pt", "j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
 
     def getList(self):
         return self.list
@@ -150,8 +152,9 @@ class createModel:
         
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
-        self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]])
-        self.x, self.y_ = self.inputDataQueue.dequeue_many(n=self.nBatch)
+        self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
+        self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
+        self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
         #tf.train.shuffle_batch(inputDataQueue.dequeue_many(n=32), batch_size = 128, capacity = 1024, min_after_dequeue = 512, enqueue_many = True, shapes = [[16], [2]])    
     
         #variables for pre-transforming data
@@ -194,14 +197,13 @@ class createModel:
         # other placeholders 
         self.reg = tf.placeholder(tf.float32)
         
-        self.wgt = tf.placeholder(tf.float32, [None, 1])
-        
         tf.add_to_collection('TrainInfo', self.x)
         tf.add_to_collection('TrainInfo', self.y)
         
-        #cross_entropy = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=yt), wgt)), tf.reduce_sum(wgt))
-        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
-        self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
+        self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    self.wgt)),    tf.reduce_sum(self.wgt))
+        #self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
+        self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), self.wgt_ph)), tf.reduce_sum(self.wgt_ph))
+        #self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
@@ -288,12 +290,14 @@ class CustomRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, maxEpoch, batchSize, data, answers, queueX):
-        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, data.shape[1]])
-        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, answers.shape[1]])
+    def __init__(self, maxEpoch, batchSize, data, answers, weights, queueX):
+        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, data.shape[1]], name="dataX")
+        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, answers.shape[1]], name="dataY")
+        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, weights.shape[1]], name="dataW")
 
         self.data = data
         self.answers = answers
+        self.weights = weights
         self.maxEpochs = maxEpoch
 
         self.batch_size = batchSize
@@ -302,14 +306,14 @@ class CustomRunner(object):
         self.queueX = queueX
 
         # The symbolic operation to add data to the queue
-        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY])
+        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataW])
 
     def data_iterator(self):
       """ A simple data iterator """
       batch_idx = 0
       nEpoch = 0
       while True:
-        yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size]
+        yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size], self.weights[batch_idx:batch_idx+self.batch_size]
         batch_idx += self.batch_size
         if batch_idx + self.batch_size > self.length:
           batch_idx = 0
@@ -321,8 +325,8 @@ class CustomRunner(object):
       """
       Function run on alternate thread. Basically, keep adding data to the queue.
       """
-      for dataX, dataY in self.data_iterator():
-        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY})
+      for dataX, dataY, dataW in self.data_iterator():
+        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
 
       #The file is exhausted, close the queue 
       sess.run(self.queueX.close())

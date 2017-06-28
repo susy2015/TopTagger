@@ -37,7 +37,7 @@ def mainSKL():
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"], prescale=True, ptReweight=True)
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"], prescale=True, ptReweight=True)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -88,13 +88,14 @@ def mainTF(_):
   dg = DataGetter(options.variables)
   npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"])#, "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
   #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.h5"])
-  npyValidData, npyValidAnswer, _, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
+  npyValidData, npyValidAnswer, npyInputValidWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
 
   #Training parameters
   l2Reg = 0.0001
   MiniBatchSize = 128
   NEpoch = options.nepoch
   ReportInterval = 1000
+  validationCount = min(10000, npyValidData.shape[0])
 
   #scale data inputs to range 0-1
   mins = npyInputData.min(0)
@@ -103,10 +104,10 @@ def mainTF(_):
 
   #Define input queues
   #inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
-  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
+  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]], [npyInputWgts.shape[1]]], dtypes=[tf.float32, tf.float32, tf.float32])
 
   #Create cusromRunner object to manage data loading 
-  cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, inputDataQueue)
+  cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, npyInputWgts, inputDataQueue)
 
   # Build the graph
   mlp = createModel([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
@@ -116,7 +117,7 @@ def mainTF(_):
 
   print "TRAINING MLP"
 
-  with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=4) ) as sess:
+  with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=8) ) as sess:
     sess.run(tf.global_variables_initializer())
 
     #start queue runners
@@ -136,7 +137,7 @@ def mainTF(_):
         i += 1
 
         if not i % ReportInterval:
-          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: npyValidData, mlp.y_ph_: npyValidAnswer, mlp.reg: l2Reg})
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: npyValidData[:validationCount], mlp.y_ph_: npyValidAnswer[:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: npyInputValidWgts[:validationCount]})
           summary_writer.add_summary(summary_vl, i)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
           
