@@ -4,6 +4,9 @@ import pandas as pd
 import math
 import tensorflow as tf
 import threading
+import multiprocessing as mp
+import Queue
+import sharedmem
 
 class DataGetter:
 
@@ -37,21 +40,21 @@ class DataGetter:
       
       inputData = numpy.empty([0])
       npyInputWgts = numpy.empty([0])
-    
+
       for sample in samplesToRun:
         print sample
-        if ".pkl" in sample:
-          data = pd.read_pickle(sample)
-        elif ".h5" in sample:
-          import h5py
-          f = h5py.File(sample, "r")
-          npData = f["reco_candidates"][:]
-          columnHeaders = f["reco_candidates"].attrs["column_headers"]
+        #if ".pkl" in sample:
+        #  data = pd.read_pickle(sample)
+        #elif ".h5" in sample:
+        import h5py
+        f = h5py.File(sample, "r")
+        npData = f["reco_candidates"][:]
+        columnHeaders = f["reco_candidates"].attrs["column_headers"]
     
-          indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+        indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
         
-          data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
-          f.close()
+        data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+        f.close()
     
         #remove partial tops 
         inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
@@ -116,7 +119,7 @@ class DataGetter:
         npyInputWgts = npyInputWgts[perms]
         npyInputSampleWgts = npyInputSampleWgts[perms]
     
-      return npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts
+      return {"data":npyInputData, "labels":npyInputAnswers, "weights":npyInputWgts, "":npyInputSampleWgts}
 
 
 class createModel:
@@ -285,61 +288,135 @@ class createModel:
         print("Frozen model (model and weights) saved in file: %s" % output_graph_path)
 
 
+class FileNameQueue:
+    #This class is designed to store and randomize a filelist for use by several CustomRunner objects
+    def __init__(self, files, nEpoch):
+        self.files = numpy.array(files)
+        self.nEpoch = nEpoch
+
+        self.fileQueue = mp.Queue(self.files.shape[0])
+
+    def getQueue(self):
+        return self.fileQueue
+
+    def get(self):
+        return self.fileQueue.get(False)
+
+    def queueProcess(self):
+        for i in xrange(self.nEpoch):
+            perms = numpy.random.permutation(self.files.shape[0])
+            self.files = self.files[perms]
+            
+            for fileName in self.files:
+                print "Enqueue file: ", fileName
+                self.fileQueue.put(fileName)
+        self.fileQueue.close()
+
+    def startQueueProcess(self):
+        #p = mp.Process(target=self.queueProcess)
+        #p.daemon = True # thread will close when parent quits
+        #p.start()
+        #return p
+        p = threading.Thread(target=self.queueProcess)
+        p.daemon = True # thread will close when parent quits
+        p.start()
+        return p
+            
+
 class CustomRunner(object):
     """
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, maxEpoch, batchSize, data, answers, weights, queueX):
-        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, data.shape[1]], name="dataX")
-        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, answers.shape[1]], name="dataY")
-        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, weights.shape[1]], name="dataW")
+    def __init__(self, batchSize, variables, fileQueue, queueX):
+        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16], name="dataX")
+        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2], name="dataY")
+        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, 1], name="dataW")
 
-        self.data = data
-        self.answers = answers
-        self.weights = weights
-        self.maxEpochs = maxEpoch
+        self.fileQueue = fileQueue
+        self.variables = variables
 
         self.batch_size = batchSize
-        self.length = len(self.data)
         # The actual queue of data. 
         self.queueX = queueX
 
         # The symbolic operation to add data to the queue
         self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataW])
 
+    def fileName_iterator(self):
+        #Simple iterator to get new filename from file queue
+        while True:
+            try:
+                print "DEQUEUE"
+                yield self.fileQueue.get()
+            except Queue.Empty:
+                return
+
+    def thread_readFile(self, dg, fname, dataOut):
+      dataOut.append( dg.importData([fname]) )
+
     def data_iterator(self):
       """ A simple data iterator """
-      batch_idx = 0
-      nEpoch = 0
-      while True:
-        yield self.data[batch_idx:batch_idx+self.batch_size], self.answers[batch_idx:batch_idx+self.batch_size], self.weights[batch_idx:batch_idx+self.batch_size]
-        batch_idx += self.batch_size
-        if batch_idx + self.batch_size > self.length:
-          batch_idx = 0
-          nEpoch += 1
-          if nEpoch >= self.maxEpochs:
-            return
+
+      #filename iterator 
+      fIter = self.fileName_iterator()
+
+      #private data getter object 
+      dg = DataGetter(self.variables)
+      
+      #variables to hold the data
+      #data = None
+      #dataNext = []
+      ##preload the first file to dataNext
+      #fetchFile = mp.Process(target=self.thread_readFile, args=((dg, next(fIter), dataNext), ) )
+      #fetchFile.start()
+      
+      #loop until there are no more files to get from the queue
+      for fileName in fIter:
+        #wait until the next file is read 
+        #fetchFile.join()
+        #swap dataNext to data
+        #data = dataNext[0]
+        #start reading next file
+        #fetchFile = mp.Process(target=self.thread_readFile, args=((dg, fileName, dataNext), ))
+        #fetchFile.start()
+        data = dg.importData([fileName])
+        
+        batch_idx = 0
+        print "Length data: ", len(data)
+        print "Data Shape: ", data["data"].shape, self.batch_size
+        while batch_idx + self.batch_size <= data["data"].shape[0]:
+            print "Batch_idx: ", batch_idx
+            yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
+            batch_idx += self.batch_size
+
+      #fileFetchPool.close()
+      return
+
 
     def thread_main(self, sess):
       """
       Function run on alternate thread. Basically, keep adding data to the queue.
       """
       for dataX, dataY, dataW in self.data_iterator():
+        print "GOGO TF ENQUEUE"
+        print dataX.shape, dataY.shape, dataW.shape
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
+        print "GOGO TF ENQUEUE -- DONE"
 
-      #The file is exhausted, close the queue 
+      #The files are exhausted, close the queue 
+      print "I (THE TF ENQUERER) GIVE UP"
       sess.run(self.queueX.close())
 
     def start_threads(self, sess, n_threads=1):
-      qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
-      tf.train.add_queue_runner(qrx)
+      #qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
+      #tf.train.add_queue_runner(qrx)
       
       """ Start background threads to feed queue """
       threads = []
       for n in range(n_threads):
         t = threading.Thread(target=self.thread_main, args=(sess,))
-        t.daemon = True # thread will close when parent quits
+        #p.daemon = True # thread will close when parent quits
         t.start()
         threads.append(t)
       return threads

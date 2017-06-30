@@ -6,6 +6,7 @@ import math
 from MVAcommon_tf import *
 import optparse
 from math import sqrt
+from time import sleep
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
@@ -86,31 +87,34 @@ def mainTF(_):
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"])#, "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
+  #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"])#, "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
   #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.h5"])
-  npyValidData, npyValidAnswer, npyInputValidWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
+  validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
 
   #Training parameters
   l2Reg = 0.0001
   MiniBatchSize = 128
   NEpoch = options.nepoch
   ReportInterval = 1000
-  validationCount = min(10000, npyValidData.shape[0])
+  validationCount = min(10000, validData["data"].shape[0])
 
   #scale data inputs to range 0-1
-  mins = npyInputData.min(0)
-  ptps = npyInputData.ptp(0)
+  mins = validData["data"].min(0)
+  ptps = validData["data"].ptp(0)
   #npyInputData = (npyInputData - mins)/ptps
 
   #Define input queues
-  #inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]]], dtypes=[tf.float32, tf.float32])
-  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[npyInputData.shape[1]], [npyInputAnswer.shape[1]], [npyInputWgts.shape[1]]], dtypes=[tf.float32, tf.float32, tf.float32])
+  inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+  #inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+
+  #Create filename queue
+  fnq = FileNameQueue(["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"], NEpoch)
 
   #Create cusromRunner object to manage data loading 
-  cr = CustomRunner(NEpoch, MiniBatchSize, npyInputData, npyInputAnswer, npyInputWgts, inputDataQueue)
+  cr = CustomRunner(MiniBatchSize, options.variables, fnq, inputDataQueue)
 
   # Build the graph
-  mlp = createModel([npyInputData.shape[1], 100, 50, 50, npyInputAnswer.shape[1]], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  mlp = createModel([16, 100, 50, 50, 2], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(outputDirectory + "log_graph", graph=tf.get_default_graph())
@@ -124,20 +128,27 @@ def mainTF(_):
     coord = tf.train.Coordinator()
     # start the tensorflow QueueRunner's
     qrthreads = tf.train.start_queue_runners(coord=coord, sess=sess)
+
+    # start the file queue running
+    fnq.startQueueProcess()
+    sleep(2)
     # start our custom queue runner's threads
     cr.start_threads(sess)
+
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
 
     i = 0
     try:
       while not coord.should_stop():
+        print "step: ", i
         _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg})
+        print "POOP"
         summary_writer.add_summary(summary, i)
         i += 1
 
         if not i % ReportInterval:
-          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: npyValidData[:validationCount], mlp.y_ph_: npyValidAnswer[:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: npyInputValidWgts[:validationCount]})
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl, i)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
           
@@ -152,7 +163,7 @@ def mainTF(_):
     mlp.saveCheckpoint(sess, outputDirectory)
     mlp.saveModel(sess, outputDirectory)
 
-    y_out, yt_out = sess.run([mlp.y_ph, mlp.yt_ph], feed_dict={mlp.x_ph: npyInputData, mlp.y_ph_: npyInputAnswer, mlp.reg: l2Reg})
+    #y_out, yt_out = sess.run([mlp.y_ph, mlp.yt_ph], feed_dict={mlp.x_ph: npyInputData, mlp.y_ph_: npyInputAnswer, mlp.reg: l2Reg})
 
     #try:
     #  import matplotlib.pyplot as plt
