@@ -201,9 +201,9 @@ class createModel:
         tf.add_to_collection('TrainInfo', self.x)
         tf.add_to_collection('TrainInfo', self.y)
         
-        self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    self.wgt)),    tf.reduce_sum(self.wgt))
+        self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    tf.reshape(self.wgt, [-1]) )),    tf.reduce_sum(self.wgt))
         #self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
-        self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), self.wgt_ph)), tf.reduce_sum(self.wgt_ph))
+        self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), tf.reshape(self.wgt_ph, [-1]) )), tf.reduce_sum(self.wgt_ph))
         #self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
@@ -222,13 +222,12 @@ class createModel:
         summary_ce = tf.summary.scalar("cross_entropy", self.cross_entropy)
         summary_l2n = tf.summary.scalar("l2_norm", self.l2_norm)
         summary_loss = tf.summary.scalar("loss", self.loss)
-        #summary_queueSize = tf.summary.scalar("queue_size", cr.queue_size_op())
+        summary_queueSize = tf.summary.scalar("queue_size", self.inputDataQueue.size())
         summary_vloss = tf.summary.scalar("valid_loss", self.loss_ph)
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy)
         # Merge all summaries into a single op
-        #self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
         self.merged_valid_summary_op = tf.summary.merge([summary_accuracy, summary_vloss])
 
 
@@ -336,9 +335,6 @@ class FileNameQueue:
         p.start()
         return p
 
-    def queue_size_op(self):
-      return self.inputDataQueue.size()
-            
 
 class CustomRunner(object):
     """
