@@ -94,6 +94,7 @@ def mainHDF5():
     branchNamesUsed = []
     evalStr = ""
     nevt  =0
+    iFile = 0
     for event in dataset.slimmedTuple:
         if nevt % 1000 == 0:
             print nevt
@@ -127,23 +128,28 @@ def mainHDF5():
         for i in xrange(0, len(event.genTopPt)):
             genData.append([nevt, i, event.genTopPt[i], event.sampleWgt, event.Njet])
 
-    f = h5py.File(datasetFile[0:-5] + ".h5", "w")
+        if not nevt%100000:
+            f = h5py.File(datasetFile[0:-5] + "_%i.h5"%iFile, "w")
+            iFile += 1
+            
+            fullBranchNames = np.hstack([["eventNum", "candNum", "ncand"], branchNamesUsed] )
+            
+            dataArray = np.array(data)
+            dsReco = f.create_dataset("reco_candidates", dataArray.shape, h5py.h5t.NATIVE_FLOAT)
+            dsReco[:] = dataArray
+            dsReco.attrs.create("column_headers", fullBranchNames, fullBranchNames.shape)
+            
+            genFullBranchNames = np.array(["eventNum", "candNum", "genTopPt", "sampleWgt", "Njet"])
+            
+            genDataArray = np.array(genData)
+            dsGen = f.create_dataset("gen_tops", genDataArray.shape, h5py.h5t.NATIVE_FLOAT)
+            dsGen[:] = genDataArray
+            dsGen.attrs.create("column_headers", genFullBranchNames, genFullBranchNames.shape)
+            
+            f.close()
 
-    fullBranchNames = np.hstack([["eventNum", "candNum", "ncand"], branchNamesUsed] )
-
-    dataArray = np.array(data)
-    dsReco = f.create_dataset("reco_candidates", dataArray.shape, h5py.h5t.NATIVE_FLOAT)
-    dsReco[:] = dataArray
-    dsReco.attrs.create("column_headers", fullBranchNames, fullBranchNames.shape)
-
-    genFullBranchNames = np.array(["eventNum", "candNum", "genTopPt", "sampleWgt", "Njet"])
-
-    genDataArray = np.array(genData)
-    dsGen = f.create_dataset("gen_tops", genDataArray.shape, h5py.h5t.NATIVE_FLOAT)
-    dsGen[:] = genDataArray
-    dsGen.attrs.create("column_headers", genFullBranchNames, genFullBranchNames.shape)
-
-    f.close()
+            data = []
+            genData = []
 
 def mainTFR():
 
