@@ -56,11 +56,11 @@ inputs = {"rf_2bseed": {"files":  ["RF_TeamAlpha_2BSelection/roc.pkl", "RF_TeamA
 #          "mlp_comp": {"files":  ["RF_TeamAlphaMoreQGL_Nominal/roc.pkl", "MLP_TeamAlphaMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaMoreQGL_100_50_50_1MWithZ/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1MWithZ/roc.pkl", "MLP_noPtWgt_TeamAlphaMoreQGL_100_50_50_1M/roc.pkl", "MLP_TeamAlphaWithCandPtAndMoreQGL_100_50_50_1M/roc.pkl"],
 #                       "labels": ["RF More QGL", "More QGL", "Cand pt + More QGL", "More QGL With Z", "cand pt + More QGL With Z", "More QGL no wgt", "Cand pt + More QGL no wgt"]
 #                    },
-          "mlp_comp": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamAlphaMoreQGLCandPt/roc.pkl", "RF_TeamAlphaMoreQGL/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_100/roc.pkl", "MLP_TeamAMoreQGLCandPt_EPOCH_100_RSQ/roc.pkl", "MLP_MixedMoreQGLCandPt_EPOCH_50_RSQ/roc.pkl"],
-                       "labels": ["RF TeamAlpha", "RF TeamAlpha More QGL Cand Pt", "RF TeamAlpha More QGL", "MLP Team Alpha More QGL Cand Pt", "MLP Team A More QGL Cand Pt", "MLP Mixed More QGL Cand Pt"]
+          "mlp_comp": {"files":  ["RF_TeamAlpha_Nominal/roc.pkl", "RF_TeamAlphaMoreQGL/roc.pkl", "RF_TeamAlphaMoreQGLCandPt/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_100/roc.pkl", "MLP_TeamAMoreQGLCandPt_EPOCH_100_RSQ/roc.pkl", "MLP_MixedMoreQGLCandPt_EPOCH_50_RSQ/roc.pkl"],
+                       "labels": ["RF Alpha", "RF Alpha + QGL inputs", "RF Alpha + QGL inputs + Cand Pt", "MLP Alpha + QGL inputs + Cand Pt", "MLP A + QGL inputs + Cand Pt", "MLP Mixed + QGL inputs + Cand Pt"]
                     },
-          "mlp_nepochs": {"files":  ["MLP_TeamAlphaMoreQGLCandPt_EPOCH_1/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_10/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_20/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_100/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50_RSQ/roc.pkl"],
-                          "labels": ["1 Epoch", "10 Epoch", "20 Epoch", "50 Epoch", "100 Epoch", "50 Epoch RSQ"]
+          "mlp_nepochs": {"files":  ["MLP_TeamAlphaMoreQGLCandPt_EPOCH_1/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_10/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_20/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_100/roc.pkl"],#, "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50_RSQ/roc.pkl"],
+                          "labels": ["1 Epoch", "10 Epoch", "20 Epoch", "50 Epoch", "100 Epoch"]#, "50 Epoch RSQ"]
                     },
           
 
