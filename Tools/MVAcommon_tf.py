@@ -288,11 +288,27 @@ class createModel:
 
 class FileNameQueue:
     #This class is designed to store and randomize a filelist for use by several CustomRunner objects
-    def __init__(self, files, nEpoch):
+    def __init__(self, files, nEpoch, nFeatures, nLabels, nWeigts):
         self.files = numpy.array(files)
         self.nEpoch = nEpoch
 
+        #filename queue
         self.fileQueue = Queue.Queue(self.files.shape[0])
+
+        #Define input data queue
+        #inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+        self.inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
+
+        #CustomRunner threads 
+        self.customRunnerThreads = []
+
+    def addCustomRunnerThreads(self, crs):
+        try:
+            for cr in crs:
+                self.customRunnerThreads.append(cr)
+        except TypeError:
+            #it is not a list, so assume it is a simgle CustomRunner
+            self.customRunnerThreads.append(crs)
 
     def getQueue(self):
         return self.fileQueue
@@ -300,7 +316,7 @@ class FileNameQueue:
     def get(self):
         return self.fileQueue.get(False)
 
-    def queueProcess(self):
+    def queueProcess(self, sess):
         for i in xrange(self.nEpoch):
             perms = numpy.random.permutation(self.files.shape[0])
             self.files = self.files[perms]
@@ -308,15 +324,24 @@ class FileNameQueue:
             for fileName in self.files:
                 self.fileQueue.put(fileName)
 
-    def startQueueProcess(self):
+        #The files are exhausted, wait for enqueues to finish
+        for cr in self.customRunnerThreads:
+            cr.join()
+        #and then close the queue 
+        sess.run(self.inputDataQueue.close())        
+
+    def startQueueProcess(self, sess):
         #p = mp.Process(target=self.queueProcess)
         #p.daemon = True # thread will close when parent quits
         #p.start()
         #return p
-        p = threading.Thread(target=self.queueProcess)
+        p = threading.Thread(target=self.queueProcess, args=(sess,))
         p.daemon = True # thread will close when parent quits
         p.start()
         return p
+
+    def queue_size_op(self):
+      return self.inputDataQueue.size()
             
 
 class CustomRunner(object):
@@ -324,17 +349,22 @@ class CustomRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, variables, fileQueue, queueX):
-        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[0][0]], name="dataX")
-        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[1][0]], name="dataY")
-        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[2][0]], name="dataW")
+    def __init__(self, batchSize, variables, fileQueue):
 
         self.fileQueue = fileQueue
+        # The actual queue of data. 
+        self.queueX = self.fileQueue.inputDataQueue
+
+        # place holders to enqueue data with 
+        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[0][0]])
+        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[1][0]])
+        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[2][0]])
+
+        #feature names to select
         self.variables = variables
 
+        # enqueue batch size - NOT the dequeue batch for training
         self.batch_size = batchSize
-        # The actual queue of data. 
-        self.queueX = queueX
 
         # The symbolic operation to add data to the queue
         self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataW])
@@ -393,9 +423,6 @@ class CustomRunner(object):
       for dataX, dataY, dataW in self.data_iterator():
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
 
-      #The files are exhausted, close the queue 
-      sess.run(self.queueX.close())
-
     def start_threads(self, sess, n_threads=1):
       #qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
       #tf.train.add_queue_runner(qrx)
@@ -407,7 +434,8 @@ class CustomRunner(object):
         #p.daemon = True # thread will close when parent quits
         t.start()
         threads.append(t)
+
+      #pass threads to FileQueue for management
+      self.fileQueue.addCustomRunnerThreads(threads)
       return threads
 
-    def queue_size_op(self):
-      return self.queueX.size()

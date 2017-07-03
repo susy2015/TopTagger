@@ -7,6 +7,7 @@ from MVAcommon_tf import *
 import optparse
 from math import sqrt
 from time import sleep
+from glob import glob
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
@@ -106,18 +107,14 @@ def mainTF(_):
   ptps = validData["data"].ptp(0)
   #npyInputData = (npyInputData - mins)/ptps
 
-  #Define input queues
-  #inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
-  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
-
   #Create filename queue
-  fnq = FileNameQueue(["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"], NEpoch)
+  fnq = FileNameQueue(glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts)
 
   #Create CustomRunner object to manage data loading 
-  cr = CustomRunner(MiniBatchSize, options.variables, fnq, inputDataQueue)
+  crs = [CustomRunner(MiniBatchSize, options.variables, fnq) for i in xrange(4)]
 
   # Build the graph
-  mlp = createModel([nFeatures, 100, 50, 50, nLabels], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  mlp = createModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(outputDirectory + "log_graph", graph=tf.get_default_graph())
@@ -133,12 +130,13 @@ def mainTF(_):
     qrthreads = tf.train.start_queue_runners(coord=coord, sess=sess)
 
     # start the file queue running
-    fnq.startQueueProcess()
+    fnq.startQueueProcess(sess)
     # we must sleep to ensure that the file queue is filled before 
     # starting the feeder queues 
     sleep(2)
     # start our custom queue runner's threads
-    cr.start_threads(sess)
+    for cr in crs:
+      cr.start_threads(sess)
 
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
