@@ -87,9 +87,12 @@ def mainTF(_):
 
   # Import data
   dg = DataGetter(options.variables)
-  #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"])#, "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"])
-  #npyInputData, npyInputAnswer, npyInputWgts, _       = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training.h5", "trainingTuple_division_1_ZJetsToNuNu_validation.h5"])
   validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
+
+  #get input/output sizes
+  nFeatures = validData["data"].shape[1]
+  nLabels = validData["labels"].shape[1]
+  nWeigts = validData["weights"].shape[1]
 
   #Training parameters
   l2Reg = 0.0001
@@ -104,17 +107,17 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Define input queues
-  inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
-  #inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+  #inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+  inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
 
   #Create filename queue
   fnq = FileNameQueue(["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"], NEpoch)
 
-  #Create cusromRunner object to manage data loading 
+  #Create CustomRunner object to manage data loading 
   cr = CustomRunner(MiniBatchSize, options.variables, fnq, inputDataQueue)
 
   # Build the graph
-  mlp = createModel([16, 100, 50, 50, 2], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  mlp = createModel([nFeatures, 100, 50, 50, nLabels], inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(outputDirectory + "log_graph", graph=tf.get_default_graph())

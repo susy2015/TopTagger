@@ -157,7 +157,6 @@ class createModel:
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
         self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
-        #tf.train.shuffle_batch(inputDataQueue.dequeue_many(n=32), batch_size = 128, capacity = 1024, min_after_dequeue = 512, enqueue_many = True, shapes = [[16], [2]])    
     
         #variables for pre-transforming data
         self.offset = tf.constant(self.offset_initial, name="offest")
@@ -326,9 +325,9 @@ class CustomRunner(object):
         a queue full of data.
     """
     def __init__(self, batchSize, variables, fileQueue, queueX):
-        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, 16], name="dataX")
-        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, 2], name="dataY")
-        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, 1], name="dataW")
+        self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[0][0]], name="dataX")
+        self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[1][0]], name="dataY")
+        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, queueX.shapes[2][0]], name="dataW")
 
         self.fileQueue = fileQueue
         self.variables = variables
