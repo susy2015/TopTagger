@@ -331,10 +331,6 @@ class FileNameQueue:
         sess.run(self.inputDataQueue.close())        
 
     def startQueueProcess(self, sess):
-        #p = mp.Process(target=self.queueProcess)
-        #p.daemon = True # thread will close when parent quits
-        #p.start()
-        #return p
         p = threading.Thread(target=self.queueProcess, args=(sess,))
         p.daemon = True # thread will close when parent quits
         p.start()
@@ -388,23 +384,10 @@ class CustomRunner(object):
 
       #private data getter object 
       dg = DataGetter(self.variables)
-      
-      #variables to hold the data
-      #data = None
-      #dataNext = []
-      ##preload the first file to dataNext
-      #fetchFile = mp.Process(target=self.thread_readFile, args=((dg, next(fIter), dataNext), ) )
-      #fetchFile.start()
-      
+            
       #loop until there are no more files to get from the queue
       for fileName in fIter:
-        #wait until the next file is read 
-        #fetchFile.join()
-        #swap dataNext to data
-        #data = dataNext[0]
-        #start reading next file
-        #fetchFile = mp.Process(target=self.thread_readFile, args=((dg, fileName, dataNext), ))
-        #fetchFile.start()
+        #read next file
         data = dg.importData([fileName])
         
         batch_idx = 0
@@ -412,7 +395,6 @@ class CustomRunner(object):
             yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
             batch_idx += self.batch_size
 
-      #fileFetchPool.close()
       return
 
 
@@ -424,9 +406,6 @@ class CustomRunner(object):
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
 
     def start_threads(self, sess, n_threads=1):
-      #qrx = tf.train.QueueRunner(self.queueX, [self.enqueue_opX] * n_threads)
-      #tf.train.add_queue_runner(qrx)
-      
       """ Start background threads to feed queue """
       threads = []
       for n in range(n_threads):
