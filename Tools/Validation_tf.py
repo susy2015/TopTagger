@@ -128,17 +128,21 @@ elif ".h5" in dataTTbarName:
     f = h5py.File(dataTTbarName, "r")
     npData = f["reco_candidates"][:]
     columnHeaders = f["reco_candidates"].attrs["column_headers"]
-    
     indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
-    
     dataTTbarAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+
+    npDataGen = f["gen_tops"][:]
+    columnHeadersGen = f["gen_tops"].attrs["column_headers"]
+    indicesGen = [npDataGen[:,0].astype(numpy.int), npDataGen[:,1].astype(numpy.int)]
+    dataTTbarGen = pd.DataFrame(npDataGen[:,2:], index=pd.MultiIndex.from_arrays(indicesGen), columns=columnHeadersGen[2:])
+
     f.close()
 
 numDataTTbar = dataTTbarAll._get_numeric_data()
 numDataTTbar[numDataTTbar < 0.0] = 0.0
 
 #dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k_gen.pkl.gz")
-dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
+#dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
 
 #print list(dataTTbar.columns.values)
 
