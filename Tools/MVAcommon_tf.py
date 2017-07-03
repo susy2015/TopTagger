@@ -4,7 +4,6 @@ import pandas as pd
 import math
 import tensorflow as tf
 import threading
-import multiprocessing as mp
 import Queue
 import sharedmem
 
@@ -294,7 +293,7 @@ class FileNameQueue:
         self.files = numpy.array(files)
         self.nEpoch = nEpoch
 
-        self.fileQueue = mp.Queue(self.files.shape[0])
+        self.fileQueue = Queue.Queue(self.files.shape[0])
 
     def getQueue(self):
         return self.fileQueue
@@ -308,9 +307,7 @@ class FileNameQueue:
             self.files = self.files[perms]
             
             for fileName in self.files:
-                print "Enqueue file: ", fileName
                 self.fileQueue.put(fileName)
-        self.fileQueue.close()
 
     def startQueueProcess(self):
         #p = mp.Process(target=self.queueProcess)
@@ -347,7 +344,6 @@ class CustomRunner(object):
         #Simple iterator to get new filename from file queue
         while True:
             try:
-                print "DEQUEUE"
                 yield self.fileQueue.get()
             except Queue.Empty:
                 return
@@ -383,10 +379,7 @@ class CustomRunner(object):
         data = dg.importData([fileName])
         
         batch_idx = 0
-        print "Length data: ", len(data)
-        print "Data Shape: ", data["data"].shape, self.batch_size
         while batch_idx + self.batch_size <= data["data"].shape[0]:
-            print "Batch_idx: ", batch_idx
             yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
             batch_idx += self.batch_size
 
@@ -399,13 +392,9 @@ class CustomRunner(object):
       Function run on alternate thread. Basically, keep adding data to the queue.
       """
       for dataX, dataY, dataW in self.data_iterator():
-        print "GOGO TF ENQUEUE"
-        print dataX.shape, dataY.shape, dataW.shape
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
-        print "GOGO TF ENQUEUE -- DONE"
 
       #The files are exhausted, close the queue 
-      print "I (THE TF ENQUERER) GIVE UP"
       sess.run(self.queueX.close())
 
     def start_threads(self, sess, n_threads=1):

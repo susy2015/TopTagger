@@ -104,7 +104,7 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Define input queues
-  inputDataQueue = tf.FIFOQueue(capacity=512, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
+  inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
   #inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
 
   #Create filename queue
@@ -131,6 +131,8 @@ def mainTF(_):
 
     # start the file queue running
     fnq.startQueueProcess()
+    # we must sleep to ensure that the file queue is filled before 
+    # starting the feeder queues 
     sleep(2)
     # start our custom queue runner's threads
     cr.start_threads(sess)
@@ -141,9 +143,7 @@ def mainTF(_):
     i = 0
     try:
       while not coord.should_stop():
-        print "step: ", i
         _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg})
-        print "POOP"
         summary_writer.add_summary(summary, i)
         i += 1
 
