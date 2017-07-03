@@ -5,7 +5,6 @@ import math
 import tensorflow as tf
 import threading
 import Queue
-import sharedmem
 
 class DataGetter:
 
