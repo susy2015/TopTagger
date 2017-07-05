@@ -11,11 +11,14 @@ from glob import glob
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
-parser.add_option ('-k', "--sklearnrf", dest='sklearnrf', action='store_true',                             help="Run using sklearn RF")
-parser.add_option ('-x', "--xgboost",   dest='xgboost',   action='store_true',                             help="Run using xgboost")
-parser.add_option ('-d', "--directory", dest='directory', action='store', default="",                      help="Directory to store outputs")
-parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha",             help="Input features to use")
-parser.add_option ('-e', "--nepoch",    dest='nepoch',    action='store', default=100,         type="int", help="Number of training epoch")
+parser.add_option ('-k', "--sklearnrf",         dest='sklearnrf',         action='store_true',                                  help="Run using sklearn RF")
+parser.add_option ('-x', "--xgboost",           dest='xgboost',           action='store_true',                                  help="Run using xgboost")
+parser.add_option ('-d', "--directory",         dest='directory',         action='store',      default="",                      help="Directory to store outputs (default .)")
+parser.add_option ('-v', "--variables",         dest='variables',         action='store',      default="TeamAlpha",             help="Input features to use (default TeamAlpha)")
+parser.add_option ('-e', "--nepoch",            dest='nepoch',            action='store',      default=100,         type="int", help="Number of training epoch (default 100)")
+parser.add_option ('-n', "--nReaders",          dest="nReaders",          action='store',      default=4,           type="int", help="Number of file readers to use (default 4)")
+parser.add_option ('-q', "--nThreadperReader",  dest="nThreadperReader",  action='store',      default=1,           type="int", help="Number of threads for each flie reader (default 1)")
+parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store_true',                                  help="Reweight pt spectrum of events durring training")
 
 options, args = parser.parse_args()
 
@@ -108,10 +111,10 @@ def mainTF(_):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
-  fnq = FileNameQueue(glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts)
+  fnq = FileNameQueue(glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
 
   #Create CustomRunner object to manage data loading 
-  crs = [CustomRunner(MiniBatchSize, options.variables, fnq) for i in xrange(4)]
+  crs = [CustomRunner(MiniBatchSize, options.variables, fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
 
   # Build the graph
   mlp = createModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
@@ -136,7 +139,7 @@ def mainTF(_):
     sleep(2)
     # start our custom queue runner's threads
     for cr in crs:
-      cr.start_threads(sess)
+      cr.start_threads(sess, n_threads=options.nThreadperReader)
 
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)

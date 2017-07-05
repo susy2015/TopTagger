@@ -200,10 +200,10 @@ class createModel:
         tf.add_to_collection('TrainInfo', self.x)
         tf.add_to_collection('TrainInfo', self.y)
         
-        self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    tf.reshape(self.wgt, [-1]) )),    tf.reduce_sum(self.wgt))
-        #self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
-        self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), tf.reshape(self.wgt_ph, [-1]) )), tf.reduce_sum(self.wgt_ph))
-        #self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
+        #self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    tf.reshape(self.wgt, [-1]) )),    tf.reduce_sum(self.wgt))
+        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
+        #self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), tf.reshape(self.wgt_ph, [-1]) )), tf.reduce_sum(self.wgt_ph))
+        self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
@@ -286,7 +286,7 @@ class createModel:
 
 class FileNameQueue:
     #This class is designed to store and randomize a filelist for use by several CustomRunner objects
-    def __init__(self, files, nEpoch, nFeatures, nLabels, nWeigts):
+    def __init__(self, files, nEpoch, nFeatures, nLabels, nWeigts, nEnqueuers = 4, batchSize = 128):
         self.files = numpy.array(files)
         self.nEpoch = nEpoch
 
@@ -295,7 +295,7 @@ class FileNameQueue:
 
         #Define input data queue
         #inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
-        self.inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=15260, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
+        self.inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=16284 - batchSize*(nEnqueuers + 2), shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
 
         #CustomRunner threads 
         self.customRunnerThreads = []
@@ -340,7 +340,7 @@ class CustomRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, variables, fileQueue):
+    def __init__(self, batchSize, variables, fileQueue, ptReweight=True):
 
         self.fileQueue = fileQueue
         # The actual queue of data. 
@@ -359,6 +359,9 @@ class CustomRunner(object):
 
         # The symbolic operation to add data to the queue
         self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataW])
+
+        # additional options 
+        self.ptReweight = ptReweight
 
     def fileName_iterator(self):
         #Simple iterator to get new filename from file queue
@@ -383,7 +386,7 @@ class CustomRunner(object):
       #loop until there are no more files to get from the queue
       for fileName in fIter:
         #read next file
-        data = dg.importData([fileName])
+        data = dg.importData([fileName], ptReweight=self.ptReweight)
         
         batch_idx = 0
         while batch_idx + self.batch_size <= data["data"].shape[0]:

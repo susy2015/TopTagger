@@ -33,7 +33,7 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 
 #parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
 #parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
-parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, help="Discriminator cut")
+parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, type=float, help="Discriminator cut")
 parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 parser.add_option ('-f', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
