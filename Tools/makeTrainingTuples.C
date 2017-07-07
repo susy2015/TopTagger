@@ -84,7 +84,7 @@ private:
         const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
         const std::vector<double>& recoJetsCharge      = tr.getVec<double>("recoJetsCharge_0");
 
-        const std::vector<double>& qgMult  = tr.getVec<double>("qgMult");
+        const std::vector<int>& qgMult  = tr.getVec<int>("qgMult");
         const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
         const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis2");
         const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");

@@ -35,7 +35,7 @@ namespace ttUtility
         puppisd_corrRECO_for_ = nullptr;
     }
 
-    void ConstAK4Inputs::addQGLVectors(const std::vector<double>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
+    void ConstAK4Inputs::addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
     {
         qgMult_ = &qgMult;
         qgPtD_ = &qgPtD;
