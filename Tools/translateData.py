@@ -11,6 +11,7 @@ parser.add_option ('-f', "--file",      dest='fileNum', action='store',      hel
 parser.add_option ('-g', "--genPtOnly", dest='gptOnly', action='store_true', help="Only produce the gen pt file")
 parser.add_option ('-p', "--pandas",    dest='pandas',  action='store_true', help="Make pandas files")
 parser.add_option ('-d', "--hdf5",      dest='hdf5',    action='store_true', help="Save output as hdf5")
+parser.add_option ('-e', "--events",    dest='events',  action='store',      type=int, default="-1", help="Save output as hdf5")
 
 options, args = parser.parse_args()
 
@@ -128,7 +129,7 @@ def mainHDF5():
         for i in xrange(0, len(event.genTopPt)):
             genData.append([nevt, i, event.genTopPt[i], event.sampleWgt, event.Njet])
 
-        if not nevt%100000:
+        if options.events > 0 and not nevt%options.events:
             f = h5py.File(datasetFile[0:-5] + "_%i.h5"%iFile, "w")
             iFile += 1
             
@@ -150,6 +151,29 @@ def mainHDF5():
 
             data = []
             genData = []
+
+    if options.events <= 0:
+        f = h5py.File(datasetFile[0:-5] + "_%i.h5"%iFile, "w")
+        iFile += 1
+        
+        fullBranchNames = np.hstack([["eventNum", "candNum", "ncand"], branchNamesUsed] )
+        
+        dataArray = np.array(data)
+        dsReco = f.create_dataset("reco_candidates", dataArray.shape, h5py.h5t.NATIVE_FLOAT)
+        dsReco[:] = dataArray
+        dsReco.attrs.create("column_headers", fullBranchNames, fullBranchNames.shape)
+        
+        genFullBranchNames = np.array(["eventNum", "candNum", "genTopPt", "sampleWgt", "Njet"])
+        
+        genDataArray = np.array(genData)
+        dsGen = f.create_dataset("gen_tops", genDataArray.shape, h5py.h5t.NATIVE_FLOAT)
+        dsGen[:] = genDataArray
+        dsGen.attrs.create("column_headers", genFullBranchNames, genFullBranchNames.shape)
+        
+        f.close()
+
+        data = []
+        genData = []
 
 def mainTFR():
 

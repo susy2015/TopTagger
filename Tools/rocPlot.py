@@ -62,8 +62,8 @@ inputs = {"rf_2bseed": {"files":  ["RF_TeamAlpha_2BSelection/roc.pkl", "RF_TeamA
           "mlp_nepochs": {"files":  ["MLP_TeamAlphaMoreQGLCandPt_EPOCH_1/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_10/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_20/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50/roc.pkl", "MLP_TeamAlphaMoreQGLCandPt_EPOCH_100/roc.pkl"],#, "MLP_TeamAlphaMoreQGLCandPt_EPOCH_50_RSQ/roc.pkl"],
                           "labels": ["1 Epoch", "10 Epoch", "20 Epoch", "50 Epoch", "100 Epoch"]#, "50 Epoch RSQ"]
                     },
-          "mlp_test": {"files":  ["TEST/roc.pkl", "TEST2/roc.pkl", "TEST3/roc.pkl"],
-                       "labels": ["TEST", "TEST2", "TEST3"]
+          "mlp_test": {"files":  ["RF_TeamAlphaMoreQGLCandPt/roc.pkl", "TEST/roc.pkl", "TEST2/roc.pkl", "TEST3/roc.pkl", "TEST4/roc.pkl", "TEST5/roc.pkl", "TEST6/roc.pkl", "TEST7/roc.pkl"],
+                       "labels": ["RF Alpha + More QGL + cand Pt", "TEST", "TEST2", "TEST3", "TEST4", "TEST5", "TEST6", "TEST7"]
                     },
           
 
