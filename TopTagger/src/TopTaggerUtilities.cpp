@@ -17,7 +17,21 @@ namespace ttUtility
 
     ConstGenInputs::ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : hadGenTops_(&hadGenTops), hadGenTopDaughters_(&hadGenTopDaughters) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)
+    {
+        recoJetschargedHadronEnergyFraction_ = nullptr;
+        recoJetschargedEmEnergyFraction_ = nullptr;
+        recoJetsneutralEmEnergyFraction_ = nullptr;
+        recoJetsmuonEnergyFraction_ = nullptr;
+        PhotonEnergyFraction_ = nullptr;
+        ElectronEnergyFraction_ = nullptr;
+        ChargedHadronMultiplicity_ = nullptr;
+        NeutralHadronMultiplicity_ = nullptr;
+        PhotonMultiplicity_ = nullptr;
+        ElectronMultiplicity_ = nullptr;
+        MuonMultiplicity_ = nullptr;
+        recoJetsCharge_0_ = nullptr;
+    }
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
@@ -43,6 +57,33 @@ namespace ttUtility
         qgAxis2_ = &qgAxis2;
     }
 
+    void ConstAK4Inputs::addSupplamentalVectors(const std::vector<double>& recoJetschargedHadronEnergyFraction,
+                                                const std::vector<double>& recoJetschargedEmEnergyFraction,
+                                                const std::vector<double>& recoJetsneutralEmEnergyFraction,
+                                                const std::vector<double>& recoJetsmuonEnergyFraction,
+                                                const std::vector<double>& PhotonEnergyFraction,
+                                                const std::vector<double>& ElectronEnergyFraction,
+                                                const std::vector<double>& ChargedHadronMultiplicity,
+                                                const std::vector<double>& NeutralHadronMultiplicity,
+                                                const std::vector<double>& PhotonMultiplicity,
+                                                const std::vector<double>& ElectronMultiplicity,
+                                                const std::vector<double>& MuonMultiplicity,
+                                                const std::vector<double>& recoJetsCharge_0)
+    {
+        recoJetschargedHadronEnergyFraction_ = &recoJetschargedHadronEnergyFraction;
+        recoJetschargedEmEnergyFraction_ = &recoJetschargedEmEnergyFraction;
+        recoJetsneutralEmEnergyFraction_ = &recoJetsneutralEmEnergyFraction;
+        recoJetsmuonEnergyFraction_ = &recoJetsmuonEnergyFraction;
+        PhotonEnergyFraction_ = &PhotonEnergyFraction;
+        ElectronEnergyFraction_ = &ElectronEnergyFraction;
+        ChargedHadronMultiplicity_ = &ChargedHadronMultiplicity;
+        NeutralHadronMultiplicity_ = &NeutralHadronMultiplicity;
+        PhotonMultiplicity_ = &PhotonMultiplicity;
+        ElectronMultiplicity_ = &ElectronMultiplicity;
+        MuonMultiplicity_ = &MuonMultiplicity;
+        recoJetsCharge_0_ = &recoJetsCharge_0;
+    }
+
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
     {
         //vector holding constituents to be created
@@ -54,13 +95,37 @@ namespace ttUtility
             THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
         }
 
+        if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+        {
+            if(jetsLVec_->size() != qgMult_->size() || jetsLVec_->size() != qgPtD_->size() || jetsLVec_->size() != qgAxis1_->size() || jetsLVec_->size() != qgAxis2_->size())
+            {
+                THROW_TTEXCEPTION("Unequal vector size (QGL)!!!!!!!\n");
+            }
+        }
+
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
             constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
 
             //Add additional QGL info if it is provided 
-            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) constituents.back().setQGLVars((*qgMult_)[iJet], (*qgPtD_)[iJet], (*qgAxis1_)[iJet], (*qgAxis2_)[iJet]);
+            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+            {
+                constituents.back().setQGLVars((*qgMult_)[iJet], (*qgPtD_)[iJet], (*qgAxis1_)[iJet], (*qgAxis2_)[iJet]);
+            }
+
+            if(recoJetschargedHadronEnergyFraction_) constituents.back().setExtraVar("recoJetschargedHadronEnergyFraction", (*recoJetschargedHadronEnergyFraction_)[iJet]);
+            if(recoJetschargedEmEnergyFraction_)     constituents.back().setExtraVar("recoJetschargedEmEnergyFraction",     (*recoJetschargedEmEnergyFraction_)[iJet]);
+            if(recoJetsneutralEmEnergyFraction_)     constituents.back().setExtraVar("recoJetsneutralEmEnergyFraction",     (*recoJetsneutralEmEnergyFraction_)[iJet]);
+            if(recoJetsmuonEnergyFraction_)          constituents.back().setExtraVar("recoJetsmuonEnergyFraction",          (*recoJetsmuonEnergyFraction_)[iJet]);
+            if(PhotonEnergyFraction_)                constituents.back().setExtraVar("PhotonEnergyFraction",                (*PhotonEnergyFraction_)[iJet]);
+            if(ElectronEnergyFraction_)              constituents.back().setExtraVar("ElectronEnergyFraction",              (*ElectronEnergyFraction_)[iJet]);
+            if(ChargedHadronMultiplicity_)           constituents.back().setExtraVar("ChargedHadronMultiplicity",           (*ChargedHadronMultiplicity_)[iJet]);
+            if(NeutralHadronMultiplicity_)           constituents.back().setExtraVar("NeutralHadronMultiplicity",           (*NeutralHadronMultiplicity_)[iJet]);
+            if(PhotonMultiplicity_)                  constituents.back().setExtraVar("PhotonMultiplicity",                  (*PhotonMultiplicity_)[iJet]);
+            if(ElectronMultiplicity_)                constituents.back().setExtraVar("ElectronMultiplicity",                (*ElectronMultiplicity_)[iJet]);
+            if(MuonMultiplicity_)                    constituents.back().setExtraVar("MuonMultiplicity",                    (*MuonMultiplicity_)[iJet]);
+            if(recoJetsCharge_0_)                    constituents.back().setExtraVar("recoJetsCharge_0",                    (*recoJetsCharge_0_)[iJet]);
 
             //Get gen matches if the required info is provided
             if(hadGenTops_ && hadGenTopDaughters_)
@@ -321,6 +386,19 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_qgPtD"]   = RF_constituents[i].getQGPtD();
             varMap["j" + std::to_string(i + 1) + "_qgAxis1"]   = RF_constituents[i].getQGAxis1();
             varMap["j" + std::to_string(i + 1) + "_qgAxis2"]   = RF_constituents[i].getQGAxis2();
+            std::cout << RF_constituents[i].p().P() << "\t" << RF_constituents[i].getQGPtD() << std::endl;
+            varMap["j" + std::to_string(i + 1) + "_chargedHadEFrac"] = RF_constituents[i].getExtraVar("recoJetschargedHadronEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_chargedEmEFrac"] = RF_constituents[i].getExtraVar("recoJetschargedEmEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_neutralEmEFrac"] = RF_constituents[i].getExtraVar("recoJetsneutralEmEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_muonEFrac"] = RF_constituents[i].getExtraVar("recoJetsmuonEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_photonEFrac"] = RF_constituents[i].getExtraVar("PhotonEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_elecEFrac"] = RF_constituents[i].getExtraVar("ElectronEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_chargedHadMult"] = RF_constituents[i].getExtraVar("ChargedHadronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_neutralHadMult"] = RF_constituents[i].getExtraVar("NeutralHadronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_photonMult"] = RF_constituents[i].getExtraVar("PhotonMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_elecMult"] = RF_constituents[i].getExtraVar("ElectronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_muonMult"] = RF_constituents[i].getExtraVar("MuonMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_jetCharge"] = RF_constituents[i].getExtraVar("recoJetsCharge_0");
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();

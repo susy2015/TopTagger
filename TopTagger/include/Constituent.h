@@ -7,6 +7,7 @@
 #include <utility>
 #include <set>
 #include <map>
+#include <string>
 
 enum ConstituentType
 {
@@ -28,6 +29,9 @@ private:
     std::vector<TLorentzVector> subjets_;
     double wMassCorr_;
 
+    //Extra Variables
+    std::map<std::string, double> extraVars_;
+
     //Variables for gen matching studies
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatches_;
 
@@ -48,6 +52,7 @@ public:
     void setSubJets(const std::vector<TLorentzVector>& subjets);
     void setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2);
     void setWMassCorr(const double& wMassCorr);
+    void setExtraVar(const std::string& name, const double var);
 
     void addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter);
 
@@ -68,6 +73,7 @@ public:
     const double getQGPtD() const                         { return qgPtD_; }
     const double getQGAxis1() const                       { return qgAxis1_; }
     const double getQGAxis2() const                       { return qgAxis2_; }
+    const double getExtraVar(const std::string var) const;
 };
 
 #endif

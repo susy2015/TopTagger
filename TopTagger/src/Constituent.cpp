@@ -1,4 +1,5 @@
 #include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 Constituent::Constituent() : type_(NOTYPE), bTagDisc_(0.0), qgLikelihood_(0.0), tau1_(0.0), tau2_(0.0), tau3_(0.0), softDropMass_(0.0), wMassCorr_(0.0) {}
 
@@ -80,4 +81,21 @@ void Constituent::setQGLVars(const double qgMult, const double qgPtD, const doub
     qgPtD_ = qgPtD;
     qgAxis1_ = qgAxis1;
     qgAxis2_ = qgAxis2;
+}
+
+void Constituent::setExtraVar(const std::string& name, const double var)
+{
+    extraVars_[name] = var;
+}
+
+const double Constituent::getExtraVar(const std::string var) const 
+{
+    auto iter = extraVars_.find(var);
+
+    if(iter == extraVars_.end())
+    {
+        THROW_TTEXCEPTION("ExtraVar: " + var + " not found!!!");
+    }
+
+    return iter->second; 
 }

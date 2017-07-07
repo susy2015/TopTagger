@@ -89,16 +89,35 @@ private:
         const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis2");
         const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
 
+        const std::vector<double>& recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
+        const std::vector<double>& recoJetschargedEmEnergyFraction     = tr.getVec<double>("recoJetschargedEmEnergyFraction");
+        const std::vector<double>& recoJetsneutralEmEnergyFraction     = tr.getVec<double>("recoJetsneutralEmEnergyFraction");
+        const std::vector<double>& recoJetsmuonEnergyFraction          = tr.getVec<double>("recoJetsmuonEnergyFraction");
+        const std::vector<double>& PhotonEnergyFraction                = tr.getVec<double>("PhotonEnergyFraction");
+        const std::vector<double>& ElectronEnergyFraction              = tr.getVec<double>("ElectronEnergyFraction");
+        const std::vector<double>& ChargedHadronMultiplicity           = tr.getVec<double>("ChargedHadronMultiplicity");
+        const std::vector<double>& NeutralHadronMultiplicity           = tr.getVec<double>("NeutralHadronMultiplicity");
+        const std::vector<double>& PhotonMultiplicity                  = tr.getVec<double>("PhotonMultiplicity");
+        const std::vector<double>& ElectronMultiplicity                = tr.getVec<double>("ElectronMultiplicity");
+        const std::vector<double>& MuonMultiplicity                    = tr.getVec<double>("MuonMultiplicity");
+        //const std::vector<double>& JetProba_0                          = tr.getVec<double>("JetProba_0");
+        //const std::vector<double>& JetProbaN_0                         = tr.getVec<double>("JetProbaN_0");
+        //const std::vector<double>& JetProbaP_0                         = tr.getVec<double>("JetProbaP_0");
+        //const std::vector<double>& JetBprob                            = tr.getVec<double>("JetBprob");
+        //const std::vector<double>& JetBprobN                           = tr.getVec<double>("JetBprobN");
+        //const std::vector<double>& JetBprobP                           = tr.getVec<double>("JetBprobP");
+        const std::vector<double>& recoJetsCharge_0                    = tr.getVec<double>("recoJetsCharge_0");
+
         const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
         const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
         const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
         const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("genDecayMomIdxVec");
 
-	std::vector<TLorentzVector> jetsLVec_forTagger;
-        std::vector<double> recoJetsBtag_forTagger;
-        std::vector<double> qgLikelihood_forTagger;
-        std::vector<double> recoJetsCharge_forTagger;
-        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, AnaConsts::pt20Arr);
+	//std::vector<TLorentzVector> jetsLVec_forTagger;
+        //std::vector<double> recoJetsBtag_forTagger;
+        //std::vector<double> qgLikelihood_forTagger;
+        //std::vector<double> recoJetsCharge_forTagger;
+        //AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, AnaConsts::pt20Arr);
 
 	const double met=tr.getVar<double>("met");
 	const double metphi=tr.getVar<double>("metphi");
@@ -126,8 +145,21 @@ private:
         {
             hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
         }
-        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood_forTagger, hadGenTops, hadGenTopDaughters);
+        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
         myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
+        myConstAK4Inputs.addSupplamentalVectors(recoJetschargedHadronEnergyFraction,
+                                                recoJetschargedEmEnergyFraction,
+                                                recoJetsneutralEmEnergyFraction,
+                                                recoJetsmuonEnergyFraction,
+                                                PhotonEnergyFraction,
+                                                ElectronEnergyFraction,
+                                                ChargedHadronMultiplicity,
+                                                NeutralHadronMultiplicity,
+                                                PhotonMultiplicity,
+                                                ElectronMultiplicity,
+                                                MuonMultiplicity,
+                                                recoJetsCharge_0);
+
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
         //run tagger
@@ -216,7 +248,8 @@ public:
 
         //double variables list here
         //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_m", "j1_CSV", "j2_p",  "j2_m", "j2_CSV", "j3_p", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab", "j1_CSV_lab", "j1_QGL_lab", "j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "j3_CSV_lab", "j3_QGL_lab", "MET", "N_CSV", "dR12_lab", "dR13_lab", "dR23_lab", "dR3_12_lab", "dR2_13_lab", "dR1_23_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j1_qgAxis1_lab", "j1_qgAxis2_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgAxis2_lab", "j3_qgMult_lab", "j3_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgAxis2_lab", "dRPtTop", "dRPtW", "sd_n2", "j1_m_lab", "j2_m_lab", "j3_m_lab"};
+        allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_p", "j1_m", "j1_CSV", "j2_p",  "j2_m", "j2_CSV", "j3_p", "j3_m",  "j3_CSV", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j13_m", "j23_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL", "j1_pt_lab", "j1_eta_lab", "j1_phi_lab", "j1_CSV_lab", "j1_QGL_lab", "j2_pt_lab", "j2_eta_lab", "j2_phi_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_pt_lab", "j3_eta_lab", "j3_phi_lab", "j3_CSV_lab", "j3_QGL_lab", "MET", "N_CSV", "dR12_lab", "dR13_lab", "dR23_lab", "dR3_12_lab", "dR2_13_lab", "dR1_23_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j1_qgAxis1_lab", "j1_qgAxis2_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgAxs2_lab", "j3_qgMult_lab", "j3_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgAxis2_lab", "dRPtTop", "dRPtW", "sd_n2", "j1_m_lab", "j2_m_lab", "j3_m_lab", "j1_chargedHadEFrac", "j2_chargedHadEFrac", "j3_chargedHadEFrac","j1_chargedEmEFrac", "j2_chargedEmEFrac", "j3_chargedEmEFrac","j1_neutralEmEFrac", "j2_neutralEmEFrac", "j3_neutralEmEFrac","j1_muonEFrac", "j2_muonEFrac", "j3_muonEFrac","j1_photonEFrac", "j2_photonEFrac", "j3_photonEFrac","j1_elecEFrac", "j2_elecEFrac", "j3_elecEFrac","j1_chargedHadMult", "j2_chargedHadMult", "j3_chargedHadMult","j1_neutralHadMult", "j2_neutralHadMult", "j3_neutralHadMult","j1_photonMult", "j2_photonMult", "j3_photonMult","j1_elecMult", "j2_elecMult", "j3_elecMult","j1_muonMult", "j2_muonMult", "j3_muonMult","j1_jetCharge" "j2_jetCharge" "j3_jetCharge"};
+
         //integer values list here
         allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
 	//boolean values list here    
