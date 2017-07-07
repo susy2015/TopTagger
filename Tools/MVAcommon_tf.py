@@ -25,6 +25,10 @@ class DataGetter:
             self.list = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
         elif variables == "TeamAMoreQGLCandPt":
             self.list = ["cand_pt", "j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
+        elif variables == "TeamAlpha1DConv":
+            #self.list = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j2_p", "j3_p", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j2_qgAxis1_lab", "j3_qgAxis1_lab", "j1_qgMult_lab", "j2_qgMult_lab", "j3_qgMult_lab", "j1_qgPtD_lab", "j2_qgPtD_lab", "j3_qgPtD_lab"]
+            self.list = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j1_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_p", "j2_CSV", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_p", "j3_CSV", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
+
 
     def getList(self):
         return self.list
@@ -144,7 +148,7 @@ class createModel:
     #  yt - unscaled output for loss function
     #  w_fc - dictionary containing all weight variables
     #  b_fc - dictionary containing all bias variables 
-    def createMLP(self):
+    def createMLP(self, useConvolution=False):
         #constants 
         NLayer = len(self.nnStruct)
     
@@ -156,11 +160,55 @@ class createModel:
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
         self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
-    
+
         #variables for pre-transforming data
         self.offset = tf.constant(self.offset_initial, name="offest")
         self.scale = tf.constant(self.scale_initial, name="scale")
-    
+
+        #input variables after rescaling 
+        transformedX = tf.multiply(self.x-self.offset,self.scale)
+        transformedX_ph = tf.multiply(self.x_ph-self.offset,self.scale)
+
+        if useConvolution:
+            #Implement 1D convolution layer here
+            NDENSEONLYVAR = 8
+            NCONSTITUENTS = 3
+            FILTERWIDTH = 1
+            NFILTERS = 6
+            
+            #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
+            dInputs = tf.slice(transformedX, [0,0], [-1, NDENSEONLYVAR])
+            cProtoInputs = tf.slice(transformedX, [0,NDENSEONLYVAR], [-1, -1])
+            nChannel = int(cProtoInputs.shape[1]/NCONSTITUENTS)
+            cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
+            
+            dInputs_ph = tf.slice(transformedX_ph, [0,0], [-1, NDENSEONLYVAR])
+            cProtoInputs_ph = tf.slice(transformedX_ph, [0,NDENSEONLYVAR], [-1, -1])
+            nChannel_ph = int(cProtoInputs_ph.shape[1]/NCONSTITUENTS)
+            cInputs_ph = tf.reshape(cProtoInputs_ph, [-1, NCONSTITUENTS, nChannel_ph])
+            
+            #weights for convolution filters - shared between all parallel graphs
+            convWeights = tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, NFILTERS]), name="conv1_weights")
+            
+            #create the convolutional layers 
+            convLayer = tf.nn.conv1d(value = cInputs, filters=convWeights, stride=1, data_format='NHWC', padding='SAME', name="conv1d")
+            convLayer_ph = tf.nn.conv1d(value = cInputs_ph, filters=convWeights, stride=1, data_format='NHWC', padding='SAME', name="conv1d_ph")
+            
+            #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
+            convLayerShape = convLayer.shape[1] * convLayer.shape[2]
+            flatConvLayer = tf.reshape(convLayer, shape=[-1, int(convLayerShape)])
+            denseInputLayer = tf.concat([dInputs, flatConvLayer], axis=1, name="dil")
+            
+            convLayerShape_ph = convLayer_ph.shape[1] * convLayer_ph.shape[2]
+            flatConvLayer_ph = tf.reshape(convLayer_ph, shape=[-1, int(convLayerShape_ph)])
+            denseInputLayer_ph = tf.concat([dInputs_ph, flatConvLayer_ph], axis=1, name="dil_ph")
+
+        else:
+            #If convolution us not used, just pass in the transformed input variables 
+            denseInputLayer = transformedX
+            denseInputLayer_ph = transformedX_ph
+
+
         #variables for weights and activation functions 
         self.w_fc = {}
         self.b_fc = {}
@@ -169,11 +217,11 @@ class createModel:
         self.h_fc_ph = {}
     
         # Fully connected input layer
-        self.w_fc[0] = self.weight_variable([self.nnStruct[0], self.nnStruct[1]], name="w_fc0")
+        self.w_fc[0] = self.weight_variable([int(denseInputLayer.shape[1]), self.nnStruct[1]], name="w_fc0")
         self.b_fc[0] = self.bias_variable([self.nnStruct[1]], name="b_fc0")
-        self.h_fc[0] = tf.multiply(self.x-self.offset,self.scale)
+        self.h_fc[0] = denseInputLayer
     
-        self.h_fc_ph[0] = tf.multiply(self.x_ph-self.offset,self.scale)
+        self.h_fc_ph[0] = denseInputLayer_ph
         
         # create hidden layers 
         for layer in xrange(1, NLayer - 1):
@@ -210,7 +258,7 @@ class createModel:
         self.loss = self.cross_entropy + self.l2_norm*self.reg
         self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
         #train_step = tf.train.GradientDescentOptimizer(1.0).minimize(cross_entropy)
-        self.train_step = tf.train.AdamOptimizer(1e-3).minimize(self.loss, var_list=self.w_fc.values() + self.b_fc.values())
+        self.train_step = tf.train.AdamOptimizer(1e-3).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
 
 
     def createSummaries(self):
