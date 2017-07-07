@@ -365,7 +365,8 @@ namespace ttUtility
         {
             TLorentzVector p4(constitutent->p());
             p4.Boost(-topCand.p().BoostVector());
-            RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
+            RF_constituents.emplace_back(*constitutent);
+            RF_constituents.back().setP(p4);
         }
 
         //re-sort constituents by p after deboosting
@@ -386,7 +387,7 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_qgPtD"]   = RF_constituents[i].getQGPtD();
             varMap["j" + std::to_string(i + 1) + "_qgAxis1"]   = RF_constituents[i].getQGAxis1();
             varMap["j" + std::to_string(i + 1) + "_qgAxis2"]   = RF_constituents[i].getQGAxis2();
-            std::cout << RF_constituents[i].p().P() << "\t" << RF_constituents[i].getQGPtD() << std::endl;
+
             varMap["j" + std::to_string(i + 1) + "_chargedHadEFrac"] = RF_constituents[i].getExtraVar("recoJetschargedHadronEnergyFraction");
             varMap["j" + std::to_string(i + 1) + "_chargedEmEFrac"] = RF_constituents[i].getExtraVar("recoJetschargedEmEnergyFraction");
             varMap["j" + std::to_string(i + 1) + "_neutralEmEFrac"] = RF_constituents[i].getExtraVar("recoJetsneutralEmEnergyFraction");
