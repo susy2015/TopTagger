@@ -98,7 +98,7 @@ private:
         std::vector<double> recoJetsBtag_forTagger;
         std::vector<double> qgLikelihood_forTagger;
         std::vector<double> recoJetsCharge_forTagger;
-        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger);
+        AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, AnaConsts::pt20Arr);
 
 	const double met=tr.getVar<double>("met");
 	const double metphi=tr.getVar<double>("metphi");
@@ -107,6 +107,7 @@ private:
         int cntNJetsPt30Eta24 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Eta24Arr);
         int cntNJetsPt30      = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Arr);
 	int cntCSVS = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVS, AnaConsts::bTagArr);
+        int cntCSVL = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVL, AnaConsts::bTagArr);
 	std::vector<double> * dPhiVec = new std::vector<double>();
         (*dPhiVec) = AnaFunctions::calcDPhi(jetsLVec, metLVec.Phi(), 3, AnaConsts::dphiArr);
 	bool passnJets = true;
@@ -193,7 +194,7 @@ private:
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
         //Generate basic MVA selection 
-        bool passMVABaseline = true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
+        bool passMVABaseline = true;//met > 100 && cntNJetsPt30 >= 5 && cntCSVS >= 1 && cntCSVL >= 2;//true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
 	const bool passValidationBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
 	tr.registerDerivedVar("passValidationBaseline",passValidationBaseline);
@@ -417,7 +418,7 @@ int main(int argc, char* argv[])
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
 			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
 			//fill mini tuple
-			bool passbaseline = true;//forFakeRate? passValidationBaseline : passMVABaseline;
+			bool passbaseline = passMVABaseline;
 			// if(passMVABaseline)
 			if(passbaseline)
                         {
@@ -428,9 +429,9 @@ int main(int argc, char* argv[])
                                 splitCounter = 0;
                                 mtmIndex = (mtmIndex + 1)%mtmVec.size();
                             }
+                            ++NEvtsTotal;
                         }
 
-                        ++NEvtsTotal;
                     }
                 }
                 catch(const SATException& e)
