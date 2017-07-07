@@ -6,7 +6,10 @@
 #include <string>
 #include <vector>
 
+#ifdef DOTENSORFLOW
 #include "tensorflow/c/c_api.h"
+#endif
+
 //class TF_Session;
 //class TF_Buffer;
 //class TF_Output;
@@ -15,6 +18,7 @@
 class TTMTensorflow : public TTModule
 {
 private:
+#ifdef DOTENSORFLOW
     double discriminator_;
     std::string modelFile_;
     double csvThreshold_;
@@ -32,6 +36,7 @@ private:
     std::vector<TF_Operation*> targets_;
 
     TF_Buffer* read_file(const std::string& file);
+#endif
 
 public:
     ~TTMTensorflow();
