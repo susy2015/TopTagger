@@ -135,18 +135,22 @@ class createModel:
         initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
         return tf.Variable(initial)
     
-    def createConvLayer(self, inputVars, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, postfix=""):
+    def createConvLayers(self, inputVars, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, postfix=""):
         #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
         dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
         cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
         
-        #create the convolutional layers 
-        convLayer = tf.nn.conv1d(value = cInputs, filters=convWeights, stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix)
+        #lost to hold conv layers 
+        convLayers = []
+
+        #create the convolutional layers
+        for layerWeights in convWeights:
+            convLayers.append(tf.nn.conv1d(value = cInputs, filters=layerWeights, stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix))
     
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
-        convLayerShape = convLayer.shape[1] * convLayer.shape[2]
-        flatConvLayer = tf.reshape(convLayer, shape=[-1, int(convLayerShape)])
+        convLayerShape = convLayers[-1].shape[1] * convLayers[-1].shape[2]
+        flatConvLayer = tf.reshape(convLayers[-1], shape=[-1, int(convLayerShape)])
         denseInputLayer = tf.concat([dInputs, flatConvLayer], axis=1, name="dil"+postfix)
 
         return denseInputLayer
@@ -215,12 +219,14 @@ class createModel:
             NDENSEONLYVAR = 8
             NCONSTITUENTS = 3
             FILTERWIDTH = 1
-            NFILTERS = 6
+            NOUTFILTERS = 6
 
             nChannel = int((transformedX.shape[1] - NDENSEONLYVAR)/NCONSTITUENTS)
 
             #weights for convolution filters - shared between all parallel graphs
-            convWeights = tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, NFILTERS]), name="conv1_weights")
+            convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel,          16]), name="conv1_weights_1"),
+                           tf.Variable(tf.random_normal([FILTERWIDTH,       16,           8]), name="conv1_weights_2"),
+                           tf.Variable(tf.random_normal([FILTERWIDTH,        8, NOUTFILTERS]), name="conv1_weights_3")]
 
             #Create colvolution layers 
             denseInputLayer = self.createConvLayer(transformedX, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel)
