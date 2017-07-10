@@ -89,7 +89,7 @@ def mainTF(options):
   crs = [CustomRunner(MiniBatchSize, options.variables, fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
 
   # Build the graph
-  mlp = createModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  mlp = CreateModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(options.directory + "log_graph", graph=tf.get_default_graph())

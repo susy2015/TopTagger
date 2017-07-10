@@ -124,7 +124,7 @@ class DataGetter:
       return {"data":npyInputData, "labels":npyInputAnswers, "weights":npyInputWgts, "":npyInputSampleWgts}
 
 
-class createModel:
+class CreateModel:
     def weight_variable(self, shape, name):
         """weight_variable generates a weight variable of a given shape."""
         initial = tf.truncated_normal(shape, stddev=0.1, name=name)
