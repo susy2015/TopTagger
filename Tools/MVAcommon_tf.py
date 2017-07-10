@@ -155,7 +155,7 @@ class CreateModel:
 
         return denseInputLayer
 
-    def crateDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, prefix=""):
         #constants 
         NLayer = len(self.nnStruct)
 
@@ -243,8 +243,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.crateDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc)
-        self.yt_ph = self.crateDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, "_ph")
+        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc)
+        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, "_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
