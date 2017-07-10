@@ -141,12 +141,12 @@ class CreateModel:
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
         cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
         
-        #lost to hold conv layers 
-        convLayers = []
+        #list to hold conv layers 
+        convLayers = [cInputs]
 
         #create the convolutional layers
-        for layerWeights in convWeights:
-            convLayers.append(tf.nn.conv1d(value = cInputs, filters=layerWeights, stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix))
+        for iLayer in xrange(len(convWeights)):
+            convLayers.append(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix))
     
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
         convLayerShape = convLayers[-1].shape[1] * convLayers[-1].shape[2]
@@ -193,7 +193,7 @@ class CreateModel:
     #  nnStruct - a list containing the number of nodes in each layer, including the input and output layers 
     #  offset_initial - a list of offsets which will be applied to the initial input features, they are stored in the tf model
     #  scale_initial - a list of scales which will be applied to each input feature after the offsets are subtracted, they are stored in the tf model
-    def createMLP(self, useConvolution=False):
+    def createMLP(self, useConvolution=True):
         #constants 
         NLayer = len(self.nnStruct)
     
@@ -219,21 +219,19 @@ class CreateModel:
             NDENSEONLYVAR = 8
             NCONSTITUENTS = 3
             FILTERWIDTH = 1
-            NOUTFILTERS = 6
 
             nChannel = int((transformedX.shape[1] - NDENSEONLYVAR)/NCONSTITUENTS)
 
             #weights for convolution filters - shared between all parallel graphs
-            convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel,          16]), name="conv1_weights_1"),
-                           tf.Variable(tf.random_normal([FILTERWIDTH,       16,           8]), name="conv1_weights_2"),
-                           tf.Variable(tf.random_normal([FILTERWIDTH,        8, NOUTFILTERS]), name="conv1_weights_3")]
+            convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, 16]), name="conv1_weights"),
+                           tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
 
             #Create colvolution layers 
-            denseInputLayer = self.createConvLayer(transformedX, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel)
-            denseInputLayer_ph = self.createConvLayer(transformedX_ph, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, "_ph")
+            denseInputLayer = self.createConvLayers(transformedX, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel)
+            denseInputLayer_ph = self.createConvLayers(transformedX_ph, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, "_ph")
 
         else:
-            #If convolution us not used, just pass in the transformed input variables 
+            #If convolution is not used, just pass in the transformed input variables 
             denseInputLayer = transformedX
             denseInputLayer_ph = transformedX_ph
 
