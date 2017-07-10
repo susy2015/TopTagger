@@ -63,7 +63,7 @@ def mainTF(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"])
+  validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"])
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]
