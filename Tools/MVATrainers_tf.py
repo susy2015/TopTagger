@@ -14,7 +14,7 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.h5"], prescale=True, ptReweight=True)
+  trainData = dg.importData(samplesToRun = glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=False)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -22,14 +22,14 @@ def mainSKL(options):
   print "TRAINING RF"
 
   # Train random forest 
-  clf = clf.fit(npyInputData, npyInputAnswer[:,0], sample_weight=npyInputWgts[:,0])
+  clf = clf.fit(trainData["data"], trainData["labels"][:,0], sample_weight=trainData["weights"][:,0])
   
   #Dump output from training
   fileObject = open(options.directory + "TrainingOutput.pkl",'wb')
   out = pickle.dump(clf, fileObject)
   fileObject.close()
       
-  output = clf.predict_proba(npyInputData)[:,1]
+  #output = clf.predict_proba(trainData["data"])[:,1]
 
 def mainXGB(options):
 
