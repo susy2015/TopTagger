@@ -44,7 +44,7 @@ class DataGetter:
       npyInputWgts = numpy.empty([0])
 
       for sample in samplesToRun:
-        print sample
+        #print sample
         #if ".pkl" in sample:
         #  data = pd.read_pickle(sample)
         #elif ".h5" in sample:
@@ -135,22 +135,48 @@ class CreateModel:
         initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
         return tf.Variable(initial)
     
-    def createConvLayers(self, inputVars, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, postfix=""):
-        #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
-        dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
-        cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
-        cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
-        
+    def createRecurentLayers(self, inputs, nodes=[], share=None):
+        #define variable scope
+        with tf.variable_scope("rnn") as scope:
+            #condition input shape 
+            slicedInputs = []
+            for iW in xrange(inputs.shape[1]):
+                slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
+            #create the rnn cell 
+            cell = tf.nn.rnn_cell.BasicLSTMCell(nodes[0], reuse=share)
+            #create the rnn layer 
+            output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
+            #reshape output to match the cnn output
+            output = tf.stack(output, axis=1) 
+            return output
+
+    def createConvLayers(self, inputs, convWeights, postfix=""):
         #list to hold conv layers 
-        convLayers = [cInputs]
+        convLayers = [inputs]
 
         #create the convolutional layers
         for iLayer in xrange(len(convWeights)):
             convLayers.append(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix))
     
+        return convLayers[-1]
+
+    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=[], postfix=""):
+        #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
+        dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
+        cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
+        cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
+        
+        output = cInputs
+
+        if len(convWeights) > 0:
+            output = self.createConvLayers(output, convWeights, postfix)
+
+        if len(rnnNodes) > 0:
+            output = self.createRecurentLayers(output, [16], len(postfix)>0)
+
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
-        convLayerShape = convLayers[-1].shape[1] * convLayers[-1].shape[2]
-        flatConvLayer = tf.reshape(convLayers[-1], shape=[-1, int(convLayerShape)])
+        convLayerShape = output.shape[1] * output.shape[2]
+        flatConvLayer = tf.reshape(output, shape=[-1, int(convLayerShape)])
         denseInputLayer = tf.concat([dInputs, flatConvLayer], axis=1, name="dil"+postfix)
 
         return denseInputLayer
@@ -193,7 +219,7 @@ class CreateModel:
     #  nnStruct - a list containing the number of nodes in each layer, including the input and output layers 
     #  offset_initial - a list of offsets which will be applied to the initial input features, they are stored in the tf model
     #  scale_initial - a list of scales which will be applied to each input feature after the offsets are subtracted, they are stored in the tf model
-    def createMLP(self, useConvolution=True):
+    def createMLP(self, useConvolution=False):
         #constants 
         NLayer = len(self.nnStruct)
     
@@ -223,12 +249,14 @@ class CreateModel:
             nChannel = int((transformedX.shape[1] - NDENSEONLYVAR)/NCONSTITUENTS)
 
             #weights for convolution filters - shared between all parallel graphs
-            convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, 16]), name="conv1_weights"),
-                           tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
+            self.convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, 16]), name="conv1_weights"),
+                                tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
 
             #Create colvolution layers 
-            denseInputLayer = self.createConvLayers(transformedX, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel)
-            denseInputLayer_ph = self.createConvLayers(transformedX_ph, convWeights, NDENSEONLYVAR, NCONSTITUENTS, nChannel, "_ph")
+            #denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], postfix="")
+            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=[], rnnNodes=[16], postfix="")
+            #denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], postfix="_ph")
+            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=[], rnnNodes=[16], postfix="_ph")
 
         else:
             #If convolution is not used, just pass in the transformed input variables 
@@ -280,9 +308,17 @@ class CreateModel:
         summary_vloss = tf.summary.scalar("valid_loss", self.loss_ph)
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy)
+        # create image of colvolutional filters 
+        valid_summaries = [summary_accuracy, summary_vloss]
+        try:
+            for i in xrange(len(convWeights)):
+                shapes = self.convWeights[i].shape
+                valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[0], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
+        except NameError:
+            pass
         # Merge all summaries into a single op
         self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
-        self.merged_valid_summary_op = tf.summary.merge([summary_accuracy, summary_vloss])
+        self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
 
 
     def __init__(self, nnStruct, inputDataQueue, nBatch, offset_initial, scale_initial):
