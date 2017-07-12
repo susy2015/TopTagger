@@ -58,6 +58,8 @@ class DataGetter:
         data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
         f.close()
     
+        data = data[data.cand_pt > 200]
+
         #remove partial tops 
         inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
         inputAnswer = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
@@ -151,14 +153,15 @@ class CreateModel:
             return output
 
     def createConvLayers(self, inputs, convWeights, postfix=""):
-        #list to hold conv layers 
-        convLayers = [inputs]
+        with tf.variable_scope("cnn") as scope:
+            #list to hold conv layers 
+            convLayers = [inputs]
 
-        #create the convolutional layers
-        for iLayer in xrange(len(convWeights)):
-            convLayers.append(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix))
+            #create the convolutional layers
+            for iLayer in xrange(len(convWeights)):
+                convLayers.append(tf.nn.relu(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix)))
     
-        return convLayers[-1]
+            return convLayers[-1]
 
     def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=[], postfix=""):
         #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
@@ -182,35 +185,36 @@ class CreateModel:
         return denseInputLayer
 
     def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, prefix=""):
-        #constants 
-        NLayer = len(self.nnStruct)
-
-        #variables
-        h_fc = {}
-
-        # Fully connected input layer
-        if not 0 in w_fc:
-            w_fc[0] = self.weight_variable([int(denseInputLayer.shape[1]), nnStruct[1]], name="w_fc0")
-        if not 0 in b_fc:
-            b_fc[0] = self.bias_variable([nnStruct[1]], name="b_fc0")
-
-        h_fc[0] = denseInputLayer
-    
-        # create hidden layers 
-        for layer in xrange(1, NLayer - 1):
-            #use relu for hidden layers as this seems to give best result
-            h_fc[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
-        
-            # Map the features to next layer
-            if not layer in w_fc:
-                w_fc[layer] = self.weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
-            if not layer in b_fc:
-                b_fc[layer] = self.bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
-        
-        #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the loss function will do this)
-        yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt"+prefix)
-
-        return yt
+        with tf.variable_scope("dense") as scope:
+            #constants 
+            NLayer = len(self.nnStruct)
+            
+            #variables
+            h_fc = {}
+            
+            # Fully connected input layer
+            if not 0 in w_fc:
+                w_fc[0] = self.weight_variable([int(denseInputLayer.shape[1]), nnStruct[1]], name="w_fc0")
+            if not 0 in b_fc:
+                b_fc[0] = self.bias_variable([nnStruct[1]], name="b_fc0")
+            
+            h_fc[0] = denseInputLayer
+            
+            # create hidden layers 
+            for layer in xrange(1, NLayer - 1):
+                #use relu for hidden layers as this seems to give best result
+                h_fc[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
+            
+                # Map the features to next layer
+                if not layer in w_fc:
+                    w_fc[layer] = self.weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
+                if not layer in b_fc:
+                    b_fc[layer] = self.bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
+            
+            #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the loss function will do this)
+            yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt"+prefix)
+            
+            return yt
 
 
     ### createMLP
@@ -253,10 +257,10 @@ class CreateModel:
                                 tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
 
             #Create colvolution layers 
-            #denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], postfix="")
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=[], rnnNodes=[16], postfix="")
-            #denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], postfix="_ph")
-            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=[], rnnNodes=[16], postfix="_ph")
+            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], postfix="")
+            #denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=[], rnnNodes=[16], postfix="")
+            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], postfix="_ph")
+            #denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=[], rnnNodes=[16], postfix="_ph")
 
         else:
             #If convolution is not used, just pass in the transformed input variables 
