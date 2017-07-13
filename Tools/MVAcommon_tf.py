@@ -58,8 +58,6 @@ class DataGetter:
         data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
         f.close()
     
-        data = data[data.cand_pt > 200]
-
         #remove partial tops 
         inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
         inputAnswer = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
