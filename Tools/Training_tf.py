@@ -16,6 +16,7 @@ if __name__ == '__main__':
   parser.add_option ('-n', "--nReaders",          dest="nReaders",          action='store',      default=4,           type="int", help="Number of file readers to use (default 4)")
   parser.add_option ('-q', "--nThreadperReader",  dest="nThreadperReader",  action='store',      default=1,           type="int", help="Number of threads for each flie reader (default 1)")
   parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store_true',                                  help="Reweight pt spectrum of events durring training")
+  parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      default="model.json",            help="JSON with model definitions")
 
   options, args = parser.parse_args()
 

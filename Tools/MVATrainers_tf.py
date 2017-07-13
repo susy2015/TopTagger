@@ -61,8 +61,22 @@ def mainTF(options):
 
   print "PROCESSING TRAINING DATA"
 
+  #Let us see if the input variables have been set by JSON
+  import json
+  try:
+    with open(options.modelJSON,"r") as f:
+      cfgs = json.load(f)
+  except IOError:
+      print "Unable to open",options.modelJSON
+      dg = DataGetter.StandardVariables(options.variables)  #We assume that the variables option specifies a variable listed defined in DataGetter.StandardVariables
+  else:
+      print "Loading",options.variables,"from",options.modelJSON
+      dg = DataGetter.DefinedVariables(cfgs[options.variables]) #the JSON file should be a dictionary, the variable option specifies the key for a list of variable names saved in the dictionary
+
+  print "Input Variables",dg.getList()
+
   # Import data
-  dg = DataGetter(options.variables)
+  #dg = DataGetter(options.variables)
   validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"])
 
   #get input/output sizes
@@ -86,7 +100,7 @@ def mainTF(options):
   fnq = FileNameQueue(glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
 
   #Create CustomRunner object to manage data loading 
-  crs = [CustomRunner(MiniBatchSize, options.variables, fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
+  crs = [CustomRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
 
   # Build the graph
   mlp = CreateModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
