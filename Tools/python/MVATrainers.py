@@ -1,6 +1,6 @@
 import numpy
 import pandas as pd
-from MVAcommon_tf import *
+from DataGetter import DataGetter
 from math import sqrt
 from time import sleep
 from glob import glob
@@ -14,7 +14,7 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -39,13 +39,13 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(prescale=False, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=False, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
   # Create xgboost classifier
   # Train random forest 
-  xgData = xgb.DMatrix(npyInputData, label=npyInputAnswer[:,0], weight=npyInputWgts)
+  xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0], weight=trainData["weights"][:,0])
   param = {'max_depth':4 }
   gbm = xgb.train(param, xgData, num_boost_round=1000)
   
@@ -58,6 +58,9 @@ def mainXGB(options):
 def mainTF(options):
 
   import tensorflow as tf
+  from CreateModel import CreateModel
+  from FileNameQueue import FileNameQueue
+  from CustomQueueRunner import CustomQueueRunner
 
   print "PROCESSING TRAINING DATA"
 
@@ -77,7 +80,7 @@ def mainTF(options):
 
   # Import data
   #dg = DataGetter(options.variables)
-  validData = dg.importData(samplesToRun = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"])
+  validData = dg.importData(samplesToRun = [options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"])
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]
@@ -85,11 +88,11 @@ def mainTF(options):
   nWeigts = validData["weights"].shape[1]
 
   #Training parameters
-  l2Reg = 0.0001
-  MiniBatchSize = 512#128
+  l2Reg = options.l2Reg
+  MiniBatchSize = options.minibatchSize
   NEpoch = options.nepoch
-  ReportInterval = 1000
-  validationCount = min(10000, validData["data"].shape[0])
+  ReportInterval = options.reportInterval
+  validationCount = min(options.nValidationEvents, validData["data"].shape[0])
 
   #scale data inputs to range 0-1
   mins = validData["data"].min(0)
@@ -97,10 +100,10 @@ def mainTF(options):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
-  fnq = FileNameQueue(glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
+  fnq = FileNameQueue(glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
 
-  #Create CustomRunner object to manage data loading 
-  crs = [CustomRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
+  #Create CustomQueueRunner object to manage data loading 
+  crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
 
   # Build the graph
   mlp = CreateModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)

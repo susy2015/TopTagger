@@ -1,6 +1,6 @@
-IDIR       = .
+IDIR       = src
 ODIR       = obj
-SDIR       = .
+SDIR       = src
 RSDIR      = $(CMSSW_BASE)/src/SusyAnaTools/Tools
 
 TTIDIR     = $(CMSSW_BASE)/src/TopTagger/TopTagger/include
