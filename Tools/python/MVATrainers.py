@@ -1,6 +1,6 @@
 import numpy
 import pandas as pd
-from MVAcommon import *
+from DataGetter import DataGetter
 from math import sqrt
 from time import sleep
 from glob import glob
@@ -58,6 +58,9 @@ def mainXGB(options):
 def mainTF(options):
 
   import tensorflow as tf
+  from CreateModel import CreateModel
+  from FileQueueRunner import FileQueueRunner
+  from CustomQueueRunner import CustomQueueRunner
 
   print "PROCESSING TRAINING DATA"
 
