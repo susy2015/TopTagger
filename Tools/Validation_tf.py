@@ -152,6 +152,31 @@ dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
+#Training data for overfitting check
+if options.sklrf:
+    dataTTbarNameTrain = "trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+elif options.xgboost:
+    dataTTbarNameTrain = "trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
+else:
+    dataTTbarNameTrain = "trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+
+import h5py
+f = h5py.File(dataTTbarNameTrain, "r")
+npData = f["reco_candidates"][:]
+columnHeaders = f["reco_candidates"].attrs["column_headers"]
+indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+dataTTbarAllTrain = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+
+f.close()
+
+numDataTTbarTrain = dataTTbarAllTrain._get_numeric_data()
+numDataTTbarTrain[numDataTTbarTrain < 0.0] = 0.0
+
+#Apply baseline cuts
+dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
+dataTTbarTrain = dataTTbarAllTrain[dataTTbarAllTrain.ncand > 0]
+
+
 print "CALCULATING TTBAR DISCRIMINATORS"
 
 if options.sklrf:
@@ -161,6 +186,7 @@ elif options.xgboost:
     dataTTbarAns = bst.predict(xgData)
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
+    dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})[:,0]
 
 print "CREATING HISTOGRAMS"
 
@@ -169,6 +195,9 @@ print "CREATING HISTOGRAMS"
 inputLabels = dataTTbar.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
 genMatches = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
 
+inputLabelsTrain = dataTTbarTrain.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+genMatchesTrain = (inputLabelsTrain[:,0] == 3) & (inputLabelsTrain[:,1] == 1)
+
 plt.clf()
 plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
 plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
@@ -176,6 +205,17 @@ plt.legend(loc='upper right')
 plt.xlabel("Discriminator")
 plt.ylabel("Normalized events")
 plt.savefig(outputDirectory + "discriminator.png")
+plt.close()
+
+plt.clf()
+plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched Validation",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched Validation", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[genMatchesTrain == 1], weights=dataTTbarTrain["sampleWgt"][genMatchesTrain == 1], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="red")
+plt.hist(dataTTbarAnsTrain[genMatchesTrain != 1], weights=dataTTbarTrain["sampleWgt"][genMatchesTrain != 1], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_validVsTrain.png")
 plt.close()
 
 #plot efficiency
