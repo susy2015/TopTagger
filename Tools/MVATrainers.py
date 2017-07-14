@@ -1,6 +1,6 @@
 import numpy
 import pandas as pd
-from MVAcommon_tf import *
+from MVAcommon import *
 from math import sqrt
 from time import sleep
 from glob import glob

@@ -1,7 +1,7 @@
 import os
 import errno
 import optparse
-from MVATrainers_tf import mainSKL, mainXGB, mainTF
+from MVATrainers import mainSKL, mainXGB, mainTF
 
 if __name__ == '__main__':
 

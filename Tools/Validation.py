@@ -4,7 +4,7 @@ import errno
 import pandas as pd
 import numpy as np
 import math
-from MVAcommon_tf import *
+from MVAcommon import *
 import optparse
 import matplotlib.pyplot as plt
 import pickle
