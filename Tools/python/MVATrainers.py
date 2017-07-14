@@ -59,7 +59,7 @@ def mainTF(options):
 
   import tensorflow as tf
   from CreateModel import CreateModel
-  from FileQueueRunner import FileQueueRunner
+  from FileNameQueue import FileNameQueue
   from CustomQueueRunner import CustomQueueRunner
 
   print "PROCESSING TRAINING DATA"
@@ -102,8 +102,8 @@ def mainTF(options):
   #Create filename queue
   fnq = FileNameQueue(glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
 
-  #Create CustomRunner object to manage data loading 
-  crs = [CustomRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
+  #Create CustomQueueRunner object to manage data loading 
+  crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
 
   # Build the graph
   mlp = CreateModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)

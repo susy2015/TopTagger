@@ -2,6 +2,8 @@ import tensorflow as tf
 import threading
 import Queue
 
+from DataGetter import DataGetter
+
 class CustomQueueRunner(object):
     """
     This class manages the background threads needed to fill
