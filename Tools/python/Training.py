@@ -2,6 +2,7 @@ import os
 import errno
 import optparse
 from MVATrainers import mainSKL, mainXGB, mainTF
+from taggerOptions import *
 
 if __name__ == '__main__':
 
@@ -24,6 +25,22 @@ if __name__ == '__main__':
   parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',      default="data",                     help="Path where the input datafiles are stored (default: \"data\")")
 
   options, args = parser.parse_args()
+
+  #The following code will be enabled when taggerOptions is turned on 
+  #parser = getParser() 
+
+  #We add the following options in order to things other than tensorflow
+  #parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
+  #parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
+
+  #cmdLineOptions, args = parser.parse_args()
+
+  #if isinstance(cmdLineOptions.cfgFile, basestring): 
+  #  options = taggerOptions.loadJSON(cmdLineOptions.cfgFile)
+  #else:
+  #  options = taggerOptions.defaults()
+
+  #options = override(options,cmdLineOptions)
 
   #create output directory if it does not already exist 
   if len(options.directory):
