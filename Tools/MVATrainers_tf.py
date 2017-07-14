@@ -14,7 +14,7 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=False)
+  trainData = dg.importData(samplesToRun = glob("trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -39,7 +39,7 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(prescale=False, ptReweight=True)
+  npyInputData, npyInputAnswer, npyInputWgts, npyInputSampleWgts = dg.importData(prescale=False, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
@@ -72,7 +72,7 @@ def mainTF(options):
 
   #Training parameters
   l2Reg = 0.0001
-  MiniBatchSize = 128
+  MiniBatchSize = 512#128
   NEpoch = options.nepoch
   ReportInterval = 1000
   validationCount = min(10000, validData["data"].shape[0])

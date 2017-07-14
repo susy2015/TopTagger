@@ -113,6 +113,9 @@ class DataGetter:
       nbg  = npyInputWgts[npyInputAnswers[:,0] != 1].sum()
       npyInputWgts[npyInputAnswers[:,0] != 1] *= nsig / nbg
     
+      #normalize training weights
+      npyInputWgts /= npyInputWgts.mean()
+      
       if randomize:
         #randomize input data
         perms = numpy.random.permutation(npyInputData.shape[0])
@@ -285,10 +288,8 @@ class CreateModel:
         tf.add_to_collection('TrainInfo', self.x)
         tf.add_to_collection('TrainInfo', self.y)
         
-        #self.cross_entropy =    tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    tf.reshape(self.wgt, [-1]) )),    tf.reduce_sum(self.wgt))
-        self.cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_, logits=self.yt))
-        #self.cross_entropy_ph = tf.divide(tf.reduce_sum(tf.multiply(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), tf.reshape(self.wgt_ph, [-1]) )), tf.reduce_sum(self.wgt_ph))
-        self.cross_entropy_ph = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph))
+        self.cross_entropy    = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    weights=tf.reshape(self.wgt, [-1]),    reduction=tf.losses.Reduction.MEAN)
+        self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
