@@ -55,7 +55,7 @@ namespace cfg {
         std::ostream& put(std::ostream& o) const;
         std::set<std::string> queriedItems() const { return m_term->queriedItems(); }
     private:
-        std::auto_ptr<TermAnd> m_term;
+        std::unique_ptr<TermAnd> m_term;
     };
 
     class ConditionChain {
