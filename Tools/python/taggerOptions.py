@@ -41,7 +41,9 @@ class runOptions:
                       reportInterval    = 1000,
                       nValidationEvents = 10000,
                       l2Reg             = 0.0001,
-                      dataPath          = "data"):
+                      dataPath          = "data",
+                      sampleNames       = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"],
+                      ptReweight        = True):
 
       self.runName           = runName
       self.directory         = directory
@@ -53,6 +55,20 @@ class runOptions:
       self.nValidationEvents = nValidationEvents
       self.l2Reg             = l2Reg
       self.dataPath          = dataPath
+      self.sampleNames       = sampleNames
+      
+      self.makeSamplesToRun()
+
+      self.ptReweight        = ptReweight
+      
+   #This method uses the dataPath and the list of sampleNames to make a list of training files
+   def makeSamplesToRun(self):
+      
+      self.samplesToRun = []
+      for name in self.sampleNames:
+         self.samplesToRun.append(self.dataPath+"/"+name)
+
+      return
 
    #This method will add the command-line options related to the parameters stored in the runOptions object
    @classmethod
@@ -62,7 +78,7 @@ class runOptions:
          print "Object passed to runOptions.getParser is not an OptionParser object"
          parser = OptionsParser()
 
-      parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store_true',               help="Reweight pt spectrum of events durring training")
+      parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store',               help="Reweight pt spectrum of events durring training")
       parser.add_option ('-d', "--directory",         dest='directory',         action='store',                    help="Directory to store outputs (default .)")
       parser.add_option ('-e', "--nepoch",            dest='nepoch',            action='store',      type="int",   help="Number of training epoch (default 50)")
       parser.add_option ('-n', "--nReaders",          dest="nReaders",          action='store',      type="int",   help="Number of file readers to use (default 4)")
@@ -118,6 +134,7 @@ class runOptions:
       if cloptions.dataFilePath != None: 
          self.dataPath = cloptions.dataFilePath
          orList.append("dataPath = "+str(cloptions.dataFilePath))
+         self.makeSamplesToRun()
 
       if len(orList):
          info = "runOptions overriden by command line:"
@@ -222,10 +239,11 @@ class taggerOptions:
 #This class will track and save the options used in a run of the TopTagger
 
    #The object is instantiated by passing to it a runOptions and a networkOptions objects
-   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults()):
+   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults(),saveName="config.json"):
       self.confName = confName
       self.runOp    = runOp
       self.netOp    = netOp
+      self.saveName = saveName
 
       self.info     = ['Info List']
 

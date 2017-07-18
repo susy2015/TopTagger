@@ -65,22 +65,24 @@ def mainTF(options):
   print "PROCESSING TRAINING DATA"
 
   #Let us see if the input variables have been set by JSON
-  import json
-  try:
-    with open(options.modelJSON,"r") as f:
-      cfgs = json.load(f)
-  except IOError:
-      print "Unable to open",options.modelJSON
-      dg = DataGetter.StandardVariables(options.variables)  #We assume that the variables option specifies a variable listed defined in DataGetter.StandardVariables
-  else:
-      print "Loading",options.variables,"from",options.modelJSON
-      dg = DataGetter.DefinedVariables(cfgs[options.variables]) #the JSON file should be a dictionary, the variable option specifies the key for a list of variable names saved in the dictionary
+  #import json
+  #try:
+  #  with open(options.modelJSON,"r") as f:
+  #    cfgs = json.load(f)
+  #except IOError:
+  #    print "Unable to open",options.modelJSON
+  #    dg = DataGetter.StandardVariables(options.variables)  #We assume that the variables option specifies a variable listed defined in DataGetter.StandardVariables
+  #else:
+  #    print "Loading",options.variables,"from",options.modelJSON
+  #    dg = DataGetter.DefinedVariables(cfgs[options.variables]) #the JSON file should be a dictionary, the variable option specifies the key for a list of variable names saved in the dictionary
+
+  dg = DataGetter.DefinedVariables(options.netOp.vNames)
 
   print "Input Variables",dg.getList()
 
   # Import data
   #dg = DataGetter(options.variables)
-  validData = dg.importData(samplesToRun = [options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"])
+  validData = dg.importData(samplesToRun = options.runOp.samplesToRun)
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]
@@ -88,11 +90,11 @@ def mainTF(options):
   nWeigts = validData["weights"].shape[1]
 
   #Training parameters
-  l2Reg = options.l2Reg
-  MiniBatchSize = options.minibatchSize
-  NEpoch = options.nepoch
-  ReportInterval = options.reportInterval
-  validationCount = min(options.nValidationEvents, validData["data"].shape[0])
+  l2Reg = options.runOp.l2Reg
+  MiniBatchSize = options.runOp.minibatchSize
+  NEpoch = options.runOp.nepoch
+  ReportInterval = options.runOp.reportInterval
+  validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
 
   #scale data inputs to range 0-1
   mins = validData["data"].min(0)
@@ -100,16 +102,16 @@ def mainTF(options):
   #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
-  fnq = FileNameQueue(glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.nReaders, MiniBatchSize)
+  fnq = FileNameQueue(glob(options.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)
 
   #Create CustomQueueRunner object to manage data loading 
-  crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.ptReweight) for i in xrange(options.nReaders)]
+  crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.runOp.ptReweight) for i in xrange(options.runOp.nReaders)]
 
   # Build the graph
   mlp = CreateModel([nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
-  summary_writer = tf.summary.FileWriter(options.directory + "log_graph", graph=tf.get_default_graph())
+  summary_writer = tf.summary.FileWriter(options.runOp.directory + "log_graph", graph=tf.get_default_graph())
 
   print "TRAINING MLP"
 
@@ -128,7 +130,7 @@ def mainTF(options):
     sleep(2)
     # start our custom queue runner's threads
     for cr in crs:
-      cr.start_threads(sess, n_threads=options.nThreadperReader)
+      cr.start_threads(sess, n_threads=options.runOp.nThreadperReader)
 
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
@@ -153,8 +155,8 @@ def mainTF(options):
 
     coord.join(qrthreads)
 
-    mlp.saveCheckpoint(sess, options.directory)
-    mlp.saveModel(sess, options.directory)
+    mlp.saveCheckpoint(sess, options.runOp.directory)
+    mlp.saveModel(sess, options.runOp.directory)
 
     #y_out, yt_out = sess.run([mlp.y_ph, mlp.yt_ph], feed_dict={mlp.x_ph: npyInputData, mlp.y_ph_: npyInputAnswer, mlp.reg: l2Reg})
 
