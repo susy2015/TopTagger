@@ -20,6 +20,7 @@ if __name__ == '__main__':
   parser.add_option ('-r', "--reportInterval",    dest="reportInterval",    action='store',      default=1000,         type="int",   help="Number of training batches between each validation check (default 1000)")
   parser.add_option ('-l', "--nValidationEvents", dest="nValidationEvents", action='store',      default=10000,        type="int",   help="Number of validation events to use for each validation step (default 10000)")
   parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      default=0.0001,       type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
+  parser.add_option ('-t', "--keepProb",          dest="keepProb",          action='store',      default=0.8,          type="float", help="The Dropout probability to apply during network training (default 0.8)")
   parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      default="model.json",               help="JSON with model definitions")
   parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',      default="data",                     help="Path where the input datafiles are stored (default: \"data\")")
 
