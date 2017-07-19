@@ -14,8 +14,8 @@ LIBSUFFIX = @LIBSUFFIX@
 
 # directory to put intermediate files 
 ODIR       = obj
-IDIR       = $(TAGGERDIR)/Tools/src
-SDIR       = $(TAGGERDIR)/Tools/src
+IDIR       = $(TAGGERDIR)/Tools/cpp
+SDIR       = $(TAGGERDIR)/Tools/cpp
 RSDIR      = $(SUSYANATOOLSDIR)/Tools/
 RIDIR      = $(SUSYANATOOLSDIR)/Tools
 

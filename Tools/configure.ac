@@ -73,7 +73,7 @@ if test -z ${SUSYANATOOLSDIR+x}; then
 fi
 
 AC_CHECK_HEADER($SUSYANATOOLSDIR/Tools/samples.h,        [], [AC_ERROR([SusyAnaTools includes are not found!!!!!!!!!!])])
-AC_CHECK_HEADER($SUSYANATOOLSDIR/Tools/NTupleReader.h,   [], [AC_ERROR([SusyAnaTools includes are not found!!!!!!!!!!])])
+dnl AC_CHECK_HEADER($SUSYANATOOLSDIR/Tools/NTupleReader.h,   [], [AC_ERROR([SusyAnaTools includes are not found!!!!!!!!!!])])
 
 AC_SUBST(SUSYANATOOLSDIR, $SUSYANATOOLSDIR)
 
