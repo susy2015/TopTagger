@@ -18,7 +18,7 @@ namespace cfg
 
     void Condition::set(TermAnd* ta) 
     {
-        m_term=std::auto_ptr<TermAnd>(ta);  
+        m_term.reset(ta);  
     }
 
     std::ostream& Condition::put(std::ostream& o) const 

@@ -1,6 +1,6 @@
 # Tagger development tools
 
-We use scikit package for MVA based tagger. Its python based.
+We use scikit package for MVA based tagger studies. Its python based.  For the final random forest algorithm we use OpenCV as it provides a native C++ interface with a Python binding for training.  
 
 ## Samples for training and validation
 
@@ -168,5 +168,6 @@ source opencvSetup.sh
 The code may then be run with the command 
 
 ```
-./openCVTest
+python Training.py --opencv
+python Validation.py --opencv
 ```

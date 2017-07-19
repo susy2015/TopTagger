@@ -19,6 +19,8 @@ namespace ttUtility
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
 
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
     ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
@@ -54,9 +56,10 @@ namespace ttUtility
         //std::vector<Constituent> constituents;
 
         //Safety check that jet and b-tag vectors are the same length
-        if(jetsLVec_->size() != btagFactors_->size() || jetsLVec_->size() != qgLikelihood_->size())
+        //Special exception for qgLikelihood if it is empty (for slimplified tagger)
+        if(jetsLVec_->size() != btagFactors_->size() || (qgLikelihood_ != nullptr && jetsLVec_->size() != qgLikelihood_->size()))
         {
-            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
+            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(btagFactors_->size()));
         }
 
         if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
@@ -70,7 +73,7 @@ namespace ttUtility
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
+            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (qgLikelihood_ != nullptr)?((*qgLikelihood_)[iJet]):(0.0));
 
             //Add additional QGL info if it is provided 
             if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
@@ -137,7 +140,7 @@ namespace ttUtility
                     for (unsigned int k=j+1; k<subjets.size(); ++k)
                     {
                         TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
-                        double diff = abs(diff_LV.M());
+                        double diff = fabs(diff_LV.M());
                         if(diff < min_diff)
                         {
                             min_diff = diff;

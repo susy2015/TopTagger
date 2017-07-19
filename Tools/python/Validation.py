@@ -2,9 +2,9 @@ import sys
 import os
 import errno
 import pandas as pd
-import numpy as np
+import numpy
 import math
-from MVAcommon_tf import *
+from DataGetter import DataGetter
 import optparse
 import matplotlib.pyplot as plt
 import pickle
@@ -36,10 +36,11 @@ parser = optparse.OptionParser("usage: %prog [options]\n")
 parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, type=float, help="Discriminator cut")
 parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
-parser.add_option ('-f', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
+parser.add_option ('-a', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
+parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',      default="data",                     help="Path where the input datafiles are stored (default: \"data\")")
 parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
 parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha", help="Input features to use")
-
+parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      default="model.json",               help="JSON with model definitions")
 options, args = parser.parse_args()
 
 outputDirectory = ""
@@ -107,7 +108,19 @@ else:
 
 print "PROCESSING TTBAR VALIDATION DATA"
 
-varsname = DataGetter(options.variables).getList()
+#Let us see if the input variables have been set by JSON
+import json
+try:
+    with open(options.modelJSON,"r") as f:
+        cfgs = json.load(f)
+except IOError:
+    print "Unable to open",options.modelJSON
+    dg = DataGetter.StandardVariables(options.variables)  #We assume that the variables option specifies a variable listed defined in DataGetter.StandardVariables
+else:
+    print "Loading",options.variables,"from",options.modelJSON
+    dg = DataGetter.DefinedVariables(cfgs[options.variables]) #the JSON file should be a dictionary, the variable option specifies the key for a list of variable names saved in the dictionary
+
+varsname = dg.getList()
 
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_TeamASel.pkl.gz")
@@ -115,11 +128,11 @@ varsname = DataGetter(options.variables).getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
 
 if options.sklrf:
-    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"
+    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"
 elif options.xgboost:
-    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
+    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = "trainingTuple_division_1_TTbarSingleLep_validation_100k.h5"
+    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"
 
 if ".pkl" in dataTTbarName:
     dataTTbarAll = pd.read_pickle(dataTTbarName)
@@ -152,6 +165,31 @@ dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
+#Training data for overfitting check
+if options.sklrf:
+    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+elif options.xgboost:
+    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
+else:
+    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+
+import h5py
+f = h5py.File(dataTTbarNameTrain, "r")
+npData = f["reco_candidates"][:]
+columnHeaders = f["reco_candidates"].attrs["column_headers"]
+indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+dataTTbarAllTrain = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+
+f.close()
+
+numDataTTbarTrain = dataTTbarAllTrain._get_numeric_data()
+numDataTTbarTrain[numDataTTbarTrain < 0.0] = 0.0
+
+#Apply baseline cuts
+dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
+dataTTbarTrain = dataTTbarAllTrain[dataTTbarAllTrain.ncand > 0]
+
+
 print "CALCULATING TTBAR DISCRIMINATORS"
 
 if options.sklrf:
@@ -161,6 +199,7 @@ elif options.xgboost:
     dataTTbarAns = bst.predict(xgData)
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
+    dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})[:,0]
 
 print "CREATING HISTOGRAMS"
 
@@ -169,6 +208,9 @@ print "CREATING HISTOGRAMS"
 inputLabels = dataTTbar.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
 genMatches = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
 
+inputLabelsTrain = dataTTbarTrain.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+genMatchesTrain = (inputLabelsTrain[:,0] == 3) & (inputLabelsTrain[:,1] == 1)
+
 plt.clf()
 plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
 plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
@@ -176,6 +218,17 @@ plt.legend(loc='upper right')
 plt.xlabel("Discriminator")
 plt.ylabel("Normalized events")
 plt.savefig(outputDirectory + "discriminator.png")
+plt.close()
+
+plt.clf()
+plt.hist(dataTTbarAns[genMatches == 1], weights=dataTTbar["sampleWgt"][genMatches == 1], bins=50, normed=True, label="Gen Matched Validation",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[genMatches != 1], weights=dataTTbar["sampleWgt"][genMatches != 1], bins=50, normed=True, label="Not gen matched Validation", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[genMatchesTrain == 1], weights=dataTTbarTrain["sampleWgt"][genMatchesTrain == 1], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="red")
+plt.hist(dataTTbarAnsTrain[genMatchesTrain != 1], weights=dataTTbarTrain["sampleWgt"][genMatchesTrain != 1], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_validVsTrain.png")
 plt.close()
 
 #plot efficiency
@@ -267,11 +320,11 @@ plt.close()
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 if options.sklrf:
-    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
 elif options.xgboost:
-    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
 else:
-    dataZnunuName = "trainingTuple_division_1_ZJetsToNuNu_validation_700k.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
 
 if ".pkl" in dataZnunuName:
     dataZnunuAll = pd.read_pickle(dataZnunuName)
@@ -340,7 +393,7 @@ plt.close()
 
 print "CALCULATING ROC CURVES"
 
-cuts = np.hstack([np.arange(0.0, 0.05, 0.005), np.arange(0.05, 0.95, 0.01), np.arange(0.95, 1.00, 0.005)])
+cuts = numpy.hstack([numpy.arange(0.0, 0.05, 0.005), numpy.arange(0.05, 0.95, 0.01), numpy.arange(0.95, 1.00, 0.005)])
 
 FPR = []
 TPR = []
