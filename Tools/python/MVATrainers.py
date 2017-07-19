@@ -125,11 +125,11 @@ def mainTF(options):
     i = 0
     try:
       while not coord.should_stop():
-        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg})
+        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.keepProb})
         summary_writer.add_summary(summary, i)
         i += 1
 
-        if not i % ReportInterval:
+        if i == 1 or not i % ReportInterval:
           validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl, i)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))

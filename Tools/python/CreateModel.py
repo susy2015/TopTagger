@@ -27,18 +27,18 @@ class CreateModel:
             output = tf.stack(output, axis=1) 
             return output
 
-    def createConvLayers(self, inputs, convWeights, postfix=""):
+    def createConvLayers(self, inputs, convWeights, keep_prob=1.0, postfix=""):
         with tf.variable_scope("cnn") as scope:
             #list to hold conv layers 
-            convLayers = [inputs]
+            convLayers = [tf.nn.dropout(inputs, keep_prob)]
 
             #create the convolutional layers
             for iLayer in xrange(len(convWeights)):
-                convLayers.append(tf.nn.relu(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix)))
+                convLayers.append(tf.nn.dropout(tf.nn.relu(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix)), keep_prob))
     
             return convLayers[-1]
 
-    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=[], postfix=""):
+    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=[], keep_prob=1.0, postfix=""):
         #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
         dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
@@ -47,7 +47,7 @@ class CreateModel:
         output = cInputs
 
         if len(convWeights) > 0:
-            output = self.createConvLayers(output, convWeights, postfix)
+            output = self.createConvLayers(output, convWeights, keep_prob, postfix)
 
         if len(rnnNodes) > 0:
             output = self.createRecurentLayers(output, [16], len(postfix)>0)
@@ -59,7 +59,7 @@ class CreateModel:
 
         return denseInputLayer
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(self.nnStruct)
@@ -73,12 +73,14 @@ class CreateModel:
             if not 0 in b_fc:
                 b_fc[0] = self.bias_variable([nnStruct[1]], name="b_fc0")
             
+            #h_fc[0] = tf.nn.dropout(denseInputLayer, keep_prob)
             h_fc[0] = denseInputLayer
             
             # create hidden layers 
             for layer in xrange(1, NLayer - 1):
                 #use relu for hidden layers as this seems to give best result
-                h_fc[layer] = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
+                layerOutput = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
+                h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
             
                 # Map the features to next layer
                 if not layer in w_fc:
@@ -105,6 +107,8 @@ class CreateModel:
         if len(self.nnStruct) < 2:
             throw
         
+        self.keep_prob = tf.placeholder_with_default(1.0, [], name="keep_prob")
+
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
@@ -132,8 +136,8 @@ class CreateModel:
                                 tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
 
             #Create colvolution layers 
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], postfix="")
-            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], postfix="_ph")
+            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], keep_prob=self.keep_prob, postfix="")
+            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], keep_prob=self.keep_prob, postfix="_ph")
 
         else:
             #If convolution is not used, just pass in the transformed input variables 
@@ -146,8 +150,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc)
-        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, "_ph")
+        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob)
+        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, prefix="_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
