@@ -1,27 +1,50 @@
 from optparse import OptionParser
 import json
+import os
+import fnmatch
 
 def StandardVariables(variables):
    if variables == "TeamAlpha":
-      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL"]
-   elif variables == "Mixed":
-      vNames = ["cand_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "j1_QGL_lab", "j2_QGL_lab", "j3_QGL_lab", "dRPtTop", "dRPtW", "sd_n2"]
-   elif variables == "TeamA":
-      vNames = ["j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j2_QGL_lab", "j3_CSV_lab", "j3_QGL_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
-   elif variables == "TeamAlphaMoreQGL":
-      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-   elif variables == "TeamAMoreQGL":
-      vNames = ["j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-   elif variables == "MixedMoreQGLCandPt":
-      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "dRPtTop", "dRPtW", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-   elif variables == "TeamAlphaMoreQGLCandPt":
-      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-   elif variables == "TeamAMoreQGLCandPt":
-      vNames = ["cand_pt", "j1_m_lab", "j1_CSV_lab", "j2_CSV_lab", "j3_CSV_lab", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab"]
-   elif variables == "TeamAlpha1DConv":
-      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "j1_p", "j1_CSV", "j1_qgAxis1_lab", "j1_qgMult_lab", "j1_qgPtD_lab", "j1_chargedHadEFrac","j1_chargedEmEFrac", "j1_neutralEmEFrac", "j1_muonEFrac", "j1_photonEFrac", "j1_elecEFrac", "j1_chargedHadMult", "j1_neutralHadMult", "j1_photonMult", "j1_elecMult", "j1_muonMult", "j1_jetCharge", "j2_p", "j2_CSV", "j2_qgAxis1_lab", "j2_qgMult_lab", "j2_qgPtD_lab", "j2_chargedHadEFrac","j2_chargedEmEFrac", "j2_neutralEmEFrac", "j2_muonEFrac", "j2_photonEFrac", "j2_elecEFrac", "j2_chargedHadMult", "j2_neutralHadMult", "j2_photonMult", "j2_elecMult", "j2_muonMult", "j2_jetCharge", "j3_p", "j3_CSV", "j3_qgAxis1_lab", "j3_qgMult_lab", "j3_qgPtD_lab", "j3_chargedHadEFrac","j3_chargedEmEFrac", "j3_neutralEmEFrac", "j3_muonEFrac", "j3_photonEFrac", "j3_elecEFrac", "j3_chargedHadMult", "j3_neutralHadMult", "j3_photonMult", "j3_elecMult", "j3_muonMult", "j3_jetCharge"];
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
+      jNames = ["p", "CSV", "QGL"]
 
-   return vNames
+   elif variables == "Mixed":
+      vNames = ["cand_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
+      jNames = ["p", "CSV_lab", "QGL_lab"]
+
+   elif variables == "TeamA":
+      vNames = ["cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
+      jNames = ["m_lab", "CSV_lab", "QGL_lab"]
+ 
+   elif variables == "TeamAlphaMoreQGL":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
+      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+
+   elif variables == "TeamAMoreQGL":
+      vNames = ["cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
+      jNames = ["m_lab", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+
+   elif variables == "MixedMoreQGLCandPt":
+      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
+      jNames = ["p", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+
+   elif variables == "TeamAlphaMoreQGLCandPt":
+      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
+      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+
+   elif variables == "TeamAMoreQGLCandPt":
+      vNames = ["cand_pt", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
+      jNames = ["m_lab", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+
+   elif variables == "TeamAlpha1DConv":
+      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
+      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "chargedHadEFrac","chargedEmEFrac", "neutralEmEFrac", "muonEFrac", "photonEFrac", "elecEFrac", "chargedHadMult", "neutralHadMult", "photonMult", "elecMult", "muonMult", "jetCharge"];
+
+   else:
+      vNames = ["cand_m"]
+      jNames = ["p"]
+
+   return vNames, jNames
 
 #The classes defined in this file are used to control the TopTagger
 #It will define default values
@@ -42,7 +65,8 @@ class runOptions:
                       nValidationEvents = 10000,
                       l2Reg             = 0.0001,
                       dataPath          = "data",
-                      sampleNames       = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"],
+                      trainingNames     = [],
+                      validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"],
                       ptReweight        = True):
 
       self.runName           = runName
@@ -55,18 +79,52 @@ class runOptions:
       self.nValidationEvents = nValidationEvents
       self.l2Reg             = l2Reg
       self.dataPath          = dataPath
-      self.sampleNames       = sampleNames
+
+      self.trainingGlob      = "trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"
       
-      self.makeSamplesToRun()
+      if(len(trainingNames) > 0):
+         self.trainingNames = trainingNames
+      else:
+         try:
+            self.trainingNames = [f for f in os.listdir(self.dataPath) if fnmatch.fnmatch(f,self.trainingGlob)]
+         except OSError:
+            self.trainingNames = []
+         
+
+      self.validationNames       = validationNames
+
+      self.makeTrainingSamples()
+      self.makeValidationSamples()
 
       self.ptReweight        = ptReweight
       
-   #This method uses the dataPath and the list of sampleNames to make a list of training files
-   def makeSamplesToRun(self):
+   #configuration variables can be left in an inconsistent state, this method will make them consistent again
+   def cleanUp(self):
+      self.makeTrainingSamples()
+      self.makeValidationSamples()
+      return
+
+   #This method uses the dataPath and the list of trainingNames to make a list of training files
+   def makeTrainingSamples(self):
       
-      self.samplesToRun = []
-      for name in self.sampleNames:
-         self.samplesToRun.append(self.dataPath+"/"+name)
+      if(len(self.trainingNames) < 1):
+         try:
+            self.trainingNames = [f for f in os.listdir(self.dataPath) if fnmatch.fnmatch(f,self.trainingGlob)]
+         except OSError:
+            self.trainingNames = []
+         
+      self.trainingSamples = []
+      for name in self.trainingNames:
+         self.trainingSamples.append(self.dataPath+"/"+name)
+
+      return
+
+   #This method uses the dataPath and the list of validationNames to make a list of validation files
+   def makeValidationSamples(self):
+      
+      self.validationSamples = []
+      for name in self.validationNames:
+         self.validationSamples.append(self.dataPath+"/"+name)
 
       return
 
@@ -87,7 +145,7 @@ class runOptions:
       parser.add_option ('-r', "--reportInterval",    dest="reportInterval",    action='store',      type="int",   help="Number of training batches between each validation check (default 1000)")
       parser.add_option ('-l', "--nValidationEvents", dest="nValidationEvents", action='store',      type="int",   help="Number of validation events to use for each validation step (default 10000)")
       parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                    help="Path where the input datafiles are stored (default: \"data\")")
-      parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      default=0.0001,       type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
+      parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
 
       return parser      
 
@@ -134,7 +192,8 @@ class runOptions:
       if cloptions.dataFilePath != None: 
          self.dataPath = cloptions.dataFilePath
          orList.append("dataPath = "+str(cloptions.dataFilePath))
-         self.makeSamplesToRun()
+         self.makeTrainingSamples()
+         self.makeValidationSamples()
 
       if len(orList):
          info = "runOptions overriden by command line:"
@@ -177,10 +236,19 @@ class networkOptions:
       self.inputVariables   = inputVariables
       self.jetVariables     = jetVariables
 
-      self.jetVariablesList = [jet+var for var in jetVariables for jet in ["j1_","j2_","j3_"]]
+      self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
 
       self.numPassThru      = len(inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList      
+
+   #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
+   def cleanUp(self):
+      self.jetVariablesList = [jet+var for var in self.jetVariables for jet in ["j1_","j2_","j3_"]]
+
+      self.numPassThru      = len(self.inputVariables)
+      self.vNames           = self.inputVariables+self.jetVariablesList
+
+      return()
 
    #This method will add the command-line options related to the parameters stored in the networkOptions object
    @classmethod
@@ -211,7 +279,16 @@ class networkOptions:
             return "Loaded "+cloptions.variables+" from "+cloptions.modelJSON 
 
       elif cloptions.variables != None:
-         self.vNames = StandardVariables(cloptions.variables)
+         inputVariables, jetVariables = StandardVariables(cloptions.variables)
+
+         self.inputVariables   = inputVariables
+         self.jetVariables     = jetVariables
+
+         self.jetVariablesList = [jet+var for var in jetVariables for jet in ["j1_","j2_","j3_"]]
+
+         self.numPassThru      = len(inputVariables)
+         self.vNames           = self.inputVariables+self.jetVariablesList
+
          return "Loaded standard input variables named "+cloptions.variables
 
       return "No networkOptions overriden by command-line"    
@@ -239,11 +316,12 @@ class taggerOptions:
 #This class will track and save the options used in a run of the TopTagger
 
    #The object is instantiated by passing to it a runOptions and a networkOptions objects
-   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults(),saveName="config.json"):
+   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults(),saveName="config.json", cfgFile = "None"):
       self.confName = confName
       self.runOp    = runOp
       self.netOp    = netOp
       self.saveName = saveName
+      self.cfgFile  = cfgFile
 
       self.info     = ['Info List']
 
@@ -266,7 +344,10 @@ class taggerOptions:
       nDict = jsonOptions['netOp']
       netOpJSON = networkOptions.makeFromDict(nDict)
 
-      return cls(confName = jsonOptions['confName'], runOp = runOpJSON, netOp = netOpJSON) 
+      runOpJSON.cleanUp()
+      netOpJSON.cleanUp()
+
+      return cls(confName = jsonOptions['confName'], runOp = runOpJSON, netOp = netOpJSON, cfgFile = fname) 
       
    #This class method will return a taggerOptions object with the default values
    @classmethod

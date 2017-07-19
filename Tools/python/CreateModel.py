@@ -196,7 +196,9 @@ class CreateModel:
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
 
 
-    def __init__(self, nnStruct, inputDataQueue, nBatch, offset_initial, scale_initial):
+    def __init__(self, options, nnStruct, inputDataQueue, nBatch, offset_initial, scale_initial):
+        self.options = options        
+
         self.nnStruct = nnStruct
         self.inputDataQueue = inputDataQueue
         self.nBatch = nBatch
