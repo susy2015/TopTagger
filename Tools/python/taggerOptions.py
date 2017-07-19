@@ -67,7 +67,8 @@ class runOptions:
                       dataPath          = "data",
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"],
-                      ptReweight        = True):
+                      ptReweight        = True,
+                      keepProb          = 0.8):
 
       self.runName           = runName
       self.directory         = directory
@@ -98,6 +99,8 @@ class runOptions:
 
       self.ptReweight        = ptReweight
       
+      self.keepProb          = keepProb
+
    #configuration variables can be left in an inconsistent state, this method will make them consistent again
    def cleanUp(self):
       self.makeTrainingSamples()
@@ -146,7 +149,7 @@ class runOptions:
       parser.add_option ('-l', "--nValidationEvents", dest="nValidationEvents", action='store',      type="int",   help="Number of validation events to use for each validation step (default 10000)")
       parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                    help="Path where the input datafiles are stored (default: \"data\")")
       parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
-
+      parser.add_option ('-t', "--keepProb",          dest="keepProb",          action='store',      type="float", help="The Dropout probability to apply during network training (default 0.8)")
       return parser      
 
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
@@ -194,6 +197,10 @@ class runOptions:
          orList.append("dataPath = "+str(cloptions.dataFilePath))
          self.makeTrainingSamples()
          self.makeValidationSamples()
+
+      if cloptions.keepProb != None:
+         self.keepProb = cloptions.keepProb
+         orList.append("keepProb = "+str(cloptions.keepProb))
 
       if len(orList):
          info = "runOptions overriden by command line:"

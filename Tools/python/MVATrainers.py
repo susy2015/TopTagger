@@ -125,7 +125,7 @@ def mainTF(options):
     i = 0
     try:
       while not coord.should_stop():
-        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.keepProb})
+        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
         summary_writer.add_summary(summary, i)
         i += 1
 
