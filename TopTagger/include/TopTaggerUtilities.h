@@ -37,35 +37,13 @@ namespace ttUtility
         const std::vector<double>* qgAxis1_;
         const std::vector<double>* qgAxis2_;
 
-        const std::vector<double>* recoJetschargedHadronEnergyFraction_;
-        const std::vector<double>* recoJetschargedEmEnergyFraction_;
-        const std::vector<double>* recoJetsneutralEmEnergyFraction_;
-        const std::vector<double>* recoJetsmuonEnergyFraction_;
-        const std::vector<double>* PhotonEnergyFraction_;
-        const std::vector<double>* ElectronEnergyFraction_;
-        const std::vector<double>* ChargedHadronMultiplicity_;
-        const std::vector<double>* NeutralHadronMultiplicity_;
-        const std::vector<double>* PhotonMultiplicity_;
-        const std::vector<double>* ElectronMultiplicity_;
-        const std::vector<double>* MuonMultiplicity_;
-        const std::vector<double>* recoJetsCharge_0_;
+        std::map<std::string, const std::vector<double>*> extraInputVariables_;
 
     public:
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2);
-        void addSupplamentalVectors(const std::vector<double>& recoJetschargedHadronEnergyFraction,
-                                    const std::vector<double>& recoJetschargedEmEnergyFraction,
-                                    const std::vector<double>& recoJetsneutralEmEnergyFraction,
-                                    const std::vector<double>& recoJetsmuonEnergyFraction,
-                                    const std::vector<double>& PhotonEnergyFraction,
-                                    const std::vector<double>& ElectronEnergyFraction,
-                                    const std::vector<double>& ChargedHadronMultiplicity,
-                                    const std::vector<double>& NeutralHadronMultiplicity,
-                                    const std::vector<double>& PhotonMultiplicity,
-                                    const std::vector<double>& ElectronMultiplicity,
-                                    const std::vector<double>& MuonMultiplicity,
-                                    const std::vector<double>& recoJetsCharge_0);
+        void addSupplamentalVector(const std::string& name, const std::vector<double>& vector);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 

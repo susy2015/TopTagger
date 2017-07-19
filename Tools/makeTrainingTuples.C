@@ -86,7 +86,7 @@ private:
 
         const std::vector<int>& qgMult  = tr.getVec<int>("qgMult");
         const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
-        const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis2");
+        const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis1");
         const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
 
         const std::vector<double>& recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
@@ -147,18 +147,18 @@ private:
         }
         ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
         myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
-        myConstAK4Inputs.addSupplamentalVectors(recoJetschargedHadronEnergyFraction,
-                                                recoJetschargedEmEnergyFraction,
-                                                recoJetsneutralEmEnergyFraction,
-                                                recoJetsmuonEnergyFraction,
-                                                PhotonEnergyFraction,
-                                                ElectronEnergyFraction,
-                                                ChargedHadronMultiplicity,
-                                                NeutralHadronMultiplicity,
-                                                PhotonMultiplicity,
-                                                ElectronMultiplicity,
-                                                MuonMultiplicity,
-                                                recoJetsCharge_0);
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction", recoJetschargedHadronEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction", recoJetschargedEmEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction", recoJetsneutralEmEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction", recoJetsmuonEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction", PhotonEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction", ElectronEnergyFraction);
+        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity", ChargedHadronMultiplicity);
+        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity", NeutralHadronMultiplicity);
+        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity", PhotonMultiplicity);
+        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity", ElectronMultiplicity);
+        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity", MuonMultiplicity);
+        myConstAK4Inputs.addSupplamentalVector("recoJetsCharge_0", recoJetsCharge_0);
 
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
