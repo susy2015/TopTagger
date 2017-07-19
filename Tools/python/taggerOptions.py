@@ -323,14 +323,14 @@ class taggerOptions:
 #This class will track and save the options used in a run of the TopTagger
 
    #The object is instantiated by passing to it a runOptions and a networkOptions objects
-   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults(),saveName="config.json", cfgFile = "None"):
+   def __init__(self, confName = "Default Configuration (no name set)", runOp=runOptions.defaults(), netOp=networkOptions.defaults(),saveName="config.json", cfgFile = "None", info = ['Info List']):
       self.confName = confName
       self.runOp    = runOp
       self.netOp    = netOp
       self.saveName = saveName
       self.cfgFile  = cfgFile
 
-      self.info     = ['Info List']
+      self.info     = info
 
    #This class  method will generate a taggerOptions object from a given json file
    @classmethod
@@ -343,7 +343,7 @@ class taggerOptions:
          jsonOptions = json.load(f)
       except IOError:
          print "Unable to open",fname,"default options will be used"
-         return cls.defaults()
+         return cls.defaultMessage("Unable to load config from "+fname)
 
       rDict = jsonOptions['runOp']
       runOpJSON = runOptions.makeFromDict(rDict)
@@ -356,6 +356,11 @@ class taggerOptions:
 
       return cls(confName = jsonOptions['confName'], runOp = runOpJSON, netOp = netOpJSON, cfgFile = fname) 
       
+   #This class method will return a taggerOptions object with the default values, and a message saved in the info field
+   @classmethod
+   def defaultMessage(cls, message):
+      return cls(runOp=runOptions.defaults(),netOp=networkOptions.defaults(),info=[message])  
+
    #This class method will return a taggerOptions object with the default values
    @classmethod
    def defaults(cls):
