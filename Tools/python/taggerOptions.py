@@ -250,7 +250,7 @@ class networkOptions:
 
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
-      self.jetVariablesList = [jet+var for var in self.jetVariables for jet in ["j1_","j2_","j3_"]]
+      self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in self.jetVariables]
 
       self.numPassThru      = len(self.inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList
