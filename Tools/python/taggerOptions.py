@@ -291,7 +291,7 @@ class networkOptions:
          self.inputVariables   = inputVariables
          self.jetVariables     = jetVariables
 
-         self.jetVariablesList = [jet+var for var in jetVariables for jet in ["j1_","j2_","j3_"]]
+         self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
 
          self.numPassThru      = len(inputVariables)
          self.vNames           = self.inputVariables+self.jetVariablesList
