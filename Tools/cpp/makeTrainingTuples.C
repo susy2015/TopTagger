@@ -82,31 +82,11 @@ private:
         const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
         const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
         const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
-        const std::vector<double>& recoJetsCharge      = tr.getVec<double>("recoJetsCharge_0");
 
         const std::vector<int>& qgMult  = tr.getVec<int>("qgMult");
         const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
         const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis1");
         const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
-
-        const std::vector<double>& recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
-        const std::vector<double>& recoJetschargedEmEnergyFraction     = tr.getVec<double>("recoJetschargedEmEnergyFraction");
-        const std::vector<double>& recoJetsneutralEmEnergyFraction     = tr.getVec<double>("recoJetsneutralEmEnergyFraction");
-        const std::vector<double>& recoJetsmuonEnergyFraction          = tr.getVec<double>("recoJetsmuonEnergyFraction");
-        const std::vector<double>& PhotonEnergyFraction                = tr.getVec<double>("PhotonEnergyFraction");
-        const std::vector<double>& ElectronEnergyFraction              = tr.getVec<double>("ElectronEnergyFraction");
-        const std::vector<double>& ChargedHadronMultiplicity           = tr.getVec<double>("ChargedHadronMultiplicity");
-        const std::vector<double>& NeutralHadronMultiplicity           = tr.getVec<double>("NeutralHadronMultiplicity");
-        const std::vector<double>& PhotonMultiplicity                  = tr.getVec<double>("PhotonMultiplicity");
-        const std::vector<double>& ElectronMultiplicity                = tr.getVec<double>("ElectronMultiplicity");
-        const std::vector<double>& MuonMultiplicity                    = tr.getVec<double>("MuonMultiplicity");
-        //const std::vector<double>& JetProba_0                          = tr.getVec<double>("JetProba_0");
-        //const std::vector<double>& JetProbaN_0                         = tr.getVec<double>("JetProbaN_0");
-        //const std::vector<double>& JetProbaP_0                         = tr.getVec<double>("JetProbaP_0");
-        //const std::vector<double>& JetBprob                            = tr.getVec<double>("JetBprob");
-        //const std::vector<double>& JetBprobN                           = tr.getVec<double>("JetBprobN");
-        //const std::vector<double>& JetBprobP                           = tr.getVec<double>("JetBprobP");
-        const std::vector<double>& recoJetsCharge_0                    = tr.getVec<double>("recoJetsCharge_0");
 
         const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
         const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
@@ -146,19 +126,78 @@ private:
             hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
         }
         ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
+
+        auto convertToDoubleandRegister = [](NTupleReader& tr, std::string name)
+        {
+            const std::vector<int>& intVec = tr.getVec<int>(name);
+            std::vector<double>* doubleVec = new std::vector<double>(intVec.begin(), intVec.end());
+            tr.registerDerivedVec(name+"ConvertedToDouble", doubleVec);
+            return doubleVec;
+        };
+
         myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction", recoJetschargedHadronEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction", recoJetschargedEmEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction", recoJetsneutralEmEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction", recoJetsmuonEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction", PhotonEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction", ElectronEnergyFraction);
-        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity", ChargedHadronMultiplicity);
-        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity", NeutralHadronMultiplicity);
-        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity", PhotonMultiplicity);
-        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity", ElectronMultiplicity);
-        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity", MuonMultiplicity);
-        myConstAK4Inputs.addSupplamentalVector("recoJetsCharge_0", recoJetsCharge_0);
+        myConstAK4Inputs.addSupplamentalVector("recoJetsFlavor"                      , tr.getVec<double>("recoJetsFlavor"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsJecScaleRawToFull"           , tr.getVec<double>("recoJetsJecScaleRawToFull"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction" , tr.getVec<double>("recoJetschargedHadronEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction"     , tr.getVec<double>("recoJetschargedEmEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction"     , tr.getVec<double>("recoJetsneutralEmEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction"          , tr.getVec<double>("recoJetsmuonEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction"      , tr.getVec<double>("recoJetsHFHadronEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction"          , tr.getVec<double>("recoJetsHFEMEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction"       , tr.getVec<double>("recoJetsneutralEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction"                , tr.getVec<double>("PhotonEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction"              , tr.getVec<double>("ElectronEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity"           , tr.getVec<double>("ChargedHadronMultiplicity"));
+        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity"           , tr.getVec<double>("NeutralHadronMultiplicity"));
+        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity"                  , tr.getVec<double>("PhotonMultiplicity"));
+        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity"                , tr.getVec<double>("ElectronMultiplicity"));
+        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity"                    , tr.getVec<double>("MuonMultiplicity"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVb"                            , tr.getVec<double>("DeepCSVb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVc"                            , tr.getVec<double>("DeepCSVc"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVl"                            , tr.getVec<double>("DeepCSVl"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVbb"                           , tr.getVec<double>("DeepCSVbb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVcc"                           , tr.getVec<double>("DeepCSVcc"));
+        myConstAK4Inputs.addSupplamentalVector("CvsL"                                , tr.getVec<double>("CvsL"));
+        myConstAK4Inputs.addSupplamentalVector("CvsB"                                , tr.getVec<double>("CvsB"));
+        myConstAK4Inputs.addSupplamentalVector("CombinedSvtx"                        , tr.getVec<double>("CombinedSvtx"));
+        myConstAK4Inputs.addSupplamentalVector("Svtx"                                , tr.getVec<double>("Svtx"));
+        myConstAK4Inputs.addSupplamentalVector("SoftM"                               , tr.getVec<double>("SoftM"));
+        myConstAK4Inputs.addSupplamentalVector("SoftE"                               , tr.getVec<double>("SoftE"));
+        myConstAK4Inputs.addSupplamentalVector("JetProba"                            , tr.getVec<double>("JetProba_0"));
+        myConstAK4Inputs.addSupplamentalVector("JetBprob"                            , tr.getVec<double>("JetBprob"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsCharge"                      , tr.getVec<double>("recoJetsCharge_0"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackJetPt"                       , tr.getVec<double>("CSVTrackJetPt"));
+        myConstAK4Inputs.addSupplamentalVector("CSVVertexCategory"                   , tr.getVec<double>("CSVVertexCategory"));
+        myConstAK4Inputs.addSupplamentalVector("CSVJetNSecondaryVertices"            , *convertToDoubleandRegister(tr, "CSVJetNSecondaryVertices"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSumJetEtRatio"               , tr.getVec<double>("CSVTrackSumJetEtRatio"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSumJetDeltaR"                , tr.getVec<double>("CSVTrackSumJetDeltaR"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip2dValAboveCharm"          , tr.getVec<double>("CSVTrackSip2dValAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip2dSigAboveCharm"          , tr.getVec<double>("CSVTrackSip2dSigAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip3dValAboveCharm"          , tr.getVec<double>("CSVTrackSip3dValAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip3dSigAboveCharm"          , tr.getVec<double>("CSVTrackSip3dSigAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CSVVertexMass"                       , tr.getVec<double>("CSVVertexMass"));
+        myConstAK4Inputs.addSupplamentalVector("CSVVertexNTracks"                    , *convertToDoubleandRegister(tr, "CSVVertexNTracks"));
+        myConstAK4Inputs.addSupplamentalVector("CSVVertexEnergyRatio"                , tr.getVec<double>("CSVVertexEnergyRatio"));
+        myConstAK4Inputs.addSupplamentalVector("CSVVertexJetDeltaR"                  , tr.getVec<double>("CSVVertexJetDeltaR"));
+        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance2dVal"              , tr.getVec<double>("CSVFlightDistance2dVal"));
+        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance2dSig"              , tr.getVec<double>("CSVFlightDistance2dSig"));
+        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance3dVal"              , tr.getVec<double>("CSVFlightDistance3dVal"));
+        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance3dSig"              , tr.getVec<double>("CSVFlightDistance3dSig"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexCategory"                  , tr.getVec<double>("CTagVertexCategory"));
+        myConstAK4Inputs.addSupplamentalVector("CTagJetNSecondaryVertices"           , *convertToDoubleandRegister(tr, "CTagJetNSecondaryVertices"));
+        myConstAK4Inputs.addSupplamentalVector("CTagTrackSumJetEtRatio"              , tr.getVec<double>("CTagTrackSumJetEtRatio"));
+        myConstAK4Inputs.addSupplamentalVector("CTagTrackSumJetDeltaR"               , tr.getVec<double>("CTagTrackSumJetDeltaR"));
+        myConstAK4Inputs.addSupplamentalVector("CTagTrackSip2dSigAboveCharm"         , tr.getVec<double>("CTagTrackSip2dSigAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CTagTrackSip3dSigAboveCharm"         , tr.getVec<double>("CTagTrackSip3dSigAboveCharm"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexMass"                      , tr.getVec<double>("CTagVertexMass"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexNTracks"                   , *convertToDoubleandRegister(tr, "CTagVertexNTracks"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexEnergyRatio"               , tr.getVec<double>("CTagVertexEnergyRatio"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexJetDeltaR"                 , tr.getVec<double>("CTagVertexJetDeltaR"));
+        myConstAK4Inputs.addSupplamentalVector("CTagFlightDistance2dSig"             , tr.getVec<double>("CTagFlightDistance2dSig"));
+        myConstAK4Inputs.addSupplamentalVector("CTagFlightDistance3dSig"             , tr.getVec<double>("CTagFlightDistance3dSig"));
+        myConstAK4Inputs.addSupplamentalVector("CTagMassVertexEnergyFraction"        , tr.getVec<double>("CTagMassVertexEnergyFraction"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexBoostOverSqrtJetPt"        , tr.getVec<double>("CTagVertexBoostOverSqrtJetPt"));
+        myConstAK4Inputs.addSupplamentalVector("CTagVertexLeptonCategory"            , tr.getVec<double>("CTagVertexLeptonCategory"));
 
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
