@@ -239,9 +239,15 @@ class networkOptions:
 #This class defined the structure of the network.
 #These include things such as the input variables, output variables,
 #and the type and structure of the network
-   def __init__(self, networkName    = "Network test Configuration (name not set)",
-                      inputVariables = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
-                      jetVariables   = ["p", "CSV", "QGL"]):
+   def __init__(self, networkName       = "Network test Configuration (name not set)",
+                      inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
+                      jetVariables      = ["p", "CSV", "QGL"],
+                      denseLayers       = [100, 50, 50],
+                      convNDenseOnlyVar = 8,
+                      convNConstituents = 3,
+                      convFilterWidth   = 1,
+                      useCNN            = True,
+                      useRNN            = True):
 
       self.networkName      = networkName
       self.inputVariables   = inputVariables
@@ -251,6 +257,15 @@ class networkOptions:
 
       self.numPassThru      = len(inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList      
+
+      self.denseLayers      = denseLayers
+
+      self.convNDenseOnlyVar = convNDenseOnlyVar
+      self.convNConstituents = convNConstituents
+      self.convFilterWidth   = convFilterWidth
+
+      self.useCNN            = useCNN
+      self.useRNN            = useRNN
 
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
