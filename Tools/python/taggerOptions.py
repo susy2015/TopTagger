@@ -3,6 +3,10 @@ import json
 import os
 import fnmatch
 
+def getJetVarNames(jetVariables):
+   return [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
+   
+
 def StandardVariables(variables):
    if variables == "TeamAlpha":
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
@@ -243,14 +247,14 @@ class networkOptions:
       self.inputVariables   = inputVariables
       self.jetVariables     = jetVariables
 
-      self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
+      self.jetVariablesList = getJetVarNames(jetVariables)
 
       self.numPassThru      = len(inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList      
 
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
-      self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in self.jetVariables]
+      self.jetVariablesList = getJetVarNames(self.jetVariables)
 
       self.numPassThru      = len(self.inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList
@@ -291,7 +295,7 @@ class networkOptions:
          self.inputVariables   = inputVariables
          self.jetVariables     = jetVariables
 
-         self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
+         self.jetVariablesList = getJetVarNames(jetVariables)
 
          self.numPassThru      = len(inputVariables)
          self.vNames           = self.inputVariables+self.jetVariablesList
