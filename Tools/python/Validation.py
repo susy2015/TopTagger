@@ -8,6 +8,7 @@ from DataGetter import DataGetter
 import optparse
 import matplotlib.pyplot as plt
 import pickle
+from taggerOptions import *
 
 def load_graph(frozen_graph_filename):
     # We load the protobuf file from the disk and parse it to retrieve the 
@@ -39,8 +40,10 @@ parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help=
 parser.add_option ('-a', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
 parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',      default="data",                     help="Path where the input datafiles are stored (default: \"data\")")
 parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
-parser.add_option ('-v', "--variables", dest='variables', action='store', default="TeamAlpha", help="Input features to use")
-parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      default="model.json",               help="JSON with model definitions")
+parser.add_option ('-v', "--variables", dest='variables', action='store', help="Input features to use")
+parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      help="JSON with model definitions")
+parser.add_option ('-j', "--trainingCfg", dest="trainingCfg", action='store', help="config file produced by training")
+
 options, args = parser.parse_args()
 
 outputDirectory = ""
@@ -54,6 +57,7 @@ if len(options.directory):
       else:
           raise
 
+  
 #disc cut
 discCut = options.discCut
 
@@ -110,16 +114,30 @@ print "PROCESSING TTBAR VALIDATION DATA"
 
 #Let us see if the input variables have been set by JSON
 import json
-try:
-    with open(options.modelJSON,"r") as f:
-        cfgs = json.load(f)
-except IOError:
-    print "Unable to open",options.modelJSON
-    dg = DataGetter.StandardVariables(options.variables)  #We assume that the variables option specifies a variable listed defined in DataGetter.StandardVariables
-else:
-    print "Loading",options.variables,"from",options.modelJSON
-    dg = DataGetter.DefinedVariables(cfgs[options.variables]) #the JSON file should be a dictionary, the variable option specifies the key for a list of variable names saved in the dictionary
 
+#It is better to load the Training configuration file, then to override the configuration at the command-line
+trainingOptions = taggerOptions.loadJSON(outputDirectory+options.trainingCfg)
+if options.modelJSON != None:
+  try:
+    f = open(options.modelJSON,"r")
+    cfgs = json.load(f)
+  except IOError:
+    print "Unable to open", options.modelJSON
+  else:
+    print "Loading",options.variables,"from",options.modelJSON
+    trainingOptions.netOp.vNames = cfgs[options.variables] #the json file is a dictionary, cloptions.variables specifies the key to use
+
+elif options.variables != None:
+  inputVariables, jetVariables = StandardVariables(options.variables)
+  trainingOptions.netOp.inputVariables   = inputVariables
+  trainingOptions.netOp.jetVariables     = jetVariables
+
+  trainingOptions.netOp.jetVariablesList = [jet+var for var in jetVariables for jet in ["j1_","j2_","j3_"]]
+
+  trainingOptions.netOp.numPassThru      = len(inputVariables)
+  trainingOptions.netOp.vNames           = trainingOptions.netOp.inputVariables+trainingOptions.netOp.jetVariablesList
+
+dg = DataGetter.DefinedVariables(trainingOptions.netOp.vNames)
 varsname = dg.getList()
 
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_2bseed.pkl.gz")
