@@ -333,8 +333,7 @@ class networkOptions:
    def __init__(self, networkName       = "Network test Configuration (name not set)",
                       inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables      = ["p", "CSV", "QGL"],
-                      denseLayers       = [100, 50, 50],
-                      convNDenseOnlyVar = 8,
+                      denseLayers       = [400, 200],
                       convNConstituents = 3,
                       convFilterWidth   = 1,
                       useCNN            = True,
@@ -346,12 +345,11 @@ class networkOptions:
 
       self.jetVariablesList = getJetVarNames(jetVariables)
 
-      self.numPassThru      = len(inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList      
 
       self.denseLayers      = denseLayers
 
-      self.convNDenseOnlyVar = convNDenseOnlyVar
+      self.convNDenseOnlyVar = len(inputVariables)
       self.convNConstituents = convNConstituents
       self.convFilterWidth   = convFilterWidth
 
@@ -362,8 +360,8 @@ class networkOptions:
    def cleanUp(self):
       self.jetVariablesList = getJetVarNames(self.jetVariables)
 
-      self.numPassThru      = len(self.inputVariables)
-      self.vNames           = self.inputVariables+self.jetVariablesList
+      self.convNDenseOnlyVar = len(self.inputVariables)
+      self.vNames            = self.inputVariables+self.jetVariablesList
 
       return()
 
@@ -403,8 +401,8 @@ class networkOptions:
 
          self.jetVariablesList = getJetVarNames(jetVariables)
 
-         self.numPassThru      = len(inputVariables)
-         self.vNames           = self.inputVariables+self.jetVariablesList
+         self.convNDenseOnlyVar = len(inputVariables)
+         self.vNames            = self.inputVariables+self.jetVariablesList
 
          return "Loaded standard input variables named "+cloptions.variables
 
