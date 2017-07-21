@@ -15,7 +15,7 @@ class FileNameQueue:
 
         #Define input data queue
         #inputDataQueue = tf.FIFOQueue(capacity=512*32, shapes=[[16], [2], [1]], dtypes=[tf.float32, tf.float32, tf.float32])
-        self.inputDataQueue = tf.RandomShuffleQueue(capacity=16284, min_after_dequeue=16284 - batchSize*(nEnqueuers + 2), shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
+        self.inputDataQueue = tf.RandomShuffleQueue(capacity=16384, min_after_dequeue=16384 - batchSize*(nEnqueuers + 2), shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
 
         #CustomRunner threads 
         self.customRunnerThreads = []
