@@ -394,7 +394,7 @@ class networkOptions:
             print "Unable to open", cloptions.modelJSON
             loaded = false
          else:
-            print "Loadinging",cloptions.variables,"from",cloptions.modelJSON
+            print "Loading",cloptions.variables,"from",cloptions.modelJSON
             self.vNames = cfgs[cloptions.variables] #the json file is a dictionary, cloptions.variables specifies the key to use
             returnMessage = "Loaded "+cloptions.variables+" from "+cloptions.modelJSON 
 
@@ -507,9 +507,9 @@ class taggerOptions:
          print "Trying to convert non taggerOptions object with serializeTaggerOptions"
          return
 
-      output = self.__dict__
-      output["runOp"] = self.runOp.__dict__ #This assumes a simple structure for runOp, this needs to be rewritten is that assumtion is violated
-      output["netOp"] = self.netOp.__dict__ #This assumes a simple structure for runOp, this needs to be rewritten is that assumtion is violated
+      output = dict(self.__dict__) #The dictionary returned points to the attributes of this object and manipulating the dictionary will change this object. We need to make a copy so that this doesn't happen
+      output["runOp"] = dict(self.runOp.__dict__) #This assumes a simple structure for runOp, this needs to be rewritten is that assumtion is violated
+      output["netOp"] = dict(self.netOp.__dict__) #This assumes a simple structure for runOp, this needs to be rewritten is that assumtion is violated
 
       return output
 
