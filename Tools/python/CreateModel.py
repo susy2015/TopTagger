@@ -62,7 +62,7 @@ class CreateModel:
     def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
-            NLayer = len(self.nnStruct)
+            NLayer = len(nnStruct)
             
             #variables
             h_fc = {}

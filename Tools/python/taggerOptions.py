@@ -38,7 +38,98 @@ def StandardVariables(variables):
 
    elif variables == "TeamAlpha1DConv":
       vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
-      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "chargedHadEFrac","chargedEmEFrac", "neutralEmEFrac", "muonEFrac", "photonEFrac", "elecEFrac", "chargedHadMult", "neutralHadMult", "photonMult", "elecMult", "muonMult", "jetCharge"];
+      jNames = ["CSVFlightDistance2dSig",
+                "CSVFlightDistance2dVal",
+                "CSVFlightDistance3dSig",
+                "CSVFlightDistance3dVal",
+                "CSVJetNSecondaryVertices",
+                "CSVTrackJetPt",
+                "CSVTrackSip2dSigAboveCharm",
+                "CSVTrackSip2dValAboveCharm",
+                "CSVTrackSip3dSigAboveCharm",
+                "CSVTrackSip3dValAboveCharm",
+                "CSVTrackSumJetDeltaR",
+                "CSVTrackSumJetEtRatio",
+                "CSVVertexCategory",
+                "CSVVertexEnergyRatio",
+                "CSVVertexJetDeltaR",
+                "CSVVertexMass",
+                "CSVVertexNTracks",
+                "CTagFlightDistance2dSig",
+                "CTagFlightDistance3dSig",
+                "CTagJetNSecondaryVertices",
+                "CTagMassVertexEnergyFraction",
+                "CTagTrackSip2dSigAboveCharm",
+                "CTagTrackSip3dSigAboveCharm",
+                "CTagTrackSumJetDeltaR",
+                "CTagTrackSumJetEtRatio",
+                "CTagVertexBoostOverSqrtJetPt",
+                "CTagVertexCategory",
+                "CTagVertexEnergyRatio",
+                "CTagVertexJetDeltaR",
+                "CTagVertexLeptonCategory",
+                "CTagVertexMass",
+                "CTagVertexNTracks",
+                "ChargedHadronMultiplicity",
+                "CombinedSvtx",
+                "ElectronEnergyFraction",
+                "ElectronMultiplicity",
+                "JetProba",
+                "MuonMultiplicity",
+                "NeutralHadronMultiplicity",
+                "PhotonEnergyFraction",
+                "PhotonMultiplicity",
+                "SoftE",
+                "SoftM",
+                "Svtx",
+                "m",
+                "p",
+                "qgAxis1",
+                "qgAxis2",
+                "qgMult",
+                "qgPtD",
+                "recoJetsCharge",
+                "recoJetsHFEMEnergyFraction",
+                "recoJetsHFHadronEnergyFraction",
+                "recoJetsJecScaleRawToFull",
+                "recoJetschargedEmEnergyFraction",
+                "recoJetschargedHadronEnergyFraction",
+                "recoJetsmuonEnergyFraction",
+                "recoJetsneutralEmEnergyFraction",
+                "recoJetsneutralEnergyFraction",]
+   elif variables == "TeamAlpha1DConvLess":
+      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
+      jNames = ["ChargedHadronMultiplicity",
+                "CombinedSvtx",
+                "ElectronEnergyFraction",
+                "ElectronMultiplicity",
+                "MuonMultiplicity",
+                "NeutralHadronMultiplicity",
+                "PhotonEnergyFraction",
+                "PhotonMultiplicity",
+                "SoftE",
+                "SoftM",
+                "Svtx",
+                "m",
+                "p",
+                "qgAxis1",
+                "qgAxis2",
+                "qgMult",
+                "qgPtD",
+                "recoJetsCharge",
+                "recoJetsHFEMEnergyFraction",
+                "recoJetsHFHadronEnergyFraction",
+                "recoJetsJecScaleRawToFull",
+                "recoJetschargedEmEnergyFraction",
+                "recoJetschargedHadronEnergyFraction",
+                "recoJetsmuonEnergyFraction",
+                "recoJetsneutralEmEnergyFraction",
+                "recoJetsneutralEnergyFraction",
+                "DeepCSVb",
+                "DeepCSVbb",
+                "DeepCSVc",
+                "DeepCSVcc",
+                "DeepCSVl",]
 
    else:
       vNames = ["cand_m"]
@@ -66,8 +157,8 @@ class runOptions:
                       l2Reg             = 0.0001,
                       dataPath          = "data",
                       trainingNames     = [],
-                      validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"],
-                      ptReweight        = True,
+                      validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"],
+                      ptReweight        = False,
                       keepProb          = 0.8):
 
       self.runName           = runName
@@ -250,7 +341,7 @@ class networkOptions:
 
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
-      self.jetVariablesList = [jet+var for var in self.jetVariables for jet in ["j1_","j2_","j3_"]]
+      self.jetVariablesList = [jet+var for jet in ["j1_","j2_","j3_"] for var in self.jetVariables]
 
       self.numPassThru      = len(self.inputVariables)
       self.vNames           = self.inputVariables+self.jetVariablesList

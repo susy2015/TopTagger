@@ -146,11 +146,11 @@ varsname = dg.getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
 
 if options.sklrf:
-    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"
+    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
 elif options.xgboost:
     dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100k_0.h5"
+    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
 
 if ".pkl" in dataTTbarName:
     dataTTbarAll = pd.read_pickle(dataTTbarName)
@@ -338,11 +338,11 @@ plt.close()
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 if options.sklrf:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 elif options.xgboost:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 else:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700k_0.h5"
+    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 
 if ".pkl" in dataZnunuName:
     dataZnunuAll = pd.read_pickle(dataZnunuName)
