@@ -97,7 +97,7 @@ def mainTF(options):
 
   # Build the graph
   denseNetwork = [nFeatures]+options.netOp.denseLayers+[nLabels]
-  convLayers = options.netOp.cnnLayers
+  convLayers = options.netOp.convLayers
   rnnNodes = options.netOp.rnnNodes
   rnnLayers = options.netOp.rnnLayers
   mlp = CreateModel(options, denseNetwork, convLayers, rnnNodes, rnnLayers, fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)

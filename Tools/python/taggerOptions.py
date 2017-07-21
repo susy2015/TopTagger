@@ -333,8 +333,8 @@ class networkOptions:
    def __init__(self, networkName       = "Network test Configuration (name not set)",
                       inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables      = ["p", "CSV", "QGL"],
-                      denseLayers       = [400, 200],
-                      convLayers        = [],
+                      denseLayers       = [200, 200],
+                      convLayers        = [100, 50, 25],
                       rnnNodes          = 0,
                       rnnLayers         = 1,
                       convNConstituents = 3,
@@ -346,29 +346,26 @@ class networkOptions:
       self.inputVariables   = inputVariables
       self.jetVariables     = jetVariables
 
-      self.jetVariablesList = getJetVarNames(jetVariables)
-
-      self.vNames           = self.inputVariables+self.jetVariablesList      
-
       self.denseLayers = denseLayers
       self.convLayers  = convLayers
       self.rnnNodes    = rnnNodes
       self.rnnLayers   = rnnLayers
 
-      self.convNDenseOnlyVar = len(inputVariables)
-      self.convNChannels     = len(jetVariables)
       self.convNConstituents = convNConstituents
       self.convFilterWidth   = convFilterWidth
 
       self.useCNN            = useCNN
       self.useRNN            = useRNN
 
+      self.cleanUp()
+
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
       self.jetVariablesList = getJetVarNames(self.jetVariables)
+      self.vNames            = self.inputVariables+self.jetVariablesList
 
       self.convNDenseOnlyVar = len(self.inputVariables)
-      self.vNames            = self.inputVariables+self.jetVariablesList
+      self.convNChannels     = len(self.jetVariables)
 
       return()
 
@@ -387,7 +384,8 @@ class networkOptions:
 
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
    def override(self, cloptions):
-    
+
+      returnMessage = None
       if cloptions.modelJSON != None:
          try:
             f = open(cloptions.modelJSON,"r")
@@ -398,7 +396,7 @@ class networkOptions:
          else:
             print "Loadinging",cloptions.variables,"from",cloptions.modelJSON
             self.vNames = cfgs[cloptions.variables] #the json file is a dictionary, cloptions.variables specifies the key to use
-            return "Loaded "+cloptions.variables+" from "+cloptions.modelJSON 
+            returnMessage = "Loaded "+cloptions.variables+" from "+cloptions.modelJSON 
 
       elif cloptions.variables != None:
          inputVariables, jetVariables = StandardVariables(cloptions.variables)
@@ -411,9 +409,14 @@ class networkOptions:
          self.convNDenseOnlyVar = len(inputVariables)
          self.vNames            = self.inputVariables+self.jetVariablesList
 
-         return "Loaded standard input variables named "+cloptions.variables
+         returnMessage = "Loaded standard input variables named "+cloptions.variables
 
-      return "No networkOptions overriden by command-line"    
+      if returnMessage == None:
+         returnMessage = "No networkOptions overriden by command-line"
+
+      self.cleanUp()
+      return returnMessage
+      
 
    @classmethod
    def defaults(cls):

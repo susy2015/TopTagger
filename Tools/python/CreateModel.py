@@ -103,7 +103,7 @@ class CreateModel:
     #  nnStruct - a list containing the number of nodes in each layer, including the input and output layers 
     #  offset_initial - a list of offsets which will be applied to the initial input features, they are stored in the tf model
     #  scale_initial - a list of scales which will be applied to each input feature after the offsets are subtracted, they are stored in the tf model
-    def createMLP(self, useConvolution=False):
+    def createMLP(self):
         #constants 
         NLayer = len(self.nnStruct)
     
@@ -126,7 +126,7 @@ class CreateModel:
         transformedX = tf.multiply(self.x-self.offset,self.scale)
         transformedX_ph = tf.multiply(self.x_ph-self.offset,self.scale)
 
-        if useConvolution:
+        if len(self.convLayers) or self.rnnNodes > 0:
             #Implement 1D convolution layer here
             #NDENSEONLYVAR = 8
             #NCONSTITUENTS = 3
@@ -135,11 +135,12 @@ class CreateModel:
             NDENSEONLYVAR = self.options.netOp.convNDenseOnlyVar
             NCONSTITUENTS = self.options.netOp.convNConstituents
             FILTERWIDTH   = self.options.netOp.convFilterWidth
-            nChannel = self.options.netOp.convNChannels
+            nChannel      = self.options.netOp.convNChannels
 
             #weights for convolution filters - shared between all parallel graphs
             self.convWeights = []
-            cnnStruct = [nChannel] + self.cnnStruct
+            print nChannel
+            cnnStruct = [nChannel] + self.convLayers
             for i in xrange(len(cnnStruct) - 1):
                 self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))
 
@@ -213,7 +214,7 @@ class CreateModel:
         self.options = options        
 
         self.nnStruct = nnStruct
-        self.convWeights = convLayers
+        self.convLayers = convLayers
         self.rnnNodes = rnnNodes
         self.rnnLayers = rnnLayers
         self.inputDataQueue = inputDataQueue
