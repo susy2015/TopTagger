@@ -12,7 +12,7 @@ class CreateModel:
         initial = tf.truncated_normal(shape, stddev=0.001, name=name)#tf.constant(0.1, shape=shape, name=name)
         return tf.Variable(initial)
     
-    def createRecurentLayers(self, inputs, nodes=0, layers=0, share=None):
+    def createRecurentLayers(self, inputs, nodes=0, layers=0, keep_prob=1.0, share=None):
         #define variable scope
         with tf.variable_scope("rnn") as scope:
             #condition input shape 
@@ -21,6 +21,8 @@ class CreateModel:
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
             #create the rnn cell
             cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share, state_is_tuple=True) for _ in xrange(layers)], state_is_tuple=True)
+            #add dropout
+            tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=output_dropout)
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
@@ -50,7 +52,7 @@ class CreateModel:
             output = self.createConvLayers(output, convWeights, keep_prob, postfix)
 
         if rnnNodes > 0:
-            output = self.createRecurentLayers(output, rnnNodes, rnnLayers, len(postfix)>0)
+            output = self.createRecurentLayers(output, rnnNodes, rnnLayers, keep_prob, len(postfix)>0)
 
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
         convLayerShape = output.shape[1] * output.shape[2]
