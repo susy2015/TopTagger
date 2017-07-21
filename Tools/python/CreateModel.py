@@ -12,7 +12,7 @@ class CreateModel:
         initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
         return tf.Variable(initial)
     
-    def createRecurentLayers(self, inputs, nodes=[], share=None):
+    def createRecurentLayers(self, inputs, nodes=0, layers=0, share=None):
         #define variable scope
         with tf.variable_scope("rnn") as scope:
             #condition input shape 
@@ -21,6 +21,9 @@ class CreateModel:
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
             #create the rnn cell 
             cell = tf.nn.rnn_cell.BasicLSTMCell(nodes[0], reuse=share)
+            #if layers > 1, create a multicell
+            if layers >= 1:
+                cell = tf.rnn.MultiRNNCell([cell] * layers )
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
@@ -38,7 +41,7 @@ class CreateModel:
     
             return convLayers[-1]
 
-    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=[], keep_prob=1.0, postfix=""):
+    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=0, rnnLayers=0, keep_prob=1.0, postfix=""):
         #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
         dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
@@ -49,8 +52,8 @@ class CreateModel:
         if len(convWeights) > 0:
             output = self.createConvLayers(output, convWeights, keep_prob, postfix)
 
-        if len(rnnNodes) > 0:
-            output = self.createRecurentLayers(output, [16], len(postfix)>0)
+        if rnnNodes > 0:
+            output = self.createRecurentLayers(output, rnnNodes, rnnLayers, len(postfix)>0)
 
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
         convLayerShape = output.shape[1] * output.shape[2]
@@ -81,7 +84,7 @@ class CreateModel:
                 #use relu for hidden layers as this seems to give best result
                 layerOutput = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
                 h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
-            
+                
                 # Map the features to next layer
                 if not layer in w_fc:
                     w_fc[layer] = self.weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
@@ -132,16 +135,18 @@ class CreateModel:
             NDENSEONLYVAR = self.options.netOp.convNDenseOnlyVar
             NCONSTITUENTS = self.options.netOp.convNConstituents
             FILTERWIDTH   = self.options.netOp.convFilterWidth
-
-            nChannel = int((transformedX.shape[1] - NDENSEONLYVAR)/NCONSTITUENTS)
+            nChannel = self.options.netOp.convNChannels
 
             #weights for convolution filters - shared between all parallel graphs
-            self.convWeights = [tf.Variable(tf.random_normal([FILTERWIDTH, nChannel, 16]), name="conv1_weights"),
-                                tf.Variable(tf.random_normal([FILTERWIDTH,       16,  8]), name="conv1_weights")]
+            self.convWeights = []
+            cnnStruct = [nChannel] + self.cnnStruct
+            for i in xrange(len(cnnStruct) - 1):
+                self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))
+
 
             #Create colvolution layers 
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=[16], keep_prob=self.keep_prob, postfix="")
-            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=[16], keep_prob=self.keep_prob, postfix="_ph")
+            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
+            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="_ph")
 
         else:
             #If convolution is not used, just pass in the transformed input variables 
@@ -204,10 +209,13 @@ class CreateModel:
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
 
 
-    def __init__(self, options, nnStruct, inputDataQueue, nBatch, offset_initial, scale_initial):
+    def __init__(self, options, nnStruct, convLayers, rnnNodes, rnnLayers, inputDataQueue, nBatch, offset_initial, scale_initial):
         self.options = options        
 
         self.nnStruct = nnStruct
+        self.convWeights = convLayers
+        self.rnnNodes = rnnNodes
+        self.rnnLayers = rnnLayers
         self.inputDataQueue = inputDataQueue
         self.nBatch = nBatch
         self.offset_initial = offset_initial

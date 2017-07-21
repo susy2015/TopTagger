@@ -416,6 +416,22 @@ plt.ylabel("Fake rate")
 plt.savefig(outputDirectory + "fakerate_njets.png")
 plt.close()
 
+plt.clf()
+
+frCandPtNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["cand_pt"].ix[:,0], bins=ptBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frCandPtDen, _ = numpy.histogram(dataZnunu["cand_pt"].ix[:,0],                         bins=ptBins, weights=dataZnunu["sampleWgt"].ix[:,0])
+
+frCandPtNum[frCandPtDen < 1e-10] = 0.0
+frCandPtDen[frCandPtDen < 1e-10] = 1.0
+frCandPt = frCandPtNum/frCandPtDen
+
+plt.hist(ptBins[:-1], bins=ptBins, weights=frCandPt, fill=False, histtype='step')
+#plt.legend(loc='upper right')
+plt.xlabel("Candidate pt")
+plt.ylabel("Fake rate")
+plt.savefig(outputDirectory + "fakerate_cand_pt.png")
+plt.close()
+
 print "CALCULATING ROC CURVES"
 
 cuts = numpy.hstack([numpy.arange(0.0, 0.05, 0.005), numpy.arange(0.05, 0.95, 0.01), numpy.arange(0.95, 1.00, 0.005)])

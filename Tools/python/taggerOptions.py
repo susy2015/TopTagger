@@ -334,6 +334,9 @@ class networkOptions:
                       inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables      = ["p", "CSV", "QGL"],
                       denseLayers       = [400, 200],
+                      convLayers        = [],
+                      rnnNodes          = 0,
+                      rnnLayers         = 1,
                       convNConstituents = 3,
                       convFilterWidth   = 1,
                       useCNN            = True,
@@ -347,9 +350,13 @@ class networkOptions:
 
       self.vNames           = self.inputVariables+self.jetVariablesList      
 
-      self.denseLayers      = denseLayers
+      self.denseLayers = denseLayers
+      self.convLayers  = convLayers
+      self.rnnNodes    = rnnNodes
+      self.rnnLayers   = rnnLayers
 
       self.convNDenseOnlyVar = len(inputVariables)
+      self.convNChannels     = len(jetVariables)
       self.convNConstituents = convNConstituents
       self.convFilterWidth   = convFilterWidth
 
