@@ -152,11 +152,11 @@ class runOptions:
 #ouput directory, input files, etc.
    def __init__(self, runName           = "Test Run Configurations (name not set)",
                       directory         = "",
-                      nepoch            = 100,
+                      nepoch            = 50,
                       nReaders          = 4,
                       nThreadperReader  = 1,
                       minibatchSize     = 512,
-                      reportInterval    = 1000,
+                      reportInterval    = 500,
                       nValidationEvents = 10000,
                       l2Reg             = 0.0001,
                       dataPath          = "data",
