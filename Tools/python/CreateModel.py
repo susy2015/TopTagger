@@ -19,11 +19,8 @@ class CreateModel:
             slicedInputs = []
             for iW in xrange(inputs.shape[1]):
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
-            #create the rnn cell 
-            cell = tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share)
-            #if layers > 1, create a multicell
-            if layers >= 1:
-                cell = tf.nn.rnn_cell.MultiRNNCell([cell] * layers )
+            #create the rnn cell
+            cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share, state_is_tuple=True) for _ in xrange(layers)], state_is_tuple=True)
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
