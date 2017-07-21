@@ -66,7 +66,7 @@ def mainTF(options):
 
   dg = DataGetter.DefinedVariables(options.netOp.vNames)
 
-  print "Input Variables",dg.getList()
+  print "Input Variables: ",len(dg.getList())
 
   # Import data
   validData = dg.importData(samplesToRun = options.runOp.validationSamples)
@@ -92,10 +92,11 @@ def mainTF(options):
   fnq = FileNameQueue(options.runOp.trainingSamples, NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)
 
   #Create CustomQueueRunner object to manage data loading 
+  print "PT reweight: ", options.runOp.ptReweight
   crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.runOp.ptReweight) for i in xrange(options.runOp.nReaders)]
 
   # Build the graph
-  mlp = CreateModel(options, [nFeatures, 100, 50, 50, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  mlp = CreateModel(options, [nFeatures, 400, 200, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(options.runOp.directory + "log_graph", graph=tf.get_default_graph())

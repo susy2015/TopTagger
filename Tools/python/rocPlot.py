@@ -65,7 +65,7 @@ for name, filelist in inputs.iteritems():
 
     second_legend = plotRocZAx.legend(handles=[solidLine, dottedLine], loc=(0.2, 0.02))
 
-    plotRocZAx.legend(loc="lower right")
+    #plotRocZAx.legend(loc="lower right")
     plotRocZAx.set_xlabel("FPR (Znunu)")
     plotRocZAx.set_ylabel("TPR (ttbar)")
     plotRocZ.savefig("rocZ_%s.png"%name)
