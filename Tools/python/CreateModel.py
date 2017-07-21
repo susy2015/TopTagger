@@ -125,9 +125,13 @@ class CreateModel:
 
         if useConvolution:
             #Implement 1D convolution layer here
-            NDENSEONLYVAR = 8
-            NCONSTITUENTS = 3
-            FILTERWIDTH = 1
+            #NDENSEONLYVAR = 8
+            #NCONSTITUENTS = 3
+            #FILTERWIDTH = 1
+
+            NDENSEONLYVAR = self.options.netOp.convNDenseOnlyVar
+            NCONSTITUENTS = self.options.netOp.convNConstituents
+            FILTERWIDTH   = self.options.netOp.convFilterWidth
 
             nChannel = int((transformedX.shape[1] - NDENSEONLYVAR)/NCONSTITUENTS)
 
