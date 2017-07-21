@@ -4,12 +4,12 @@ import tensorflow as tf
 class CreateModel:
     def weight_variable(self, shape, name):
         """weight_variable generates a weight variable of a given shape."""
-        initial = tf.truncated_normal(shape, stddev=0.1, name=name)
+        initial = tf.truncated_normal(shape, stddev=0.02, name=name)
         return tf.Variable(initial)
     
     def bias_variable(self, shape, name):
         """bias_variable generates a bias variable of a given shape."""
-        initial = tf.truncated_normal(shape, stddev=0.1, name=name)#tf.constant(0.1, shape=shape, name=name)
+        initial = tf.truncated_normal(shape, stddev=0.001, name=name)#tf.constant(0.1, shape=shape, name=name)
         return tf.Variable(initial)
     
     def createRecurentLayers(self, inputs, nodes=0, layers=0, share=None):
@@ -20,10 +20,10 @@ class CreateModel:
             for iW in xrange(inputs.shape[1]):
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
             #create the rnn cell 
-            cell = tf.nn.rnn_cell.BasicLSTMCell(nodes[0], reuse=share)
+            cell = tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share)
             #if layers > 1, create a multicell
             if layers >= 1:
-                cell = tf.rnn.MultiRNNCell([cell] * layers )
+                cell = tf.nn.rnn_cell.MultiRNNCell([cell] * layers )
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
@@ -42,7 +42,7 @@ class CreateModel:
             return convLayers[-1]
 
     def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=0, rnnLayers=0, keep_prob=1.0, postfix=""):
-        #prep inputs by splitting apart dense only variables from convolutino variables and reshape convolution variables
+        #prep inputs by splitting apart dense only variables from convolution variables and reshape convolution variables
         dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
         cInputs = tf.reshape(cProtoInputs, [-1, NCONSTITUENTS, nChannel])
@@ -200,7 +200,7 @@ class CreateModel:
         # create image of colvolutional filters 
         valid_summaries = [summary_accuracy, summary_vloss]
         try:
-            for i in xrange(len(convWeights)):
+            for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
                 valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[0], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
         except NameError:
