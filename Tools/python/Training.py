@@ -39,7 +39,7 @@ if __name__ == '__main__':
   elif cmdLineOptions.xgboost:
     mainXGB(cmdLineOptions)
   else:
-    mainTF(options)
     saveOptionsToJSON(options,options.runOp.directory+options.saveName)    
+    mainTF(options)
 
   print "TRAINING DONE!"
