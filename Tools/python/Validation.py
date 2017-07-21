@@ -116,7 +116,14 @@ print "PROCESSING TTBAR VALIDATION DATA"
 import json
 
 #It is better to load the Training configuration file, then to override the configuration at the command-line
-trainingOptions = taggerOptions.loadJSON(outputDirectory+options.trainingCfg)
+if options.trainingCfg != None:
+   jsonName = outputDirectory+options.trainingCfg
+else:
+   jsonName = outputDirectory+"config.json"
+
+trainingOptions = taggerOptions.loadJSON(jsonName)
+
+
 if options.modelJSON != None:
   try:
     f = open(options.modelJSON,"r")

@@ -96,7 +96,9 @@ def mainTF(options):
   crs = [CustomQueueRunner(MiniBatchSize, dg.getList(), fnq, ptReweight=options.runOp.ptReweight) for i in xrange(options.runOp.nReaders)]
 
   # Build the graph
-  mlp = CreateModel(options, [nFeatures, 400, 200, nLabels], fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
+  #denseNetwork = [nFeatures, 100, 50, 50, nLabels]
+  denseNetwork = [nFeatures]+options.netOp.denseLayers+[nLabels]
+  mlp = CreateModel(options, denseNetwork, fnq.inputDataQueue, MiniBatchSize, mins, 1.0/ptps)
 
   #summary writer
   summary_writer = tf.summary.FileWriter(options.runOp.directory + "log_graph", graph=tf.get_default_graph())
