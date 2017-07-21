@@ -472,7 +472,7 @@ class taggerOptions:
       runOpJSON.cleanUp()
       netOpJSON.cleanUp()
 
-      return cls(confName = jsonOptions['confName'], runOp = runOpJSON, netOp = netOpJSON, cfgFile = fname) 
+      return cls(confName = jsonOptions['confName'], runOp = runOpJSON, netOp = netOpJSON, cfgFile = fname, saveName = jsonOptions['saveName']) 
       
    #This class method will return a taggerOptions object with the default values, and a message saved in the info field
    @classmethod
