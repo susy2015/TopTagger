@@ -201,7 +201,7 @@ class CreateModel:
         try:
             for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
-                valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[0], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
+                valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[i], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
         except NameError:
             pass
         except AttributeError:
