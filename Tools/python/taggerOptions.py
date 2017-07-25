@@ -157,13 +157,13 @@ class runOptions:
                       nThreadperReader  = 1,
                       minibatchSize     = 512,
                       reportInterval    = 500,
-                      nValidationEvents = 10000,
-                      l2Reg             = 0.0001,
+                      nValidationEvents = 100000,
+                      l2Reg             = 0.001,
                       dataPath          = "data",
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.8):
+                      keepProb          = 0.6):
 
       self.runName           = runName
       self.directory         = directory
@@ -336,8 +336,8 @@ class networkOptions:
    def __init__(self, networkName       = "Network test Configuration (name not set)",
                       inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables      = ["p", "CSV", "QGL"],
-                      denseLayers       = [200, 200],
-                      convLayers        = [100, 50, 25],
+                      denseLayers       = [400, 200],
+                      convLayers        = [],
                       rnnNodes          = 0,
                       rnnLayers         = 1,
                       convNConstituents = 3,
