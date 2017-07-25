@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
   #create output directory if it does not already exist 
   if len(options.runOp.directory):
-    options.runOp.directory += "/"
+    if options.runOp.directory[-1] != "/": options.runOp.directory += "/"
     try:
       os.mkdir(options.runOp.directory)
     except OSError as exc:
