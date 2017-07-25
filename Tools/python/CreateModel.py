@@ -32,7 +32,7 @@ class CreateModel:
     def createConvLayers(self, inputs, convWeights, keep_prob=1.0, postfix=""):
         with tf.variable_scope("cnn") as scope:
             #list to hold conv layers 
-            convLayers = [tf.nn.dropout(inputs, keep_prob)]
+            convLayers = [inputs]
 
             #create the convolutional layers
             for iLayer in xrange(len(convWeights)):
