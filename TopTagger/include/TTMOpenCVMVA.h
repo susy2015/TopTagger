@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "opencv/include/opencv/cv.h"
-#include "opencv/include/opencv/ml.h"
+#include "opencv/cv.h"
+#include "opencv/ml.h"
 
 class TTMOpenCVMVA : public TTModule
 {

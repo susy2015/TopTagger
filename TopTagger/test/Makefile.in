@@ -1,0 +1,117 @@
+## Variables set by configure 
+OPENCV_DIRECTORY = @OPENCVDIR@
+TAGGERDIR        = @TAGGERDIR@
+
+CXX       = @CXX@
+LD        = @CXX@
+CXXFLAGS  = @CXXFLAGS@
+LDFLAGS   = @LDFLAGS@
+PREFIX    = @prefix@
+LDCONFIG  = @LDCONFIG@
+LIBSUFFIX = @LIBSUFFIX@
+##End variables set by configure
+
+# directory to put intermediate files 
+ODIR       = obj
+
+# Top tagger includes
+INCLUDESDIRS  += -I. -I$(TAGGERDIR)/..
+
+# Top tagger source diretoriess
+TTSDIR     = $(TAGGERDIR)/TopTagger/src
+TTTDIR     = $(TAGGERDIR)/TopTagger/test
+TPSDIR     = $(TAGGERDIR)/CfgParser/src
+
+#openCV include dirs
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
+INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
+
+## Include ROOT
+INCLUDESDIRS  += $(shell root-config --cflags)
+
+## Enable for maximum warning
+#CXXFLAGS += -Wall -Wextra -Weffc++
+
+# Flags for generating auto dependancies 
+CXXDEPFLAGS = -MMD -MP
+
+#Necessary libraries, the order matters here!
+# ROOT libraries
+LIBS       = $(shell root-config --glibs)
+# top tagger libraries
+LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
+# openCV libraries
+LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
+
+PROGRAMS = topTaggerTest
+
+LIBRARIES = TopTagger
+
+all: mkobj $(LIBRARIES) $(PROGRAMS)
+
+
+mkobj:
+	@mkdir -p $(ODIR)
+
+#special rule to make root reflex dictionary
+$(TTTDIR)/rootdict.cc : $(TTTDIR)/rootdict.h
+	rootcint -f $@ $^
+
+$(ODIR)/%.o : $(TTSDIR)/%.cc
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TTSDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TTTDIR)/%.cc
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TTTDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TPSDIR)/%.cc
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+$(ODIR)/%.o : $(TPSDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+#Compile top tagger library
+TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
+
+#link shared library
+libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
+	${LD} -shared -o $@ $^ $(LIBS)
+
+#create static library
+libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
+	ar rcs $@ $^
+
+#compile topTaggerTest code
+topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
+	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBSTOPTAGGER) $(LIBS) -o $@
+
+clean:
+	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+
+install: libTopTagger.$(LIBSUFFIX)
+	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/
+	chmod 644 $(PREFIX)/lib/libTopTagger.$(LIBSUFFIX)
+	cd $(PREFIX)/lib/
+	$(LDCONFIG)
+	mkdir -p $(PREFIX)/include/TopTagger/TopTagger/
+	cp -r $(TAGGERDIR)/../TopTagger/TopTagger/include $(PREFIX)/include/TopTagger/TopTagger/
+	chmod 644 $(PREFIX)/include/TopTagger/TopTagger/include/*.h
+	mkdir -p $(PREFIX)/include/TopTagger/CfgParser/
+	cp -r $(TAGGERDIR)/../TopTagger/CfgParser/include $(PREFIX)/include/TopTagger/CfgParser/
+	chmod 644 $(PREFIX)/include/TopTagger/CfgParser/include/*.h
+
+uninstall:
+	rm $(PREFIX)/lib/libTopTagger.$(LIBSUFFIX)
+	cd $(PREFIX)/lib/
+	$(LDCONFIG)
+	rm -r $(PREFIX)/include/TopTagger
+
+-include $(ODIR)/*.d

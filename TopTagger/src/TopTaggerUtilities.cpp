@@ -17,7 +17,9 @@ namespace ttUtility
 
     ConstGenInputs::ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : hadGenTops_(&hadGenTops), hadGenTopDaughters_(&hadGenTopDaughters) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
+
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
@@ -35,12 +37,17 @@ namespace ttUtility
         puppisd_corrRECO_for_ = nullptr;
     }
 
-    void ConstAK4Inputs::addQGLVectors(const std::vector<double>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
+    void ConstAK4Inputs::addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
     {
         qgMult_ = &qgMult;
         qgPtD_ = &qgPtD;
         qgAxis1_ = &qgAxis1;
         qgAxis2_ = &qgAxis2;
+    }
+
+    void ConstAK4Inputs::addSupplamentalVector(const std::string& name, const std::vector<double>& vector)
+    {
+        extraInputVariables_[name] = &vector;
     }
 
     void ConstAK4Inputs::packageConstituents(std::vector<Constituent>& constituents)
@@ -49,19 +56,37 @@ namespace ttUtility
         //std::vector<Constituent> constituents;
 
         //Safety check that jet and b-tag vectors are the same length
-        if(jetsLVec_->size() != btagFactors_->size() || jetsLVec_->size() != qgLikelihood_->size())
+        //Special exception for qgLikelihood if it is empty (for slimplified tagger)
+        if(jetsLVec_->size() != btagFactors_->size() || (qgLikelihood_ != nullptr && jetsLVec_->size() != qgLikelihood_->size()))
         {
-            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(qgLikelihood_->size()));
+            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(btagFactors_->size()));
+        }
+
+        if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+        {
+            if(jetsLVec_->size() != qgMult_->size() || jetsLVec_->size() != qgPtD_->size() || jetsLVec_->size() != qgAxis1_->size() || jetsLVec_->size() != qgAxis2_->size())
+            {
+                THROW_TTEXCEPTION("Unequal vector size (QGL)!!!!!!!\n");
+            }
         }
 
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (*qgLikelihood_)[iJet]);
+            constituents.emplace_back((*jetsLVec_)[iJet], (*btagFactors_)[iJet], (qgLikelihood_ != nullptr)?((*qgLikelihood_)[iJet]):(0.0));
 
             //Add additional QGL info if it is provided 
-            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) constituents.back().setQGLVars((*qgMult_)[iJet], (*qgPtD_)[iJet], (*qgAxis1_)[iJet], (*qgAxis2_)[iJet]);
+            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+            {
+                constituents.back().setQGLVars((*qgMult_)[iJet], (*qgPtD_)[iJet], (*qgAxis1_)[iJet], (*qgAxis2_)[iJet]);
+            }
 
+            //Add any extra variables that have been added 
+            for(const auto& extraVar : extraInputVariables_)
+            {
+                if(extraVar.second) constituents.back().setExtraVar(extraVar.first, (*extraVar.second)[iJet]);
+            }
+            
             //Get gen matches if the required info is provided
             if(hadGenTops_ && hadGenTopDaughters_)
             {
@@ -115,7 +140,7 @@ namespace ttUtility
                     for (unsigned int k=j+1; k<subjets.size(); ++k)
                     {
                         TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
-                        double diff = abs(diff_LV.M());
+                        double diff = fabs(diff_LV.M());
                         if(diff < min_diff)
                         {
                             min_diff = diff;
@@ -300,7 +325,8 @@ namespace ttUtility
         {
             TLorentzVector p4(constitutent->p());
             p4.Boost(-topCand.p().BoostVector());
-            RF_constituents.emplace_back(p4, constitutent->getBTagDisc(), constitutent->getQGLikelihood());
+            RF_constituents.emplace_back(*constitutent);
+            RF_constituents.back().setP(p4);
         }
 
         //re-sort constituents by p after deboosting
@@ -321,6 +347,70 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_qgPtD"]   = RF_constituents[i].getQGPtD();
             varMap["j" + std::to_string(i + 1) + "_qgAxis1"]   = RF_constituents[i].getQGAxis1();
             varMap["j" + std::to_string(i + 1) + "_qgAxis2"]   = RF_constituents[i].getQGAxis2();
+
+            varMap["j" + std::to_string(i + 1) + "_recoJetsFlavor"] = RF_constituents[i].getExtraVar("recoJetsFlavor");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsJecScaleRawToFull"] = RF_constituents[i].getExtraVar("recoJetsJecScaleRawToFull");
+            varMap["j" + std::to_string(i + 1) + "_recoJetschargedHadronEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetschargedHadronEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_recoJetschargedEmEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetschargedEmEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsneutralEmEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetsneutralEmEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsmuonEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetsmuonEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsHFHadronEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetsHFHadronEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsHFEMEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetsHFEMEnergyFraction");;
+            varMap["j" + std::to_string(i + 1) + "_recoJetsneutralEnergyFraction"] = RF_constituents[i].getExtraVar("recoJetsneutralEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_PhotonEnergyFraction"] = RF_constituents[i].getExtraVar("PhotonEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_ElectronEnergyFraction"] = RF_constituents[i].getExtraVar("ElectronEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_ChargedHadronMultiplicity"] = RF_constituents[i].getExtraVar("ChargedHadronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_NeutralHadronMultiplicity"] = RF_constituents[i].getExtraVar("NeutralHadronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_PhotonMultiplicity"] = RF_constituents[i].getExtraVar("PhotonMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_ElectronMultiplicity"] = RF_constituents[i].getExtraVar("ElectronMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_MuonMultiplicity"] = RF_constituents[i].getExtraVar("MuonMultiplicity");
+            varMap["j" + std::to_string(i + 1) + "_DeepCSVb"] = RF_constituents[i].getExtraVar("DeepCSVb");
+            varMap["j" + std::to_string(i + 1) + "_DeepCSVc"] = RF_constituents[i].getExtraVar("DeepCSVc");
+            varMap["j" + std::to_string(i + 1) + "_DeepCSVl"] = RF_constituents[i].getExtraVar("DeepCSVl");
+            varMap["j" + std::to_string(i + 1) + "_DeepCSVbb"] = RF_constituents[i].getExtraVar("DeepCSVbb");
+            varMap["j" + std::to_string(i + 1) + "_DeepCSVcc"] = RF_constituents[i].getExtraVar("DeepCSVcc");
+            varMap["j" + std::to_string(i + 1) + "_CvsL"] = RF_constituents[i].getExtraVar("CvsL");;
+            varMap["j" + std::to_string(i + 1) + "_CvsB"] = RF_constituents[i].getExtraVar("CvsB");;
+            varMap["j" + std::to_string(i + 1) + "_CombinedSvtx"] = RF_constituents[i].getExtraVar("CombinedSvtx");;
+            varMap["j" + std::to_string(i + 1) + "_Svtx"] = RF_constituents[i].getExtraVar("Svtx");;
+            varMap["j" + std::to_string(i + 1) + "_SoftM"] = RF_constituents[i].getExtraVar("SoftM");;
+            varMap["j" + std::to_string(i + 1) + "_SoftE"] = RF_constituents[i].getExtraVar("SoftE");;
+            varMap["j" + std::to_string(i + 1) + "_JetProba"] = RF_constituents[i].getExtraVar("JetProba");
+            varMap["j" + std::to_string(i + 1) + "_JetBprob"] = RF_constituents[i].getExtraVar("JetBprob");
+            varMap["j" + std::to_string(i + 1) + "_recoJetsCharge"] = RF_constituents[i].getExtraVar("recoJetsCharge");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackJetPt"] = RF_constituents[i].getExtraVar("CSVTrackJetPt");
+            varMap["j" + std::to_string(i + 1) + "_CSVVertexCategory"] = RF_constituents[i].getExtraVar("CSVVertexCategory");
+            varMap["j" + std::to_string(i + 1) + "_CSVJetNSecondaryVertices"] = RF_constituents[i].getExtraVar("CSVJetNSecondaryVertices");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSumJetEtRatio"] = RF_constituents[i].getExtraVar("CSVTrackSumJetEtRatio");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSumJetDeltaR"] = RF_constituents[i].getExtraVar("CSVTrackSumJetDeltaR");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip2dValAboveCharm"] = RF_constituents[i].getExtraVar("CSVTrackSip2dValAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip2dSigAboveCharm"] = RF_constituents[i].getExtraVar("CSVTrackSip2dSigAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip3dValAboveCharm"] = RF_constituents[i].getExtraVar("CSVTrackSip3dValAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip3dSigAboveCharm"] = RF_constituents[i].getExtraVar("CSVTrackSip3dSigAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CSVVertexMass"] = RF_constituents[i].getExtraVar("CSVVertexMass");
+            varMap["j" + std::to_string(i + 1) + "_CSVVertexNTracks"] = RF_constituents[i].getExtraVar("CSVVertexNTracks");
+            varMap["j" + std::to_string(i + 1) + "_CSVVertexEnergyRatio"] = RF_constituents[i].getExtraVar("CSVVertexEnergyRatio");
+            varMap["j" + std::to_string(i + 1) + "_CSVVertexJetDeltaR"] = RF_constituents[i].getExtraVar("CSVVertexJetDeltaR");
+            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance2dVal"] = RF_constituents[i].getExtraVar("CSVFlightDistance2dVal");
+            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance2dSig"] = RF_constituents[i].getExtraVar("CSVFlightDistance2dSig");
+            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance3dVal"] = RF_constituents[i].getExtraVar("CSVFlightDistance3dVal");
+            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance3dSig"] = RF_constituents[i].getExtraVar("CSVFlightDistance3dSig");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexCategory"] = RF_constituents[i].getExtraVar("CTagVertexCategory");
+            varMap["j" + std::to_string(i + 1) + "_CTagJetNSecondaryVertices"] = RF_constituents[i].getExtraVar("CTagJetNSecondaryVertices");
+            varMap["j" + std::to_string(i + 1) + "_CTagTrackSumJetEtRatio"] = RF_constituents[i].getExtraVar("CTagTrackSumJetEtRatio");
+            varMap["j" + std::to_string(i + 1) + "_CTagTrackSumJetDeltaR"] = RF_constituents[i].getExtraVar("CTagTrackSumJetDeltaR");
+            varMap["j" + std::to_string(i + 1) + "_CTagTrackSip2dSigAboveCharm"] = RF_constituents[i].getExtraVar("CTagTrackSip2dSigAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CTagTrackSip3dSigAboveCharm"] = RF_constituents[i].getExtraVar("CTagTrackSip3dSigAboveCharm");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexMass"] = RF_constituents[i].getExtraVar("CTagVertexMass");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexNTracks"] = RF_constituents[i].getExtraVar("CTagVertexNTracks");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexEnergyRatio"] = RF_constituents[i].getExtraVar("CTagVertexEnergyRatio");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexJetDeltaR"] = RF_constituents[i].getExtraVar("CTagVertexJetDeltaR");
+            varMap["j" + std::to_string(i + 1) + "_CTagFlightDistance2dSig"] = RF_constituents[i].getExtraVar("CTagFlightDistance2dSig");
+            varMap["j" + std::to_string(i + 1) + "_CTagFlightDistance3dSig"] = RF_constituents[i].getExtraVar("CTagFlightDistance3dSig");
+            varMap["j" + std::to_string(i + 1) + "_CTagMassVertexEnergyFraction"] = RF_constituents[i].getExtraVar("CTagMassVertexEnergyFraction");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexBoostOverSqrtJetPt"] = RF_constituents[i].getExtraVar("CTagVertexBoostOverSqrtJetPt");
+            varMap["j" + std::to_string(i + 1) + "_CTagVertexLeptonCategory"] = RF_constituents[i].getExtraVar("CTagVertexLeptonCategory");
+            
 
             //index of next jet (assumes < 4 jets)
             unsigned int iNext = (i + 1) % RF_constituents.size();

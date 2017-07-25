@@ -130,6 +130,16 @@ int main()
 
     std::cout << "Training MVA" << std::endl;
 
+    Ptr<ANN_MLP> ann = ANN_MLP::create();
+
+    Mat layers = Mat(3, 1, CV_8U);
+    layers.at<int>(0,0) = 16;
+    layers.at<int>(1,0) = 20;
+    layers.at<int>(2,0) = 1;
+    ann->setLayerSizes(layers);
+    ann->setTrainMethod(ANN_MLP_BACKPROP);
+
+
     //Mat var_type = Mat(traindata.cols + 1, 1, CV_8U );
     //var_type.setTo(Scalar(CV_VAR_NUMERICAL) ); // all inputs are numerical
     //
@@ -138,46 +148,46 @@ int main()
     //
     //var_type.at<uchar>(traindata.cols, 0) = CV_VAR_CATEGORICAL;
 
-    Mat priors = Mat(2, 1, CV_32FC1);  // weights of each classification for classes
-    priors.at<float>(0,0) = 1.0;
-    priors.at<float>(1,0) = 1.0;
-
-    Ptr<RTrees> rtree = RTrees::create();
-
-    //rtree->setActiveVarCount(int val);
-    //rtree->setCalculateVarImportance(true);
-    rtree->setTermCriteria(TermCriteria(TermCriteria::COUNT, 100, 0.1));
-    //rtree->setCVFolds(int val);
-    rtree->setMaxCategories(2);
-    rtree->setMaxDepth(8);
-    rtree->setMinSampleCount(5);
-    //rtree->setPriors(priors);
-    //rtree->setRegressionAccuracy(0);
-    //rtree->setTruncatePrunedTree(false);
-    //rtree->setUse1SERule(false);
-    //rtree->setUseSurrogates(false);
-
-    std::cout << std::setw(30) << "getActiveVarCount: "         << rtree->getActiveVarCount() << std::endl;
-    std::cout << std::setw(30) << "getCalculateVarImportance: " << rtree->getCalculateVarImportance() << std::endl;
-    std::cout << std::setw(30) << "getTermCriteria: "           << rtree->getTermCriteria().type << "\t" <<  rtree->getTermCriteria().maxCount << "\t" <<  rtree->getTermCriteria().epsilon << std::endl;
-    std::cout << std::setw(30) << "getCVFolds: "                << rtree->getCVFolds() << std::endl;
-    std::cout << std::setw(30) << "getMaxCategories: "          << rtree->getMaxCategories() << std::endl;
-    std::cout << std::setw(30) << "getMaxDepth: "               << rtree->getMaxDepth() << std::endl;
-    std::cout << std::setw(30) << "getMinSampleCount: "         << rtree->getMinSampleCount() << std::endl;
-    std::cout << std::setw(30) << "getPriors: "                 << rtree->getPriors() << std::endl;
-    std::cout << std::setw(30) << "getRegressionAccuracy: "     << rtree->getRegressionAccuracy() << std::endl;
-    std::cout << std::setw(30) << "getTruncatePrunedTree: "     << rtree->getTruncatePrunedTree() << std::endl;
-    std::cout << std::setw(30) << "getUse1SERule: "             << rtree->getUse1SERule() << std::endl;
-    std::cout << std::setw(30) << "getUseSurrogates: "          << rtree->getUseSurrogates() << std::endl;
-
-    //Ptr<Boost> rtree = Boost::create();
+    //Mat priors = Mat(2, 1, CV_32FC1);  // weights of each classification for classes
+    //priors.at<float>(0,0) = 1.0;
+    //priors.at<float>(1,0) = 1.0;
     //
-    //rtree->setWeightTrimRate(0);
-    //rtree->setBoostType(2);
-
-    rtree->train(trainingData);
-
-    rtree->save("toptagger.model");
+    //Ptr<RTrees> rtree = RTrees::create();
+    //
+    ////rtree->setActiveVarCount(int val);
+    ////rtree->setCalculateVarImportance(true);
+    //rtree->setTermCriteria(TermCriteria(TermCriteria::COUNT, 100, 0.1));
+    ////rtree->setCVFolds(int val);
+    //rtree->setMaxCategories(2);
+    //rtree->setMaxDepth(8);
+    //rtree->setMinSampleCount(5);
+    ////rtree->setPriors(priors);
+    ////rtree->setRegressionAccuracy(0);
+    ////rtree->setTruncatePrunedTree(false);
+    ////rtree->setUse1SERule(false);
+    ////rtree->setUseSurrogates(false);
+    //
+    //std::cout << std::setw(30) << "getActiveVarCount: "         << rtree->getActiveVarCount() << std::endl;
+    //std::cout << std::setw(30) << "getCalculateVarImportance: " << rtree->getCalculateVarImportance() << std::endl;
+    //std::cout << std::setw(30) << "getTermCriteria: "           << rtree->getTermCriteria().type << "\t" <<  rtree->getTermCriteria().maxCount << "\t" <<  rtree->getTermCriteria().epsilon << std::endl;
+    //std::cout << std::setw(30) << "getCVFolds: "                << rtree->getCVFolds() << std::endl;
+    //std::cout << std::setw(30) << "getMaxCategories: "          << rtree->getMaxCategories() << std::endl;
+    //std::cout << std::setw(30) << "getMaxDepth: "               << rtree->getMaxDepth() << std::endl;
+    //std::cout << std::setw(30) << "getMinSampleCount: "         << rtree->getMinSampleCount() << std::endl;
+    //std::cout << std::setw(30) << "getPriors: "                 << rtree->getPriors() << std::endl;
+    //std::cout << std::setw(30) << "getRegressionAccuracy: "     << rtree->getRegressionAccuracy() << std::endl;
+    //std::cout << std::setw(30) << "getTruncatePrunedTree: "     << rtree->getTruncatePrunedTree() << std::endl;
+    //std::cout << std::setw(30) << "getUse1SERule: "             << rtree->getUse1SERule() << std::endl;
+    //std::cout << std::setw(30) << "getUseSurrogates: "          << rtree->getUseSurrogates() << std::endl;
+    //
+    ////Ptr<Boost> rtree = Boost::create();
+    ////
+    ////rtree->setWeightTrimRate(0);
+    ////rtree->setBoostType(2);
+    //
+    //rtree->train(trainingData);
+    //
+    //rtree->save("toptagger.model");
 
     std::cout << "Processing validation data" << std::endl;
     

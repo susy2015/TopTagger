@@ -32,15 +32,19 @@ namespace ttUtility
         const std::vector<TLorentzVector>* jetsLVec_;
         const std::vector<double>* btagFactors_;
         const std::vector<double>* qgLikelihood_;
-        const std::vector<double>* qgMult_;
+        const std::vector<int>* qgMult_;
         const std::vector<double>* qgPtD_;
         const std::vector<double>* qgAxis1_;
         const std::vector<double>* qgAxis2_;
 
+        std::map<std::string, const std::vector<double>*> extraInputVariables_;
+
     public:
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
         ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
-        void addQGLVectors(const std::vector<double>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2);
+        void addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2);
+        void addSupplamentalVector(const std::string& name, const std::vector<double>& vector);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 

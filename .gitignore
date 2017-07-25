@@ -17,6 +17,14 @@
 #Root
 *.root
 
+#other data files
+*.csv
+*.pkl
+
+#MVA model files 
+*.pb
+*.model
+
 #Network File System
 .nfs*
 
