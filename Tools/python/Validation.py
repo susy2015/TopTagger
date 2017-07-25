@@ -6,6 +6,8 @@ import numpy
 import math
 from DataGetter import DataGetter
 import optparse
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pickle
 from taggerOptions import *

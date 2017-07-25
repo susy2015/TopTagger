@@ -198,12 +198,12 @@ class CreateModel:
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy)
         # create image of colvolutional filters 
         valid_summaries = [summary_accuracy, summary_vloss]
-        try:
-            for i in xrange(len(self.convWeights)):
-                shapes = self.convWeights[i].shape
-                valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[0], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
-        except NameError:
-            pass
+#        try:
+#            for i in xrange(len(self.convWeights)):
+#                shapes = self.convWeights[i].shape
+#                valid_summaries.append(tf.summary.image("conv_wgt_%i"%i, tf.reshape(self.convWeights[0], [int(shapes[0]), int(shapes[1]), int(shapes[2]), 1])))
+#        except NameError:
+#            pass
         # Merge all summaries into a single op
         self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)

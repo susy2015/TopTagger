@@ -176,6 +176,8 @@ class runOptions:
       self.l2Reg             = l2Reg
       self.dataPath          = dataPath
 
+      if self.dataPath[-1] != "/": self.dataPath += "/"
+
       self.trainingGlob      = "trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"
       
       if(len(trainingNames) > 0):
@@ -213,7 +215,7 @@ class runOptions:
          
       self.trainingSamples = []
       for name in self.trainingNames:
-         self.trainingSamples.append(self.dataPath+"/"+name)
+         self.trainingSamples.append(self.dataPath+name)
 
       return
 
@@ -222,7 +224,7 @@ class runOptions:
       
       self.validationSamples = []
       for name in self.validationNames:
-         self.validationSamples.append(self.dataPath+"/"+name)
+         self.validationSamples.append(self.dataPath+name)
 
       return
 
@@ -289,6 +291,7 @@ class runOptions:
 
       if cloptions.dataFilePath != None: 
          self.dataPath = cloptions.dataFilePath
+         if self.dataPath[-1] != "/": self.dataPath+= "/"
          orList.append("dataPath = "+str(cloptions.dataFilePath))
          self.makeTrainingSamples()
          self.makeValidationSamples()
