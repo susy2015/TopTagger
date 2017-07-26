@@ -200,6 +200,8 @@ class runOptions:
 
    #configuration variables can be left in an inconsistent state, this method will make them consistent again
    def cleanUp(self):
+      if self.dataPath[-1] != "/": self.dataPath += "/"
+
       self.makeTrainingSamples()
       self.makeValidationSamples()
       return
@@ -385,6 +387,13 @@ class networkOptions:
 
       return parser    
 
+   #This method will load standard variables
+   def loadStandardVariables(self, variables):
+      inputVariables, jetVariables = StandardVariables(variables)
+      self.inputVariables = inputVariables
+      self.jetVariables = jetVariables
+      self.cleanUp()
+
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
    def override(self, cloptions):
 
@@ -498,6 +507,11 @@ class taggerOptions:
 
       return parser
 
+   def cleanUp(self):
+      #This will return runOp and netOp to consistent states
+      self.runOp.cleanUp()
+      self.netOp.cleanUp()
+
    def override(self, cloptions):
    
        #The override methods will return a string with info that will be saved in the info list.
@@ -509,6 +523,8 @@ class taggerOptions:
       if not isinstance(self, taggerOptions):
          print "Trying to convert non taggerOptions object with serializeTaggerOptions"
          return
+
+      self.cleanUp()
 
       output = dict(self.__dict__) #The dictionary returned points to the attributes of this object and manipulating the dictionary will change this object. We need to make a copy so that this doesn't happen
       output["runOp"] = dict(self.runOp.__dict__) #This assumes a simple structure for runOp, this needs to be rewritten is that assumtion is violated
@@ -527,6 +543,8 @@ def saveOptionsToJSON(options,fname):
    if not isinstance(options, taggerOptions):
       print "Incorrect object passed. saveOptionsToJSON works on taggerOptions objects. Nothing will be saved."
       return
+
+   options.cleanUp()
 
    try:
       f = open(fname,"w")
