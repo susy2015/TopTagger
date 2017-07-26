@@ -22,7 +22,7 @@ class CreateModel:
             #create the rnn cell
             cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share, state_is_tuple=True) for _ in xrange(layers)], state_is_tuple=True)
             #add dropout
-            tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=output_dropout)
+            tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=keep_prob)
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
