@@ -40,7 +40,7 @@ parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, 
 parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
 parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
 parser.add_option ('-a', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
-parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',      default="data",                     help="Path where the input datafiles are stored (default: \"data\")")
+parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                     help="Path where the input datafiles are stored (default: \"data\")")
 parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
 parser.add_option ('-v', "--variables", dest='variables', action='store', help="Input features to use")
 parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      help="JSON with model definitions")
@@ -154,12 +154,14 @@ varsname = dg.getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
 
+if options.dataFilePath != None: trainingOptions.runOp.dataPath = options.dataFilePath
+
 if options.sklrf:
-    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
+    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
 elif options.xgboost:
-    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
+    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
+    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
 
 if ".pkl" in dataTTbarName:
     dataTTbarAll = pd.read_pickle(dataTTbarName)
@@ -194,11 +196,11 @@ dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
 #Training data for overfitting check
 if options.sklrf:
-    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
 elif options.xgboost:
-    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
+    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
 else:
-    dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
 
 import h5py
 f = h5py.File(dataTTbarNameTrain, "r")
@@ -347,11 +349,11 @@ plt.close()
 print "PROCESSING ZNUNU VALIDATION DATA"
 
 if options.sklrf:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
+    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 elif options.xgboost:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
+    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 else:
-    dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
+    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 
 if ".pkl" in dataZnunuName:
     dataZnunuAll = pd.read_pickle(dataZnunuName)
