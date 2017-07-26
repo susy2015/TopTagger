@@ -29,18 +29,18 @@ class CreateModel:
             output = tf.stack(output, axis=1) 
             return output
 
-    def createConvLayers(self, inputs, convWeights, keep_prob=1.0, postfix=""):
+    def createConvLayers(self, inputs, convWeights, convBiases, keep_prob=1.0, postfix=""):
         with tf.variable_scope("cnn") as scope:
             #list to hold conv layers 
             convLayers = [inputs]
 
             #create the convolutional layers
             for iLayer in xrange(len(convWeights)):
-                convLayers.append(tf.nn.dropout(tf.nn.relu(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix)), keep_prob))
+                convLayers.append(tf.nn.dropout(tf.nn.relu(tf.nn.conv1d(value = convLayers[iLayer], filters=convWeights[iLayer], stride=1, data_format='NHWC', padding='SAME', name="conv1d"+postfix) + convBiases[iLayer]), keep_prob))
     
             return convLayers[-1]
 
-    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], rnnNodes=0, rnnLayers=0, keep_prob=1.0, postfix=""):
+    def createCNNRNNLayers(self, NDENSEONLYVAR, NCONSTITUENTS, nChannel, inputVars, convWeights=[], convBiases=[], rnnNodes=0, rnnLayers=0, keep_prob=1.0, postfix=""):
         #prep inputs by splitting apart dense only variables from convolution variables and reshape convolution variables
         dInputs = tf.slice(inputVars, [0,0], [-1, NDENSEONLYVAR])
         cProtoInputs = tf.slice(inputVars, [0,NDENSEONLYVAR], [-1, -1])
@@ -49,7 +49,7 @@ class CreateModel:
         output = cInputs
 
         if len(convWeights) > 0:
-            output = self.createConvLayers(output, convWeights, keep_prob, postfix)
+            output = self.createConvLayers(output, convWeights, convBiases, keep_prob, postfix)
 
         if rnnNodes > 0:
             output = self.createRecurentLayers(output, rnnNodes, rnnLayers, keep_prob, len(postfix)>0)
@@ -138,15 +138,17 @@ class CreateModel:
 
             #weights for convolution filters - shared between all parallel graphs
             self.convWeights = []
+            self.convBiases = []
             print nChannel
             cnnStruct = [nChannel] + self.convLayers
             for i in xrange(len(cnnStruct) - 1):
                 self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))
+                self.convBiases.append(self.bias_variable([cnnStruct[i + 1]], name="conv1_biasses"))
 
 
             #Create colvolution layers 
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
-            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="_ph")
+            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
+            denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="_ph")
 
         else:
             #If convolution is not used, just pass in the transformed input variables 
