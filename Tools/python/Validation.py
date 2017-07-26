@@ -161,25 +161,42 @@ elif options.xgboost:
 else:
     dataTTbarName = options.dataFilePath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
 
-if ".pkl" in dataTTbarName:
-    dataTTbarAll = pd.read_pickle(dataTTbarName)
-elif ".h5" in dataTTbarName:
-    import h5py
-    f = h5py.File(dataTTbarName, "r")
-    npData = f["reco_candidates"][:]
-    columnHeaders = f["reco_candidates"].attrs["column_headers"]
-    indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
-    dataTTbarAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
 
-    npDataGen = f["gen_tops"][:]
-    columnHeadersGen = f["gen_tops"].attrs["column_headers"]
-    indicesGen = [npDataGen[:,0].astype(numpy.int), npDataGen[:,1].astype(numpy.int)]
-    dataTTbarGen = pd.DataFrame(npDataGen[:,2:], index=pd.MultiIndex.from_arrays(indicesGen), columns=columnHeadersGen[2:])
+def getData(dataName):
+    if ".pkl" in dataName:
+        dataAll = pd.read_pickle(dataName)
+    elif ".h5" in dataName:
+        import h5py
+        f = h5py.File(dataName, "r")
+        npData = f["reco_candidates"][:]
+        columnHeaders = f["reco_candidates"].attrs["column_headers"]
+        indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+        dataAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+    
+        npDataGen = f["gen_tops"][:]
+        columnHeadersGen = f["gen_tops"].attrs["column_headers"]
+        indicesGen = [npDataGen[:,0].astype(numpy.int), npDataGen[:,1].astype(numpy.int)]
+        dataGen = pd.DataFrame(npDataGen[:,2:], index=pd.MultiIndex.from_arrays(indicesGen), columns=columnHeadersGen[2:])
+    
+        f.close()
+    
+    numData = dataAll._get_numeric_data()
+    for i in xrange(numData.shape[1]):
+        dataCol = numData.iloc[:,i]
+        dataCol[numpy.isnan(dataCol)] = 0.0
+        dataCol[numpy.isinf(dataCol)] = 0.0
+        #dataCol = dataCol[dataCol < 0]
+        #check that this column both has negative values, and that they are all the same 
+        if len(dataCol[dataCol < 0]) > 0:
+            ptp = dataCol[dataCol < 0].ptp()
+            if ptp == 0.0:
+                dataCol[dataCol < 0] = 0.0
+            elif ptp/(dataCol.ptp() - ptp) > 2.5:
+                dataCol[dataCol < -(dataCol.ptp()-ptp)*2.5] = 0.0
 
-    f.close()
-
-numDataTTbar = dataTTbarAll._get_numeric_data()
-numDataTTbar[numDataTTbar < 0.0] = 0.0
+    return dataAll, dataGen
+            
+dataTTbarAll, dataTTbarGen = getData(dataTTbarName)
 
 #dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k_gen.pkl.gz")
 #dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
@@ -200,22 +217,11 @@ elif options.xgboost:
 else:
     dataTTbarNameTrain = options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
 
-import h5py
-f = h5py.File(dataTTbarNameTrain, "r")
-npData = f["reco_candidates"][:]
-columnHeaders = f["reco_candidates"].attrs["column_headers"]
-indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
-dataTTbarAllTrain = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
-
-f.close()
-
-numDataTTbarTrain = dataTTbarAllTrain._get_numeric_data()
-numDataTTbarTrain[numDataTTbarTrain < 0.0] = 0.0
+dataTTbarAllTrain, _ = getData(dataTTbarNameTrain)
 
 #Apply baseline cuts
 dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
 dataTTbarTrain = dataTTbarAllTrain[dataTTbarAllTrain.ncand > 0]
-
 
 print "CALCULATING TTBAR DISCRIMINATORS"
 
@@ -307,6 +313,7 @@ for var in varsname:
     plt.legend()
     plt.xlabel(var)
     plt.ylabel("Normalized events")
+    plt.yscale('log')
     plt.savefig(outputDirectory + var + ".png")
     plt.close()
 
@@ -353,21 +360,7 @@ elif options.xgboost:
 else:
     dataZnunuName = options.dataFilePath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 
-if ".pkl" in dataZnunuName:
-    dataZnunuAll = pd.read_pickle(dataZnunuName)
-elif ".h5" in dataZnunuName:
-    import h5py
-    f = h5py.File(dataZnunuName, "r")
-    npData = f["reco_candidates"][:]
-    columnHeaders = f["reco_candidates"].attrs["column_headers"]
-    
-    indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
-    
-    dataZnunuAll = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
-    f.close()
-
-numDataZnunu = dataZnunuAll._get_numeric_data()
-numDataZnunu[numDataZnunu < 0.0] = 0.0
+dataZnunuAll, _ = getData(dataZnunuName)
 
 dataZnunuAll = dataZnunuAll[dataZnunuAll.Njet >= 4]
 dataZnunu = dataZnunuAll[dataZnunuAll.ncand > 0]

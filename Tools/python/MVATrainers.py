@@ -83,9 +83,9 @@ def mainTF(options):
   ReportInterval = options.runOp.reportInterval
   validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
 
-  #scale data inputs to range 0-1
-  mins = validData["data"].min(0)
-  ptps = validData["data"].ptp(0)
+  #scale data inputs to mean 0, stddev 1
+  mins = validData["data"].mean(0)
+  ptps = validData["data"].std(0)
   #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
