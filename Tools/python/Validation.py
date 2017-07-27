@@ -476,6 +476,10 @@ for cut in cuts:
     TPRPtCut.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar > ptCut)].sum() / NevtTPRPtCut    )
     FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (cantPtZnunu > ptCut)].sum() / NevtZPtCut )
 
+#prepare tuples
+    rocTTbar = list(zip(FPR,TPR))
+    rocZnunu = list(zip(FPRZ,TPR))
+
 #Dump roc to file
 fileObject = open(outputDirectory + "roc.pkl",'wb')
 pickle.dump(TPR, fileObject)
