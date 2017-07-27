@@ -99,8 +99,17 @@ class DataGetter:
       npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
     
       if reluInputs:
-        #ensure data is all greater than one
-        npyInputData[npyInputData < 0] = 0.0
+        #ensure data is all greater than one if approperiate
+        for i in xrange(npyInputData.shape[1]):
+          dataColA = npyInputData[:,i]
+          dataCol = dataColA[dataColA < 0]
+          #check that this column both has negative values, and that they are all the same 
+          if len(dataCol[dataCol < 0]) > 0:
+            ptp = dataCol[dataCol < 0].ptp()
+            if ptp == 0.0:
+              dataColA[dataColA < 0] = 0.0
+            elif ptp/(dataColA.ptp() - ptp) > 2.5:
+              dataColA[dataColA < -(dataColA.ptp()-ptp)*2.5] = 0.0
     
       if prescale:
         #Remove background events so that bg and signal are roughly equally represented
