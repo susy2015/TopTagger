@@ -145,7 +145,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             bool passTopEta = (fabs((*iTop)->p().Eta()) < maxTopEta_);
 
             //Check if the candidates have been used in another top
-            bool overlaps = constituentsAreUsed((*iTop)->getConstituents(), usedJets, dRMatch_);
+            bool overlaps = constituentsAreUsed(jets, usedJets, dRMatch_);
 
             //Prune top from final top collection if it fails the following requirements
             if(overlaps || !passTopEta)
@@ -158,7 +158,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             //If the candidate survived, it must be a good top!!!
 
             //Add the good tops constituents to the set tracking which constituents have been used
-            markConstituentsUsed((*iTop)->getConstituents(), constituents, usedJets, dRMatch_);
+            markConstituentsUsed(jets, constituents, usedJets, dRMatch_);
         }
 
         ++iTop;

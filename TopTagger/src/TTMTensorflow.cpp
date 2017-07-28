@@ -23,6 +23,8 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
     modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
+    inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
+    outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -76,12 +78,17 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
         THROW_TTEXCEPTION("ERROR: Unable to create tf session: " + std::string(TF_Message(status)));
     }
 
-    TF_Operation* op_x = TF_GraphOperationByName(graph, "x");
-    TF_Operation* op_y = TF_GraphOperationByName(graph, "y");
+    TF_Operation* op_x = TF_GraphOperationByName(graph, inputOp_.c_str());
+    TF_Operation* op_y = TF_GraphOperationByName(graph, outputOp_.c_str());
 
-    if(op_x == nullptr || op_y == nullptr)
+    if(op_x == nullptr)
     {
-        THROW_TTEXCEPTION("Input/output operations not found in graph");
+        THROW_TTEXCEPTION("Input operation \"" + inputOp_ + "\" not found in graph");
+    }    
+
+    if(op_y == nullptr)
+    {
+        THROW_TTEXCEPTION("Output operation \"" + outputOp_ + "\" not found in graph");
     }
 
     inputs_ .emplace_back(TF_Output({op_x, 0}));

@@ -20,7 +20,7 @@ class TTMTensorflow : public TTModule
 private:
 #ifdef DOTENSORFLOW
     double discriminator_;
-    std::string modelFile_;
+    std::string modelFile_, inputOp_, outputOp_;
     double csvThreshold_;
     double bEtaCut_;
     int maxNbInTop_;
