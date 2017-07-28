@@ -25,8 +25,15 @@ public:
     virtual void run(TopTaggerResults&) = 0;
 };
 
+//Macro to suppress the incorrect "unused variable" warnings for module factory instantiation 
+#ifdef __GNUC__
+#define TT_VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#else
+#define TT_VARIABLE_IS_NOT_USED
+#endif
+
 //magic macro for registering classes with the factory object
 #define REGISTER_TTMODULE( _module ) \
-    static bool _module ## _module_created = TTMFactory::registerModule( #_module, []()->TTModule*{ return new _module(); } )
+    static bool TT_VARIABLE_IS_NOT_USED _module ## _module_created = TTMFactory::registerModule( #_module, []()->TTModule*{ return new _module(); } )
 
 #endif
