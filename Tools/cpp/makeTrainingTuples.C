@@ -25,6 +25,162 @@
 #include <math.h>
 #include <memory>
 
+#include "hdf5.h"
+
+class HDF5Writer
+{
+private:
+    int nEvtsPerFile_, nEvts_, nFile_;
+    std::string ofname_;
+    std::map<std::string, std::vector<std::string>> variables_;
+    std::map<std::string, std::vector<const char *>> variablesPtr_;
+    std::map<std::string, std::vector<std::pair<bool,const  void*>>> pointers_;
+    std::map<std::string, std::vector<float>> data_;
+
+public:
+    HDF5Writer(const std::map<std::string, std::vector<std::string>>& variables, int eventsPerFile, std::string ofname) : variables_(variables), nEvtsPerFile_(eventsPerFile), nEvts_(0), nFile_(0), ofname_(ofname)
+    {
+        for(const auto& varVec : variables_)
+        {
+            auto& ptrVec = variablesPtr_[varVec.first];
+            for(const auto& str : varVec.second)
+            {
+                ptrVec.push_back(str.c_str());
+            }
+        }
+    }
+
+    void initBranches(const NTupleReader& tr)
+    {
+        for(const auto& dataset : variables_)
+        {
+            auto& ptrPair = pointers_[dataset.first];
+            for(const auto& var : dataset.second)
+            {
+                std::string type;
+                tr.getType(var, type);
+                if(type.find("vector") != std::string::npos)
+                {
+                    if(type.find("*") != std::string::npos)
+                    {
+                        throw "MiniTupleMaker::initBranches(...): Vectors of pointers are not allowed in MiniTuples!!!";
+                    }
+                    else
+                    {
+                        if(type.find("double") != std::string::npos)
+                        {
+                            ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
+                        }
+                        else
+                        {
+                        throw "MiniTupleMaker::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;           
+                        }
+                    }
+                }
+                else
+                {
+                    if(type.find("double") != std::string::npos)
+                    {
+                        ptrPair.push_back(std::make_pair(false, tr.getPtr(var)));
+                    }
+                    else
+                    {
+                        throw "MiniTupleMaker::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;
+                    }
+                }
+            }
+        }
+    }
+
+    void saveHDF5File(std::string fileName)
+    {
+        herr_t      status;
+        std::vector<char*> attr_data;
+
+        /* Open an existing file. */
+        hid_t file_id = H5Fcreate("test.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+        for(const auto& data : data_)
+        {
+            const float* dset_data = data.second.data();
+            /* Create the data space for the dataset. */
+            hsize_t dims[2];
+            dims[0] = variables_[data.first].size();
+            dims[1] = data.second.size()/dims[0];
+            hid_t dataspace_id = H5Screate_simple(2, dims, NULL);
+
+            /* Create the dataset. */
+            hid_t dataset_id = H5Dcreate2(file_id, data.first.c_str(), H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+            /* Write the dataset. */
+            status = H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
+
+            //create type
+            hid_t vls_type_c_id = H5Tcopy(H5T_C_S1);
+            status = H5Tset_size(vls_type_c_id, H5T_VARIABLE);
+
+            /* Create a dataset attribute. */
+            hid_t dataspace2_id = H5Screate_simple(1, dims, NULL);
+
+            hid_t attribute_id = H5Acreate2 (dataset_id, "column_headers", vls_type_c_id, dataspace2_id, H5P_DEFAULT, H5P_DEFAULT);
+
+            /* Write the attribute data. */
+            status = H5Awrite(attribute_id, vls_type_c_id, variablesPtr_[data.first].data());
+
+            /* Close the attribute. */
+            status = H5Aclose(attribute_id);
+            status = H5Sclose(dataspace2_id);
+
+            /* End access to the dataset and release resources used by it. */
+            status = H5Dclose(dataset_id);
+
+            /* Terminate access to the data space. */ 
+            status = H5Sclose(dataspace_id);
+        }
+
+        /* Close the file. */
+        status = H5Fclose(file_id);
+    }
+
+    void fill(const NTupleReader& tr)
+    {
+        ++nEvts_;
+        for(const auto& dataset : variables_)
+        {
+            auto& ptrPair = pointers_[dataset.first];
+            auto& varVec = variables_[dataset.first];
+            auto& dataVec = data_[dataset.first];
+            int nCand = 0;
+            //get ncand
+            for(const auto& pp : ptrPair)
+            {
+                //Look for the first vector
+                if(pp.first)
+                {
+                    nCand = (*static_cast<const std::vector<double> * const * const>(pp.second))->size();
+                    break;
+                }
+            }
+            for(int i = 0; i < nCand; ++i)
+            {
+                for(const auto& pp : ptrPair)
+                {
+                    //Check if this is a vector or a pointer 
+                    if(pp.first) dataVec.push_back((**static_cast<const std::vector<double> * const * const>(pp.second))[i]);
+                    else         dataVec.push_back(*static_cast<const double * const>(pp.second));
+                }
+            }
+        }
+
+        if(nEvts_ >= nEvtsPerFile_)
+        {
+            //if we reached the max event per file lets write the file
+            
+        }
+    }
+    
+};
+
 class PrepVariables
 {
 private:
