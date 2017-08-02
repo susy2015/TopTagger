@@ -1,7 +1,9 @@
 ## Variables set by configure 
-OPENCV_DIRECTORY = @OPENCVDIR@
-TAGGERDIR        = @TAGGERDIR@
-SUSYANATOOLSDIR  = @SUSYANATOOLSDIR@
+OPENCV_DIRECTORY    = @OPENCVDIR@
+HDF5_DIRECTORY      = @HDF5DIR@
+HDF5_INC_DIRECTORY  = @HDF5INCDIR@
+TAGGERDIR           = @TAGGERDIR@
+SUSYANATOOLSDIR     = @SUSYANATOOLSDIR@
 
 CXX       = @CXX@
 LD        = @CXX@
@@ -33,6 +35,9 @@ INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)
 INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
 
+#hdf5 include dir
+INCLUDESDIRS  += -L$(HDF5_DIRECTORY)/$(HDF5_INC_DIRECTORY)
+
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
 
@@ -48,6 +53,10 @@ LIBS       = $(shell root-config --glibs)
 
 # openCV libraries
 LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
+
+# hdf5 libs
+LIBS += -I$(HDF5_DIRECTORY)/lib -lhdf5
+
 
 # tagger libraries
 LIBS      += -L$(TAGGERDIR)/TopTagger/test -lTopTagger

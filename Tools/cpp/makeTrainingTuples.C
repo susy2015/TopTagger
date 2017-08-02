@@ -50,6 +50,8 @@ public:
         }
     }
 
+    void setTupleVars(const std::set<std::string>&) {}
+
     void initBranches(const NTupleReader& tr)
     {
         for(const auto& dataset : variables_)
@@ -61,11 +63,12 @@ public:
                 tr.getType(var, type);
                 if(type.find("vector") != std::string::npos)
                 {
-                    if(type.find("*") != std::string::npos)
-                    {
-                        throw "MiniTupleMaker::initBranches(...): Vectors of pointers are not allowed in MiniTuples!!!";
-                    }
-                    else
+                    //std::cout << type << std::endl;
+                    //if(type.find("*") != std::string::npos)
+                    //{
+                    //    throw "MiniTupleMaker::initBranches(...): Vectors of pointers are not allowed in MiniTuples!!!";
+                    //}
+                    //else
                     {
                         if(type.find("double") != std::string::npos)
                         {
@@ -73,7 +76,7 @@ public:
                         }
                         else
                         {
-                        throw "MiniTupleMaker::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;           
+                        throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;           
                         }
                     }
                 }
@@ -85,28 +88,32 @@ public:
                     }
                     else
                     {
-                        throw "MiniTupleMaker::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;
+                        throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;
                     }
                 }
             }
         }
     }
 
-    void saveHDF5File(std::string fileName)
+    void saveHDF5File()
     {
         herr_t      status;
         std::vector<char*> attr_data;
 
+        std::string fileName(ofname_, 0, ofname_.find("."));
+        fileName += "_" + std::to_string(nFile_) + ".h5";
+        ++nFile_;
+
         /* Open an existing file. */
-        hid_t file_id = H5Fcreate("test.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        hid_t file_id = H5Fcreate(fileName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
         for(const auto& data : data_)
         {
             const float* dset_data = data.second.data();
             /* Create the data space for the dataset. */
             hsize_t dims[2];
-            dims[0] = variables_[data.first].size();
-            dims[1] = data.second.size()/dims[0];
+            dims[1] = variables_[data.first].size();
+            dims[0] = data.second.size()/dims[1];
             hid_t dataspace_id = H5Screate_simple(2, dims, NULL);
 
             /* Create the dataset. */
@@ -120,6 +127,7 @@ public:
             status = H5Tset_size(vls_type_c_id, H5T_VARIABLE);
 
             /* Create a dataset attribute. */
+            dims[0] = variables_[data.first].size();
             hid_t dataspace2_id = H5Screate_simple(1, dims, NULL);
 
             hid_t attribute_id = H5Acreate2 (dataset_id, "column_headers", vls_type_c_id, dataspace2_id, H5P_DEFAULT, H5P_DEFAULT);
@@ -142,7 +150,7 @@ public:
         status = H5Fclose(file_id);
     }
 
-    void fill(const NTupleReader& tr)
+    void fill()
     {
         ++nEvts_;
         for(const auto& dataset : variables_)
@@ -166,7 +174,7 @@ public:
                 for(const auto& pp : ptrPair)
                 {
                     //Check if this is a vector or a pointer 
-                    if(pp.first) dataVec.push_back((**static_cast<const std::vector<double> * const * const>(pp.second))[i]);
+                    if(pp.first) dataVec.push_back(nCand?((**static_cast<const std::vector<double> * const * const>(pp.second))[i]):0.0);
                     else         dataVec.push_back(*static_cast<const double * const>(pp.second));
                 }
             }
@@ -175,8 +183,16 @@ public:
         if(nEvts_ >= nEvtsPerFile_)
         {
             //if we reached the max event per file lets write the file
-            
+            saveHDF5File();
+
+            for(auto& data : data_) data.second.clear();
         }
+    }
+
+    ~HDF5Writer()
+    {
+        //Write the last events no matter what we have                                                                                                                                                                        
+        saveHDF5File();
     }
     
 };
@@ -232,6 +248,7 @@ private:
     TopTagger* topTagger_;
     TopCat topMatcher_;
     std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
+    int eventNum_;
 
     void prepVariables(NTupleReader& tr)
     {
@@ -370,8 +387,8 @@ private:
 
         std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
 
-        std::vector<int> *genMatchdR = new std::vector<int>();//genMatches.first);
-        std::vector<int> *genMatchConst = new std::vector<int>();//genMatches.second.first);
+        std::vector<double> *genMatchdR = new std::vector<double>();//genMatches.first);
+        std::vector<double> *genMatchConst = new std::vector<double>();//genMatches.second.first);
         std::vector<double> *genMatchVec = new std::vector<double>();
         //for(const auto& vec : genMatches.second.second)
         //{
@@ -385,9 +402,12 @@ private:
         //prepare a vector of get top pt
         for(auto& genTop : genTops) vh.add("genTopPt", genTop.Pt());
 
+        std::vector<double>* candNum = new std::vector<double>();
+        int iTop = 0;
         //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
+            candNum->push_back(static_cast<double>(iTop++));
             const auto* bestMatch = topCand.getBestGenTopMatch();
             genMatchdR->push_back(bestMatch !=  nullptr);
             genMatchVec->push_back(bestMatch?(bestMatch->Pt()):(-999.9));
@@ -420,24 +440,30 @@ private:
 
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
+        tr.registerDerivedVar("eventNum", static_cast<double>(eventNum_++));
+        tr.registerDerivedVec("candNum", candNum);
+        tr.registerDerivedVar("ncand", static_cast<double>(candNum->size()));
+
         //Generate basic MVA selection 
         bool passMVABaseline = true;//met > 100 && cntNJetsPt30 >= 5 && cntCSVS >= 1 && cntCSVL >= 2;//true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
 	const bool passValidationBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
 	tr.registerDerivedVar("passValidationBaseline",passValidationBaseline);
 	tr.registerDerivedVar("MET", met);
-	tr.registerDerivedVar("Njet",cntNJetsPt30);
-	tr.registerDerivedVar("Bjet", cntCSVS);
-	tr.registerDerivedVar("passnJets", passnJets);
-	tr.registerDerivedVar("passMET", passMET);
-	tr.registerDerivedVar("passdPhis", passdPhis);
-	tr.registerDerivedVar("passBJets", passBJets);
+	tr.registerDerivedVar("Njet",      static_cast<double>(cntNJetsPt30));
+        tr.registerDerivedVar("Bjet",      static_cast<double>(cntCSVS));
+        tr.registerDerivedVar("passnJets", static_cast<double>(passnJets));
+        tr.registerDerivedVar("passMET",   static_cast<double>(passMET));
+        tr.registerDerivedVar("passdPhis", static_cast<double>(passdPhis));
+        tr.registerDerivedVar("passBJets", static_cast<double>(passBJets));
 	
     }
 
 public:
     PrepVariables()
     {
+        eventNum_ = 0;
+
         topTagger_ = new TopTagger();
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
@@ -823,8 +849,15 @@ int main(int argc, char* argv[])
         }
     }
 
+    const std::map<std::string, std::vector<std::string>> variables =
+    {
+        {"gen_tops", {"eventNum", "candNum", "genTopPt", "sampleWgt","Njet"} },
+        {"reco_candidates", {"eventNum", "candNum", "ncand", "cand_dRMax", "cand_eta", "cand_m", "cand_phi", "cand_pt", "dR12_lab", "dR13_lab", "dR1_23_lab", "dR23_lab", "dR2_13_lab", "dR3_12_lab", "dRPtTop", "dRPtW", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j12_m_lab", "j13_m", "j13_m_lab", "j1_CSV", "j1_CSVFlightDistance2dSig", "j1_CSVFlightDistance2dVal", "j1_CSVFlightDistance3dSig", "j1_CSVFlightDistance3dVal", "j1_CSVJetNSecondaryVertices", "j1_CSVTrackJetPt", "j1_CSVTrackSip2dSigAboveCharm", "j1_CSVTrackSip2dValAboveCharm", "j1_CSVTrackSip3dSigAboveCharm", "j1_CSVTrackSip3dValAboveCharm", "j1_CSVTrackSumJetDeltaR", "j1_CSVTrackSumJetEtRatio", "j1_CSVVertexCategory", "j1_CSVVertexEnergyRatio", "j1_CSVVertexJetDeltaR", "j1_CSVVertexMass", "j1_CSVVertexNTracks", "j1_CSV_lab", "j1_CTagFlightDistance2dSig", "j1_CTagFlightDistance3dSig", "j1_CTagJetNSecondaryVertices", "j1_CTagMassVertexEnergyFraction", "j1_CTagTrackSip2dSigAboveCharm", "j1_CTagTrackSip3dSigAboveCharm", "j1_CTagTrackSumJetDeltaR", "j1_CTagTrackSumJetEtRatio", "j1_CTagVertexBoostOverSqrtJetPt", "j1_CTagVertexCategory", "j1_CTagVertexEnergyRatio", "j1_CTagVertexJetDeltaR", "j1_CTagVertexLeptonCategory", "j1_CTagVertexMass", "j1_CTagVertexNTracks", "j1_ChargedHadronMultiplicity", "j1_CombinedSvtx", "j1_CvsB", "j1_CvsL", "j1_DeepCSVb", "j1_DeepCSVbb", "j1_DeepCSVc", "j1_DeepCSVcc", "j1_DeepCSVl", "j1_ElectronEnergyFraction", "j1_ElectronMultiplicity", "j1_JetBprob", "j1_JetProba", "j1_MuonMultiplicity", "j1_NeutralHadronMultiplicity", "j1_PhotonEnergyFraction", "j1_PhotonMultiplicity", "j1_QGL", "j1_QGL_lab", "j1_SoftE", "j1_SoftM", "j1_Svtx", "j1_eta_lab", "j1_m", "j1_m_lab", "j1_p", "j1_phi_lab", "j1_pt_lab", "j1_qgAxis1", "j1_qgAxis1_lab", "j1_qgAxis2", "j1_qgAxis2_lab", "j1_qgMult", "j1_qgMult_lab", "j1_qgPtD", "j1_qgPtD_lab", "j1_recoJetsCharge", "j1_recoJetsFlavor", "j1_recoJetsHFEMEnergyFraction", "j1_recoJetsHFHadronEnergyFraction", "j1_recoJetsJecScaleRawToFull", "j1_recoJetschargedEmEnergyFraction", "j1_recoJetschargedHadronEnergyFraction", "j1_recoJetsmuonEnergyFraction", "j1_recoJetsneutralEmEnergyFraction", "j1_recoJetsneutralEnergyFraction", "j23_m", "j23_m_lab", "j2_CSV", "j2_CSVFlightDistance2dSig", "j2_CSVFlightDistance2dVal", "j2_CSVFlightDistance3dSig", "j2_CSVFlightDistance3dVal", "j2_CSVJetNSecondaryVertices", "j2_CSVTrackJetPt", "j2_CSVTrackSip2dSigAboveCharm", "j2_CSVTrackSip2dValAboveCharm", "j2_CSVTrackSip3dSigAboveCharm", "j2_CSVTrackSip3dValAboveCharm", "j2_CSVTrackSumJetDeltaR", "j2_CSVTrackSumJetEtRatio", "j2_CSVVertexCategory", "j2_CSVVertexEnergyRatio", "j2_CSVVertexJetDeltaR", "j2_CSVVertexMass", "j2_CSVVertexNTracks", "j2_CSV_lab", "j2_CTagFlightDistance2dSig", "j2_CTagFlightDistance3dSig", "j2_CTagJetNSecondaryVertices", "j2_CTagMassVertexEnergyFraction", "j2_CTagTrackSip2dSigAboveCharm", "j2_CTagTrackSip3dSigAboveCharm", "j2_CTagTrackSumJetDeltaR", "j2_CTagTrackSumJetEtRatio", "j2_CTagVertexBoostOverSqrtJetPt", "j2_CTagVertexCategory", "j2_CTagVertexEnergyRatio", "j2_CTagVertexJetDeltaR", "j2_CTagVertexLeptonCategory", "j2_CTagVertexMass", "j2_CTagVertexNTracks", "j2_ChargedHadronMultiplicity", "j2_CombinedSvtx", "j2_CvsB", "j2_CvsL", "j2_DeepCSVb", "j2_DeepCSVbb", "j2_DeepCSVc", "j2_DeepCSVcc", "j2_DeepCSVl", "j2_ElectronEnergyFraction", "j2_ElectronMultiplicity", "j2_JetBprob", "j2_JetProba", "j2_MuonMultiplicity", "j2_NeutralHadronMultiplicity", "j2_PhotonEnergyFraction", "j2_PhotonMultiplicity", "j2_QGL", "j2_QGL_lab", "j2_SoftE", "j2_SoftM", "j2_Svtx", "j2_eta_lab", "j2_m", "j2_m_lab", "j2_p", "j2_phi_lab", "j2_pt_lab", "j2_qgAxis1", "j2_qgAxis1_lab", "j2_qgAxis2", "j2_qgAxis2_lab", "j2_qgMult", "j2_qgMult_lab", "j2_qgPtD", "j2_qgPtD_lab", "j2_recoJetsCharge", "j2_recoJetsFlavor", "j2_recoJetsHFEMEnergyFraction", "j2_recoJetsHFHadronEnergyFraction", "j2_recoJetsJecScaleRawToFull", "j2_recoJetschargedEmEnergyFraction", "j2_recoJetschargedHadronEnergyFraction", "j2_recoJetsmuonEnergyFraction", "j2_recoJetsneutralEmEnergyFraction", "j2_recoJetsneutralEnergyFraction", "j3_CSV", "j3_CSVFlightDistance2dSig", "j3_CSVFlightDistance2dVal", "j3_CSVFlightDistance3dSig", "j3_CSVFlightDistance3dVal", "j3_CSVJetNSecondaryVertices", "j3_CSVTrackJetPt", "j3_CSVTrackSip2dSigAboveCharm", "j3_CSVTrackSip2dValAboveCharm", "j3_CSVTrackSip3dSigAboveCharm", "j3_CSVTrackSip3dValAboveCharm", "j3_CSVTrackSumJetDeltaR", "j3_CSVTrackSumJetEtRatio", "j3_CSVVertexCategory", "j3_CSVVertexEnergyRatio", "j3_CSVVertexJetDeltaR", "j3_CSVVertexMass", "j3_CSVVertexNTracks", "j3_CSV_lab", "j3_CTagFlightDistance2dSig", "j3_CTagFlightDistance3dSig", "j3_CTagJetNSecondaryVertices", "j3_CTagMassVertexEnergyFraction", "j3_CTagTrackSip2dSigAboveCharm", "j3_CTagTrackSip3dSigAboveCharm", "j3_CTagTrackSumJetDeltaR", "j3_CTagTrackSumJetEtRatio", "j3_CTagVertexBoostOverSqrtJetPt", "j3_CTagVertexCategory", "j3_CTagVertexEnergyRatio", "j3_CTagVertexJetDeltaR", "j3_CTagVertexLeptonCategory", "j3_CTagVertexMass", "j3_CTagVertexNTracks", "j3_ChargedHadronMultiplicity", "j3_CombinedSvtx", "j3_CvsB", "j3_CvsL", "j3_DeepCSVb", "j3_DeepCSVbb", "j3_DeepCSVc", "j3_DeepCSVcc", "j3_DeepCSVl", "j3_ElectronEnergyFraction", "j3_ElectronMultiplicity", "j3_JetBprob", "j3_JetProba", "j3_MuonMultiplicity", "j3_NeutralHadronMultiplicity", "j3_PhotonEnergyFraction", "j3_PhotonMultiplicity", "j3_QGL", "j3_QGL_lab", "j3_SoftE", "j3_SoftM", "j3_Svtx", "j3_eta_lab", "j3_m", "j3_m_lab", "j3_p", "j3_phi_lab", "j3_pt_lab", "j3_qgAxis1", "j3_qgAxis1_lab", "j3_qgAxis2", "j3_qgAxis2_lab", "j3_qgMult", "j3_qgMult_lab", "j3_qgPtD", "j3_qgPtD_lab", "j3_recoJetsCharge", "j3_recoJetsFlavor", "j3_recoJetsHFEMEnergyFraction", "j3_recoJetsHFHadronEnergyFraction", "j3_recoJetsJecScaleRawToFull", "j3_recoJetschargedEmEnergyFraction", "j3_recoJetschargedHadronEnergyFraction", "j3_recoJetsmuonEnergyFraction", "j3_recoJetsneutralEmEnergyFraction", "j3_recoJetsneutralEnergyFraction", "sd_n2", "genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet", "passnJets", "passMET", "passdPhis", "passBJets", "sampleWgt"} }
+    };
+
     //parse sample splitting and set up minituples
-    vector<pair<std::unique_ptr<MiniTupleMaker>, int>> mtmVec;
+    //vector<pair<std::unique_ptr<MiniTupleMaker>, int>> mtmVec;
+    vector<pair<std::unique_ptr<HDF5Writer>, int>> mtmVec;
     int sumRatio = 0;
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
     {
@@ -835,7 +868,8 @@ int main(int argc, char* argv[])
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
         else if(iter == 2) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
         else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
-        mtmVec.emplace_back(std::unique_ptr<MiniTupleMaker>(new MiniTupleMaker(ofname, "slimmedTuple")), splitNum);
+        //mtmVec.emplace_back(std::unique_ptr<MiniTupleMaker>(new MiniTupleMaker(ofname, "slimmedTuple")), splitNum);
+        mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 100000, ofname)), splitNum);
     }
 
     for(auto& fileVec : fileMap)
