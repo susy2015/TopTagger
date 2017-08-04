@@ -4,12 +4,12 @@ import tensorflow as tf
 class CreateModel:
     def weight_variable(self, shape, name):
         """weight_variable generates a weight variable of a given shape."""
-        initial = tf.truncated_normal(shape, stddev=0.02, name=name)
+        initial = tf.truncated_normal(shape, stddev=2.0/shape[0], name=name)
         return tf.Variable(initial)
     
     def bias_variable(self, shape, name):
         """bias_variable generates a bias variable of a given shape."""
-        initial = tf.truncated_normal(shape, stddev=0.001, name=name)#tf.constant(0.1, shape=shape, name=name)
+        initial = tf.constant(0.01, shape=shape, name=name)
         return tf.Variable(initial)
     
     def createRecurentLayers(self, inputs, nodes=0, layers=0, keep_prob=1.0, share=None):
