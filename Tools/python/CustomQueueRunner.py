@@ -55,7 +55,7 @@ class CustomQueueRunner(object):
       #loop until there are no more files to get from the queue
       for fileName in fIter:
         #read next file
-        data = dg.importData([fileName], ptReweight=self.ptReweight)
+        data = dg.importData(fileName, ptReweight=self.ptReweight)
         
         batch_idx = 0
         while batch_idx + self.batch_size <= data["data"].shape[0]:

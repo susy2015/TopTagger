@@ -161,7 +161,7 @@ if options.sklrf:
 elif options.xgboost:
     dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
+    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
 
 
 def getData(dataName):
@@ -182,20 +182,6 @@ def getData(dataName):
     
         f.close()
     
-    numData = dataAll._get_numeric_data()
-    for i in xrange(numData.shape[1]):
-        dataCol = numData.iloc[:,i]
-        dataCol[numpy.isnan(dataCol)] = 0.0
-        dataCol[numpy.isinf(dataCol)] = 0.0
-        #dataCol = dataCol[dataCol < 0]
-        #check that this column both has negative values, and that they are all the same 
-        if len(dataCol[dataCol < 0]) > 0:
-            ptp = dataCol[dataCol < 0].ptp()
-            if ptp == 0.0:
-                dataCol[dataCol < 0] = 0.0
-            elif ptp/(dataCol.ptp() - ptp) > 2.5:
-                dataCol[dataCol < -(dataCol.ptp()-ptp)*2.5] = 0.0
-
     return dataAll, dataGen
             
 dataTTbarAll, dataTTbarGen = getData(dataTTbarName)
@@ -217,7 +203,7 @@ if options.sklrf:
 elif options.xgboost:
     dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
 else:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
 
 dataTTbarAllTrain, _ = getData(dataTTbarNameTrain)
 
@@ -360,7 +346,7 @@ if options.sklrf:
 elif options.xgboost:
     dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 else:
-    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
+    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5"
 
 dataZnunuAll, _ = getData(dataZnunuName)
 
