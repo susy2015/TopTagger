@@ -69,7 +69,7 @@ def mainTF(options):
   print "Input Variables: ",len(dg.getList())
 
   # Import data
-  validData = dg.importData(samplesToRun = options.runOp.validationSamples)
+  validData = dg.importData(samplesToRun = options.runOp.validationSamples, ptReweight=options.runOp.ptReweight)
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]
