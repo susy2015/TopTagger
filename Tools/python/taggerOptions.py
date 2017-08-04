@@ -226,7 +226,7 @@ class runOptions:
          print "Object passed to runOptions.getParser is not an OptionParser object"
          parser = OptionsParser()
 
-      parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store',               help="Reweight pt spectrum of events durring training")
+      parser.add_option ('-p', "--ptReweight",        dest="ptReweight",        action='store',      type="int",   help="Reweight pt spectrum of events durring training")
       parser.add_option ('-d', "--directory",         dest='directory',         action='store',                    help="Directory to store outputs (default .)")
       parser.add_option ('-e', "--nepoch",            dest='nepoch',            action='store',      type="int",   help="Number of training epoch (default 50)")
       parser.add_option ('-n', "--nReaders",          dest="nReaders",          action='store',      type="int",   help="Number of file readers to use (default 4)")
@@ -244,7 +244,7 @@ class runOptions:
       orList = []
 
       if cloptions.ptReweight != None: 
-         self.ptReweight = cloptions.ptReWeight
+         self.ptReweight = cloptions.ptReweight
          orList.append("ptReweight = "+str(cloptions.ptReweight))
 
       if cloptions.directory != None: 
