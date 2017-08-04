@@ -2,6 +2,7 @@ from optparse import OptionParser
 import json
 import os
 import fnmatch
+from glob import glob
 
 def getJetVarNames(jetVariables):
    return [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
@@ -157,7 +158,7 @@ class runOptions:
                       l2Reg             = 0.001,
                       dataPath          = "data",
                       trainingNames     = [],
-                      validationNames   = ["trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"],
+                      validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_100_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
                       keepProb          = 0.6):
 
@@ -174,7 +175,7 @@ class runOptions:
 
       if self.dataPath[-1] != "/": self.dataPath += "/"
 
-      self.trainingGlob      = "trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"
+      self.trainingGlob      = ["trainingTuple_TTbarSingleLepT_*_division_0_TTbarSingleLepT_training_[0123].h5", "trainingTuple_TTbarSingleLepTbar_*_division_0_TTbarSingleLepTbar_training_[0123].h5"]
       
       if(len(trainingNames) > 0):
          self.trainingNames = trainingNames
@@ -184,7 +185,6 @@ class runOptions:
          except OSError:
             self.trainingNames = []
          
-
       self.validationNames       = validationNames
 
       self.makeTrainingSamples()
@@ -204,18 +204,10 @@ class runOptions:
 
    #This method uses the dataPath and the list of trainingNames to make a list of training files
    def makeTrainingSamples(self):
-      
-      if(len(self.trainingNames) < 1):
-         try:
-            self.trainingNames = [f for f in os.listdir(self.dataPath) if fnmatch.fnmatch(f,self.trainingGlob)]
-         except OSError:
-            self.trainingNames = []
-         
-      self.trainingSamples = []
-      for name in self.trainingNames:
-         self.trainingSamples.append(self.dataPath+name)
+      #Some temporary hacks, lets make these options      
+      fileLists = [glob(self.dataPath + fileGlob)[:100] for fileGlob in self.trainingGlob]
 
-      return
+      self.trainingSamples = zip(*fileLists)
 
    #This method uses the dataPath and the list of validationNames to make a list of validation files
    def makeValidationSamples(self):

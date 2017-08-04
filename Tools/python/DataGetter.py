@@ -63,7 +63,7 @@ class DataGetter:
     
         #remove partial tops 
         inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-        inputAnswer = (inputLabels[:,0] == 3) & (inputLabels[:,1] == 1)
+        inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
         inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
         filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
         data = data[filterArray]
@@ -94,7 +94,7 @@ class DataGetter:
       #parse pandas dataframe into training data
       npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
       npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-      npyInputAnswer = (npyInputLabels[:,0] == 3) & (npyInputLabels[:,1] == 1)
+      npyInputAnswer = (npyInputLabels[:,0] > 2.99) & (npyInputLabels[:,1] > 0.99)
       npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
       npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
     
@@ -121,9 +121,10 @@ class DataGetter:
         npyInputSampleWgts = self.prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescaleRatio)
     
       #equalize bg and signal weights 
-      nsig = npyInputWgts[npyInputAnswers[:,0] == 1].sum()
-      nbg  = npyInputWgts[npyInputAnswers[:,0] != 1].sum()
-      npyInputWgts[npyInputAnswers[:,0] != 1] *= nsig / nbg
+      nsig = npyInputWgts[npyInputAnswers[:,0] > 0.99].sum()
+      nbg  = npyInputWgts[npyInputAnswers[:,0] < 0.99].sum()
+      print nsig, nbg
+      npyInputWgts[npyInputAnswers[:,0] < 0.99] *= nsig / nbg
     
       #normalize training weights
       npyInputWgts /= npyInputWgts.mean()
