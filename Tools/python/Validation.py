@@ -161,7 +161,7 @@ if options.sklrf:
 elif options.xgboost:
     dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
+    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
 
 
 def getData(dataName):
@@ -217,7 +217,7 @@ if options.sklrf:
 elif options.xgboost:
     dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
 else:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
+    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
 
 dataTTbarAllTrain, _ = getData(dataTTbarNameTrain)
 
@@ -360,7 +360,7 @@ if options.sklrf:
 elif options.xgboost:
     dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
 else:
-    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
+    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5"
 
 dataZnunuAll, _ = getData(dataZnunuName)
 
