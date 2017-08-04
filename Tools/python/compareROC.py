@@ -29,11 +29,11 @@ for dir in get_directories(options.dir):
    FPR = pickle.load(file)
    FPRZ = pickle.load(file)
 
-   ttbarScore = int.integrate(list(zip(FPR,TPR)))
-   znunuScore = int.integrate(list(zip(FPRZ,TPR)))
+   ttbarScore = int.intWindow(list(zip(FPR,TPR)))
+   znunuScore = int.intWindow(list(zip(FPRZ,TPR)))
 
    scores[dir] = (ttbarScore,znunuScore)
-
+ 
 ttbarList, znunuList =  zip(*list(scores.values()))
 
 numTTbar = np.array(list(filter(lambda a: a != 0.,ttbarList)))
