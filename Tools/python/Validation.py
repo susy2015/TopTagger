@@ -182,20 +182,6 @@ def getData(dataName):
     
         f.close()
     
-    numData = dataAll._get_numeric_data()
-    for i in xrange(numData.shape[1]):
-        dataCol = numData.iloc[:,i]
-        dataCol[numpy.isnan(dataCol)] = 0.0
-        dataCol[numpy.isinf(dataCol)] = 0.0
-        #dataCol = dataCol[dataCol < 0]
-        #check that this column both has negative values, and that they are all the same 
-        if len(dataCol[dataCol < 0]) > 0:
-            ptp = dataCol[dataCol < 0].ptp()
-            if ptp == 0.0:
-                dataCol[dataCol < 0] = 0.0
-            elif ptp/(dataCol.ptp() - ptp) > 2.5:
-                dataCol[dataCol < -(dataCol.ptp()-ptp)*2.5] = 0.0
-
     return dataAll, dataGen
             
 dataTTbarAll, dataTTbarGen = getData(dataTTbarName)

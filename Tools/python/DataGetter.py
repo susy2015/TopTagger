@@ -43,7 +43,7 @@ class DataGetter:
     def prescaleBackground(self, input, answer, prescale):
       return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
     
-    def importData(self, samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, reluInputs=True, ptReweight=True, randomize = True):
+    def importData(self, samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, ptReweight=True, randomize = True):
       #variables to train
       vars = self.getList()
       
@@ -97,20 +97,7 @@ class DataGetter:
       npyInputAnswer = (npyInputLabels[:,0] > 2.99) & (npyInputLabels[:,1] > 0.99)
       npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
       npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
-    
-      if reluInputs:
-        #ensure data is all greater than one if approperiate
-        for i in xrange(npyInputData.shape[1]):
-          dataColA = npyInputData[:,i]
-          dataCol = dataColA[dataColA < 0]
-          #check that this column both has negative values, and that they are all the same 
-          if len(dataCol[dataCol < 0]) > 0:
-            ptp = dataCol[dataCol < 0].ptp()
-            if ptp == 0.0:
-              dataColA[dataColA < 0] = 0.0
-            elif ptp/(dataColA.ptp() - ptp) > 2.5:
-              dataColA[dataColA < -(dataColA.ptp()-ptp)*2.5] = 0.0
-    
+        
       if prescale:
         #Remove background events so that bg and signal are roughly equally represented
         prescaleRatio = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
