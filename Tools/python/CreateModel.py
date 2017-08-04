@@ -182,8 +182,8 @@ class CreateModel:
           self.l2_norm += tf.nn.l2_loss(w)
         self.loss = self.cross_entropy + self.l2_norm*self.reg
         self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
-        #train_step = tf.train.GradientDescentOptimizer(1.0).minimize(cross_entropy)
-        self.train_step = tf.train.AdamOptimizer(1e-3).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+
+        self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
 
 
     def createSummaries(self):
@@ -195,11 +195,12 @@ class CreateModel:
         summary_l2n = tf.summary.scalar("l2_norm", self.l2_norm)
         summary_loss = tf.summary.scalar("loss", self.loss)
         summary_queueSize = tf.summary.scalar("queue_size", self.inputDataQueue.size())
+        summary_vce = tf.summary.scalar("valid_cross_entropy", self.cross_entropy_ph)
         summary_vloss = tf.summary.scalar("valid_loss", self.loss_ph)
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy)
         # create image of colvolutional filters 
-        valid_summaries = [summary_accuracy, summary_vloss]
+        valid_summaries = [summary_accuracy, summary_vloss, summary_vce]
         try:
             for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
