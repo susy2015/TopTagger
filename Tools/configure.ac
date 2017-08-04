@@ -57,6 +57,19 @@ AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV 
 
 AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
+dnl check for openCV
+if test -z ${HDF5DIR+x}; then
+   HDF5DIR=/usr/local/HDF_Group/HDF5/1.8.19
+fi
+
+HDF5INCDIR=src
+AC_CHECK_FILE($HDF5DIR/$HDF5INCDIR/hdf5.h, [], [AC_ERROR([HDF5 includes are required. Specify location with ./configure HDF5DIR=/Path])])
+
+AC_CHECK_FILE($HDF5DIR/lib/libhdf5.${LIBSUFFIX}, [], [AC_ERROR([HDF5 libraries are required. Specify location with ./configure HDF5DIR=/Path])])
+
+AC_SUBST(HDF5DIR, $HDF5DIR)
+AC_SUBST(HDF5INCDIR, $HDF5INCDIR)
+
 dnl check for top tagger code
 if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../"
