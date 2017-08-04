@@ -100,24 +100,20 @@ def StandardVariables(variables):
                 "recoJetsneutralEnergyFraction",]
    elif variables == "TeamAlpha1DConvLess":
       vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
-      jNames = ["ChargedHadronMultiplicity",
-                "CombinedSvtx",
-                "ElectronEnergyFraction",
-                "ElectronMultiplicity",
-                "MuonMultiplicity",
-                "NeutralHadronMultiplicity",
-                "PhotonEnergyFraction",
-                "PhotonMultiplicity",
-                "SoftE",
-                "SoftM",
-                "Svtx",
-                "m",
+      jNames = ["m",
                 "p",
                 "qgAxis1",
                 "qgAxis2",
                 "qgMult",
                 "qgPtD",
                 "recoJetsCharge",
+                "ChargedHadronMultiplicity",
+                "ElectronEnergyFraction",
+                "ElectronMultiplicity",
+                "MuonMultiplicity",
+                "NeutralHadronMultiplicity",
+                "PhotonEnergyFraction",
+                "PhotonMultiplicity",
                 "recoJetsHFEMEnergyFraction",
                 "recoJetsHFHadronEnergyFraction",
                 "recoJetsJecScaleRawToFull",
@@ -155,12 +151,12 @@ class runOptions:
                       minibatchSize     = 512,
                       reportInterval    = 500,
                       nValidationEvents = 100000,
-                      l2Reg             = 0.001,
+                      l2Reg             = 0.002,
                       dataPath          = "data",
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_100_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.6):
+                      keepProb          = 0.5):
 
       self.runName           = runName
       self.directory         = directory
