@@ -116,7 +116,6 @@ def StandardVariables(variables):
                 "PhotonMultiplicity",
                 "recoJetsHFEMEnergyFraction",
                 "recoJetsHFHadronEnergyFraction",
-                "recoJetsJecScaleRawToFull",
                 "recoJetschargedEmEnergyFraction",
                 "recoJetschargedHadronEnergyFraction",
                 "recoJetsmuonEnergyFraction",
