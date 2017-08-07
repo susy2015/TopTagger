@@ -161,7 +161,7 @@ if options.sklrf:
 elif options.xgboost:
     dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
 else:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
+    dataTTbarName = "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
 
 
 def getData(dataName):
@@ -169,7 +169,7 @@ def getData(dataName):
         dataAll = pd.read_pickle(dataName)
     elif ".h5" in dataName:
         import h5py
-        f = h5py.File(dataName, "r")
+        f = h5py.File(trainingOptions.runOp.dataPath + dataName, "r")
         npData = f["reco_candidates"][:]
         columnHeaders = f["reco_candidates"].attrs["column_headers"]
         indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
@@ -183,8 +183,43 @@ def getData(dataName):
         f.close()
     
     return dataAll, dataGen
-            
-dataTTbarAll, dataTTbarGen = getData(dataTTbarName)
+
+def getDataTTbar(tSample, tbarSample):
+    dataTTbarTAll,    dataTTbarTGen    = getData(tSample)
+    dataTTbarTbarAll, dataTTbarTbarGen = getData(tbarSample)
+
+    NTEVENTS = 60995379.0
+    NTBAREVENTS = 60125087.0
+    dataTTbarTAll.sampleWgt *= NTEVENTS/dataTTbarTAll.shape[0]
+    dataTTbarTbarAll.sampleWgt *= NTBAREVENTS/dataTTbarTbarAll.shape[0]
+    dataTTbarTGen.sampleWgt *= NTEVENTS/dataTTbarTGen.shape[0]
+    dataTTbarTbarGen.sampleWgt *= NTBAREVENTS/dataTTbarTbarGen.shape[0]
+
+    dataTTbarAll = pd.concat([dataTTbarTAll, dataTTbarTbarAll])
+    dataTTbarGen = pd.concat([dataTTbarTGen, dataTTbarTbarGen])
+
+    return dataTTbarAll, dataTTbarGen
+
+def getDataZnunu(sampleInfo):
+    data = []
+    dataGen = []
+
+    for key in sampleInfo:
+        dataAll,    dataGenAll    = getData(key)
+
+        NEVENTS = sampleInfo[key]
+        dataAll.sampleWgt *= NEVENTS/dataAll.shape[0]
+        dataGenAll.sampleWgt *= NEVENTS/dataGenAll.shape[0]
+        
+        data.append(dataAll)
+        dataGen.append(dataGenAll)
+
+    dataAll = pd.concat(data)
+    dataGen = pd.concat(dataGen)
+
+    return dataAll, dataGen
+
+dataTTbarAll, dataTTbarGen = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_2_TTbarSingleLepTbar_test_0.h5")
 
 #dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k_gen.pkl.gz")
 #dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
@@ -205,7 +240,7 @@ elif options.xgboost:
 else:
     dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
 
-dataTTbarAllTrain, _ = getData(dataTTbarNameTrain)
+dataTTbarAllTrain, _ = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_0_TTbarSingleLepTbar_training_0.h5")
 
 #Apply baseline cuts
 dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
@@ -348,7 +383,14 @@ elif options.xgboost:
 else:
     dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5"
 
-dataZnunuAll, _ = getData(dataZnunuName)
+dataZnunuAll, _ = getDataZnunu({"trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5": 24006616.0,
+                                "trainingTuple_ZJetsToNuNu_HT_200to400_0_division_2_ZJetsToNuNu_HT_200to400_test_0.h5": 24450102.0,
+                                "trainingTuple_ZJetsToNuNu_HT_400to600_0_division_2_ZJetsToNuNu_HT_400to600_test_0.h5": 9627133.0,
+                                "trainingTuple_ZJetsToNuNu_HT_600to800_0_division_2_ZJetsToNuNu_HT_600to800_test_0.h5": 5671792.0,
+                                "trainingTuple_ZJetsToNuNu_HT_800to1200_0_division_2_ZJetsToNuNu_HT_800to1200_test_0.h5": 2170137.0,
+                                "trainingTuple_ZJetsToNuNu_HT_1200to2500_0_division_2_ZJetsToNuNu_HT_1200to2500_test_0.h5": 513471.0,
+                                "trainingTuple_ZJetsToNuNu_HT_2500toInf_0_division_2_ZJetsToNuNu_HT_2500toInf_test_0.h5": 405030.0
+                            })
 
 dataZnunuAll = dataZnunuAll[dataZnunuAll.Njet >= 4]
 dataZnunu = dataZnunuAll[dataZnunuAll.ncand > 0]
