@@ -43,7 +43,7 @@ class DataGetter:
     def prescaleBackground(self, input, answer, prescale):
       return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
     
-    def importData(self, samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, ptReweight=True, randomize = True):
+    def importData(self, options, samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, ptReweight=True, randomize = True):
       #variables to train
       vars = self.getList()
       
@@ -61,13 +61,15 @@ class DataGetter:
         data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
         f.close()
     
-        #remove partial tops 
-        inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-        inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
-        inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
-        filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
-        data = data[filterArray]
-        inputAnswer = inputAnswer[filterArray]
+        #remove partial tops
+        if options.runOp.removePartial: 
+          inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+          inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
+          inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
+          filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
+          data = data[filterArray]
+          inputAnswer = inputAnswer[filterArray]
+
         inputWgts = numpy.copy(data.as_matrix(["sampleWgt"]).astype(numpy.float32))
         
         if ptReweight:
