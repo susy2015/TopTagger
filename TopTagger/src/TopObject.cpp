@@ -18,10 +18,15 @@ void TopObject::updateVariables()
 
     // calculate other variables 
     dRmax_ = 0.0;
+    dThetaMin_ = 9999.0;
+    dThetaMax_ = 0.0;
     for(const auto& jet : constituents_) 
     {
         double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, jet->p());
+        double deltaTheta = p_.Angle(jet->p().Vect());
         dRmax_ = std::max(dRmax_, deltaR);
+        dThetaMin_ = std::min(dThetaMin_, deltaTheta);
+        dThetaMax_ = std::max(dThetaMax_, deltaTheta);
 
         //If there is gen information in the constituent
         //add it to the top gen match map
