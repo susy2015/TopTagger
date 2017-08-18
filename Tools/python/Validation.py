@@ -287,6 +287,17 @@ plt.ylabel("Normalized events")
 plt.savefig(outputDirectory + "discriminator_validVsTrain.png")
 plt.close()
 
+plt.clf()
+plt.hist(dataTTbarAns[dataTTbar.cand_pt > 200][genMatches[dataTTbar.cand_pt > 200] == 1], weights=dataTTbar[dataTTbar.cand_pt > 200]["sampleWgt"][genMatches[dataTTbar.cand_pt > 200] == 1], bins=50, normed=True, label="Gen Matched Validation",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[dataTTbar.cand_pt > 200][genMatches[dataTTbar.cand_pt > 200] != 1], weights=dataTTbar[dataTTbar.cand_pt > 200]["sampleWgt"][genMatches[dataTTbar.cand_pt > 200] != 1], bins=50, normed=True, label="Not gen matched Validation", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[dataTTbarTrain.cand_pt > 200][genMatchesTrain[dataTTbarTrain.cand_pt > 200] == 1], weights=dataTTbarTrain[dataTTbarTrain.cand_pt > 200]["sampleWgt"][genMatchesTrain[dataTTbarTrain.cand_pt > 200] == 1], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="red")
+plt.hist(dataTTbarAnsTrain[dataTTbarTrain.cand_pt > 200][genMatchesTrain[dataTTbarTrain.cand_pt > 200] != 1], weights=dataTTbarTrain[dataTTbarTrain.cand_pt > 200]["sampleWgt"][genMatchesTrain[dataTTbarTrain.cand_pt > 200] != 1], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", linewidth=2, edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_validVsTrain_highpt.png")
+plt.close()
+
 #plot efficiency
 
 effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 700, 10), [800, 1000]])
