@@ -86,6 +86,7 @@ def mainTF(options):
   #scale data inputs to mean 0, stddev 1
   mins = validData["data"].mean(0)
   ptps = validData["data"].std(0)
+  ptps[ptps < 1e-10] = 1.0
   #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
