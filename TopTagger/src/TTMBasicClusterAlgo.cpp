@@ -20,11 +20,14 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     dRMaxDiJet_       = cfgDoc->get("dRMaxDijet",       localCxt, -999.9);
 
     //trijet parameters
-    minTopCandMass_   = cfgDoc->get("minTopCandMass",   localCxt, -999.9);
-    maxTopCandMass_   = cfgDoc->get("maxTopCandMass",   localCxt, -999.9);
-    doTrijet_         = cfgDoc->get("doTrijet",         localCxt,  false);
-    dRMaxTrijet_      = cfgDoc->get("dRMaxTrijet",      localCxt, -999.9);
-    nbSeed_           = cfgDoc->get("nbSeed",           localCxt, -1);
+    minTopCandMass_     = cfgDoc->get("minTopCandMass",    localCxt, -999.9);
+    maxTopCandMass_     = cfgDoc->get("maxTopCandMass",    localCxt, -999.9);
+    doTrijet_           = cfgDoc->get("doTrijet",          localCxt,  false);
+    dRMaxTrijet_        = cfgDoc->get("dRMaxTrijet",       localCxt, -999.9);
+    nbSeed_             = cfgDoc->get("nbSeed",            localCxt, -1);
+    minTrijetAK4JetPt_  = cfgDoc->get("minTrijetAK4JetPt", localCxt, -999.0);
+    midTrijetAK4JetPt_  = cfgDoc->get("midTrijetAK4JetPt", localCxt, -999.0);
+    maxTrijetAK4JetPt_  = cfgDoc->get("maxTrijetAK4JetPt", localCxt, -999.0);
 
     //get vars for TTMConstituentReqs
     TTMConstituentReqs::getParameters(cfgDoc, localContextName);
@@ -40,7 +43,7 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
     {
         for(const auto& constituent : constituents)
         {
-            constituentsCSVSort.push_back(&constituent);
+            if(passAK4ResolvedReqs(constituent, minTrijetAK4JetPt_)) constituentsCSVSort.push_back(&constituent);
         }
         std::sort(constituentsCSVSort.begin(), constituentsCSVSort.end(), [](const Constituent* c1, const Constituent* c2) { return c1->getBTagDisc() > c2->getBTagDisc(); } );
     }
@@ -89,33 +92,32 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
         //Trijet combinations 
         if(doTrijet_)
         {
-            if(passAK4ResolvedReqs(constituents[i]))
+            if(passAK4ResolvedReqs(constituents[i], minTrijetAK4JetPt_))
             {
                 for(unsigned int j = 0; j < i; ++j)
                 {
-                    if(passAK4ResolvedReqs(constituents[j]))
+                    if(passAK4ResolvedReqs(constituents[j], midTrijetAK4JetPt_))
                     {
-                        if(nbSeed_ <= 0)
+                        for(unsigned int k = 0; k < j; ++k)
                         {
-                            for(unsigned int k = 0; k < j; ++k)
+                            if(passAK4ResolvedReqs(constituents[k], maxTrijetAK4JetPt_))
                             {
-                                if(passAK4ResolvedReqs(constituents[k]))
+                                if(nbSeed_ > 0)
                                 {
-                                    fillTriplet(&constituents[k], &constituents[j], &constituents[i], topCandidates);
+                                    //Require that each combination contain at least one of the nbSeed_ highest csv jets 
+                                    bool reject = true;
+                                    for(int l = 0; l < std::min(nbSeed_, static_cast<int>(constituentsCSVSort.size())); ++l)
+                                    {
+                                        if(&constituents[k] == constituentsCSVSort[l] || &constituents[j] == constituentsCSVSort[l] || &constituents[i] == constituentsCSVSort[l])
+                                        {
+                                            reject = false;
+                                            break;
+                                        }
+                                    }
+                                    if(reject) continue;
                                 }
-                            }
-                        }
-                        else
-                        {
-                            for(int k = 0; k < std::min(nbSeed_, static_cast<int>(constituentsCSVSort.size())); ++k)
-                            {
-                                if(constituentsCSVSort[k] == &constituents[i] || constituentsCSVSort[k] == &constituents[j]) continue;
 
-                                if(passAK4ResolvedReqs(*constituentsCSVSort[k]))
-                                {
-                                    fillTriplet(constituentsCSVSort[k], &constituents[j], &constituents[i], topCandidates);
-                                }
-                                
+                                fillTriplet(&constituents[k], &constituents[j], &constituents[i], topCandidates);
                             }
                         }
                     }
