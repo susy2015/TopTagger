@@ -154,7 +154,10 @@ varsname = dg.getList()
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_jpt20_nocone.pkl.gz")
 #dataTTbarAll = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k.pkl.gz")
 
-if options.dataFilePath != None: trainingOptions.runOp.dataPath = options.dataFilePath
+if options.dataFilePath != None: 
+    if options.dataFilePath[-1] != "/": # check for /
+        options.dataFilePath += "/"
+    trainingOptions.runOp.dataPath = options.dataFilePath
 
 if options.sklrf:
     dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
