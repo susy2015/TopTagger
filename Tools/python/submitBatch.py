@@ -58,9 +58,11 @@ def submitJob(options,  workdir, jobName):
    pythonDir = (os.path.dirname(os.path.abspath(__file__)))
 
    f.write("cd "+options.runOp.directory+"\n")
-   f.write("source /home/hatake/tensorflow/setup.sh\n")
-   f.write("python "+os.path.join(pythonDir,"Training.py")+" -c "+jobName+".json\n")
-   f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+"\n")
+   f.write("export CUDA_DEVICE_ORDER=PCI_BUS_ID\n")
+   f.write("export CUDA_VISIBLE_DEVICES=0\n")
+   f.write("source /home/hatake/tensorflow/setup.sh > log.log\n")
+   f.write("python "+os.path.join(pythonDir,"Training.py")+" -c "+jobName+".json >> log.log\n")
+   f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+" >> log.log\n")
 
    f.close()
 
