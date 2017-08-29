@@ -12,7 +12,6 @@
 #include <cstring>
 #include <memory>
 #include <vector>
-#include <iostream>
 
 void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
