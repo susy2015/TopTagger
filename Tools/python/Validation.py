@@ -211,8 +211,8 @@ def getDataZnunu(sampleInfo):
         dataAll,    dataGenAll    = getData(key)
 
         NEVENTS = sampleInfo[key]
-        dataAll.sampleWgt *= NEVENTS/dataAll.shape[0]
-        dataGenAll.sampleWgt *= NEVENTS/dataGenAll.shape[0]
+        dataAll.sampleWgt *= NEVENTS/dataAll.index.levels[0][-1]
+        dataGenAll.sampleWgt *= NEVENTS/dataGenAll.index.levels[0][-1]
         
         data.append(dataAll)
         dataGen.append(dataGenAll)
@@ -243,13 +243,17 @@ elif options.xgboost:
 else:
     dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
 
-dataTTbarAllTrain, _ = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_0_TTbarSingleLepTbar_training_0.h5")
+dataTTbarAllTrain, dataTTbarGenTrain = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_0_TTbarSingleLepTbar_training_0.h5")
 
 #Apply baseline cuts
 dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
 dataTTbarTrain = dataTTbarAllTrain[dataTTbarAllTrain.ncand > 0]
 
+dataTTbarGenTrain = dataTTbarGenTrain[dataTTbarGenTrain.Njet >= 4]
+
 print "CALCULATING TTBAR DISCRIMINATORS"
+
+discNum = 4
 
 if options.sklrf:
     dataTTbarAns = clf1.predict_proba(dataTTbar.as_matrix(varsname))[:,1]
@@ -259,6 +263,30 @@ elif options.xgboost:
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
     dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})[:,0]
+
+    discCutTTbar = 0.75 + (dataTTbar.cand_pt * 0.22/300.0)
+    discCutTTbar[discCutTTbar > 0.97] = 0.97
+
+    discCutTTbarTrain = 0.75 + (dataTTbarTrain.cand_pt * 0.22/300.0)
+    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+
+    #topPt1 = dataTTbar.cand_pt < 100
+    #topPt2 = (100 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 200)
+    #topPt3 = (200 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 300)
+    #topPt4 = (300 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 400)
+    #topPt5 = (400 <= dataTTbar.cand_pt)
+    #indicies = topPt2*1 + topPt3*2 + topPt4*3 + topPt5*4
+    #dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})
+    #dataTTbarAns = dataTTbarAns[numpy.arange(indicies.shape[0]),indicies]
+    #
+    #topPt1 = dataTTbarTrain.cand_pt < 100
+    #topPt2 = (100 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 200)
+    #topPt3 = (200 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 300)
+    #topPt4 = (300 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 400)
+    #topPt5 = (400 <= dataTTbarTrain.cand_pt)
+    #indicies = topPt2*1 + topPt3*2 + topPt4*3 + topPt5*4
+    #dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})
+    #dataTTbarAnsTrain = dataTTbarAnsTrain[numpy.arange(indicies.shape[0]),indicies]
 
 print "CREATING HISTOGRAMS"
 
@@ -277,6 +305,71 @@ plt.legend(loc='upper right')
 plt.xlabel("Discriminator")
 plt.ylabel("Normalized events")
 plt.savefig(outputDirectory + "discriminator.png")
+plt.close()
+
+plt.clf()
+filterVec = dataTTbar.cand_pt < 100
+filterVecTrain = dataTTbarTrain.cand_pt < 100
+plt.hist(dataTTbarAns[filterVec & (genMatches == 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches == 1)], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[filterVec & (genMatches != 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches != 1)], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain == 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain == 1)], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", edgecolor="red")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain != 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain != 1)], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_0_100.png")
+plt.close()
+
+plt.clf()
+filterVec = (100 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 200)
+filterVecTrain = (100 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 200)
+plt.hist(dataTTbarAns[filterVec & (genMatches == 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches == 1)], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[filterVec & (genMatches != 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches != 1)], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain == 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain == 1)], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", edgecolor="red")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain != 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain != 1)], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_100_200.png")
+plt.close()
+
+plt.clf()
+filterVec = (200 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 300)
+filterVecTrain = (200 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 300)
+plt.hist(dataTTbarAns[filterVec & (genMatches == 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches == 1)], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[filterVec & (genMatches != 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches != 1)], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain == 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain == 1)], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", edgecolor="red")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain != 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain != 1)], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_200_300.png")
+plt.close()
+
+plt.clf()
+filterVec = (300 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 400)
+filterVecTrain = (300 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 400)
+plt.hist(dataTTbarAns[filterVec & (genMatches == 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches == 1)], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[filterVec & (genMatches != 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches != 1)], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain == 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain == 1)], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", edgecolor="red")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain != 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain != 1)], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_300_400.png")
+plt.close()
+
+plt.clf()
+filterVec = (400 <= dataTTbar.cand_pt)
+filterVecTrain = (400 <= dataTTbarTrain.cand_pt)
+plt.hist(dataTTbarAns[filterVec & (genMatches == 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches == 1)], bins=50, normed=True, label="Gen Matched",     fill=False, histtype='step', edgecolor="red")
+plt.hist(dataTTbarAns[filterVec & (genMatches != 1)], weights=dataTTbar["sampleWgt"][filterVec & (genMatches != 1)], bins=50, normed=True, label="Not gen matched", fill=False, histtype='step', edgecolor="blue")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain == 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain == 1)], bins=50, normed=True, label="Gen Matched Train",     fill=False, histtype='step', linestyle="dotted", edgecolor="red")
+plt.hist(dataTTbarAnsTrain[filterVecTrain & (genMatchesTrain != 1)], weights=dataTTbarTrain["sampleWgt"][filterVecTrain & (genMatchesTrain != 1)], bins=50, normed=True, label="Not gen matched Train", fill=False, histtype='step', linestyle="dotted", edgecolor="blue")
+plt.legend(loc='upper right')
+plt.xlabel("Discriminator")
+plt.ylabel("Normalized events")
+plt.savefig(outputDirectory + "discriminator_400_Inf.png")
 plt.close()
 
 plt.clf()
@@ -303,40 +396,46 @@ plt.close()
 
 #plot efficiency
 
-effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 700, 10), [800, 1000]])
-ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["sampleWgt"])
-ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
-
-effPt = ptNum/ptDen
-
-plt.clf()
-plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt, fill=False, histtype='step')
-#plt.legend(loc='upper right')
-plt.xlabel("Candidate Pt [GeV]")
-plt.ylabel("Efficiency")
-plt.savefig(outputDirectory + "efficiency.png")
-plt.close()
-
 effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
-ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCut]["sampleWgt"])
+ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["sampleWgt"])
 ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
 
 effPt = ptNum/ptDen
 
+ptNumTrain, _ = numpy.histogram(dataTTbarTrain[genMatchesTrain == 1][dataTTbarAnsTrain[genMatchesTrain == 1] > discCutTTbarTrain[genMatchesTrain == 1]]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbarTrain[genMatchesTrain == 1][dataTTbarAnsTrain[genMatchesTrain == 1] > discCutTTbarTrain[genMatchesTrain == 1]]["sampleWgt"])
+ptDenTrain, _ = numpy.histogram(dataTTbarGenTrain["genTopPt"], bins=effPtBins, weights=dataTTbarGenTrain["sampleWgt"])
+
+effPtTrain = ptNumTrain/ptDenTrain
+
 plt.clf()
-plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt, fill=False, histtype='step')
+plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt,     fill=False,  histtype='step', label="Test")
+plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPtTrain, fill=False, histtype='step', label="Teaining", linestyle="dotted")
 #plt.legend(loc='upper right')
 plt.xlabel("Candidate Pt [GeV]")
 plt.ylabel("Efficiency")
 plt.savefig(outputDirectory + "efficiency.png")
 plt.close()
+
+#effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
+#ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["sampleWgt"])
+#ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
+#
+#effPt = ptNum/ptDen
+#
+#plt.clf()
+#plt.hist(effPtBins[:-1], bins=effPtBins, weights=effPt, fill=False, histtype='step')
+##plt.legend(loc='upper right')
+#plt.xlabel("Candidate Pt [GeV]")
+#plt.ylabel("Efficiency")
+#plt.savefig(outputDirectory + "efficiency.png")
+#plt.close()
 
 #input variable histograms
 
 genTopData = dataTTbar[genMatches == 1]
 genBGData = dataTTbar[genMatches != 1]
-recoTopData = dataTTbar[dataTTbarAns > discCut]
-recoBGData = dataTTbar[dataTTbarAns < discCut]
+recoTopData = dataTTbar[dataTTbarAns > discCutTTbar]
+recoBGData = dataTTbar[dataTTbarAns < discCutTTbar]
 minTTbar = dataTTbar.min()
 maxTTbar = dataTTbar.max()
 
@@ -361,8 +460,8 @@ for var in varsname:
 plt.clf()
 
 ptBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
-purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCut][genMatches[dataTTbarAns > discCut] == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCut][genMatches[dataTTbarAns > discCut] == 1])
-purityDen,_  = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCut],                  bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCut])
+purityNum, _ = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCutTTbar][genMatches[dataTTbarAns > discCutTTbar] == 1], bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCutTTbar][genMatches[dataTTbarAns > discCutTTbar] == 1])
+purityDen,_  = numpy.histogram(dataTTbar["cand_pt"][dataTTbarAns > discCutTTbar],                  bins=ptBins, weights=dataTTbar["sampleWgt"][dataTTbarAns > discCutTTbar])
 
 purity = purityNum/purityDen
 
@@ -419,12 +518,17 @@ elif options.xgboost:
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
 
+    discCutZnunu = 0.75 + (dataZnunu.cand_pt * 0.22/300.0)
+    discCutZnunu[discCutZnunu > 0.97] = 0.97
+
+
+
 #calculate fake rate 
 
 plt.clf()
 
 metBins = numpy.linspace(0, 1000, 21)
-frMETNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["MET"].ix[:,0], bins=metBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frMETNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCutZnunu]["MET"].ix[:,0], bins=metBins, weights=dataZnunu[dataZnunuAns > discCutZnunu]["sampleWgt"].ix[:,0])
 frMETDen,_  = numpy.histogram(dataZnunuAll["MET"].ix[:,0],                      bins=metBins, weights=dataZnunuAll["sampleWgt"].ix[:,0])
 
 frMETNum[frMETDen < 1e-10] = 0.0
@@ -441,7 +545,7 @@ plt.close()
 plt.clf()
 
 njBins = numpy.linspace(0, 20, 21)
-frNjNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["Njet"].ix[:,0], bins=njBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frNjNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCutZnunu]["Njet"].ix[:,0], bins=njBins, weights=dataZnunu[dataZnunuAns > discCutZnunu]["sampleWgt"].ix[:,0])
 frNjDen,_  = numpy.histogram(dataZnunuAll["Njet"].ix[:,0],                      bins=njBins, weights=dataZnunuAll["sampleWgt"].ix[:,0])
 
 frNjNum[frNjDen < 1e-10] = 0.0
@@ -457,7 +561,7 @@ plt.close()
 
 plt.clf()
 
-frCandPtNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCut]["cand_pt"].ix[:,0], bins=ptBins, weights=dataZnunu[dataZnunuAns > discCut]["sampleWgt"].ix[:,0])
+frCandPtNum, _ = numpy.histogram(dataZnunu[dataZnunuAns > discCutZnunu]["cand_pt"].ix[:,0], bins=ptBins, weights=dataZnunu[dataZnunuAns > discCutZnunu]["sampleWgt"].ix[:,0])
 frCandPtDen, _ = numpy.histogram(dataZnunu["cand_pt"].ix[:,0],                         bins=ptBins, weights=dataZnunu["sampleWgt"].ix[:,0])
 
 frCandPtNum[frCandPtDen < 1e-10] = 0.0

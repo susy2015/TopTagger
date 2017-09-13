@@ -25,7 +25,6 @@ protected:
     double minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_, minAK4WPt_;
 
     //trijet variables
-    double dRMaxTrijet_, minAK4ResolvedPt_;
 
     //Implement the requirements to be tagged as an AK8 W
     bool passAK8WReqs(const Constituent& constituent) const;
@@ -37,7 +36,7 @@ protected:
     bool passAK8TopReqs(const Constituent& constituent) const;
 
     //Implement the requirements for the AK4 resolved constituents
-    bool passAK4ResolvedReqs(const Constituent& constituent) const;
+    bool passAK4ResolvedReqs(const Constituent& constituent, const double minPt) const;
 
     //Get the parameters needed for te constituent selection functions
     void getParameters(const cfg::CfgDocument*, const std::string&);
