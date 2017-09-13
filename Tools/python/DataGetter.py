@@ -100,7 +100,7 @@ class DataGetter:
         
       if prescale:
         #Remove background events so that bg and signal are roughly equally represented
-        prescaleRatio = (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum()
+        prescaleRatio = max(1, (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum())
     
         npyInputData =       self.prescaleBackground(npyInputData, npyInputAnswer, prescaleRatio)
         npyInputAnswers =    self.prescaleBackground(npyInputAnswers, npyInputAnswer, prescaleRatio)

@@ -51,7 +51,7 @@ class CreateModel:
         if len(convWeights) > 0:
             output = self.createConvLayers(output, convWeights, convBiases, keep_prob, postfix)
 
-        if rnnNodes > 0:
+        if rnnNodes > 0 and rnnLayers > 0:
             output = self.createRecurentLayers(output, rnnNodes, rnnLayers, keep_prob, len(postfix)>0)
 
         #Reshape convolutional output and recombine with the variables which bypass the convolution stage 
@@ -189,6 +189,8 @@ class CreateModel:
     def createSummaries(self):
         correct_prediction = tf.equal(tf.argmax(self.y_ph, 1), tf.argmax(self.y_ph_, 1))
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        correct_prediction_train = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
+        self.accuracy_train = tf.reduce_mean(tf.cast(correct_prediction_train, tf.float32))
 
         # Create a summary to monitor cost tensor
         summary_ce = tf.summary.scalar("cross_entropy", self.cross_entropy)
@@ -198,9 +200,10 @@ class CreateModel:
         summary_vce = tf.summary.scalar("valid_cross_entropy", self.cross_entropy_ph)
         summary_vloss = tf.summary.scalar("valid_loss", self.loss_ph)
         # Create a summary to monitor accuracy tensor
-        summary_accuracy = tf.summary.scalar("accuracy", self.accuracy)
+        summary_accuracy = tf.summary.scalar("accuracy", self.accuracy_train)
+        summary_vaccuracy = tf.summary.scalar("valid accuracy", self.accuracy)
         # create image of colvolutional filters 
-        valid_summaries = [summary_accuracy, summary_vloss, summary_vce]
+        valid_summaries = [summary_vaccuracy, summary_vloss, summary_vce]
         try:
             for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
@@ -210,7 +213,7 @@ class CreateModel:
         except AttributeError:
             pass
         # Merge all summaries into a single op
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize, summary_accuracy])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
 
 

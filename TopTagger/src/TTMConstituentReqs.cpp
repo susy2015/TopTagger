@@ -27,7 +27,6 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
     minAK4WPt_        = cfgDoc->get("minAK4WPt",        localCxt, -999.9);
 
     //trijet parameters
-    minAK4ResolvedPt_ = cfgDoc->get("minAK4ResolvedPt", localCxt, -999.9);
 }
 
 bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
@@ -75,7 +74,7 @@ bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const
            tau32 < maxTopTau32_;
 }
 
-bool TTMConstituentReqs::passAK4ResolvedReqs(const Constituent& constituent) const
+bool TTMConstituentReqs::passAK4ResolvedReqs(const Constituent& constituent, const double minPt) const
 {
-    return constituent.getType() == AK4JET && constituent.p().Pt() > minAK4ResolvedPt_;
+    return constituent.getType() == AK4JET && constituent.p().Pt() > minPt;
 }

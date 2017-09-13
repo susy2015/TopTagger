@@ -251,7 +251,7 @@ private:
     TopTagger* topTagger_;
     TopCat topMatcher_;
     std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
-    int eventNum_;
+    int eventNum_, bgPrescale_;
 
     void prepVariables(NTupleReader& tr)
     {
@@ -414,10 +414,9 @@ private:
         //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
-            candNum->push_back(static_cast<double>(iTop++));
             const auto* bestMatch = topCand.getBestGenTopMatch();
-            genMatchdR->push_back(bestMatch !=  nullptr);
-            genMatchVec->push_back(bestMatch?(bestMatch->Pt()):(-999.9));
+            bool hasBestMatch = bestMatch !=  nullptr;
+            double bestMatchPt = bestMatch?(bestMatch->Pt()):(-999.9);
 
             int NConstMatches = 0;
             for(const auto* constituent : topCand.getConstituents())
@@ -428,15 +427,25 @@ private:
                     ++NConstMatches;
                 }
             }
-            genMatchConst->push_back(NConstMatches);
 
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, AnaConsts::cutCSVS);
 
-            for(auto& var : allowedVarsD_)
+            if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
             {
-                vh.add(var, varMap[var]);
+                candNum->push_back(static_cast<double>(iTop++));
+                genMatchConst->push_back(NConstMatches);
+                genMatchdR->push_back(hasBestMatch);
+                genMatchVec->push_back(bestMatchPt);
+
+                std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, AnaConsts::cutCSVS);
+
+                for(auto& var : allowedVarsD_)
+                {
+                    vh.add(var, varMap[var]);
+                }
             }
+            if(bgPrescale_ >= 7) bgPrescale_ = 0;
         }
+
 
         vh.registerFunctions();
 
@@ -470,6 +479,7 @@ public:
     PrepVariables()
     {
         eventNum_ = 0;
+        bgPrescale_ = 0;
 
         topTagger_ = new TopTagger();
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
@@ -956,6 +966,7 @@ int main(int argc, char* argv[])
                         //Get cut variable 
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
 			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
+
 			//fill mini tuple
 			bool passbaseline = passMVABaseline;
 			// if(passMVABaseline)
