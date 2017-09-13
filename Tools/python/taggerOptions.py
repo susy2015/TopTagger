@@ -126,6 +126,35 @@ def StandardVariables(variables):
                 "DeepCSVc",
                 "DeepCSVcc",
                 "DeepCSVl",]
+   elif variables == "TeamAlpha1DConvPrime":
+      vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
+      jNames = ["m",
+                "p",
+                "p_top",
+                "qgAxis1",
+                "qgAxis2",
+                "qgMult",
+                "qgPtD",
+                "recoJetsCharge",
+                "ChargedHadronMultiplicity",
+                "ElectronEnergyFraction",
+                "ElectronMultiplicity",
+                "MuonMultiplicity",
+                "NeutralHadronMultiplicity",
+                "PhotonEnergyFraction",
+                "PhotonMultiplicity",
+                "recoJetsHFEMEnergyFraction",
+                "recoJetsHFHadronEnergyFraction",
+                "recoJetschargedEmEnergyFraction",
+                "recoJetschargedHadronEnergyFraction",
+                "recoJetsmuonEnergyFraction",
+                "recoJetsneutralEmEnergyFraction",
+                "recoJetsneutralEnergyFraction",
+                "DeepCSVb",
+                "DeepCSVbb",
+                "DeepCSVc",
+                "DeepCSVcc",
+                "DeepCSVl",]
 
    else:
       vNames = ["cand_m"]
