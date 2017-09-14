@@ -54,7 +54,9 @@ topZnunu, _ = zip(*sorted(znunuDict.items(), key=operator.itemgetter(1))[-3:])
 bottomTTbar, _ = zip(*sorted(ttbarDict.items(), key=operator.itemgetter(1))[:1])
 bottomZnunu, _ = zip(*sorted(znunuDict.items(), key=operator.itemgetter(1))[:1])
 
-plotItems =  list(set(topTTBar).union(set(topZnunu)).union(set(bottomTTbar)).union(set(bottomZnunu)))
+plotItems1 =  list(set(topTTBar).union(set(topZnunu)).union(set(bottomTTbar)).union(set(bottomZnunu)))
+plotItems2 = sorted([(x,scores[x][0]) for x in plotItems1],key=operator.itemgetter(1),reverse=True)
+plotItems, _ = list(zip(*plotItems2))
 
 print plotItems
 
