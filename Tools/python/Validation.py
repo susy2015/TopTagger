@@ -591,7 +591,7 @@ candPtZnunu = dataZnunu["cand_pt"]
 dataTTbarAnsRoc = (dataTTbarAns - dataTTbarAns.min()) / dataTTbarAns.ptp()
 dataZnunuAnsRoc = (dataZnunuAns - dataZnunuAns.min()) / dataZnunuAns.ptp()
 
-for i in xrange(PtCutList):
+for i in xrange(len(PtCutList)):
     pt_min = PtCutList[i]
     pt_max = -1 # final pt cut
     if i < len(PtCutList) - 1: # not final pt cut
