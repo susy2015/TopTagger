@@ -579,57 +579,77 @@ print "CALCULATING ROC CURVES"
 
 cuts = numpy.hstack([numpy.arange(0.0, 0.05, 0.005), numpy.arange(0.05, 0.95, 0.01), numpy.arange(0.95, 1.00, 0.005)])
 
-FPR = []
-TPR = []
-FPRZ = []
-
-FPRPtCut = []
-TPRPtCut = []
-FPRZPtCut = []
+PtCutList = [0, 100, 200, 300, 400]
+PtCutMap = {}
 
 evtwgt = dataTTbar["sampleWgt"]
 evtwgtZnunu = dataZnunu["sampleWgt"]
 
-NevtTPR = evtwgt[dataTTbar.genConstiuentMatchesVec==3].sum()
-NevtFPR = evtwgt[dataTTbar.genConstiuentMatchesVec!=3].sum()
-NevtZ = evtwgtZnunu.sum()
-
-ptCut = 200
-
 candPtTTbar = dataTTbar["cand_pt"]
-cantPtZnunu = dataZnunu["cand_pt"]
-
-NevtTPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar>ptCut)].sum()
-NevtFPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar>ptCut)].sum()
-NevtZPtCut = evtwgtZnunu[cantPtZnunu > ptCut].sum()
+candPtZnunu = dataZnunu["cand_pt"]
 
 dataTTbarAnsRoc = (dataTTbarAns - dataTTbarAns.min()) / dataTTbarAns.ptp()
 dataZnunuAnsRoc = (dataZnunuAns - dataZnunuAns.min()) / dataZnunuAns.ptp()
 
-for cut in cuts:
-    FPR.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec!=3)].sum() / NevtFPR    )
-    TPR.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec==3)].sum() / NevtTPR    )
-    FPRZ.append( evtwgtZnunu[(dataZnunuAnsRoc > cut)].sum() / NevtZ )
+for i in xrange(len(PtCutList)):
+    pt_min = PtCutList[i]
+    pt_max = -1 # final pt cut
+    if i < len(PtCutList) - 1: # not final pt cut
+        pt_max = PtCutList[i+1]
 
-    FPRPtCut.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec!=3) & (candPtTTbar > ptCut)].sum() / NevtFPRPtCut    )
-    TPRPtCut.append(  evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec==3) & (candPtTTbar > ptCut)].sum() / NevtTPRPtCut    )
-    FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (cantPtZnunu > ptCut)].sum() / NevtZPtCut )
+    if pt_max > 0:
+        cutKey = "pt_{0}_to_{1}".format(pt_min, pt_max)
+        print "Calculating ROC Curve for Pt from {0} to {1} GeV; cutKey = {2}".format(pt_min, pt_max, cutKey)
+    else:
+        cutKey = "pt_{0}_to_infinity".format(pt_min)
+        print "Calculating ROC Curve for Pt from {0} to infinite GeV; cutKey = {1}".format(pt_min, cutKey)
 
-#prepare tuples
-    rocTTbar = list(zip(FPR,TPR))
-    rocZnunu = list(zip(FPRZ,TPR))
+    TPRPtCut = []
+    FPRPtCut = []
+    FPRZPtCut = []
+
+    if pt_max > 0: # not final pt cut
+        NevtTPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec == 3) & (candPtTTbar > pt_min) & (candPtTTbar < pt_max)].sum()
+        NevtFPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec != 3) & (candPtTTbar > pt_min) & (candPtTTbar < pt_max)].sum()
+        NevtZPtCut = evtwgtZnunu[(candPtZnunu > pt_min) & (candPtZnunu < pt_max)].sum()
+    else: # final pt cut (from min to infinity)
+        NevtTPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec == 3) & (candPtTTbar > pt_min)].sum()
+        NevtFPRPtCut = evtwgt[(dataTTbar.genConstiuentMatchesVec != 3) & (candPtTTbar > pt_min)].sum()
+        NevtZPtCut = evtwgtZnunu[(candPtZnunu > pt_min)].sum()
+    
+    for cut in cuts:
+        if pt_max > 0: # not final pt cut
+            TPRPtCut.append( evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec == 3) & (candPtTTbar > pt_min) & (candPtTTbar < pt_max)].sum() / NevtTPRPtCut )
+            FPRPtCut.append( evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec != 3) & (candPtTTbar > pt_min) & (candPtTTbar < pt_max)].sum() / NevtFPRPtCut )
+            FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (candPtZnunu > pt_min) & (candPtZnunu < pt_max)].sum() / NevtZPtCut )
+        else: # final pt cut (from min to infinity)
+            TPRPtCut.append( evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec == 3) & (candPtTTbar > pt_min)].sum() / NevtTPRPtCut )
+            FPRPtCut.append( evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec != 3) & (candPtTTbar > pt_min)].sum() / NevtFPRPtCut )
+            FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (candPtZnunu > pt_min)].sum() / NevtZPtCut )
+
+    PtCutMap[cutKey] = {"TPR" : TPRPtCut, "FPR" : FPRPtCut, "FPRZ" : FPRZPtCut, "PtMin" : pt_min, "PtMax" : pt_max }
+
 
 #Dump roc to file
 fileObject = open(outputDirectory + "roc.pkl",'wb')
+pickle.dump(PtCutMap, fileObject)
+fileObject.close()
+
+'''
 pickle.dump(TPR, fileObject)
 pickle.dump(FPR, fileObject)
 pickle.dump(FPRZ, fileObject)
 pickle.dump(TPRPtCut, fileObject)
 pickle.dump(FPRPtCut, fileObject)
 pickle.dump(FPRZPtCut, fileObject)
-fileObject.close()
+'''
 
+'''
+#prepare tuples
+rocTTbar = list(zip(FPR,TPR))
+rocZnunu = list(zip(FPRZ,TPR))
 plt.clf()
+
 plt.plot(FPR,TPR)
 plt.xlabel("FPR (ttbar)")
 plt.ylabel("TPR (ttbar)")
@@ -642,7 +662,6 @@ plt.xlabel("FPR (Znunu)")
 plt.ylabel("TPR (ttbar)")
 plt.savefig(outputDirectory + "rocZ.png")
 plt.close()
-
-
+'''
 
 print "VALIDATION DONE!"

@@ -15,7 +15,7 @@ def makeJobs(submitJob,saveJSON,options,workdir):
 
    options.netOp.denseLayers = [50]
 
-   options.netOp.loadStandardVariables("TeamAlpha1DConv")
+   options.netOp.loadStandardVariables("TeamAlpha1DConvLess")
 
    options.cleanUp()
 
