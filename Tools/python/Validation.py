@@ -580,7 +580,7 @@ print "CALCULATING ROC CURVES"
 cuts = numpy.hstack([numpy.arange(0.0, 0.05, 0.005), numpy.arange(0.05, 0.95, 0.01), numpy.arange(0.95, 1.00, 0.005)])
 
 PtCutList = [0, 100, 200, 300, 400]
-PtCutMaps = []
+PtCutMap = {}
 
 evtwgt = dataTTbar["sampleWgt"]
 evtwgtZnunu = dataZnunu["sampleWgt"]
@@ -598,9 +598,11 @@ for i in xrange(len(PtCutList)):
         pt_max = PtCutList[i+1]
 
     if pt_max > 0:
-        print "Calculating ROC Curve for Pt from {0} to {1} GeV".format(pt_min, pt_max)
+        cutKey = "pt_{0}_to_{1}".format(pt_min, pt_max)
+        print "Calculating ROC Curve for Pt from {0} to {1} GeV; cutKey = {2}".format(pt_min, pt_max, cutKey)
     else:
-        print "Calculating ROC Curve for Pt from {0} to infinite GeV".format(pt_min)
+        cutKey = "pt_{0}_to_infinity".format(pt_min)
+        print "Calculating ROC Curve for Pt from {0} to infinite GeV; cutKey = {1}".format(pt_min, cutKey)
 
     TPRPtCut = []
     FPRPtCut = []
@@ -625,12 +627,12 @@ for i in xrange(len(PtCutList)):
             FPRPtCut.append( evtwgt[(dataTTbarAnsRoc > cut) & (dataTTbar.genConstiuentMatchesVec != 3) & (candPtTTbar > pt_min)].sum() / NevtFPRPtCut )
             FPRZPtCut.append( evtwgtZnunu[(dataZnunuAnsRoc > cut) & (candPtZnunu > pt_min)].sum() / NevtZPtCut )
 
-    PtCutMaps.append( {"TPR" : TPRPtCut, "FPR" : FPRPtCut, "FPRZ" : FPRZPtCut, "PtMin" : pt_min, "PtMax" : pt_max } )
+    PtCutMap[cutKey] = {"TPR" : TPRPtCut, "FPR" : FPRPtCut, "FPRZ" : FPRZPtCut, "PtMin" : pt_min, "PtMax" : pt_max }
 
 
 #Dump roc to file
 fileObject = open(outputDirectory + "roc.pkl",'wb')
-pickle.dump(PtCutMaps, fileObject)
+pickle.dump(PtCutMap, fileObject)
 fileObject.close()
 
 '''
