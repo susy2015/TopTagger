@@ -4,10 +4,14 @@ import pickle
 import json
 import numpy as np
 
+print "LOADING JSON FILE"
+
 with open("rocPlots.json", "r") as f:
     inputs = json.load(f)
 
+ninputs = len(inputs)
 colors = ["red", "blue", "green", "orange", "black", "purple", "yellow", "pink", "maroon"]
+styles = list( (k, ( 2*(k+1), 2*(k+1)) ) for k in xrange(ninputs) ) 
 
 for name, filelist in inputs.iteritems():
     plt.clf()
@@ -26,9 +30,15 @@ for name, filelist in inputs.iteritems():
     rocsZ = []
     rocsPtZ = []
 
-    for label, file, color in zip(labels, files, colors):
-        f1 = open(file, "rb")
-        
+    for label, file1, color in zip(labels, files, colors):
+        print "OPENING PICKLE FILE: {0}".format(file1)
+        f1 = open(file1, "rb")
+        PtCutMap = pickle.load(f1) 
+        for style, cut in zip(styles, PtCutMap):
+            print "Label: {0} File: {1} Color: {2} Style: {3} Cut: {4}".format(label, file1, color, style, cut)
+
+'''
+
         TPR = pickle.load(f1)
         FPR = pickle.load(f1)
         FPRZ = pickle.load(f1)
@@ -76,3 +86,4 @@ for name, filelist in inputs.iteritems():
     plotRocZ.savefig("rocZ_%s.pdf"%name)
     plt.close(plotRocZ)
     
+'''
