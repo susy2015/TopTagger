@@ -29,8 +29,8 @@ namespace cfg {
     }
 
     CfgDocument::~CfgDocument() {
-        for (std::map<std::string, Parameter*>::iterator i=m_parameters.begin(); i!=m_parameters.end(); i++)
-            delete i->second;
+        //for (std::map<std::string, Parameter*>::iterator i=m_parameters.begin(); i!=m_parameters.end(); i++)
+        //    delete i->second;
         for (std::vector<Condition*>::iterator i=m_conditions.begin(); i!=m_conditions.end(); i++)
             delete *i;
     }
@@ -46,9 +46,9 @@ namespace cfg {
 
     void CfgDocument::assignParameter(const std::string& ns, const std::string& name, const ConditionChain& cc, const Literal& l) {
         std::string key=makeKey(ns,name);
-        std::map<std::string, Parameter*>::iterator i=m_parameters.find(key);
+        std::map<std::string, std::unique_ptr<Parameter>>::iterator i=m_parameters.find(key);
         if (i==m_parameters.end()) {
-            m_parameters.insert(std::pair<std::string,Parameter*>(key,new Parameter(ns,name)));
+            m_parameters.insert(std::pair<std::string,std::unique_ptr<Parameter>>(key,std::unique_ptr<Parameter>(new Parameter(ns,name))));
             i=m_parameters.find(key);
         }
         i->second->addAssignment(cc,l);
@@ -57,7 +57,7 @@ namespace cfg {
     Literal CfgDocument::get(const std::string& name, const Context& cxt, const Literal& defl) const
     {
         std::string key=makeKey(cxt.ns(),name);
-        std::map<std::string, Parameter*>::const_iterator i=m_parameters.find(key);
+        std::map<std::string, std::unique_ptr<Parameter>>::const_iterator i=m_parameters.find(key);
         if (i==m_parameters.end()) 
         {
             if (m_recordPtr!=0) m_recordPtr->record(cxt, name, defl, true);
