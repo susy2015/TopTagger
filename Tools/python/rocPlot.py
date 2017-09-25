@@ -9,9 +9,7 @@ print "LOADING JSON FILE"
 with open("rocPlots.json", "r") as f:
     inputs = json.load(f)
 
-ninputs = len(inputs)
 colors = ["red", "blue", "green", "orange", "black", "purple", "yellow", "pink", "maroon"]
-styles = list( (k, ( 2*(k+1), 2*(k+1)) ) for k in xrange(ninputs) ) 
 
 for name, filelist in inputs.iteritems():
     plt.clf()
@@ -30,15 +28,23 @@ for name, filelist in inputs.iteritems():
     rocsZ = []
     rocsPtZ = []
 
-    for label, file1, color in zip(labels, files, colors):
-        print "OPENING PICKLE FILE: {0}".format(file1)
+    # colors per file
+    for file1, label, color in zip(files, labels, colors):
+        print "OPENING PICKLE; NAME: {0} FILE: {1}".format(name, file1)
         f1 = open(file1, "rb")
         PtCutMap = pickle.load(f1) 
-        for style, cut in zip(styles, PtCutMap):
-            print "Label: {0} File: {1} Color: {2} Style: {3} Cut: {4}".format(label, file1, color, style, cut)
+        ncuts = len(PtCutMap)
+        styles = list( (k, ( 2*(k+1), 2*(k+1)) ) for k in xrange(ncuts) ) 
+        # styles per cut
+        istyle = 0
+        #for cut, style in zip(PtCutMap, styles):
+        #for cut in sorted(PtCutMap.iteritems(), key=lambda (k,v): (v,k)):
+        for cut in sorted(PtCutMap.iteritems()):
+            style = styles[istyle]
+            print "File: {0} Label: {1} Color: {2} Style: {3} Cut: {4}".format(file1, label, color, style, cut[0])
+            istyle += 1
 
 '''
-
         TPR = pickle.load(f1)
         FPR = pickle.load(f1)
         FPRZ = pickle.load(f1)
