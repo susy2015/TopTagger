@@ -8,8 +8,9 @@ import os
 import optparse
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
-parser.add_option('-d', "--directory",  dest='directory',   action='store', default="",                 help="Directory to store outputs")
-parser.add_option('-j', "--jsonFile",   dest='jsonFile',    action='store', default="rocPlots.json",    help="Json file defining files and labels.")
+parser.add_option('-d', "--directory",  dest='directory',   action='store',      default="",               help="Directory to store outputs")
+parser.add_option('-j', "--jsonFile",   dest='jsonFile',    action='store',      default="rocPlots.json",  help="Json file defining files and labels")
+parser.add_option('-s', "--split",      dest='split',       action='store_true', default=False,            help="Split ROC curves into separate plots per pt range.")
 
 options, args = parser.parse_args()
 
@@ -107,8 +108,8 @@ for name, filelist in inputs.iteritems():
     plotRocAx.set_ylim(0.2, 1.0)
     #plotRocAx.xscale('log')
     #plotRocAx.yscale('log')
-    plotRoc.savefig("roc_%s.png"%name)
-    plotRoc.savefig("roc_%s.pdf"%name)
+    plotRoc.savefig("{0}roc_{1}.png".format(outputDirectory, name))
+    plotRoc.savefig("{0}roc_{1}.pdf".format(outputDirectory, name))
     plt.close(plotRoc)
 
     first_legend = plotRocZAx.legend(handles=fileLines, loc="lower right")
@@ -121,7 +122,7 @@ for name, filelist in inputs.iteritems():
     plotRocZAx.set_title("ROC Plot for TPR (ttbar) vs FPR (Znunu)")
     plotRocZAx.set_xlim(0.0, 0.5)
     plotRocZAx.set_ylim(0.2, 1.0)
-    plotRocZ.savefig("rocZ_%s.png"%name)
-    plotRocZ.savefig("rocZ_%s.pdf"%name)
+    plotRocZ.savefig("{0}rocZ_{1}.png".format(outputDirectory, name))
+    plotRocZ.savefig("{0}rocZ_{1}.pdf".format(outputDirectory, name))
     plt.close(plotRocZ)
     
