@@ -3,10 +3,35 @@ import matplotlib.lines as mlines
 import pickle
 import json
 import numpy as np
+import errno
+import os
+import optparse
+
+parser = optparse.OptionParser("usage: %prog [options]\n")
+parser.add_option('-d', "--directory",  dest='directory',   action='store', default="",                 help="Directory to store outputs")
+parser.add_option('-j', "--jsonFile",   dest='jsonFile',    action='store', default="rocPlots.json",    help="Json file defining files and labels.")
+
+options, args = parser.parse_args()
+
+outputDirectory = ""
+
+if len(options.directory):
+  outputDirectory = options.directory
+  if outputDirectory[-1] != "/":
+      outputDirectory += "/"
+  try:
+      os.mkdir(outputDirectory)
+  except OSError as exc:
+      if exc.errno == errno.EEXIST and os.path.isdir(outputDirectory):
+          pass
+      else:
+          raise
 
 print "LOADING JSON FILE"
 
-with open("rocPlots.json", "r") as f:
+jsonFile = options.jsonFile
+
+with open(jsonFile, "r") as f:
     inputs = json.load(f)
 
 colors = ["red", "blue", "green", "orange", "black", "purple", "yellow", "pink", "maroon"]
