@@ -602,7 +602,7 @@ for i in xrange(len(PtCutList)):
         print "Calculating ROC Curve for Pt from {0} to {1} GeV; cutKey = {2}".format(pt_min, pt_max, cutKey)
     else:
         cutKey = "pt_{0}_to_infinity".format(pt_min)
-        print "Calculating ROC Curve for Pt from {0} to infinite GeV; cutKey = {1}".format(pt_min, cutKey)
+        print "Calculating ROC Curve for Pt greater than {0} GeV; cutKey = {1}".format(pt_min, cutKey)
 
     TPRPtCut = []
     FPRPtCut = []

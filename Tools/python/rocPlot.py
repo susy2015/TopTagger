@@ -22,11 +22,9 @@ for name, filelist in inputs.iteritems():
     plotRocZ = plt.figure()
     plotRocZAx = plotRocZ.add_subplot(111)
 
-    rocs = []
-    rocsPt = []
-
+    rocs  = []
     rocsZ = []
-    rocsPtZ = []
+    lines = []
 
     # colors per file
     for file1, label, color in zip(files, labels, colors):
@@ -44,29 +42,31 @@ for name, filelist in inputs.iteritems():
             print "File: {0} Label: {1} Color: {2} Style: {3} Cut: {4}".format(file1, label, color, style, cut[0])
             istyle += 1
 
-'''
-        TPR = pickle.load(f1)
-        FPR = pickle.load(f1)
-        FPRZ = pickle.load(f1)
-    
-        TPRPtCut = pickle.load(f1)
-        FPRPtCut = pickle.load(f1)
-        FPRZPtCut = pickle.load(f1)
-    
-        rocs.append( plotRocAx.plot(FPR, TPR, label=label, color=color, alpha=1.0)[0])
-        rocsPt.append(plotRocAx.plot(FPRPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=1.0)[0])
+            PtCutData = PtCutMap[cut[0]]
+            TPRPtCut  = PtCutData["TPR"]  
+            FPRPtCut  = PtCutData["FPR"] 
+            FPRZPtCut = PtCutData["FPRZ"] 
+            pt_min = PtCutData["PtMin"]
+            pt_max = PtCutData["PtMax"]
+            lineLabel = ""
+            if pt_max > 0:
+                lineLabel = "{0} {1} GeV < Pt < {2} GeV".format(label, pt_min, pt_max)
+            else:
+                lineLabel = "{0} Pt > {1} GeV".format(label, pt_min)
+            
+            rocs.append(plotRocAx.plot(FPRPtCut,      TPRPtCut, label=lineLabel, linestyle=style, color=color, alpha=1.0)[0])
+            rocsZ.append(plotRocZAx.plot(FPRZPtCut,   TPRPtCut, label=lineLabel, linestyle=style, color=color, alpha=1.0)[0])
+            lines.append(mlines.Line2D([], [], color='black', marker=None, linestyle=style, label=lineLabel))
 
-        rocsZ.append(plotRocZAx.plot(FPRZ, TPR, label=label, color=color, alpha=1.0)[0])
-        rocsPtZ.append(plotRocZAx.plot(FPRZPtCut, TPRPtCut, label=label+" Pt > 200 GeV", linestyle="dotted", color=color, alpha=1.0)[0])
 
-    
     first_legend = plotRocAx.legend(handles=rocs, loc="lower right")
     plotRoc.gca().add_artist(first_legend)
-
+    second_legend = plotRocAx.legend(handles=lines, loc=(0.2, 0.02))
+    '''
     solidLine = mlines.Line2D([], [], color='black', marker=None, label='All events')
     dottedLine = mlines.Line2D([], [], color='black', marker=None, linestyle='dotted', label=r'$p_{T} > 200$ GeV')
     second_legend = plotRocAx.legend(handles=[solidLine, dottedLine], loc=(0.2, 0.02))
-
+    '''
     #plotRocAx.legend(loc="upper left")
     plotRocAx.set_xlabel("FPR (ttbar)")
     plotRocAx.set_ylabel("TPR (ttbar)")
@@ -80,8 +80,7 @@ for name, filelist in inputs.iteritems():
 
     first_legend = plotRocZAx.legend(handles=rocsZ, loc="lower right")
     plotRocZ.gca().add_artist(first_legend)
-
-    second_legend = plotRocZAx.legend(handles=[solidLine, dottedLine], loc=(0.2, 0.02))
+    second_legend = plotRocZAx.legend(handles=lines, loc=(0.2, 0.02))
 
     #plotRocZAx.legend(loc="lower right")
     plotRocZAx.set_xlabel("FPR (Znunu)")
@@ -92,4 +91,3 @@ for name, filelist in inputs.iteritems():
     plotRocZ.savefig("rocZ_%s.pdf"%name)
     plt.close(plotRocZ)
     
-'''
