@@ -80,6 +80,9 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     TF_Operation* op_x = TF_GraphOperationByName(graph, inputOp_.c_str());
     TF_Operation* op_y = TF_GraphOperationByName(graph, outputOp_.c_str());
 
+    //Clean up graph
+    TF_DeleteGraph(graph);
+
     if(op_x == nullptr)
     {
         THROW_TTEXCEPTION("Input operation \"" + inputOp_ + "\" not found in graph");
@@ -168,7 +171,7 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
             bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
 
             //place in final top list if it passes the threshold
-            if(discriminator > discriminator_ && passBrequirements)
+            if(discriminator > std::min(0.97, 0.80 + topCand.p().Pt()*0.15/300.0) /*discriminator_*/ && passBrequirements)
             {
                 tops.push_back(&topCand);
             }
@@ -194,6 +197,8 @@ TTMTensorflow::~TTMTensorflow()
     {
         THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
     }
+
+    TF_DeleteStatus(status);
 }
 
 void free_buffer(void* data, size_t length) 
