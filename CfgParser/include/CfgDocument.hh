@@ -35,7 +35,7 @@ namespace cfg {
         std::string get(const std::string& name, int index, const Context& cxt, const std::string& defl) const;
 
         // access internal values (as needed)
-        typedef std::map<std::string, Parameter*>::const_iterator param_itr;
+        typedef std::map<std::string, std::unique_ptr<Parameter>>::const_iterator param_itr;
         param_itr param_begin() const { return m_parameters.begin(); }
         param_itr param_end() const { return m_parameters.end(); }
 
@@ -46,7 +46,7 @@ namespace cfg {
     private:      
         Literal get(const std::string& name, const Context& cxt, const Literal& defl) const;
         std::string makeKey(const std::string& ns, const std::string& name) const;
-        std::map<std::string, Parameter*> m_parameters;
+        std::map<std::string, std::unique_ptr<Parameter>> m_parameters;
         std::vector<Condition*> m_conditions; // owner of all conditions
         Record* m_recordPtr; // not to be deleted!
         //log4cplus::Logger m_logger;

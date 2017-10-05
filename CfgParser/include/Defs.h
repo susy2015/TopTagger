@@ -1,6 +1,6 @@
 #include <string>
-#include <iostream>
 #include <vector>
+#include <memory>
 #include "TopTagger/CfgParser/include/Scanner.h"
 #include "TopTagger/CfgParser/include/Language.hh"
 #include "TopTagger/CfgParser/include/Condition.hh"
@@ -14,7 +14,7 @@ public:
     //log4cplus::Logger m_logger;
 public:
     //CfgBuilder() : m_logger(log4cplus::Logger::getInstance("Hcal.CfgScriptParser")) { theDoc=new cfg::CfgDocument(m_logger); }
-    CfgBuilder() { theDoc=new cfg::CfgDocument(); }
+CfgBuilder() : theDoc(new cfg::CfgDocument()) {  }
 
     //void setup(log4cplus::Logger l) { 
     //  m_logger=l; 
@@ -24,15 +24,12 @@ public:
 
     void setup() 
     { 
-        delete theDoc;
-        theDoc=new cfg::CfgDocument(); 
+        theDoc.reset(new cfg::CfgDocument()); 
     }
 
-    cfg::CfgDocument* takeDoc() 
+    std::unique_ptr<cfg::CfgDocument> takeDoc() 
     {
-        cfg::CfgDocument* rv=theDoc;
-        theDoc=0;
-        return rv;
+        return theDoc;
     }
 
     cfg::SimpleTerm* simpleTerm(const std::string& ident, const std::string& op) 
@@ -108,7 +105,7 @@ public:
     cfg::Term* lastTerm;
     std::string theNamespace, theItemName;
     int theItemIndex;
-    cfg::CfgDocument* theDoc;
+    std::unique_ptr<cfg::CfgDocument> theDoc;
 
     static std::string toString(const wchar_t* d) 
     {
