@@ -14,7 +14,7 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(options,samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -39,7 +39,7 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=False, ptReweight=options.ptReweight)
+  trainData = dg.importData(options, samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=False, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
@@ -69,7 +69,7 @@ def mainTF(options):
   print "Input Variables: ",len(dg.getList())
 
   # Import data
-  validData = dg.importData(samplesToRun = options.runOp.validationSamples, ptReweight=options.runOp.ptReweight)
+  validData = dg.importData(options, samplesToRun = options.runOp.validationSamples, ptReweight=options.runOp.ptReweight)
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]

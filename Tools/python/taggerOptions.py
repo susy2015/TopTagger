@@ -184,7 +184,8 @@ class runOptions:
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_100_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.5):
+                      keepProb          = 0.5,
+                      removePartial     = True):
 
       self.runName           = runName
       self.directory         = directory
@@ -205,7 +206,7 @@ class runOptions:
          self.trainingNames = trainingNames
       else:
          try:
-            self.trainingNames = [f for f in os.listdir(self.dataPath) if fnmatch.fnmatch(f,self.trainingGlob)]
+            self.trainingNames = [f for f in os.listdir(self.dataPath) for g in self.trainingGlob if fnmatch.fnmatch(f,g)]
          except OSError:
             self.trainingNames = []
          
@@ -217,6 +218,7 @@ class runOptions:
       self.ptReweight        = ptReweight
       
       self.keepProb          = keepProb
+      self.removePartial     = removePartial
 
    #configuration variables can be left in an inconsistent state, this method will make them consistent again
    def cleanUp(self):
