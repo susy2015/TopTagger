@@ -7,8 +7,6 @@
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 #include "TopTagger/CfgParser/include/TTException.h"
 
-#include <iostream>
-
 void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
