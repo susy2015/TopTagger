@@ -29,7 +29,7 @@ CfgBuilder() : theDoc(new cfg::CfgDocument()) {  }
 
     std::unique_ptr<cfg::CfgDocument> takeDoc() 
     {
-        return theDoc;
+        return std::move(theDoc);
     }
 
     cfg::SimpleTerm* simpleTerm(const std::string& ident, const std::string& op) 
