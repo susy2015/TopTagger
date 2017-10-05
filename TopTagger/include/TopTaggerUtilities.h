@@ -57,6 +57,7 @@ namespace ttUtility
         const std::vector<double>* tau3_;
         const std::vector<double>* softDropMass_;
         const std::vector<TLorentzVector>* subjetsLVec_;
+        const std::vector<std::vector<TLorentzVector>>* vecSubjetsLVec_;
         TF1* puppisd_corrGEN_;
         TF1* puppisd_corrRECO_cen_;
         TF1* puppisd_corrRECO_for_;
@@ -65,7 +66,9 @@ namespace ttUtility
 
     public:
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec);
         ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
         std::vector<TLorentzVector> denominator(const double ptCut) const;
         void setWMassCorrHistos(const std::string& fname);

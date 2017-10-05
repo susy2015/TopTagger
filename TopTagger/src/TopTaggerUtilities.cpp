@@ -28,13 +28,31 @@ namespace ttUtility
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
         puppisd_corrRECO_for_ = nullptr;
+        vecSubjetsLVec_ = nullptr;
     }
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), vecSubjetsLVec_(&vecSubJetsLVec) 
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
         puppisd_corrRECO_for_ = nullptr;
+        subjetsLVec_ = nullptr;
+    }
+    
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    {
+        puppisd_corrGEN_ = nullptr;
+        puppisd_corrRECO_cen_ = nullptr;
+        puppisd_corrRECO_for_ = nullptr;
+        vecSubjetsLVec_ = nullptr;
+    }
+
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), vecSubjetsLVec_(&vecSubJetsLVec) 
+    {
+        puppisd_corrGEN_ = nullptr;
+        puppisd_corrRECO_cen_ = nullptr;
+        puppisd_corrRECO_for_ = nullptr;
+        subjetsLVec_ = nullptr;
     }
 
     void ConstAK4Inputs::addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2)
@@ -120,39 +138,46 @@ namespace ttUtility
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
-            //Calculate matching subjets
             // For each tagged top/W, find the corresponding subjets
             std::vector<TLorentzVector> subjets;
-            for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
+            if(vecSubjetsLVec_ != nullptr)
             {
-                double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
-                if (myDR < 0.8)
-                {
-                    subjets.push_back(puppiSubJet);
-                }
-            }
-            // If more than 2 matches, find the best combination of two subjets
-            if (subjets.size() > 2)
+                subjets = (*vecSubjetsLVec_)[iJet];
+            } 
+            else if (subjetsLVec_ != nullptr) 
             {
-                double min_diff = 999999.;
-                int min_j=0, min_k=1;
-                for (unsigned int j=0 ; j<subjets.size(); ++j)
+                // Calculate matching subjets if a single list was given 
+                for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
                 {
-                    for (unsigned int k=j+1; k<subjets.size(); ++k)
+                    double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
+                    if (myDR < 0.8)
                     {
-                        TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
-                        double diff = fabs(diff_LV.M());
-                        if(diff < min_diff)
-                        {
-                            min_diff = diff;
-                            min_j = j;
-                            min_k = k;
-                        }
+                        subjets.push_back(puppiSubJet);
                     }
                 }
-                subjets = {subjets[min_j], subjets[min_k]};
-            }
 
+                // If more than 2 matches, find the best combination of two subjets
+                if (subjets.size() > 2) 
+                {
+                    double min_diff = 999999.;
+                    int min_j=0, min_k=1;
+                    for (unsigned int j=0 ; j<subjets.size(); ++j)
+                    {
+                        for (unsigned int k=j+1; k<subjets.size(); ++k)
+                        {
+                            TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
+                            double diff = fabs(diff_LV.M());
+                            if(diff < min_diff)
+                            {
+                                min_diff = diff;
+                                min_j = j;
+                                min_k = k;
+                            }
+                        }
+                    }
+                    subjets = {subjets[min_j], subjets[min_k]};
+                }
+            }
             //Emplace new constituent into vector
             constituents.emplace_back((*jetsLVec_)[iJet], (*tau1_)[iJet], (*tau2_)[iJet], (*tau3_)[iJet], (*softDropMass_)[iJet], subjets, getPUPPIweight((*jetsLVec_)[iJet].Pt(), (*jetsLVec_)[iJet].Eta()));
 
