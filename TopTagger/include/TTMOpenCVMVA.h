@@ -11,6 +11,7 @@
 
 class TTMOpenCVMVA : public TTModule
 {
+#ifdef SHOTTOPTAGGER_DO_OPENCV
 private:
     double discriminator_;
     std::string modelFile_;
@@ -25,6 +26,7 @@ private:
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
+#endif
 };
 REGISTER_TTMODULE(TTMOpenCVMVA);
 
