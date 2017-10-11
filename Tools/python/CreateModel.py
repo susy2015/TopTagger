@@ -81,7 +81,13 @@ class CreateModel:
             # create hidden layers 
             for layer in xrange(1, NLayer - 1):
                 #use relu for hidden layers as this seems to give best result
-                layerOutput = tf.nn.relu(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), name="h_fc%i%s"%(layer,prefix))
+                addResult = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix))
+                if self.options.netOp.denseActivationFunc == "relu":
+                    layerOutput = tf.nn.relu(addResult, name="h_fc%i%s"%(layer,prefix))
+                elif self.options.netOp.denseActivationFunc == "sigmoid":
+                    layerOutput = tf.nn.sigmoid(addResult, name="h_fc%i%s"%(layer,prefix))
+                elif self.options.netOp.denseActivationFunc == "tanh":
+                    layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
                 h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 
                 # Map the features to next layer
