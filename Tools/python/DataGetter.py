@@ -110,7 +110,7 @@ class DataGetter:
       #equalize bg and signal weights 
       nsig = npyInputWgts[npyInputAnswers[:,0] > 0.99].sum()
       nbg  = npyInputWgts[npyInputAnswers[:,0] < 0.99].sum()
-      print nsig, nbg
+
       npyInputWgts[npyInputAnswers[:,0] < 0.99] *= nsig / nbg
     
       #normalize training weights
