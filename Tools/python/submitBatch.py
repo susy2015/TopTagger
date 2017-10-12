@@ -8,70 +8,93 @@ import imp
 
 qsubStr = "qsub -q gpu -l nodes=1:ppn=36 "
 
-#We pass a taggerOptions file, the workdir, and a job name
-#This function will create the directory structure, the job, the pbs file, then submit the job
-def submitJob(options,  workdir, jobName):
+class SubmitJobs:
 
-   if not isinstance(options, taggerOptions):
-      print "The submitJob method requires an object of the taggerOptions type"
-      return
+    def __init__(self, workdir, NGPU = 2):
+        self.NGPU = NGPU
+        self.workdir = workdir
+        self.submitList = [[] for i in xrange(self.NGPU)]
+        self.currentGPU = 0
 
-   if not os.path.isdir(workdir):
-      print "Invalid work directory:", workdir
-      return
+    #We pass a taggerOptions file, the workdir, and a job name
+    #This function will create the directory structure, the job, the pbs file, then submit the job
+    def createJob(self, options,  workdir, jobName):
+    
+       if not isinstance(options, taggerOptions):
+          print "The submitJob method requires an object of the taggerOptions type"
+          return
+    
+       if not os.path.isdir(workdir):
+          print "Invalid work directory:", workdir
+          return
+    
+       if not isinstance(jobName, basestring):
+          print "The submitJob method requires a valid jobName"
+          return
+    
+       #Let's make sure that we are working with absolute paths
+       workdir = os.path.abspath(workdir)
+    
+       #If the directory for the jobs already exists, we won't continue with the job submission
+       if workdir[-1] != "/": workdir += "/"
+       jobDir = os.path.join(workdir,jobName)
+       if jobDir[-1] != "/": jobDir += "/"
+    
+       try:
+          os.mkdir(jobDir)
+       except OSError as exc:
+          if exc.errno == errno.EEXIST:
+             print jobDir, "already exists.", jobName, "job will not be submitted"
+             return
+          else:
+             raise
+    
+       options.confName = jobName
+       options.runOp.directory = jobDir
+       options.runOp.runName = jobName
+       options.cleanUp()
+    
+       jsonOptionsPath = options.runOp.directory+jobName+".json"
+    
+       saveOptionsToJSON(options,jsonOptionsPath)
+    
+       #Let's make the pbs file
+       shName = options.runOp.directory+jobName+".sh"   
+    
+       f = open(shName,"w+")
+    
+       pythonDir = (os.path.dirname(os.path.abspath(__file__)))
+    
+       f.write("export CUDA_DEVICE_ORDER=PCI_BUS_ID\n")
+       f.write("export CUDA_VISIBLE_DEVICES=%i\n"%self.currentGPU)
+       f.write("cd "+options.runOp.directory+"\n")
+       f.write("source /home/hatake/tensorflow/setup.sh > log.log\n")
+       f.write("python "+os.path.join(pythonDir,"Training.py")+" -c "+jobName+".json >> log.log\n")
+       f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+" >> log.log\n")
+    
+       f.close()
 
-   if not isinstance(jobName, basestring):
-      print "The submitJob method requires a valid jobName"
-      return
+       self.submitList[self.currentGPU].append({"shName":shName})
+       self.currentGPU = (self.currentGPU + 1)%self.NGPU
+    
+    def __call__(self, options,  workdir, jobName):
+        self.createJob(options,  workdir, jobName)
 
-   #Let's make sure that we are working with absolute paths
-   workdir = os.path.abspath(workdir)
-
-   #If the directory for the jobs already exists, we won't continue with the job submission
-   if workdir[-1] != "/": workdir += "/"
-   jobDir = os.path.join(workdir,jobName)
-   if jobDir[-1] != "/": jobDir += "/"
-
-   try:
-      os.mkdir(jobDir)
-   except OSError as exc:
-      if exc.errno == errno.EEXIST:
-         print jobDir, "already exists.", jobName, "job will not be submitted"
-         return
-      else:
-         raise
-
-   options.confName = jobName
-   options.runOp.directory = jobDir
-   options.runOp.runName = jobName
-   options.cleanUp()
-
-   jsonOptionsPath = options.runOp.directory+jobName+".json"
-
-   saveOptionsToJSON(options,jsonOptionsPath)
-
-   #Let's make the pbs file
-   pbsName = options.runOp.directory+jobName+".pbs"   
-
-   f = open(pbsName,"w+")
-
-   pythonDir = (os.path.dirname(os.path.abspath(__file__)))
-
-   f.write("cd "+options.runOp.directory+"\n")
-   f.write("export CUDA_DEVICE_ORDER=PCI_BUS_ID\n")
-   f.write("export CUDA_VISIBLE_DEVICES=0\n")
-   f.write("source /home/hatake/tensorflow/setup.sh > log.log\n")
-   f.write("python "+os.path.join(pythonDir,"Training.py")+" -c "+jobName+".json >> log.log\n")
-   f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+" >> log.log\n")
-
-   f.close()
-
-   #submit the job
-   os.chdir(options.runOp.directory)
-   call(qsubStr+pbsName, shell=True)
-   os.chdir(pythonDir[:-6])
-   print qsubStr+pbsName
-   print "Submitted", jobName
+    def submitJobs(self):
+        import itertools 
+        os.chdir(self.workdir)
+        for i, jobs in enumerate(itertools.izip_longest(*self.submitList)):
+            #create pbs submit file
+            fname = "%s/batchJob%i.pbs"%(self.workdir, i)
+            with open(fname, "w") as f:
+               for job in jobs:
+                  print job["shName"]
+                  if job != None:
+                     f.write("bash %s &\n"%(job["shName"]))
+               f.write("wait\n")
+            #submit the job
+            print qsubStr + fname
+            call(qsubStr + fname, shell=True)
 
 
 if __name__ == '__main__':
@@ -131,5 +154,9 @@ if __name__ == '__main__':
    baseOptions.runOp.dataPath = datadir
    baseOptions.cleanUp()
 
+   #job submitter
+   submitJob = SubmitJobs(workdir)
+
    #submitJob(baseOptions,workdir,options.prefix+"_testjob")
    batchCode.makeJobs(submitJob,saveOptionsToJSON,baseOptions,workdir)
+   submitJob.submitJobs()

@@ -106,7 +106,6 @@ def StandardVariables(variables):
                 "qgAxis2",
                 "qgMult",
                 "qgPtD",
-                "recoJetsCharge",
                 "ChargedHadronMultiplicity",
                 "ElectronEnergyFraction",
                 "ElectronMultiplicity",
@@ -182,7 +181,7 @@ class runOptions:
                       l2Reg             = 0.002,
                       dataPath          = "data",
                       trainingNames     = [],
-                      validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_100_division_1_TTbarSingleLepTbar_validation_0.h5"],
+                      validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
                       keepProb          = 0.5):
 
@@ -347,23 +346,26 @@ class networkOptions:
 #This class defined the structure of the network.
 #These include things such as the input variables, output variables,
 #and the type and structure of the network
-   def __init__(self, networkName       = "Network test Configuration (name not set)",
-                      inputVariables    = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
-                      jetVariables      = ["p", "CSV", "QGL"],
-                      denseLayers       = [400, 200],
-                      convLayers        = [],
-                      rnnNodes          = 30,
-                      rnnLayers         = 2,
-                      convNConstituents = 3,
-                      convFilterWidth   = 1,
-                      useCNN            = True,
-                      useRNN            = True):
+   def __init__(self, networkName         = "Network test Configuration (name not set)",
+                      inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
+                      jetVariables        = ["p", "CSV", "QGL"],
+                      denseLayers         = [400, 200],
+                      denseActivationFunc = "tanh",
+                      convLayers          = [],
+                      rnnNodes            = 30,
+                      rnnLayers           = 2,
+                      convNConstituents   = 3,
+                      convFilterWidth     = 1,
+                      useCNN              = True,
+                      useRNN              = True):
 
       self.networkName      = networkName
       self.inputVariables   = inputVariables
       self.jetVariables     = jetVariables
 
       self.denseLayers = denseLayers
+      self.denseActivationFunc = denseActivationFunc
+
       self.convLayers  = convLayers
       self.rnnNodes    = rnnNodes
       self.rnnLayers   = rnnLayers
