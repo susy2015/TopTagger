@@ -30,8 +30,16 @@ def StandardVariables(variables):
       jNames = ["m_lab", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
 
    elif variables == "MixedMoreQGLCandPt":
-      vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
-      jNames = ["p", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+      vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
+      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "CvsL", "CvsB"]
+
+   elif variables == "MixedDeepCSV":
+      vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
+      jNames = ["p", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "DeepCSVb", "DeepCSVbb", "DeepCSVc", "DeepCSVcc", "DeepCSVl"]
+
+   elif variables == "MixedDeepCSV2":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "sd_n2"]
+      jNames = ["p", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "DeepCSVb", "DeepCSVbb", "DeepCSVc", "DeepCSVcc", "DeepCSVl"]
 
    elif variables == "TeamAlphaMoreQGLCandPt":
       vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 

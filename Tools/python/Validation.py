@@ -257,9 +257,28 @@ discNum = 4
 
 if options.sklrf:
     dataTTbarAns = clf1.predict_proba(dataTTbar.as_matrix(varsname))[:,1]
+
+    dataTTbarAnsTrain = clf1.predict_proba(dataTTbarTrain.as_matrix(varsname))[:,1]
+
+    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
+    discCutTTbar[discCutTTbar > 0.97] = 0.97
+
+    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
+    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+
 elif options.xgboost:
     xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
     dataTTbarAns = bst.predict(xgData)
+
+    xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
+    dataTTbarAnsTrain = bst.predict(xgb.DMatrix(dataTTbarTrain.as_matrix(varsname)))
+
+    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
+    discCutTTbar[discCutTTbar > 0.97] = 0.97
+
+    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
+    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
     dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})[:,0]
@@ -489,13 +508,6 @@ plt.close()
 
 print "PROCESSING ZNUNU VALIDATION DATA"
 
-if options.sklrf:
-    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
-elif options.xgboost:
-    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_ZJetsToNuNu_validation_700K_0.h5"
-else:
-    dataZnunuName = trainingOptions.runOp.dataPath + "/trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5"
-
 dataZnunuAll, _ = getDataZnunu({"trainingTuple_ZJetsToNuNu_HT_100to200_0_division_2_ZJetsToNuNu_HT_100to200_test_0.h5": 24006616.0,
                                 "trainingTuple_ZJetsToNuNu_HT_200to400_0_division_2_ZJetsToNuNu_HT_200to400_test_0.h5": 24450102.0,
                                 "trainingTuple_ZJetsToNuNu_HT_400to600_0_division_2_ZJetsToNuNu_HT_400to600_test_0.h5": 9627133.0,
@@ -512,9 +524,17 @@ print "CALCULATING ZNUNU DISCRIMINATORS"
 
 if options.sklrf:
     dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
+
+    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
+    discCutZnunu[discCutZnunu > 0.97] = 0.97
+
 elif options.xgboost:
     xgData = xgb.DMatrix(dataZnunu.as_matrix(varsname))
     dataZnunuAns = bst.predict(xgData)
+
+    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
+    discCutZnunu[discCutZnunu > 0.97] = 0.97
+
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
 
