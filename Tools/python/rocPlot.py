@@ -12,14 +12,16 @@ class Plotter:
     def __init__(self):
         self.outputDirectory = ""
         self.jsonFile = "rocPlots.json"
-        self.colors = ["red", "blue", "green", "orange", "black", "purple", "yellow", "pink", "maroon"]
+        self.colors = ["red", "blue", "green", "orange", "black", "purple", "yellow", "pink", "maroon", "xkcd:sky blue", "xkcd:violet", "xkcd:cerulean",
+                       "xkcd:light red", "xkcd:sea blue", "xkcd:emerald", "xkcd:reddish purple", "xkcd:dark rose", "xkcd:aubergine", "xkcd:teal green", "xkcd:avocado"]
 
 
 def main():
     parser = optparse.OptionParser("usage: %prog [options]\n")
-    parser.add_option('-d', "--directory",  dest='directory',   action='store',      default="",               help="Directory to store outputs")
-    parser.add_option('-j', "--jsonFile",   dest='jsonFile',    action='store',      default="rocPlots.json",  help="Json file defining files and labels")
-    parser.add_option('-s', "--split",      dest='split',       action='store_true', default=False,            help="Split ROC curves into separate plots per pt range.")
+    parser.add_option('-d', "--directory",   dest='directory',   action='store',      default="",               help="Directory to store outputs")
+    parser.add_option('-j', "--jsonFile",    dest='jsonFile',    action='store',      default="rocPlots.json",  help="Json file defining files and labels")
+    parser.add_option('-m', "--models",      dest='models',      action='store_true', default=False,            help="Split ROC curves into one plot per model")
+    parser.add_option('-c', "--cuts",        dest='cuts',        action='store_true', default=False,            help="Split ROC curves into one plot per pt cut")
     
     options, args = parser.parse_args()
 
@@ -44,17 +46,25 @@ def main():
     with open(p.jsonFile, "r") as f:
         p.inputs = json.load(f)
 
-    split = options.split
+    models = options.models
+    cuts = options.cuts
 
-    if split:
-        makeSplitPlots(p) 
+    if models:
+        # make one plot per model, multiple cuts per plot
+        makeModelPlots(p) 
+    elif cuts:
+        # make one plot per cut, multiple models per plot
+        makeCutPlots(p)
     else:
         makeCombinedPlots(p)
 
-def makeSplitPlots(plotter):
-    print "MAKING SPLIT PLOTS"
+# make one plot per model with multiple pt cuts per plot
+def makeModelPlots(plotter):
+    print "MAKING MODEL PLOTS"
     p = plotter
     style = "solid"
+    
+    # get files
     for name, filelist in p.inputs.iteritems():
         files = filelist["files"]
         labels = filelist["labels"]
@@ -64,7 +74,6 @@ def makeSplitPlots(plotter):
             print "OPENING PICKLE; NAME: {0} FILE: {1}".format(name, file1)
             f1 = open(file1, "rb")
             PtCutMap = pickle.load(f1) 
-            ncuts = len(PtCutMap)
 
             plotRoc  = plt.figure()
             plotRocZ = plt.figure()
@@ -94,6 +103,7 @@ def makeSplitPlots(plotter):
                 rocsZ.append(plotRocZAx.plot(FPRZPtCut,   TPRPtCut, label=lineLabel, linestyle=style, color=color, alpha=1.0)[0])
                 icut += 1
         
+            # crate plot for each file
             first_legend = plotRocAx.legend(handles=rocs, loc="lower right")
             plotRoc.gca().add_artist(first_legend)
             
@@ -118,6 +128,82 @@ def makeSplitPlots(plotter):
             plotRocZ.savefig("{0}rocZ_{1}_{2}.pdf".format(p.outputDirectory, name, label))
             plt.close(plotRocZ)
 
+# make one plot per pt cut with multiple models per plot
+def makeCutPlots(plotter):
+    print "MAKING PT CUT PLOTS"
+    p = plotter
+    style = "solid"
+
+    # get files
+    for name, filelist in p.inputs.iteritems():
+        files = filelist["files"]
+        labels = filelist["labels"]
+       
+        PtCutList = []
+        # get p_t cut maps from files
+        for file1 in files:
+            print "OPENING PICKLE; NAME: {0} FILE: {1}".format(name, file1)
+            f1 = open(file1, "rb")
+            PtCutMap = pickle.load(f1) 
+            PtCutList.append(PtCutMap)
+        
+        # plot p_t cuts per file
+        for cut in sorted(PtCutList[0].iteritems()):
+            plotRoc  = plt.figure()
+            plotRocZ = plt.figure()
+            plotRocAx  = plotRoc.add_subplot(111)
+            plotRocZAx = plotRocZ.add_subplot(111)
+            rocs  = []
+            rocsZ = []
+            ifile = 0
+            for file1, label in zip(files, labels):
+                PtCutMap = PtCutList[ifile]
+                color = p.colors[ifile]
+                print "File: {0} Label: {1} Color: {2} Cut: {3}".format(file1, label, color, cut[0])
+                PtCutData = PtCutMap[cut[0]]
+                TPRPtCut  = PtCutData["TPR"]  
+                FPRPtCut  = PtCutData["FPR"] 
+                FPRZPtCut = PtCutData["FPRZ"] 
+                pt_min = PtCutData["PtMin"]
+                pt_max = PtCutData["PtMax"]
+                
+                rocs.append(plotRocAx.plot(FPRPtCut,      TPRPtCut, label=label, linestyle=style, color=color, alpha=1.0)[0])
+                rocsZ.append(plotRocZAx.plot(FPRZPtCut,   TPRPtCut, label=label, linestyle=style, color=color, alpha=1.0)[0])
+                ifile += 1
+            
+            fileLabel = cut[0]
+            plotLabel = ""
+            if pt_max > 0:
+                plotLabel = r'${0}$ GeV $< p_T < {1}$ GeV'.format(pt_min, pt_max)
+            else:
+                plotLabel = r'$p_T > {0}$ GeV'.format(pt_min)
+            
+            # crate plot for each cut
+            first_legend = plotRocAx.legend(handles=rocs, loc="lower right")
+            plotRoc.gca().add_artist(first_legend)
+            
+            plotRocAx.set_xlabel("FPR (ttbar)")
+            plotRocAx.set_ylabel("TPR (ttbar)")
+            plotRocAx.set_title("ROC Plot for TPR (ttbar) vs FPR (ttbar) "+plotLabel)
+            plotRocAx.set_xlim(0.0, 0.5)
+            plotRocAx.set_ylim(0.2, 1.0)
+            plotRoc.savefig("{0}roc_{1}_{2}.png".format(p.outputDirectory, name, fileLabel))
+            plotRoc.savefig("{0}roc_{1}_{2}.pdf".format(p.outputDirectory, name, fileLabel))
+            plt.close(plotRoc)
+    
+            first_legend = plotRocZAx.legend(handles=rocsZ, loc="lower right")
+            plotRocZ.gca().add_artist(first_legend)
+    
+            plotRocZAx.set_xlabel("FPR (Znunu)")
+            plotRocZAx.set_ylabel("TPR (ttbar)")
+            plotRocZAx.set_title("ROC Plot for TPR (ttbar) vs FPR (Znunu) "+plotLabel)
+            plotRocZAx.set_xlim(0.0, 0.5)
+            plotRocZAx.set_ylim(0.2, 1.0)
+            plotRocZ.savefig("{0}rocZ_{1}_{2}.png".format(p.outputDirectory, name, fileLabel))
+            plotRocZ.savefig("{0}rocZ_{1}_{2}.pdf".format(p.outputDirectory, name, fileLabel))
+            plt.close(plotRocZ)
+
+# make one plot with multiple models and cuts combined in the same plot
 def makeCombinedPlots(plotter):
     print "MAKING COMBINED PLOTS"
     p = plotter
