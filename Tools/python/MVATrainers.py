@@ -12,12 +12,20 @@ def mainSKL(options):
 
   print "PROCESSING TRAINING DATA"
 
+  from taggerOptions import StandardVariables, getJetVarNames
+
+  #get variables 
+  globalVars, jetVars = StandardVariables(options.variables)
+  allVars = globalVars + getJetVarNames(jetVars)
+
   # Import data
-  dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=True, ptReweight=options.ptReweight)
+  dg = DataGetter(allVars)
+  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
-  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
+  clf = RandomForestClassifier(n_estimators=500, max_depth=12, n_jobs = 4, verbose = True)
+
+  print trainData
   
   print "TRAINING RF"
 
@@ -25,7 +33,7 @@ def mainSKL(options):
   clf = clf.fit(trainData["data"], trainData["labels"][:,0], sample_weight=trainData["weights"][:,0])
   
   #Dump output from training
-  fileObject = open(options.directory + "TrainingOutput.pkl",'wb')
+  fileObject = open(options.directory + "/" + "TrainingOutput.pkl",'wb')
   out = pickle.dump(clf, fileObject)
   fileObject.close()
       
@@ -34,25 +42,30 @@ def mainSKL(options):
 def mainXGB(options):
 
   import xgboost as xgb
+  from taggerOptions import StandardVariables, getJetVarNames
 
   print "PROCESSING TRAINING DATA"
 
+  #get variables 
+  globalVars, jetVars = StandardVariables(options.variables)
+  allVars = globalVars + getJetVarNames(jetVars)
+
   # Import data
-  dg = DataGetter(options.variables)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_*.h5"), prescale=False, ptReweight=options.ptReweight)
+  dg = DataGetter(allVars)
+  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
   # Create xgboost classifier
   # Train random forest 
   xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0], weight=trainData["weights"][:,0])
-  param = {'max_depth':4 }
-  gbm = xgb.train(param, xgData, num_boost_round=1000)
+  param = {'max_depth':3, 'eta':0.05 }
+  gbm = xgb.train(param, xgData, num_boost_round=3000)
   
   #Dump output from training
-  gbm.save_model(options.directory + 'TrainingModel.xgb')
+  gbm.save_model(options.directory + "/" + 'TrainingModel.xgb')
 
-  output = gbm.predict(xgData)
+  #output = gbm.predict(xgData)
 
 
 def mainTF(options):
