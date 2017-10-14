@@ -88,8 +88,8 @@ class SubmitJobs:
             fname = "%s/batchJob%i.pbs"%(self.workdir, i)
             with open(fname, "w") as f:
                for job in jobs:
-                  print job["shName"]
                   if job != None:
+                     print job["shName"]
                      f.write("bash %s &\n"%(job["shName"]))
                f.write("wait\n")
             #submit the job
