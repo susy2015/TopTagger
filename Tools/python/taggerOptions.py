@@ -191,7 +191,8 @@ class runOptions:
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.5):
+                      keepProb          = 0.5,
+                      nTrainingFiles    = 100):
 
       self.runName           = runName
       self.directory         = directory
@@ -216,7 +217,9 @@ class runOptions:
          except OSError:
             self.trainingNames = []
          
-      self.validationNames       = validationNames
+      self.validationNames     = validationNames
+
+      self.nTrainingFiles      = nTrainingFiles 
 
       self.makeTrainingSamples()
       self.makeValidationSamples()
@@ -236,7 +239,7 @@ class runOptions:
    #This method uses the dataPath and the list of trainingNames to make a list of training files
    def makeTrainingSamples(self):
       #Some temporary hacks, lets make these options      
-      fileLists = [glob(self.dataPath + fileGlob)[:100] for fileGlob in self.trainingGlob]
+      fileLists = [glob(self.dataPath + fileGlob)[:self.nTrainingFiles] for fileGlob in self.trainingGlob]
 
       self.trainingSamples = zip(*fileLists)
 
@@ -268,11 +271,14 @@ class runOptions:
       parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                    help="Path where the input datafiles are stored (default: \"data\")")
       parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
       parser.add_option ('-t', "--keepProb",          dest="keepProb",          action='store',      type="float", help="The Dropout probability to apply during network training (default 0.8)")
+      parser.add_option ('-y', "--nTrainingFiles",    dest="nTrainingFiles",    action='store',      type="int",   help="The number of training files to use (default: 100)")
       return parser      
 
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
    def override(self, cloptions):
       orList = []
+
+      doCleanup = False
 
       if cloptions.ptReweight != None: 
          self.ptReweight = cloptions.ptReweight
@@ -310,16 +316,24 @@ class runOptions:
          self.l2Reg = cloptions.l2Reg
          orList.append("l2Reg = "+str(cloptions.l2Reg))
 
+      if cloptions.nTrainingFiles != None:
+         self.nTrainingFiles = cloptions.nTrainingFiles
+         orList.append("nTrainingFiles ="+str(cloptions.nTrainingFiles))
+         doCleanup = True
+
       if cloptions.dataFilePath != None: 
          self.dataPath = cloptions.dataFilePath
          if self.dataPath[-1] != "/": self.dataPath+= "/"
          orList.append("dataPath = "+str(cloptions.dataFilePath))
-         self.makeTrainingSamples()
-         self.makeValidationSamples()
+         doCleanup = True
 
       if cloptions.keepProb != None:
          self.keepProb = cloptions.keepProb
          orList.append("keepProb = "+str(cloptions.keepProb))
+
+      if doCleanup:
+         self.makeTrainingSamples()
+         self.makeValidationSamples()
 
       if len(orList):
          info = "runOptions overriden by command line:"
