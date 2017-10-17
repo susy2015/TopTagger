@@ -6,7 +6,7 @@ import errno
 #from generic import *
 import imp
 
-qsubStr = "qsub -q gpu -l nodes=1:ppn=36 "
+qsubStr = "qsub -q gpu -l nodes=gpu001:ppn=36 "
 
 class SubmitJobs:
 
