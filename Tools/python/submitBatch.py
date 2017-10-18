@@ -112,7 +112,7 @@ if __name__ == '__main__':
    options, _ = parser.parse_args()   
 
    #Let's specify the correct node
-   if options.node != "gpu001" and options.node != "gpu002":
+   if options.node != "gpu001" and options.node != "gpu002" and options.node !="1":
       print options.node, "is not an acceptable option. Please specify gpu001 or gpu002"
    else:
       qsubStr = "qsub -q gpu -l nodes="+options.node+":ppn=36 "
