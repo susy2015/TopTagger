@@ -88,6 +88,8 @@ class CreateModel:
                     layerOutput = tf.nn.sigmoid(addResult, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "tanh":
                     layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
+                elif self.options.netOp.denseActivationFunc == "none":
+                    layerOutput = addResult
                 h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 
                 # Map the features to next layer
