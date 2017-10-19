@@ -2,6 +2,7 @@ import bisect
 
 #given a line defined by two points give the y-value for the given x-value
 def interpolate_y(a=(1,1),b=(2,2),x=1.5):
+   if b[0]==a[0]: return a[1]
    return ((float(b[1]-a[1])/float(b[0]-a[0]))*(x-a[0]))+a[1]
 
 #This method will take a list of ordered pair and will integrate them by assuming that they are in order along the x-axis
@@ -17,6 +18,7 @@ def integrate(points=[]):
    return integral
 
 def interpolate_x(a=(1,1),b=(2,2),y=1.5):
+   if b[1] == a[1]: return a[0]
    return ((float(b[0]-a[0])/float(b[1]-a[1]))*(y-a[1]))+a[0]
 
 #This will take a list of ordered pairs then reduce it to only consider the ones in x=0..(.5) and y=0..1
