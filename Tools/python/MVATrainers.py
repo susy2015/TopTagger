@@ -138,13 +138,15 @@ def mainTF(options):
     for cr in crs:
       cr.start_threads(sess, n_threads=options.runOp.nThreadperReader)
 
-
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
+
+    #preload the first data into staging area
+    sess.run([mlp.stagingOp], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
 
     i = 0
     try:
       while not coord.should_stop():
-        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
+        _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
         summary_writer.add_summary(summary, i)
         i += 1
 

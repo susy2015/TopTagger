@@ -123,7 +123,13 @@ class CreateModel:
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
-        self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
+
+        #define a StagingArea here
+        self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes)
+        self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
+        self.x, self.y_, self.wgt = self.stagingArea.get()
+
+        #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
         #variables for pre-transforming data
         self.offset = tf.constant(self.offset_initial, name="offest")
