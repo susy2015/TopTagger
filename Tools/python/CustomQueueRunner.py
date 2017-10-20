@@ -50,7 +50,7 @@ class CustomQueueRunner(object):
       fIter = self.fileName_iterator()
 
       #private data getter object 
-      dg = DataGetter(self.variables)
+      dg = DataGetter(self.variables, bufferData = False)
             
       #loop until there are no more files to get from the queue
       for fileName in fIter:

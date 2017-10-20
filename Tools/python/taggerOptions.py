@@ -372,7 +372,7 @@ class networkOptions:
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
                       denseLayers         = [400, 200],
-                      denseActivationFunc = "tanh",
+                      denseActivationFunc = "relu",
                       convLayers          = [],
                       rnnNodes            = 30,
                       rnnLayers           = 2,
