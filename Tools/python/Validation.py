@@ -34,18 +34,16 @@ def load_graph(frozen_graph_filename):
 
 parser = optparse.OptionParser("usage: %prog [options]\n")
 
-#parser.add_option ('-o', "--opencv", dest='opencv', action='store_true', help="Run using opencv RTrees")
-#parser.add_option ('-n', "--noRoc", dest='noROC', action='store_true', help="Do not calculate ROC to save time")
-parser.add_option ('-c', "--disc", dest='discCut', action='store', default=0.6, type=float, help="Discriminator cut")
-parser.add_option ('-k', "--sklrf", dest='sklrf', action='store_true', help="Use skl random forest instead of tensorflow")
-parser.add_option ('-x', "--xgboost", dest='xgboost', action='store_true', help="Run using xgboost")
-parser.add_option ('-a', "--mvaFile", dest='mvaFile', action='store', default="", help="Mva training file")
-parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                     help="Path where the input datafiles are stored (default: \"data\")")
-parser.add_option ('-d', "--directory", dest='directory', action='store', default="", help="Directory to store outputs")
-parser.add_option ('-v', "--variables", dest='variables', action='store', help="Input features to use")
-parser.add_option ('-m', "--modelCfg",          dest="modelJSON",         action='store',      help="JSON with model definitions")
-parser.add_option ('-j', "--trainingCfg", dest="trainingCfg", action='store', help="config file produced by training")
-
+parser.add_option ('-c', "--disc",         dest='discCut',      action='store', default=0.6, type=float, help="Discriminator cut")
+parser.add_option ('-k', "--sklrf",        dest='sklrf',        action='store_true',                     help="Use skl random forest instead of tensorflow")
+parser.add_option ('-x', "--xgboost",      dest='xgboost',      action='store_true',                     help="Run using xgboost")
+parser.add_option ('-a', "--mvaFile",      dest='mvaFile',      action='store', default="",              help="Mva training file")
+parser.add_option ('-f', "--dataFilePath", dest="dataFilePath", action='store',                          help="Path where the input datafiles are stored (default: \"data\")")
+parser.add_option ('-d', "--directory",    dest='directory',    action='store', default="",              help="Directory to store outputs")
+parser.add_option ('-v', "--variables",    dest='variables',    action='store',                          help="Input features to use")
+parser.add_option ('-m', "--modelCfg",     dest="modelJSON",    action='store',                          help="JSON with model definitions")
+parser.add_option ('-j', "--trainingCfg",  dest="trainingCfg",  action='store',                          help="config file produced by training")
+ 
 options, args = parser.parse_args()
 
 outputDirectory = ""
@@ -224,11 +222,6 @@ def getDataZnunu(sampleInfo):
 
 dataTTbarAll, dataTTbarGen = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_2_TTbarSingleLepTbar_test_0.h5")
 
-#dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_100k_gen.pkl.gz")
-#dataTTbarGen = pd.read_pickle("trainingTuple_division_1_TTbarSingleLep_validation_gen.pkl.gz")
-
-#print list(dataTTbar.columns.values)
-
 #Apply baseline cuts
 dataTTbarAll = dataTTbarAll[dataTTbarAll.Njet >= 4]
 dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
@@ -254,6 +247,10 @@ dataTTbarGenTrain = dataTTbarGenTrain[dataTTbarGenTrain.Njet >= 4]
 print "CALCULATING TTBAR DISCRIMINATORS"
 
 discNum = 4
+
+def npSigmoid(x, pt):
+    return x#1 / (1 + numpy.exp(-(x - 0.5 - 0.3/400*pt)*8))
+    
 
 if options.sklrf:
     dataTTbarAns = clf1.predict_proba(dataTTbar.as_matrix(varsname))[:,1]
@@ -283,29 +280,17 @@ else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
     dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})[:,0]
 
-    discCutTTbar = 0.75 + (dataTTbar.cand_pt * 0.22/300.0)
-    discCutTTbar[discCutTTbar > 0.97] = 0.97
+    dataTTbarAns = npSigmoid(dataTTbarAns, dataTTbar.cand_pt)
+    dataTTbarAnsTrain = npSigmoid(dataTTbarAnsTrain, dataTTbarTrain.cand_pt)
 
-    discCutTTbarTrain = 0.75 + (dataTTbarTrain.cand_pt * 0.22/300.0)
-    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+    discCutTTbar = numpy.array([0.9]*len(dataTTbarAns))
+    discCutTTbarTrain = numpy.array([0.9]*len(dataTTbarAnsTrain))
 
-    #topPt1 = dataTTbar.cand_pt < 100
-    #topPt2 = (100 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 200)
-    #topPt3 = (200 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 300)
-    #topPt4 = (300 <= dataTTbar.cand_pt) & (dataTTbar.cand_pt < 400)
-    #topPt5 = (400 <= dataTTbar.cand_pt)
-    #indicies = topPt2*1 + topPt3*2 + topPt4*3 + topPt5*4
-    #dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})
-    #dataTTbarAns = dataTTbarAns[numpy.arange(indicies.shape[0]),indicies]
+    #discCutTTbar = 0.75 + (dataTTbar.cand_pt * 0.22/300.0)
+    #discCutTTbar[discCutTTbar > 0.97] = 0.97
     #
-    #topPt1 = dataTTbarTrain.cand_pt < 100
-    #topPt2 = (100 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 200)
-    #topPt3 = (200 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 300)
-    #topPt4 = (300 <= dataTTbarTrain.cand_pt) & (dataTTbarTrain.cand_pt < 400)
-    #topPt5 = (400 <= dataTTbarTrain.cand_pt)
-    #indicies = topPt2*1 + topPt3*2 + topPt4*3 + topPt5*4
-    #dataTTbarAnsTrain = sess.run(y_train, feed_dict={x: dataTTbarTrain.as_matrix(varsname)})
-    #dataTTbarAnsTrain = dataTTbarAnsTrain[numpy.arange(indicies.shape[0]),indicies]
+    #discCutTTbarTrain = 0.75 + (dataTTbarTrain.cand_pt * 0.22/300.0)
+    #discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
 
 print "CREATING HISTOGRAMS"
 
@@ -449,6 +434,21 @@ plt.close()
 #plt.savefig(outputDirectory + "efficiency.png")
 #plt.close()
 
+#random scatter plot 
+
+from matplotlib.colors import LogNorm
+plt.clf()
+plt.hist2d(dataTTbar.cand_pt[genMatches == 1], dataTTbarAns[genMatches == 1], bins=20, norm=LogNorm())
+plt.hist2d(dataTTbar.cand_pt[genMatches != 1], dataTTbarAns[genMatches != 1], bins=20, norm=LogNorm())
+plt.colorbar()
+#plt.legend(loc='upper right')
+#plt.xlabel("Candidate Pt [GeV]")
+#plt.ylabel("Efficiency")
+
+plt.savefig(outputDirectory + "discVsCandPt.png")
+plt.close()
+
+
 #input variable histograms
 
 genTopData = dataTTbar[genMatches == 1]
@@ -538,8 +538,12 @@ elif options.xgboost:
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
 
-    discCutZnunu = 0.75 + (dataZnunu.cand_pt * 0.22/300.0)
-    discCutZnunu[discCutZnunu > 0.97] = 0.97
+    dataZnunuAns = npSigmoid(dataZnunuAns, dataZnunu.cand_pt)
+
+    discCutZnunu = numpy.array([0.9]*len(dataZnunuAns))
+
+    #discCutZnunu = 0.75 + (dataZnunu.cand_pt * 0.22/300.0)
+    #discCutZnunu[discCutZnunu > 0.97] = 0.97
 
 
 
