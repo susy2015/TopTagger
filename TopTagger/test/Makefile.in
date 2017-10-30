@@ -1,5 +1,6 @@
 ## Variables set by configure 
 OPENCV_DIRECTORY = @OPENCVDIR@
+XGBOOST_DIRECTORY = @XGBOOSTDIR@
 TAGGERDIR        = @TAGGERDIR@
 
 CXX       = @CXX@
@@ -29,6 +30,9 @@ INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)
 INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
 
+#xgboost include dirs
+INCLUDESDIRS  += -I$(XGBOOST_DIRECTORY) -I$(XGBOOST_DIRECTORY)/rabit/include
+
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
 
@@ -38,6 +42,9 @@ INCLUDESDIRS  += $(shell root-config --cflags)
 # Flags for generating auto dependancies 
 CXXDEPFLAGS = -MMD -MP
 
+# More CXX Flags
+CXXFLAGS += -D DOXGBOOST -D DOOPENCV
+
 #Necessary libraries, the order matters here!
 # ROOT libraries
 LIBS       = $(shell root-config --glibs)
@@ -45,7 +52,8 @@ LIBS       = $(shell root-config --glibs)
 LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
 # openCV libraries
 LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
-
+# xgboost libraries
+LIBS      += -L$(XGBOOST_DIRECTORY)/lib -lxgboost
 PROGRAMS = topTaggerTest
 
 LIBRARIES = TopTagger

@@ -624,6 +624,7 @@ TAGGERDIR
 EGREP
 GREP
 CXXCPP
+XGBOOSTDIR
 OPENCVDIR
 rootcintfound
 rootconfigfound
@@ -2733,6 +2734,84 @@ fi
 
 
 OPENCVDIR=$OPENCVDIR
+
+
+if test -z ${XGBOOSTDIR+x}; then
+   XGBOOSTDIR=/usr/local/
+fi
+
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/include/xgboost/c_api.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/include/xgboost/c_api.h" >&5
+$as_echo_n "checking for $XGBOOSTDIR/include/xgboost/c_api.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$XGBOOSTDIR/include/xgboost/c_api.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  as_fn_error $? "XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
+fi
+
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/rabit/include/rabit/c_api.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/rabit/include/rabit/c_api.h" >&5
+$as_echo_n "checking for $XGBOOSTDIR/rabit/include/rabit/c_api.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$XGBOOSTDIR/rabit/include/rabit/c_api.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  as_fn_error $? "XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
+fi
+
+
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}" >&5
+$as_echo_n "checking for $XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+
+else
+  as_fn_error $? "XGBoost libraries are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
+fi
+
+
+XGBOOSTDIR=$XGBOOSTDIR
 
 
 if test -z ${TOPTAGGERDIR+x}; then

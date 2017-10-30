@@ -57,6 +57,18 @@ AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV 
 
 AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
+dnl check for xgboost
+if test -z ${XGBOOSTDIR+x}; then
+   XGBOOSTDIR=/usr/local/
+fi
+
+AC_CHECK_FILE($XGBOOSTDIR/include/xgboost/c_api.h, [], [AC_ERROR([XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path])])
+AC_CHECK_FILE($XGBOOSTDIR/rabit/include/rabit/c_api.h, [], [AC_ERROR([XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path])])
+
+AC_CHECK_FILE($XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}, [], [AC_ERROR([XGBoost libraries are required. Specify location with ./configure XGBOOSTDIR=/Path])])
+
+AC_SUBST(XGBOOSTDIR, $XGBOOSTDIR)
+
 dnl check for top tagger code
 if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../../"
