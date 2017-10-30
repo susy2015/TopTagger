@@ -52,7 +52,7 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 

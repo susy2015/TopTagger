@@ -13,6 +13,10 @@ def StandardVariables(variables):
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
       jNames = ["p", "CSV", "QGL"]
 
+   elif variables == "Kinematic":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
+      jNames = ["p"]
+
    elif variables == "Mixed":
       vNames = ["cand_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
       jNames = ["p", "CSV_lab", "QGL_lab"]
