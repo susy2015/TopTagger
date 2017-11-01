@@ -73,8 +73,9 @@ mkobj:
 	@mkdir -p $(ODIR)
 
 #special rule to make root reflex dictionary
-$(TTTDIR)/rootdict.cc : $(TTTDIR)/rootdict.h
+$(ODIR)/rootdict.cc : $(TTTDIR)/rootdict.h
 	rootcint -f $@ $^
+	mv $(ODIR)/rootdict_rdict.pcm $(TTTDIR)
 
 $(ODIR)/%.o : $(TTSDIR)/%.cc
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
@@ -94,6 +95,9 @@ $(ODIR)/%.o : $(TPSDIR)/%.cc
 $(ODIR)/%.o : $(TPSDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
+$(ODIR)/%.o : $(ODIR)/%.cc
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
 #Compile top tagger library
 TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
 
@@ -110,7 +114,7 @@ topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdi
 	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBSTOPTAGGER) $(LIBS) -o $@
 
 clean:
-	rm -f rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
 
 install: libTopTagger.$(LIBSUFFIX)
 	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/

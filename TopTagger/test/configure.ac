@@ -113,3 +113,6 @@ AC_OUTPUT(Makefile)
 
 dnl Process taggerSetup.sh.in to create taggerSetup.sh
 AC_OUTPUT(taggerSetup.sh)
+
+dnl Process taggerSetup.csh.in to create taggerSetup.csh
+AC_OUTPUT(taggerSetup.csh)
