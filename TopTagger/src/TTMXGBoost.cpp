@@ -61,6 +61,8 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
         THROW_TTEXCEPTION("ERROR: Unable to import model from file: " + modelFile_);
     }
 
+#else
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with XGBoost support!!!");
 #endif
 }
 
