@@ -6,8 +6,10 @@
 #include <string>
 #include <vector>
 
+#ifdef SHOTTOPTAGGER_DO_OPENCV
 #include "opencv/cv.h"
 #include "opencv/ml.h"
+#endif
 
 class TTMOpenCVMVA : public TTModule
 {
@@ -23,10 +25,12 @@ private:
     cv::Ptr<cv::ml::RTrees> treePtr_;
     std::vector<std::string> vars_;
 
+#endif
+
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);
     void run(TopTaggerResults&);
-#endif
+
 };
 REGISTER_TTMODULE(TTMOpenCVMVA);
 

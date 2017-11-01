@@ -49,25 +49,54 @@ if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
 fi
 
-AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
+OPENCVINCLUDECVH=$OPENCVDIR/include/opencv/cv.h
+OPENCVINCLUDEMLH=$OPENCVDIR/include/opencv/ml.h
+AC_CHECK_FILE($OPENCVINCLUDECVH, [], [])
+AC_CHECK_FILE($OPENCVINCLUDEMLH, [], [])
 
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
+OPENCVLIBML=$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}
+OPENCVLIBCV=$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}
+AC_CHECK_FILE($OPENCVLIBCV, [], [])
+AC_CHECK_FILE($OPENCVLIBML, [], [])
 
-AC_SUBST(OPENCVDIR, $OPENCVDIR)
+OPENCVINCLUDECVH=ac_cv_file_$(echo ${OPENCVINCLUDECVH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVINCLUDEMLH=ac_cv_file_$(echo ${OPENCVINCLUDEMLH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVLIBCV=ac_cv_file_$(echo ${OPENCVLIBCV} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVLIBML=ac_cv_file_$(echo ${OPENCVLIBML} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure OPENCV if it is found
+if test "${!OPENCVINCLUDECVH}" = "no" || test "${!OPENCVINCLUDEMLH}" = "no" || test "${!OPENCVLIBCV}" = "no" || test "${!OPENCVLIBML}" = "no"; then
+   AC_WARN([OpenCV includes or libraries are not found. Specify location with "./configure OPENCVDIR=/Path" if required.])
+   AC_SUBST(OPENCVDIR, "")
+else
+   AC_SUBST(OPENCVDIR, $OPENCVDIR)
+fi
+
 
 dnl check for xgboost
 if test -z ${XGBOOSTDIR+x}; then
    XGBOOSTDIR=/usr/local/
 fi
 
-AC_CHECK_FILE($XGBOOSTDIR/include/xgboost/c_api.h, [], [AC_ERROR([XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path])])
-AC_CHECK_FILE($XGBOOSTDIR/rabit/include/rabit/c_api.h, [], [AC_ERROR([XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path])])
+XGBOOSTINCLUDEXGBCAPIH=$XGBOOSTDIR/include/xgboost/c_api.h
+XGBOOSTINCLUDERABCAPIH=$XGBOOSTDIR/rabit/include/rabit/c_api.h
+AC_CHECK_FILE($XGBOOSTINCLUDEXGBCAPIH, [], [])
+AC_CHECK_FILE($XGBOOSTINCLUDERABCAPIH, [], [])
 
-AC_CHECK_FILE($XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}, [], [AC_ERROR([XGBoost libraries are required. Specify location with ./configure XGBOOSTDIR=/Path])])
+XGBOOSTLIBXGB=$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}
+AC_CHECK_FILE($XGBOOSTLIBXGB, [], [])
 
-AC_SUBST(XGBOOSTDIR, $XGBOOSTDIR)
+XGBOOSTINCLUDEXGBCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDEXGBCAPIH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+XGBOOSTINCLUDERABCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDERABCAPIH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+XGBOOSTLIBXGB=ac_cv_file_$(echo ${XGBOOSTLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure OPENCV if it is found
+if test "${!XGBOOSTINCLUDEXGBCAPIH}" = "no" || test "${!XGBOOSTINCLUDERABCAPIH}" = "no" || test "${!XGBOOSTLIBXGB}" = "no"; then
+   AC_WARN([XGBoost includes or libraries are not found. Specify location with "./configure XGBOOSTDIR=/Path" if required.])
+   AC_SUBST(XGBOOSTDIR, "")
+else
+   AC_SUBST(XGBOOSTDIR, $XGBOOSTDIR)
+fi
 
 dnl check for top tagger code
 if test -z ${TOPTAGGERDIR+x}; then

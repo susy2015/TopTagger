@@ -1,15 +1,15 @@
 ## Variables set by configure 
-OPENCV_DIRECTORY = @OPENCVDIR@
+OPENCV_DIRECTORY  = @OPENCVDIR@
 XGBOOST_DIRECTORY = @XGBOOSTDIR@
-TAGGERDIR        = @TAGGERDIR@
+TAGGERDIR         = @TAGGERDIR@
 
-CXX       = @CXX@
-LD        = @CXX@
-CXXFLAGS  = @CXXFLAGS@
-LDFLAGS   = @LDFLAGS@
-PREFIX    = @prefix@
-LDCONFIG  = @LDCONFIG@
-LIBSUFFIX = @LIBSUFFIX@
+CXX          = @CXX@
+LD           = @CXX@
+CXXFLAGS     = @CXXFLAGS@
+LDFLAGS      = @LDFLAGS@
+PREFIX       = @prefix@
+LDCONFIG     = @LDCONFIG@
+LIBSUFFIX    = @LIBSUFFIX@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -24,14 +24,18 @@ TTTDIR     = $(TAGGERDIR)/TopTagger/test
 TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
 #openCV include dirs
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
+ifdef OPENCV_DIRECTORY
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
+endif
 
 #xgboost include dirs
-INCLUDESDIRS  += -I$(XGBOOST_DIRECTORY) -I$(XGBOOST_DIRECTORY)/rabit/include
+ifdef XGBOOST_DIRECTORY
+	INCLUDESDIRS  += -I$(XGBOOST_DIRECTORY) -I$(XGBOOST_DIRECTORY)/rabit/include
+endif
 
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
@@ -42,18 +46,22 @@ INCLUDESDIRS  += $(shell root-config --cflags)
 # Flags for generating auto dependancies 
 CXXDEPFLAGS = -MMD -MP
 
-# More CXX Flags
-CXXFLAGS += -D DOXGBOOST -D DOOPENCV
-
 #Necessary libraries, the order matters here!
 # ROOT libraries
 LIBS       = $(shell root-config --glibs)
 # top tagger libraries
 LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
 # openCV libraries
-LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
+ifdef OPENCV_DIRECTORY
+	CXXFLAGS += -DSHOTTOPTAGGER_DO_OPENCV
+	LIBS     += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
+endif
 # xgboost libraries
-LIBS      += -L$(XGBOOST_DIRECTORY)/lib -lxgboost
+ifdef XGBOOST_DIRECTORY
+	CXXFLAGS += -DDOXGBOOST
+	LIBS     += -L$(XGBOOST_DIRECTORY)/lib -lxgboost
+endif
+
 PROGRAMS = topTaggerTest
 
 LIBRARIES = TopTagger

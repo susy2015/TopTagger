@@ -2639,15 +2639,17 @@ if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/include/opencv/cv.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/include/opencv/cv.h" >&5
-$as_echo_n "checking for $OPENCVDIR/include/opencv/cv.h... " >&6; }
+OPENCVINCLUDECVH=$OPENCVDIR/include/opencv/cv.h
+OPENCVINCLUDEMLH=$OPENCVDIR/include/opencv/ml.h
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVINCLUDECVH" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVINCLUDECVH" >&5
+$as_echo_n "checking for $OPENCVINCLUDECVH... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/include/opencv/cv.h"; then
+if test -r "$OPENCVINCLUDECVH"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2658,19 +2660,17 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/include/opencv/ml.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/include/opencv/ml.h" >&5
-$as_echo_n "checking for $OPENCVDIR/include/opencv/ml.h... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVINCLUDEMLH" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVINCLUDEMLH" >&5
+$as_echo_n "checking for $OPENCVINCLUDEMLH... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/include/opencv/ml.h"; then
+if test -r "$OPENCVINCLUDEMLH"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2681,20 +2681,20 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}" >&5
-$as_echo_n "checking for $OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}... " >&6; }
+OPENCVLIBML=$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}
+OPENCVLIBCV=$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVLIBCV" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVLIBCV" >&5
+$as_echo_n "checking for $OPENCVLIBCV... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}"; then
+if test -r "$OPENCVLIBCV"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2705,19 +2705,17 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}" >&5
-$as_echo_n "checking for $OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$OPENCVLIBML" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $OPENCVLIBML" >&5
+$as_echo_n "checking for $OPENCVLIBML... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}"; then
+if test -r "$OPENCVLIBML"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2728,27 +2726,40 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path" "$LINENO" 5
 fi
 
 
-OPENCVDIR=$OPENCVDIR
+OPENCVINCLUDECVH=ac_cv_file_$(echo ${OPENCVINCLUDECVH} | sed -e 's/\//_/g' -e 's/\./_/')
+OPENCVINCLUDEMLH=ac_cv_file_$(echo ${OPENCVINCLUDEMLH} | sed -e 's/\//_/g' -e 's/\./_/')
+OPENCVLIBCV=ac_cv_file_$(echo ${OPENCVLIBCV} | sed -e 's/\//_/g' -e 's/\./_/')
+OPENCVLIBML=ac_cv_file_$(echo ${OPENCVLIBML} | sed -e 's/\//_/g' -e 's/\./_/')
+
+if test "${!OPENCVINCLUDECVH}" = "no" || test "${!OPENCVINCLUDEMLH}" = "no" || test "${!OPENCVLIBCV}" = "no" || test "${!OPENCVLIBML}" = "no"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: OpenCV includes or libraries are not found. Specify location with \"./configure OPENCVDIR=/Path\" if required." >&5
+$as_echo "$as_me: WARNING: OpenCV includes or libraries are not found. Specify location with \"./configure OPENCVDIR=/Path\" if required." >&2;}
+   OPENCVDIR=""
+
+else
+   OPENCVDIR=$OPENCVDIR
+
+fi
 
 
 if test -z ${XGBOOSTDIR+x}; then
    XGBOOSTDIR=/usr/local/
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/include/xgboost/c_api.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/include/xgboost/c_api.h" >&5
-$as_echo_n "checking for $XGBOOSTDIR/include/xgboost/c_api.h... " >&6; }
+XGBOOSTINCLUDEXGBCAPIH=$XGBOOSTDIR/include/xgboost/c_api.h
+XGBOOSTINCLUDERABCAPIH=$XGBOOSTDIR/rabit/include/rabit/c_api.h
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTINCLUDEXGBCAPIH" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTINCLUDEXGBCAPIH" >&5
+$as_echo_n "checking for $XGBOOSTINCLUDEXGBCAPIH... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$XGBOOSTDIR/include/xgboost/c_api.h"; then
+if test -r "$XGBOOSTINCLUDEXGBCAPIH"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2759,19 +2770,17 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
 fi
 
-as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/rabit/include/rabit/c_api.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/rabit/include/rabit/c_api.h" >&5
-$as_echo_n "checking for $XGBOOSTDIR/rabit/include/rabit/c_api.h... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTINCLUDERABCAPIH" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTINCLUDERABCAPIH" >&5
+$as_echo_n "checking for $XGBOOSTINCLUDERABCAPIH... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$XGBOOSTDIR/rabit/include/rabit/c_api.h"; then
+if test -r "$XGBOOSTINCLUDERABCAPIH"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2782,20 +2791,19 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "XGBoost includes are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
 fi
 
 
-as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}" >&5
-$as_echo_n "checking for $XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}... " >&6; }
+XGBOOSTLIBXGB=$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}
+as_ac_File=`$as_echo "ac_cv_file_$XGBOOSTLIBXGB" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $XGBOOSTLIBXGB" >&5
+$as_echo_n "checking for $XGBOOSTLIBXGB... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}"; then
+if test -r "$XGBOOSTLIBXGB"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -2806,13 +2814,22 @@ eval ac_res=\$$as_ac_File
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
-else
-  as_fn_error $? "XGBoost libraries are required. Specify location with ./configure XGBOOSTDIR=/Path" "$LINENO" 5
 fi
 
 
-XGBOOSTDIR=$XGBOOSTDIR
+XGBOOSTINCLUDEXGBCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDEXGBCAPIH} | sed -e 's/\//_/g' -e 's/\./_/')
+XGBOOSTINCLUDERABCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDERABCAPIH} | sed -e 's/\//_/g' -e 's/\./_/')
+XGBOOSTLIBXGB=ac_cv_file_$(echo ${XGBOOSTLIBXGB} | sed -e 's/\//_/g' -e 's/\./_/')
 
+if test "${!XGBOOSTINCLUDEXGBCAPIH}" = "no" || test "${!XGBOOSTINCLUDERABCAPIH}" = "no" || test "${!XGBOOSTLIBXGB}" = "no"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: XGBoost includes or libraries are not found. Specify location with \"./configure XGBOOSTDIR=/Path\" if required." >&5
+$as_echo "$as_me: WARNING: XGBoost includes or libraries are not found. Specify location with \"./configure XGBOOSTDIR=/Path\" if required." >&2;}
+   XGBOOSTDIR=""
+
+else
+   XGBOOSTDIR=$XGBOOSTDIR
+
+fi
 
 if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../../"
