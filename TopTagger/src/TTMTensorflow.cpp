@@ -98,6 +98,8 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     targets_.emplace_back(op_y);
 
     TF_DeleteStatus(status);
+#else
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow support!!!");
 #endif
 }
 

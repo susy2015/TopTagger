@@ -85,6 +85,8 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
 
     Py_DECREF(pArgs);
 
+#else
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with python support!!!");
 #endif
 }
 
