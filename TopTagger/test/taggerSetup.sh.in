@@ -1,18 +1,27 @@
-OPENCVPATH=@OPENCVDIR@/lib
+OPENCVPATH=@OPENCVDIR@
+XGBOOSTPATH=@XGBOOSTDIR@
 TAGGERDIR=@TAGGERDIR@/TopTagger/test
 
 OSNAME=$(uname -s)
 if [[ "$OSNAME" == "Darwin" ]]; then
-    if [[ $DYLD_LIBRARY_PATH != *"${OPENCVPATH}"* ]]; then
-	export DYLD_LIBRARY_PATH=${OPENCVPATH}:${LD_LIBRARY_PATH}
+    if [[ $DYLD_LIBRARY_PATH != *"${OPENCVPATH}"* ]] && [[ ! -z "${OPENCVPATH// }" ]]; then
+	export DYLD_LIBRARY_PATH=${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
+    fi
+    
+    if [[ $DYLD_LIBRARY_PATH != *"${XGBOOSTPATH}"* ]] && [[ ! -z "${XGBOOSTPATH// }" ]]; then
+	export DYLD_LIBRARY_PATH=${XGBOOSTPATH}/lib:${LD_LIBRARY_PATH}
     fi
     
     if [[ $DYLD_LIBRARY_PATH != *"${TAGGERDIR}"* ]]; then
 	export DYLD_LIBRARY_PATH=${TAGGERDIR}:${LD_LIBRARY_PATH}
     fi
 else
-    if [[ $LD_LIBRARY_PATH != *"${OPENCVPATH}"* ]]; then
-	export LD_LIBRARY_PATH=${OPENCVPATH}:${LD_LIBRARY_PATH}
+    if [[ $LD_LIBRARY_PATH != *"${OPENCVPATH}"* ]] && [[ ! -z "${OPENCVPATH// }" ]]; then
+	export LD_LIBRARY_PATH=${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
+    fi
+    
+    if [[ $LD_LIBRARY_PATH != *"${XGBOOSTPATH}"* ]] && [[ ! -z "${XGBOOSTPATH// }" ]]; then
+	export DYLD_LIBRARY_PATH=${XGBOOSTPATH}/lib:${LD_LIBRARY_PATH}
     fi
     
     if [[ $LD_LIBRARY_PATH != *"${TAGGERDIR}"* ]]; then

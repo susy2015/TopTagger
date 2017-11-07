@@ -44,18 +44,69 @@ if test ${rootcintfound} == no; then
    AC_ERROR([ROOT: rootcint not found.])
 fi   
 
+dnl check for python 
+AC_CHECK_PROG(pythonconfigfound, python-config, yes, no)
+
+if test ${pythonconfigfound} == no; then
+   AC_WARN([Optional dependency missing: python-config not found.])
+   AC_SUBST(PYTHONCFG, "")
+else
+   AC_SUBST(PYTHONCFG, python-config)
+fi
+
 dnl check for openCV
 if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
 fi
 
-AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
+OPENCVINCLUDECVH=$OPENCVDIR/include/opencv/cv.h
+OPENCVINCLUDEMLH=$OPENCVDIR/include/opencv/ml.h
+AC_CHECK_FILE($OPENCVINCLUDECVH, [], [])
+AC_CHECK_FILE($OPENCVINCLUDEMLH, [], [])
 
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
+OPENCVLIBML=$OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}
+OPENCVLIBCV=$OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}
+AC_CHECK_FILE($OPENCVLIBCV, [], [])
+AC_CHECK_FILE($OPENCVLIBML, [], [])
 
-AC_SUBST(OPENCVDIR, $OPENCVDIR)
+OPENCVINCLUDECVH=ac_cv_file_$(echo ${OPENCVINCLUDECVH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVINCLUDEMLH=ac_cv_file_$(echo ${OPENCVINCLUDEMLH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVLIBCV=ac_cv_file_$(echo ${OPENCVLIBCV} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+OPENCVLIBML=ac_cv_file_$(echo ${OPENCVLIBML} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure OPENCV if it is found
+if test "${!OPENCVINCLUDECVH}" = "no" || test "${!OPENCVINCLUDEMLH}" = "no" || test "${!OPENCVLIBCV}" = "no" || test "${!OPENCVLIBML}" = "no"; then
+   AC_WARN([Optional dependency missing: OpenCV includes or libraries are not found. Specify location with "./configure OPENCVDIR=/Path" if required.])
+   AC_SUBST(OPENCVDIR, "")
+else
+   AC_SUBST(OPENCVDIR, $OPENCVDIR)
+fi
+
+
+dnl check for xgboost
+if test -z ${XGBOOSTDIR+x}; then
+   XGBOOSTDIR=/usr/local/
+fi
+
+XGBOOSTINCLUDEXGBCAPIH=$XGBOOSTDIR/include/xgboost/c_api.h
+XGBOOSTINCLUDERABCAPIH=$XGBOOSTDIR/rabit/include/rabit/c_api.h
+AC_CHECK_FILE($XGBOOSTINCLUDEXGBCAPIH, [], [])
+AC_CHECK_FILE($XGBOOSTINCLUDERABCAPIH, [], [])
+
+XGBOOSTLIBXGB=$XGBOOSTDIR/lib/libxgboost.${LIBSUFFIX}
+AC_CHECK_FILE($XGBOOSTLIBXGB, [], [])
+
+XGBOOSTINCLUDEXGBCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDEXGBCAPIH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+XGBOOSTINCLUDERABCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDERABCAPIH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+XGBOOSTLIBXGB=ac_cv_file_$(echo ${XGBOOSTLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure OPENCV if it is found
+if test "${!XGBOOSTINCLUDEXGBCAPIH}" = "no" || test "${!XGBOOSTINCLUDERABCAPIH}" = "no" || test "${!XGBOOSTLIBXGB}" = "no"; then
+   AC_WARN([Optional dependency missing: XGBoost includes or libraries are not found. Specify location with "./configure XGBOOSTDIR=/Path" if required.])
+   AC_SUBST(XGBOOSTDIR, "")
+else
+   AC_SUBST(XGBOOSTDIR, $XGBOOSTDIR)
+fi
 
 dnl check for top tagger code
 if test -z ${TOPTAGGERDIR+x}; then
@@ -72,3 +123,6 @@ AC_OUTPUT(Makefile)
 
 dnl Process taggerSetup.sh.in to create taggerSetup.sh
 AC_OUTPUT(taggerSetup.sh)
+
+dnl Process taggerSetup.csh.in to create taggerSetup.csh
+AC_OUTPUT(taggerSetup.csh)
