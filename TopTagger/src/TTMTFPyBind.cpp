@@ -74,68 +74,16 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     }
     while(keepLooping);
 
-    if(!Py_IsInitialized())
-    {
-        PyEval_InitThreads();
-        Py_Initialize();
-    }
+    initializePyInterpreter();
 
-    // create the main module
-    main = PyImport_AddModule("__main__");
+    //create function arguements tuple
+    PyObject *pArgs = PyTuple_New(1);
+    PyTuple_SetItem(pArgs, 0, PyString_FromString(modelFile_.c_str()));
 
-    // define the globals of the main module as our context
-    pGlobal = PyModule_GetDict(main);
+    //start the tensorflow session
+    callPython("start_session", pArgs);
 
-    // since PyModule_GetDict returns a borrowed reference, increase the count to own one
-    Py_INCREF(pGlobal);
-
-    pModule = PyRun_String(embeddedTensorflowScript.c_str(), Py_file_input, pGlobal, pGlobal);
-
-    if (pModule != NULL) 
-    {
-        pFunc = PyObject_GetAttrString(main, "start_session");
-        /* pFunc is a new reference */
-
-        if (pFunc && PyCallable_Check(pFunc)) 
-        {
-            pArgs = PyTuple_New(1);
-            pValue = PyString_FromString(modelFile_.c_str());
-            PyTuple_SetItem(pArgs, 0, pValue);
-            Py_INCREF(pValue);
-
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            Py_DECREF(pValue);
-            if (pValue != NULL) 
-            {
-                Py_DECREF(pValue);
-            }
-            else 
-            {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr,"Call failed\n");
-                return;
-            }
-        }
-        else 
-        {
-            if (PyErr_Occurred())
-                PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", "start_session");
-        }
-        Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
-    }
-    else 
-    {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", "Dummy");
-        return;
-    }
-
-    import_array();
+    Py_DECREF(pArgs);
 
 #endif
 }
@@ -148,19 +96,24 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
     //Get the list of final tops into which we will stick candidates
     std::vector<TopObject*>& tops = ttResults.getTops();
 
-    //create numpy array
+    //create numpy array for input data
     npy_intp sizearray[2] = {1, static_cast<npy_intp>(vars_.size())};
     //PyObject* nparray = PyArray_SimpleNewFromData(2, sizearray, NPY_FLOAT, data);
     PyObject* nparray = PyArray_SimpleNew(2, sizearray, NPY_FLOAT);
 
+    // create input feed dict 
     PyObject *inputs = PyDict_New();
-    PyDict_SetItem(inputs, PyString_FromString(inputOp_.c_str()), nparray);
-    Py_INCREF(nparray);
+    PyDict_SetItemString(inputs, inputOp_.c_str(), nparray);
 
+    // create dict of output nodes 
     PyObject *outputs = PyDict_New();
     PyObject* outputOpName = PyString_FromString(outputOp_.c_str());
     PyDict_SetItem(outputs, outputOpName, Py_None);
-    Py_INCREF(outputOpName);
+
+    // create arguements tuple 
+    PyObject *pArgs = PyTuple_New(2);
+    PyTuple_SetItem(pArgs, 0, inputs);
+    PyTuple_SetItem(pArgs, 1, outputs);
     
     for(auto& topCand : topCandidates)
     {
@@ -177,62 +130,27 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
                 *static_cast<float*>(PyArray_GETPTR2(nparray, 0, i)) = varMap[vars_[i]];
             }
 
-            //predict value
-            if (pModule != NULL) 
-            {
-                pFunc = PyObject_GetAttrString(main, "eval_session");
-                /* pFunc is a new reference */
-            
-                if (pFunc && PyCallable_Check(pFunc)) 
-                {
-                    pArgs = PyTuple_New(2);
-                    PyTuple_SetItem(pArgs, 0, inputs);
-                    PyTuple_SetItem(pArgs, 1, outputs);
-                    Py_INCREF(inputs);
-                    Py_INCREF(outputs);
+            callPython("eval_session", pArgs);
 
-                    pValue = PyObject_CallObject(pFunc, pArgs);
-                    Py_DECREF(pArgs);
-                    if (pValue != NULL) 
-                    {
-                        Py_DECREF(pValue);
-                    }
-                    else 
-                    {
-                        Py_DECREF(pFunc);
-                        Py_DECREF(pModule);
-                        PyErr_Print();
-                        fprintf(stderr,"Call failed\n");
-                        return;
-                    }
-                }
-                else 
-                {
-                    if (PyErr_Occurred())
-                        PyErr_Print();
-                    fprintf(stderr, "Cannot find function \"%s\"\n", "eval_session");
-                }
-                Py_XDECREF(pFunc);
-                Py_DECREF(pModule);
-            }
-            else 
-            {
-                PyErr_Print();
-                fprintf(stderr, "Failed to load \"%s\"\n", "Dummy");
-                return;
-            }
-
-
-            //Get output discriminator 
+            //Get output discriminator
             PyObject *discriminators = PyDict_GetItem(outputs, outputOpName);
-            double discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(discriminators, 0, 0)));
-            topCand.setDiscriminator(discriminator);
+            double discriminator = -999.9;
+            if(PyArray_Check(discriminators))
+            {
+                discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(discriminators, 0, 0)));
+                topCand.setDiscriminator(discriminator);
+            }
+            else
+            {
+                THROW_TTEXCEPTION("Returned object is not a numpy array!!!");
+            }
 
             //Check number of b-tagged jets in the top
             bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
 
             //place in final top list if it passes the threshold
-            if(discriminator > std::min(0.97, 0.80 + topCand.p().Pt()*0.15/300.0) /*discriminator_*/ && passBrequirements)
+            //if(discriminator > std::min(0.97, 0.80 + topCand.p().Pt()*0.15/300.0) /*discriminator_*/ && passBrequirements)
+            if(discriminator > discriminator_ && passBrequirements)
             {
                 tops.push_back(&topCand);
             }
@@ -243,6 +161,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
     Py_DECREF(inputs);
     Py_DECREF(outputs);
     Py_DECREF(outputOpName);
+    Py_DECREF(pArgs);
 
 #endif
 }
@@ -251,10 +170,79 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 
 TTMTFPyBind::~TTMTFPyBind()
 {
+    //finish cleanup of python objects and close interpreter
     Py_DECREF(pModule);
-    Py_DECREF(main);
+    Py_DECREF(pMain);
     Py_DECREF(pGlobal);
     Py_Finalize();
+}
+
+
+void TTMTFPyBind::initializePyInterpreter()
+{
+    // initialize the python interpreter 
+    if(!Py_IsInitialized())
+    {
+        PyEval_InitThreads();
+        Py_Initialize();
+    }
+
+    // create the main module
+    pMain = PyImport_AddModule("__main__");
+
+    // define the globals of the main module as our context
+    pGlobal = PyModule_GetDict(pMain);
+
+    // since PyModule_GetDict returns a borrowed reference, increase the count to own one
+    Py_INCREF(pGlobal);
+
+    // load the python interface module 
+    pModule = PyRun_String(embeddedTensorflowScript.c_str(), Py_file_input, pGlobal, pGlobal);
+
+    // initialize numpy api
+    import_array();
+}
+
+PyObject* TTMTFPyBind::callPython(const std::string& func, PyObject* pArgs)
+{
+    if (pModule != NULL && pMain != NULL) 
+    {
+        PyObject* pFunc = PyObject_GetAttrString(pMain, func.c_str());
+        // pFunc is a new reference
+
+        if (pFunc && PyCallable_Check(pFunc)) 
+        {
+            PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
+
+            if (pValue != NULL) 
+            {
+                Py_DECREF(pValue);
+            }
+            else 
+            {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                Py_DECREF(pMain);
+                PyErr_Print();
+                THROW_TTEXCEPTION("Cannot call function \"" + func + "\"!!!");
+            }
+        }
+        else 
+        {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            THROW_TTEXCEPTION("Cannot find function \"" + func + "\"!!!");
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else 
+    {
+        PyErr_Print();
+        THROW_TTEXCEPTION("Python interpreter not initialized!!!");
+    }
+    
+    return NULL;
 }
 
 #endif

@@ -25,8 +25,11 @@ private:
     //Input variable names 
     std::vector<std::string> vars_;
 
-    PyObject *pName, *pModule, *pArgs, *pValue, *pFunc, *main;
+    PyObject *pModule, *pMain;
     PyObject *pGlobal;
+
+    void initializePyInterpreter();
+    PyObject* callPython(const std::string& func, PyObject* pArgs);
 
 #endif
 
