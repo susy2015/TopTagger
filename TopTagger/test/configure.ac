@@ -44,6 +44,16 @@ if test ${rootcintfound} == no; then
    AC_ERROR([ROOT: rootcint not found.])
 fi   
 
+dnl check for python 
+AC_CHECK_PROG(pythonconfigfound, python-config, yes, no)
+
+if test ${pythonconfigfound} == no; then
+   AC_WARN([Optional dependency missing: python-config not found.])
+   AC_SUBST(PYTHONCFG, "")
+else
+   AC_SUBST(PYTHONCFG, python-config)
+fi
+
 dnl check for openCV
 if test -z ${OPENCVDIR+x}; then
    OPENCVDIR=/usr/local/
@@ -66,7 +76,7 @@ OPENCVLIBML=ac_cv_file_$(echo ${OPENCVLIBML} | sed -e 's/[\/]/_/g' -e 's/\./_/')
 
 dnl configure OPENCV if it is found
 if test "${!OPENCVINCLUDECVH}" = "no" || test "${!OPENCVINCLUDEMLH}" = "no" || test "${!OPENCVLIBCV}" = "no" || test "${!OPENCVLIBML}" = "no"; then
-   AC_WARN([OpenCV includes or libraries are not found. Specify location with "./configure OPENCVDIR=/Path" if required.])
+   AC_WARN([Optional dependency missing: OpenCV includes or libraries are not found. Specify location with "./configure OPENCVDIR=/Path" if required.])
    AC_SUBST(OPENCVDIR, "")
 else
    AC_SUBST(OPENCVDIR, $OPENCVDIR)
@@ -92,7 +102,7 @@ XGBOOSTLIBXGB=ac_cv_file_$(echo ${XGBOOSTLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./
 
 dnl configure OPENCV if it is found
 if test "${!XGBOOSTINCLUDEXGBCAPIH}" = "no" || test "${!XGBOOSTINCLUDERABCAPIH}" = "no" || test "${!XGBOOSTLIBXGB}" = "no"; then
-   AC_WARN([XGBoost includes or libraries are not found. Specify location with "./configure XGBOOSTDIR=/Path" if required.])
+   AC_WARN([Optional dependency missing: XGBoost includes or libraries are not found. Specify location with "./configure XGBOOSTDIR=/Path" if required.])
    AC_SUBST(XGBOOSTDIR, "")
 else
    AC_SUBST(XGBOOSTDIR, $XGBOOSTDIR)
