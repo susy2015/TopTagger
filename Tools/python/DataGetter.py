@@ -36,8 +36,8 @@ class DataGetter:
 
     #Simply accept a list and pass it to the constructor
     @classmethod
-    def DefinedVariables(cls, variables):
-        return cls(variables)
+    def DefinedVariables(cls, variables, bufferData = False):
+        return cls(variables, bufferData)
 
     def getList(self):
         return self.list
