@@ -16,6 +16,8 @@ class TTMTFPyBind : public TTModule
 private:
 #ifdef DOTENSORFLOWPYBIND
     double discriminator_;
+    double discOffset_;
+    double discSlope_;
     double csvThreshold_;
     double bEtaCut_;
     int maxNbInTop_;

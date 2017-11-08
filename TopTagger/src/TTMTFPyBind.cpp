@@ -46,6 +46,8 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     cfg::Context localCxt(localContextName);
 
     discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
+    discOffset_    = cfgDoc->get("discOffset",   localCxt, 999.9);
+    discSlope_     = cfgDoc->get("discSlope",    localCxt, 0.0);
     modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
     inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
     outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
@@ -85,6 +87,8 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
 
     Py_DECREF(pArgs);
 
+#else
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with python support!!!");
 #endif
 }
 
@@ -149,8 +153,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
             bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
 
             //place in final top list if it passes the threshold
-            //if(discriminator > std::min(0.97, 0.80 + topCand.p().Pt()*0.15/300.0) /*discriminator_*/ && passBrequirements)
-            if(discriminator > discriminator_ && passBrequirements)
+            if(discriminator > std::min(discriminator_, discOffset_ + topCand.p().Pt()*discSlope_) && passBrequirements)
             {
                 tops.push_back(&topCand);
             }
