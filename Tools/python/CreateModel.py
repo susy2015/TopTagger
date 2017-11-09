@@ -153,7 +153,6 @@ class CreateModel:
             #weights for convolution filters - shared between all parallel graphs
             self.convWeights = []
             self.convBiases = []
-            print nChannel
             cnnStruct = [nChannel] + self.convLayers
             for i in xrange(len(cnnStruct) - 1):
                 self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))
