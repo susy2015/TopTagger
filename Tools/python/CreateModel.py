@@ -132,7 +132,7 @@ class CreateModel:
         #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
         #variables for pre-transforming data
-        self.offset = tf.constant(self.offset_initial, name="offest")
+        self.offset = tf.constant(self.offset_initial, name="offset")
         self.scale = tf.constant(self.scale_initial, name="scale")
 
         #input variables after rescaling 
@@ -153,7 +153,6 @@ class CreateModel:
             #weights for convolution filters - shared between all parallel graphs
             self.convWeights = []
             self.convBiases = []
-            print nChannel
             cnnStruct = [nChannel] + self.convLayers
             for i in xrange(len(cnnStruct) - 1):
                 self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))
