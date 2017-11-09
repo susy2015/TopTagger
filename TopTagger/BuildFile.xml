@@ -1,7 +1,7 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="TopTagger/CfgParser"/>
-<Flags CXXFLAGS="-Isrc/opencv/include/ -Isrc/opencv/modules/core/include -Isrc/opencv/modules/video/include -Isrc/opencv/modules/objdetect/include -Isrc/opencv/modules/ml/include/ -Isrc/opencv/modules/photo/include/ -Isrc/opencv/modules/imgproc/include/ -Lsrc/opencv/lib/"/>
-<Flags CXXFLAGS="-g"/>
+<use name="python" />
+<use name="py2-numpy" />
+<use name="py2-numpy-c-api" />
+<Flags CXXFLAGS="-DDOTENSORFLOWPYBIND"/>
 <flags EDM_PLUGIN="0"/>
-<lib name="opencv_ml"/>
-<lib name="opencv_core"/>

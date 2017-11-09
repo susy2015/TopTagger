@@ -131,7 +131,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
             //populate tensor based on desired input variables 
             for(unsigned int i = 0; i < vars_.size(); ++i)
             {
-                *static_cast<float*>(PyArray_GETPTR2(nparray, 0, i)) = varMap[vars_[i]];
+                *static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(nparray), 0, i)) = varMap[vars_[i]];
             }
 
             callPython("eval_session", pArgs);
@@ -141,7 +141,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
             double discriminator = -999.9;
             if(PyArray_Check(discriminators))
             {
-                discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(discriminators, 0, 0)));
+                discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(discriminators), 0, 0)));
                 topCand.setDiscriminator(discriminator);
             }
             else
