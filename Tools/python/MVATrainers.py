@@ -104,7 +104,7 @@ def mainTF(options):
     selectedCategory = categories == i
     mins[selectedCategory] = validData["data"][:,selectedCategory].mean()
     ptps[selectedCategory] = validData["data"][:,selectedCategory].std()
-  ptps[ptps == 0.0] = 1.0
+  ptps[ptps < 1e-10] = 1.0
 
   #Create filename queue
   fnq = FileNameQueue(options.runOp.trainingSamples, NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)
