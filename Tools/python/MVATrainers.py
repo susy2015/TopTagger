@@ -97,10 +97,14 @@ def mainTF(options):
   validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
 
   #scale data inputs to mean 0, stddev 1
-  mins = validData["data"].mean(0)
-  ptps = validData["data"].std(0)
-  ptps[ptps < 1e-10] = 1.0
-  #npyInputData = (npyInputData - mins)/ptps
+  categories = numpy.array(options.netOp.vCategories)
+  mins = numpy.zeros(categories.shape, dtype=numpy.float32)
+  ptps = numpy.zeros(categories.shape, dtype=numpy.float32)
+  for i in xrange(categories.max()):
+    selectedCategory = categories == i
+    mins[selectedCategory] = validData["data"][:,selectedCategory].mean()
+    ptps[selectedCategory] = validData["data"][:,selectedCategory].std()
+  ptps[ptps == 0.0] = 1.0
 
   #Create filename queue
   fnq = FileNameQueue(options.runOp.trainingSamples, NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)

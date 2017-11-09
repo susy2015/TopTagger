@@ -132,7 +132,7 @@ class CreateModel:
         #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
         #variables for pre-transforming data
-        self.offset = tf.constant(self.offset_initial, name="offest")
+        self.offset = tf.constant(self.offset_initial, name="offset")
         self.scale = tf.constant(self.scale_initial, name="scale")
 
         #input variables after rescaling 
