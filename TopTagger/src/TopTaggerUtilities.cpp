@@ -384,12 +384,11 @@ namespace ttUtility
             //Here we fake the QGL if it is a b jet
             varMap["j" + std::to_string(i + 1) + "_QGL"]                                 = (RF_constituents[i].getBTagDisc() > csvThresh)?(1.0):(RF_constituents[i].getQGLikelihood());
 
-            varMap["j" + std::to_string(i + 1) + "_qgMult"]                              = relu(RF_constituents[i].getExtraVar("qgMult"));
+            varMap["j" + std::to_string(i + 1) + "_recoJetsJecScaleRawToFull"]           = relu(RF_constituents[i].getExtraVar("recoJetsJecScaleRawToFull"));
+            varMap["j" + std::to_string(i + 1) + "_qgLikelihood"]                        = relu(RF_constituents[i].getExtraVar("qgLikelihood"));
             varMap["j" + std::to_string(i + 1) + "_qgPtD"]                               = relu(RF_constituents[i].getExtraVar("qgPtD"));
             varMap["j" + std::to_string(i + 1) + "_qgAxis1"]                             = relu(RF_constituents[i].getExtraVar("qgAxis1"));
             varMap["j" + std::to_string(i + 1) + "_qgAxis2"]                             = relu(RF_constituents[i].getExtraVar("qgAxis2"));
-            //varMap["j" + std::to_string(i + 1) + "_recoJetsFlavor"]                      = relu(RF_constituents[i].getExtraVar("recoJetsFlavor"));
-            varMap["j" + std::to_string(i + 1) + "_recoJetsJecScaleRawToFull"]           = relu(RF_constituents[i].getExtraVar("recoJetsJecScaleRawToFull"));
             varMap["j" + std::to_string(i + 1) + "_recoJetschargedHadronEnergyFraction"] = relu(RF_constituents[i].getExtraVar("recoJetschargedHadronEnergyFraction"));
             varMap["j" + std::to_string(i + 1) + "_recoJetschargedEmEnergyFraction"]     = relu(RF_constituents[i].getExtraVar("recoJetschargedEmEnergyFraction"));
             varMap["j" + std::to_string(i + 1) + "_recoJetsneutralEmEnergyFraction"]     = relu(RF_constituents[i].getExtraVar("recoJetsneutralEmEnergyFraction"));
@@ -409,47 +408,20 @@ namespace ttUtility
             varMap["j" + std::to_string(i + 1) + "_DeepCSVl"]                            = relu(RF_constituents[i].getExtraVar("DeepCSVl"));
             varMap["j" + std::to_string(i + 1) + "_DeepCSVbb"]                           = relu(RF_constituents[i].getExtraVar("DeepCSVbb"));
             varMap["j" + std::to_string(i + 1) + "_DeepCSVcc"]                           = relu(RF_constituents[i].getExtraVar("DeepCSVcc"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavorb"]                         = relu(RF_constituents[i].getExtraVar("DeepFlavorb"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavorbb"]                        = relu(RF_constituents[i].getExtraVar("DeepFlavorbb"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavorlepb"]                      = relu(RF_constituents[i].getExtraVar("DeepFlavorlepb"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavorc"]                         = relu(RF_constituents[i].getExtraVar("DeepFlavorc"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavoruds"]                       = relu(RF_constituents[i].getExtraVar("DeepFlavoruds"));
+            varMap["j" + std::to_string(i + 1) + "_DeepFlavorg"]                         = relu(RF_constituents[i].getExtraVar("DeepFlavorg"));
             varMap["j" + std::to_string(i + 1) + "_CvsL"]                                = relu(RF_constituents[i].getExtraVar("CvsL"));
             varMap["j" + std::to_string(i + 1) + "_CvsB"]                                = relu(RF_constituents[i].getExtraVar("CvsB"));
-            //varMap["j" + std::to_string(i + 1) + "_CombinedSvtx"]                        = relu(RF_constituents[i].getExtraVar("CombinedSvtx"));
-            //varMap["j" + std::to_string(i + 1) + "_Svtx"]                                = relu(RF_constituents[i].getExtraVar("Svtx"));
-            //varMap["j" + std::to_string(i + 1) + "_SoftM"]                               = relu(RF_constituents[i].getExtraVar("SoftM"));
-            //varMap["j" + std::to_string(i + 1) + "_SoftE"]                               = relu(RF_constituents[i].getExtraVar("SoftE"));
+            varMap["j" + std::to_string(i + 1) + "_CombinedSvtx"]                        = relu(RF_constituents[i].getExtraVar("CombinedSvtx"));
             varMap["j" + std::to_string(i + 1) + "_JetProba"]                            = relu(RF_constituents[i].getExtraVar("JetProba"));
             varMap["j" + std::to_string(i + 1) + "_JetBprob"]                            = relu(RF_constituents[i].getExtraVar("JetBprob"));
-            varMap["j" + std::to_string(i + 1) + "_recoJetsCharge"]                      = relu(RF_constituents[i].getExtraVar("recoJetsCharge"), -2.0);
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackJetPt"]                       = relu(RF_constituents[i].getExtraVar("CSVTrackJetPt"));
-            varMap["j" + std::to_string(i + 1) + "_CSVVertexCategory"]                   = relu(RF_constituents[i].getExtraVar("CSVVertexCategory"));
-            varMap["j" + std::to_string(i + 1) + "_CSVJetNSecondaryVertices"]            = relu(RF_constituents[i].getExtraVar("CSVJetNSecondaryVertices"));
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSumJetEtRatio"]               = relu(RF_constituents[i].getExtraVar("CSVTrackSumJetEtRatio"));
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSumJetDeltaR"]                = relu(RF_constituents[i].getExtraVar("CSVTrackSumJetDeltaR"));
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip2dValAboveCharm"]          = relu(RF_constituents[i].getExtraVar("CSVTrackSip2dValAboveCharm"), -0.5);
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip2dSigAboveCharm"]          = relu(RF_constituents[i].getExtraVar("CSVTrackSip2dSigAboveCharm"), -100.0);
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip3dValAboveCharm"]          = relu(RF_constituents[i].getExtraVar("CSVTrackSip3dValAboveCharm"), -0.98);
-            varMap["j" + std::to_string(i + 1) + "_CSVTrackSip3dSigAboveCharm"]          = relu(RF_constituents[i].getExtraVar("CSVTrackSip3dSigAboveCharm"), -200.0);
-            varMap["j" + std::to_string(i + 1) + "_CSVVertexMass"]                       = relu(RF_constituents[i].getExtraVar("CSVVertexMass"));
-            varMap["j" + std::to_string(i + 1) + "_CSVVertexNTracks"]                    = relu(RF_constituents[i].getExtraVar("CSVVertexNTracks"));
-            varMap["j" + std::to_string(i + 1) + "_CSVVertexEnergyRatio"]                = relu(RF_constituents[i].getExtraVar("CSVVertexEnergyRatio"));
-            varMap["j" + std::to_string(i + 1) + "_CSVVertexJetDeltaR"]                  = relu(RF_constituents[i].getExtraVar("CSVVertexJetDeltaR"));
-            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance2dVal"]              = relu(RF_constituents[i].getExtraVar("CSVFlightDistance2dVal"));
-            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance2dSig"]              = relu(RF_constituents[i].getExtraVar("CSVFlightDistance2dSig"));
-            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance3dVal"]              = relu(RF_constituents[i].getExtraVar("CSVFlightDistance3dVal"));
-            varMap["j" + std::to_string(i + 1) + "_CSVFlightDistance3dSig"]              = relu(RF_constituents[i].getExtraVar("CSVFlightDistance3dSig"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexCategory"]                  = relu(RF_constituents[i].getExtraVar("CTagVertexCategory"));
-            varMap["j" + std::to_string(i + 1) + "_CTagJetNSecondaryVertices"]           = relu(RF_constituents[i].getExtraVar("CTagJetNSecondaryVertices"));
-            varMap["j" + std::to_string(i + 1) + "_CTagTrackSumJetEtRatio"]              = relu(RF_constituents[i].getExtraVar("CTagTrackSumJetEtRatio"));
-            varMap["j" + std::to_string(i + 1) + "_CTagTrackSumJetDeltaR"]               = relu(RF_constituents[i].getExtraVar("CTagTrackSumJetDeltaR"));
-            varMap["j" + std::to_string(i + 1) + "_CTagTrackSip2dSigAboveCharm"]         = relu(RF_constituents[i].getExtraVar("CTagTrackSip2dSigAboveCharm"), -100.0);
-            varMap["j" + std::to_string(i + 1) + "_CTagTrackSip3dSigAboveCharm"]         = relu(RF_constituents[i].getExtraVar("CTagTrackSip3dSigAboveCharm"), -200.0);
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexMass"]                      = relu(RF_constituents[i].getExtraVar("CTagVertexMass"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexNTracks"]                   = relu(RF_constituents[i].getExtraVar("CTagVertexNTracks"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexEnergyRatio"]               = relu(RF_constituents[i].getExtraVar("CTagVertexEnergyRatio"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexJetDeltaR"]                 = relu(RF_constituents[i].getExtraVar("CTagVertexJetDeltaR"));
-            varMap["j" + std::to_string(i + 1) + "_CTagFlightDistance2dSig"]             = relu(RF_constituents[i].getExtraVar("CTagFlightDistance2dSig"));
-            varMap["j" + std::to_string(i + 1) + "_CTagFlightDistance3dSig"]             = relu(RF_constituents[i].getExtraVar("CTagFlightDistance3dSig"));
-            varMap["j" + std::to_string(i + 1) + "_CTagMassVertexEnergyFraction"]        = relu(RF_constituents[i].getExtraVar("CTagMassVertexEnergyFraction"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexBoostOverSqrtJetPt"]        = relu(RF_constituents[i].getExtraVar("CTagVertexBoostOverSqrtJetPt"));
-            varMap["j" + std::to_string(i + 1) + "_CTagVertexLeptonCategory"]            = relu(RF_constituents[i].getExtraVar("CTagVertexLeptonCategory"));
+            varMap["j" + std::to_string(i + 1) + "_recoJetsBtag"]                        = relu(RF_constituents[i].getExtraVar("recoJetsBtag"));
+            varMap["j" + std::to_string(i + 1) + "_recoJetsCharge"]                      = relu(RF_constituents[i].getExtraVar("recoJetsCharge"), -2);
+            varMap["j" + std::to_string(i + 1) + "_qgMult"]                              = relu(RF_constituents[i].getExtraVar("qgMult"));
             
 
             //index of next jet (assumes < 4 jets)
@@ -470,7 +442,195 @@ namespace ttUtility
 
     std::vector<std::string> getMVAVars()
     {
-        return std::vector<std::string>({"cand_m", "cand_pt", "cand_p", "cand_dRMax", "cand_dThetaMax", "cand_dThetaMin", "j12_m", "j13_m", "j23_m", "j1_p", "j2_p", "j3_p", "dTheta12", "dTheta23", "dTheta13", "j1_CSV", "j2_CSV", "j3_CSV", "j1_QGL", "j2_QGL", "j3_QGL","j1_qgMult", "j1_qgPtD", "j1_qgAxis1", "j1_qgAxis2", "j1_recoJetsFlavor", "j1_recoJetsJecScaleRawToFull", "j1_recoJetschargedHadronEnergyFraction", "j1_recoJetschargedEmEnergyFraction", "j1_recoJetsneutralEmEnergyFraction", "j1_recoJetsmuonEnergyFraction", "j1_recoJetsHFHadronEnergyFraction", "j1_recoJetsHFEMEnergyFraction", "j1_recoJetsneutralEnergyFraction", "j1_PhotonEnergyFraction", "j1_ElectronEnergyFraction", "j1_ChargedHadronMultiplicity", "j1_NeutralHadronMultiplicity", "j1_PhotonMultiplicity", "j1_ElectronMultiplicity", "j1_MuonMultiplicity", "j1_DeepCSVb", "j1_DeepCSVc", "j1_DeepCSVl", "j1_DeepCSVbb", "j1_DeepCSVcc", "j1_CvsL", "j1_CvsB", /*"j1_CombinedSvtx", "j1_Svtx", "j1_SoftM", "j1_SoftE", */"j1_JetProba", "j1_JetBprob", "j1_recoJetsCharge", "j1_CSVTrackJetPt", "j1_CSVVertexCategory", "j1_CSVJetNSecondaryVertices", "j1_CSVTrackSumJetEtRatio", "j1_CSVTrackSumJetDeltaR", "j1_CSVTrackSip2dValAboveCharm", "j1_CSVTrackSip2dSigAboveCharm", "j1_CSVTrackSip3dValAboveCharm", "j1_CSVTrackSip3dSigAboveCharm", "j1_CSVVertexMass", "j1_CSVVertexNTracks", "j1_CSVVertexEnergyRatio", "j1_CSVVertexJetDeltaR", "j1_CSVFlightDistance2dVal", "j1_CSVFlightDistance2dSig", "j1_CSVFlightDistance3dVal", "j1_CSVFlightDistance3dSig", "j1_CTagVertexCategory", "j1_CTagJetNSecondaryVertices", "j1_CTagTrackSumJetEtRatio", "j1_CTagTrackSumJetDeltaR", "j1_CTagTrackSip2dSigAboveCharm", "j1_CTagTrackSip3dSigAboveCharm", "j1_CTagVertexMass", "j1_CTagVertexNTracks", "j1_CTagVertexEnergyRatio", "j1_CTagVertexJetDeltaR", "j1_CTagFlightDistance2dSig", "j1_CTagFlightDistance3dSig", "j1_CTagMassVertexEnergyFraction", "j1_CTagVertexBoostOverSqrtJetPt", "j1_CTagVertexLeptonCategory", "j2_qgMult", "j2_qgPtD", "j2_qgAxis1", "j2_qgAxis2", "j2_recoJetsFlavor", "j2_recoJetsJecScaleRawToFull", "j2_recoJetschargedHadronEnergyFraction", "j2_recoJetschargedEmEnergyFraction", "j2_recoJetsneutralEmEnergyFraction", "j2_recoJetsmuonEnergyFraction", "j2_recoJetsHFHadronEnergyFraction", "j2_recoJetsHFEMEnergyFraction", "j2_recoJetsneutralEnergyFraction", "j2_PhotonEnergyFraction", "j2_ElectronEnergyFraction", "j2_ChargedHadronMultiplicity", "j2_NeutralHadronMultiplicity", "j2_PhotonMultiplicity", "j2_ElectronMultiplicity", "j2_MuonMultiplicity", "j2_DeepCSVb", "j2_DeepCSVc", "j2_DeepCSVl", "j2_DeepCSVbb", "j2_DeepCSVcc", "j2_CvsL", "j2_CvsB", /*"j2_CombinedSvtx", "j2_Svtx", "j2_SoftM", "j2_SoftE",*/ "j2_JetProba", "j2_JetBprob", "j2_recoJetsCharge", "j2_CSVTrackJetPt", "j2_CSVVertexCategory", "j2_CSVJetNSecondaryVertices", "j2_CSVTrackSumJetEtRatio", "j2_CSVTrackSumJetDeltaR", "j2_CSVTrackSip2dValAboveCharm", "j2_CSVTrackSip2dSigAboveCharm", "j2_CSVTrackSip3dValAboveCharm", "j2_CSVTrackSip3dSigAboveCharm", "j2_CSVVertexMass", "j2_CSVVertexNTracks", "j2_CSVVertexEnergyRatio", "j2_CSVVertexJetDeltaR", "j2_CSVFlightDistance2dVal", "j2_CSVFlightDistance2dSig", "j2_CSVFlightDistance3dVal", "j2_CSVFlightDistance3dSig", "j2_CTagVertexCategory", "j2_CTagJetNSecondaryVertices", "j2_CTagTrackSumJetEtRatio", "j2_CTagTrackSumJetDeltaR", "j2_CTagTrackSip2dSigAboveCharm", "j2_CTagTrackSip3dSigAboveCharm", "j2_CTagVertexMass", "j2_CTagVertexNTracks", "j2_CTagVertexEnergyRatio", "j2_CTagVertexJetDeltaR", "j2_CTagFlightDistance2dSig", "j2_CTagFlightDistance3dSig", "j2_CTagMassVertexEnergyFraction", "j2_CTagVertexBoostOverSqrtJetPt", "j2_CTagVertexLeptonCategory", "j3_qgMult", "j3_qgPtD", "j3_qgAxis1", "j3_qgAxis2", "j3_recoJetsFlavor", "j3_recoJetsJecScaleRawToFull", "j3_recoJetschargedHadronEnergyFraction", "j3_recoJetschargedEmEnergyFraction", "j3_recoJetsneutralEmEnergyFraction", "j3_recoJetsmuonEnergyFraction", "j3_recoJetsHFHadronEnergyFraction", "j3_recoJetsHFEMEnergyFraction", "j3_recoJetsneutralEnergyFraction", "j3_PhotonEnergyFraction", "j3_ElectronEnergyFraction", "j3_ChargedHadronMultiplicity", "j3_NeutralHadronMultiplicity", "j3_PhotonMultiplicity", "j3_ElectronMultiplicity", "j3_MuonMultiplicity", "j3_DeepCSVb", "j3_DeepCSVc", "j3_DeepCSVl", "j3_DeepCSVbb", "j3_DeepCSVcc", "j3_CvsL", "j3_CvsB",/* "j3_CombinedSvtx", "j3_Svtx", "j3_SoftM", "j3_SoftE", */"j3_JetProba", "j3_JetBprob", "j3_recoJetsCharge", "j3_CSVTrackJetPt", "j3_CSVVertexCategory", "j3_CSVJetNSecondaryVertices", "j3_CSVTrackSumJetEtRatio", "j3_CSVTrackSumJetDeltaR", "j3_CSVTrackSip2dValAboveCharm", "j3_CSVTrackSip2dSigAboveCharm", "j3_CSVTrackSip3dValAboveCharm", "j3_CSVTrackSip3dSigAboveCharm", "j3_CSVVertexMass", "j3_CSVVertexNTracks", "j3_CSVVertexEnergyRatio", "j3_CSVVertexJetDeltaR", "j3_CSVFlightDistance2dVal", "j3_CSVFlightDistance2dSig", "j3_CSVFlightDistance3dVal", "j3_CSVFlightDistance3dSig", "j3_CTagVertexCategory", "j3_CTagJetNSecondaryVertices", "j3_CTagTrackSumJetEtRatio", "j3_CTagTrackSumJetDeltaR", "j3_CTagTrackSip2dSigAboveCharm", "j3_CTagTrackSip3dSigAboveCharm", "j3_CTagVertexMass", "j3_CTagVertexNTracks", "j3_CTagVertexEnergyRatio", "j3_CTagVertexJetDeltaR", "j3_CTagFlightDistance2dSig", "j3_CTagFlightDistance3dSig", "j3_CTagMassVertexEnergyFraction", "j3_CTagVertexBoostOverSqrtJetPt", "j3_CTagVertexLeptonCategory", "j1_p_top", "j1_theta_top", "j1_phi_top", "j2_p_top", "j2_theta_top", "j2_phi_top", "j3_p_top", "j3_theta_top", "j3_phi_top"});
+        return std::vector<std::string>({"genTopPt",
+                    "MET",
+                    "cand_dRMax",
+                    "cand_dThetaMin",
+                    "cand_dThetaMax",
+                    "cand_eta",
+                    "cand_m",
+                    "cand_phi",
+                    "cand_pt",
+                    "cand_p",
+                    "dR12_lab",
+                    "dR13_lab",
+                    "dR1_23_lab",
+                    "dR23_lab",
+                    "dR2_13_lab",
+                    "dR3_12_lab",
+                    "dRPtTop",
+                    "dRPtW",
+                    "dTheta12",
+                    "dTheta13",
+                    "dTheta23",
+                    "j12_m",
+                    "j12_m_lab",
+                    "j13_m",
+                    "j13_m_lab",
+
+                    "j1_recoJetsJecScaleRawToFull",
+                    "j1_qgLikelihood",
+                    "j1_qgPtD",
+                    "j1_qgAxis1",
+                    "j1_qgAxis2",
+                    "j1_recoJetschargedHadronEnergyFraction",
+                    "j1_recoJetschargedEmEnergyFraction",
+                    "j1_recoJetsneutralEmEnergyFraction",
+                    "j1_recoJetsmuonEnergyFraction",
+                    "j1_recoJetsHFHadronEnergyFraction",
+                    "j1_recoJetsHFEMEnergyFraction",
+                    "j1_recoJetsneutralEnergyFraction",
+                    "j1_PhotonEnergyFraction",
+                    "j1_ElectronEnergyFraction",
+                    "j1_ChargedHadronMultiplicity",
+                    "j1_NeutralHadronMultiplicity",
+                    "j1_PhotonMultiplicity",
+                    "j1_ElectronMultiplicity",
+                    "j1_MuonMultiplicity",
+                    "j1_DeepCSVb",
+                    "j1_DeepCSVc",
+                    "j1_DeepCSVl",
+                    "j1_DeepCSVbb",
+                    "j1_DeepCSVcc",
+                    "j1_DeepFlavorb",
+                    "j1_DeepFlavorbb",
+                    "j1_DeepFlavorlepb",
+                    "j1_DeepFlavorc",
+                    "j1_DeepFlavoruds",
+                    "j1_DeepFlavorg",
+                    "j1_CvsL",
+                    "j1_CvsB",
+                    "j1_CombinedSvtx",
+                    "j1_JetProba",
+                    "j1_JetBprob",
+                    "j1_recoJetsBtag",
+                    "j1_recoJetsCharge",
+                    "j1_qgMult",
+                    "j1_CSV",
+                    "j1_CSV_lab",
+                    "j1_QGL",
+                    "j1_QGL_lab",
+                    "j1_eta_lab",
+                    "j1_m",
+                    "j1_m_lab",
+                    "j1_p",
+                    "j1_phi_lab",
+                    "j1_pt_lab",
+                    "j1_qgAxis1_lab",
+                    "j1_qgAxis2_lab",
+                    "j1_qgMult_lab",
+                    "j1_qgPtD_lab",
+                    "j2_recoJetsJecScaleRawToFull",
+                    "j2_qgLikelihood",
+                    "j2_qgPtD",
+                    "j2_qgAxis1",
+                    "j2_qgAxis2",
+                    "j2_recoJetschargedHadronEnergyFraction",
+                    "j2_recoJetschargedEmEnergyFraction",
+                    "j2_recoJetsneutralEmEnergyFraction",
+                    "j2_recoJetsmuonEnergyFraction",
+                    "j2_recoJetsHFHadronEnergyFraction",
+                    "j2_recoJetsHFEMEnergyFraction",
+                    "j2_recoJetsneutralEnergyFraction",
+                    "j2_PhotonEnergyFraction",
+                    "j2_ElectronEnergyFraction",
+                    "j2_ChargedHadronMultiplicity",
+                    "j2_NeutralHadronMultiplicity",
+                    "j2_PhotonMultiplicity",
+                    "j2_ElectronMultiplicity",
+                    "j2_MuonMultiplicity",
+                    "j2_DeepCSVb",
+                    "j2_DeepCSVc",
+                    "j2_DeepCSVl",
+                    "j2_DeepCSVbb",
+                    "j2_DeepCSVcc",
+                    "j2_DeepFlavorb",
+                    "j2_DeepFlavorbb",
+                    "j2_DeepFlavorlepb",
+                    "j2_DeepFlavorc",
+                    "j2_DeepFlavoruds",
+                    "j2_DeepFlavorg",
+                    "j2_CvsL",
+                    "j2_CvsB",
+                    "j2_CombinedSvtx",
+                    "j2_JetProba",
+                    "j2_JetBprob",
+                    "j2_recoJetsBtag",
+                    "j2_recoJetsCharge",
+                    "j2_qgMult",
+                    "j2_CSV",
+                    "j2_CSV_lab",
+                    "j2_QGL",
+                    "j2_QGL_lab",
+                    "j2_eta_lab",
+                    "j2_m",
+                    "j2_m_lab",
+                    "j2_p",
+                    "j2_phi_lab",
+                    "j2_pt_lab",
+                    "j2_qgAxis1_lab",
+                    "j2_qgAxis2_lab",
+                    "j2_qgMult_lab",
+                    "j2_qgPtD_lab",
+
+                    "j3_recoJetsJecScaleRawToFull",
+                    "j3_qgLikelihood",
+                    "j3_qgPtD",
+                    "j3_qgAxis1",
+                    "j3_qgAxis2",
+                    "j3_recoJetschargedHadronEnergyFraction",
+                    "j3_recoJetschargedEmEnergyFraction",
+                    "j3_recoJetsneutralEmEnergyFraction",
+                    "j3_recoJetsmuonEnergyFraction",
+                    "j3_recoJetsHFHadronEnergyFraction",
+                    "j3_recoJetsHFEMEnergyFraction",
+                    "j3_recoJetsneutralEnergyFraction",
+                    "j3_PhotonEnergyFraction",
+                    "j3_ElectronEnergyFraction",
+                    "j3_ChargedHadronMultiplicity",
+                    "j3_NeutralHadronMultiplicity",
+                    "j3_PhotonMultiplicity",
+                    "j3_ElectronMultiplicity",
+                    "j3_MuonMultiplicity",
+                    "j3_DeepCSVb",
+                    "j3_DeepCSVc",
+                    "j3_DeepCSVl",
+                    "j3_DeepCSVbb",
+                    "j3_DeepCSVcc",
+                    "j3_DeepFlavorb",
+                    "j3_DeepFlavorbb",
+                    "j3_DeepFlavorlepb",
+                    "j3_DeepFlavorc",
+                    "j3_DeepFlavoruds",
+                    "j3_DeepFlavorg",
+                    "j3_CvsL",
+                    "j3_CvsB",
+                    "j3_CombinedSvtx",
+                    "j3_JetProba",
+                    "j3_JetBprob",
+                    "j3_recoJetsBtag",
+                    "j3_recoJetsCharge",
+                    "j3_qgMult",
+                    "j3_CSV",
+                    "j3_CSV_lab",
+                    "j3_QGL",
+                    "j3_QGL_lab",
+                    "j3_eta_lab",
+                    "j3_m",
+                    "j3_m_lab",
+                    "j3_p",
+                    "j3_phi_lab",
+                    "j3_pt_lab",
+                    "j3_qgAxis1_lab",
+                    "j3_qgAxis2_lab",
+                    "j3_qgMult_lab",
+                    "j3_qgPtD_lab",
+
+                    "j23_m",
+                    "j23_m_lab",
+                    "sd_n2",
+                    "j1_p_top", "j1_theta_top", "j1_phi_top", "j2_p_top", "j2_theta_top", "j2_phi_top", "j3_p_top", "j3_theta_top", "j3_phi_top"});
+
     }
 
     std::vector<TLorentzVector> GetHadTopLVec(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec)

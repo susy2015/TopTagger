@@ -20,7 +20,7 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
   clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
@@ -50,7 +50,7 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
@@ -80,7 +80,7 @@ def mainTF(options):
   print "Input Variables: ",len(dg.getList())
 
   # Import data
-  validData = dg.importData(samplesToRun = options.runOp.validationSamples, ptReweight=options.runOp.ptReweight)
+  validData = dg.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
 
   #get input/output sizes
   nFeatures = validData["data"].shape[1]
@@ -95,10 +95,14 @@ def mainTF(options):
   validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
 
   #scale data inputs to mean 0, stddev 1
-  mins = validData["data"].mean(0)
-  ptps = validData["data"].std(0)
+  categories = numpy.array(options.netOp.vCategories)
+  mins = numpy.zeros(categories.shape, dtype=numpy.float32)
+  ptps = numpy.zeros(categories.shape, dtype=numpy.float32)
+  for i in xrange(categories.max()):
+    selectedCategory = categories == i
+    mins[selectedCategory] = validData["data"][:,selectedCategory].mean()
+    ptps[selectedCategory] = validData["data"][:,selectedCategory].std()
   ptps[ptps < 1e-10] = 1.0
-  #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
   fnq = FileNameQueue(options.runOp.trainingSamples, NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)
@@ -136,13 +140,15 @@ def mainTF(options):
     for cr in crs:
       cr.start_threads(sess, n_threads=options.runOp.nThreadperReader)
 
-
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, NEpoch)
+
+    #preload the first data into staging area
+    sess.run([mlp.stagingOp], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
 
     i = 0
     try:
       while not coord.should_stop():
-        _, summary = sess.run([mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
+        _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
         summary_writer.add_summary(summary, i)
         i += 1
 

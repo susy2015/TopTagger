@@ -88,6 +88,8 @@ class CreateModel:
                     layerOutput = tf.nn.sigmoid(addResult, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "tanh":
                     layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
+                elif self.options.netOp.denseActivationFunc == "none":
+                    layerOutput = addResult
                 h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 
                 # Map the features to next layer
@@ -121,10 +123,16 @@ class CreateModel:
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
-        self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
+
+        #define a StagingArea here
+        self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes)
+        self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
+        self.x, self.y_, self.wgt = self.stagingArea.get()
+
+        #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
         #variables for pre-transforming data
-        self.offset = tf.constant(self.offset_initial, name="offest")
+        self.offset = tf.constant(self.offset_initial, name="offset")
         self.scale = tf.constant(self.scale_initial, name="scale")
 
         #input variables after rescaling 
@@ -145,7 +153,6 @@ class CreateModel:
             #weights for convolution filters - shared between all parallel graphs
             self.convWeights = []
             self.convBiases = []
-            print nChannel
             cnnStruct = [nChannel] + self.convLayers
             for i in xrange(len(cnnStruct) - 1):
                 self.convWeights.append(tf.Variable(tf.random_normal([FILTERWIDTH, cnnStruct[i], cnnStruct[i + 1]]), name="conv1_weights"))

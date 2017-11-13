@@ -40,7 +40,7 @@ class FileNameQueue:
             self.files = self.files[perms]
             
             for fileName in self.files:
-                self.fileQueue.put(fileName)
+                self.fileQueue.put(tuple(fileName))
 
         #The files are exhausted, wait for enqueues to finish
         for cr in self.customRunnerThreads:

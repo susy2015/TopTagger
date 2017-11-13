@@ -4,8 +4,10 @@ import pandas as pd
 class DataGetter:
 
     #The constructor simply takes in a list and saves it to self.list
-    def __init__(self, variables):
+    def __init__(self, variables, bufferData = False):
         self.list = variables
+        self.bufferData = bufferData
+        self.dataMap = {}
 
     #This method accepts a string and will return a DataGetter object with the variable list defined in this method.
     @classmethod
@@ -34,8 +36,8 @@ class DataGetter:
 
     #Simply accept a list and pass it to the constructor
     @classmethod
-    def DefinedVariables(cls, variables):
-        return cls(variables)
+    def DefinedVariables(cls, variables, bufferData = False):
+        return cls(variables, bufferData)
 
     def getList(self):
         return self.list
@@ -43,79 +45,87 @@ class DataGetter:
     def prescaleBackground(self, input, answer, prescale):
       return numpy.vstack([input[answer == 1], input[answer != 1][::prescale]])
     
-    def importData(self, samplesToRun = ["trainingTuple_division_0_TTbarSingleLep_training_1M.pkl.gz"], prescale = True, ptReweight=True, randomize = True):
-      #variables to train
-      vars = self.getList()
-      
-      inputData = numpy.empty([0])
-      npyInputWgts = numpy.empty([0])
+    def importData(self, samplesToRun, prescale = True, ptReweight=True, randomize = True):
 
-      import h5py
-      for sample in samplesToRun:
-        f = h5py.File(sample, "r")
-        npData = f["reco_candidates"][:]
-        columnHeaders = f["reco_candidates"].attrs["column_headers"]
-    
-        indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
-        
-        data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
-        f.close()
-    
-        #remove partial tops 
-        inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-        inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
-        inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
-        filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
-        data = data[filterArray]
-        inputAnswer = inputAnswer[filterArray]
-        inputWgts = numpy.copy(data.as_matrix(["sampleWgt"]).astype(numpy.float32))
-        
-        if ptReweight:
-          #calculate pt weights
-          #inputWgts = numpy.empty([len(inputAnswer), 1])
-          #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
-          ptBins = numpy.hstack([numpy.linspace(0, 2000, 51), [10000]])
-          dataPt = data["cand_pt"]
-          inputSampleWgts = data["sampleWgt"]
-          ptHistSig, _ = numpy.histogram(dataPt[inputAnswer == 1], bins=ptBins, weights=inputSampleWgts[inputAnswer == 1])
-          ptHistBg,  _ = numpy.histogram(dataPt[inputAnswer != 1], bins=ptBins, weights=inputSampleWgts[inputAnswer != 1])
-          ptHistSig[ptHistSig < 10] = ptHistSig.max()
-          ptHistBg[ptHistBg < 10] = ptHistBg.max()
-          inputWgts[inputAnswer == 1] *= (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
-          inputWgts[inputAnswer != 1] *= (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
-    
-        if len(inputData) == 0:
-          inputData = data
-          npyInputWgts = inputWgts
-        else:
-          inputData = pd.concat([inputData, data])
-          npyInputWgts = numpy.vstack([npyInputWgts, inputWgts])
-    
-      #parse pandas dataframe into training data
-      npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
-      npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-      npyInputAnswer = (npyInputLabels[:,0] > 2.99) & (npyInputLabels[:,1] > 0.99)
-      npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
-      npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
-        
-      if prescale:
-        #Remove background events so that bg and signal are roughly equally represented
-        prescaleRatio = max(1, (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum())
-    
-        npyInputData =       self.prescaleBackground(npyInputData, npyInputAnswer, prescaleRatio)
-        npyInputAnswers =    self.prescaleBackground(npyInputAnswers, npyInputAnswer, prescaleRatio)
-        npyInputWgts =       self.prescaleBackground(npyInputWgts, npyInputAnswer, prescaleRatio)
-        npyInputSampleWgts = self.prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescaleRatio)
-    
-      #equalize bg and signal weights 
-      nsig = npyInputWgts[npyInputAnswers[:,0] > 0.99].sum()
-      nbg  = npyInputWgts[npyInputAnswers[:,0] < 0.99].sum()
+      if (samplesToRun, prescale, ptReweight) in self.dataMap:
+        npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts = self.dataMap[samplesToRun, prescale, ptReweight]
 
-      npyInputWgts[npyInputAnswers[:,0] < 0.99] *= nsig / nbg
-    
-      #normalize training weights
-      npyInputWgts /= npyInputWgts.mean()
-      
+      else:
+        #variables to train
+        vars = self.getList()
+        
+        inputData = numpy.empty([0])
+        npyInputWgts = numpy.empty([0])
+        
+        import h5py
+        for sample in samplesToRun:
+          f = h5py.File(sample, "r")
+          npData = f["reco_candidates"][:]
+          columnHeaders = f["reco_candidates"].attrs["column_headers"]
+        
+          indices = [npData[:,0].astype(numpy.int), npData[:,1].astype(numpy.int)]
+          
+          data = pd.DataFrame(npData[:,2:], index=pd.MultiIndex.from_arrays(indices), columns=columnHeaders[2:])
+          f.close()
+        
+          #remove partial tops 
+          inputLabels = data.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+          inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
+          inputBackground = (inputLabels[:,0] == 0) & numpy.logical_not(inputLabels[:,1])
+          filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (data["ncand"] > 0)
+          data = data[filterArray]
+          inputAnswer = inputAnswer[filterArray]
+          inputWgts = numpy.copy(data.as_matrix(["sampleWgt"]).astype(numpy.float32))
+          
+          if ptReweight:
+            #calculate pt weights
+            #inputWgts = numpy.empty([len(inputAnswer), 1])
+            #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
+            ptBins = numpy.hstack([numpy.linspace(0, 2000, 51), [10000]])
+            dataPt = data["cand_pt"]
+            inputSampleWgts = data["sampleWgt"]
+            ptHistSig, _ = numpy.histogram(dataPt[inputAnswer == 1], bins=ptBins, weights=inputSampleWgts[inputAnswer == 1])
+            ptHistBg,  _ = numpy.histogram(dataPt[inputAnswer != 1], bins=ptBins, weights=inputSampleWgts[inputAnswer != 1])
+            ptHistSig[ptHistSig < 10] = ptHistSig.max()
+            ptHistBg[ptHistBg < 10] = ptHistBg.max()
+            inputWgts[inputAnswer == 1] *= (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
+            inputWgts[inputAnswer != 1] *= (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
+        
+          if len(inputData) == 0:
+            inputData = data
+            npyInputWgts = inputWgts
+          else:
+            inputData = pd.concat([inputData, data])
+            npyInputWgts = numpy.vstack([npyInputWgts, inputWgts])
+        
+        #parse pandas dataframe into training data
+        npyInputData = inputData.as_matrix(vars).astype(numpy.float32)
+        npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
+        npyInputAnswer = (npyInputLabels[:,0] > 2.99) & (npyInputLabels[:,1] > 0.99)
+        npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
+        npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
+          
+        if prescale:
+          #Remove background events so that bg and signal are roughly equally represented
+          prescaleRatio = max(1, (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum())
+        
+          npyInputData =       self.prescaleBackground(npyInputData, npyInputAnswer, prescaleRatio)
+          npyInputAnswers =    self.prescaleBackground(npyInputAnswers, npyInputAnswer, prescaleRatio)
+          npyInputWgts =       self.prescaleBackground(npyInputWgts, npyInputAnswer, prescaleRatio)
+          npyInputSampleWgts = self.prescaleBackground(npyInputSampleWgts, npyInputAnswer, prescaleRatio)
+        
+        #equalize bg and signal weights 
+        nsig = npyInputWgts[npyInputAnswers[:,0] > 0.99].sum()
+        nbg  = npyInputWgts[npyInputAnswers[:,0] < 0.99].sum()
+        
+        npyInputWgts[npyInputAnswers[:,0] < 0.99] *= nsig / nbg
+        
+        #normalize training weights
+        npyInputWgts /= npyInputWgts.mean()
+        
+        if self.bufferData:
+            self.dataMap[samplesToRun, prescale, ptReweight] = (npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts)
+
       if randomize:
         #randomize input data
         perms = numpy.random.permutation(npyInputData.shape[0])

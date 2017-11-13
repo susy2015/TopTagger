@@ -5,13 +5,38 @@ import fnmatch
 from glob import glob
 
 def getJetVarNames(jetVariables):
-   return [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
-   
+   return [(jet+var[0], var[1]) if (isinstance(var, tuple) or isinstance(var, list)) else jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
+
+def splitVarAndCatagory(inVars):
+   categoryDict = {}
+   categoryCnt = 0
+   variables = []
+   categories = []
+   for v in inVars:
+      if isinstance(v, tuple) or isinstance(v, list):
+         variables.append(v[0])
+         if not v[1] in categoryDict:
+            categoryDict[v[1]] = categoryCnt
+            categoryCnt += 1
+         categories.append(categoryDict[v[1]])
+      else:
+         variables.append(v)
+         categories.append(categoryCnt)
+         categoryCnt += 1
+   return variables, categories
 
 def StandardVariables(variables):
    if variables == "TeamAlpha":
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
       jNames = ["p", "CSV", "QGL"]
+
+   elif variables == "TeamAlphaNorm":
+      vNames = [("cand_m", 1), ("j12_m", 1), ("j13_m", 1), ("j23_m", 1), ("dTheta12", 2), ("dTheta23", 2), ("dTheta13", 2)]
+      jNames = [("p", 1), "CSV", "QGL"]
+
+   elif variables == "Kinematic":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
+      jNames = ["p"]
 
    elif variables == "Mixed":
       vNames = ["cand_m", "j12_m_lab", "j13_m_lab", "j23_m_lab", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
@@ -195,7 +220,8 @@ class runOptions:
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.5):
+                      keepProb          = 0.5,
+                      nTrainingFiles    = 100):
 
       self.runName           = runName
       self.directory         = directory
@@ -220,7 +246,9 @@ class runOptions:
          except OSError:
             self.trainingNames = []
          
-      self.validationNames       = validationNames
+      self.validationNames     = validationNames
+
+      self.nTrainingFiles      = nTrainingFiles 
 
       self.makeTrainingSamples()
       self.makeValidationSamples()
@@ -240,7 +268,7 @@ class runOptions:
    #This method uses the dataPath and the list of trainingNames to make a list of training files
    def makeTrainingSamples(self):
       #Some temporary hacks, lets make these options      
-      fileLists = [glob(self.dataPath + fileGlob)[:100] for fileGlob in self.trainingGlob]
+      fileLists = [glob(self.dataPath + fileGlob)[:self.nTrainingFiles] for fileGlob in self.trainingGlob]
 
       self.trainingSamples = zip(*fileLists)
 
@@ -272,11 +300,14 @@ class runOptions:
       parser.add_option ('-f', "--dataFilePath",      dest="dataFilePath",      action='store',                    help="Path where the input datafiles are stored (default: \"data\")")
       parser.add_option ('-g', "--l2Reg",             dest="l2Reg",             action='store',      type="float", help="Scale factor for the L2 regularization term of the loss (default 0.0001)")
       parser.add_option ('-t', "--keepProb",          dest="keepProb",          action='store',      type="float", help="The Dropout probability to apply during network training (default 0.8)")
+      parser.add_option ('-y', "--nTrainingFiles",    dest="nTrainingFiles",    action='store',      type="int",   help="The number of training files to use (default: 100)")
       return parser      
 
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
    def override(self, cloptions):
       orList = []
+
+      doCleanup = False
 
       if cloptions.ptReweight != None: 
          self.ptReweight = cloptions.ptReweight
@@ -314,16 +345,24 @@ class runOptions:
          self.l2Reg = cloptions.l2Reg
          orList.append("l2Reg = "+str(cloptions.l2Reg))
 
+      if cloptions.nTrainingFiles != None:
+         self.nTrainingFiles = cloptions.nTrainingFiles
+         orList.append("nTrainingFiles ="+str(cloptions.nTrainingFiles))
+         doCleanup = True
+
       if cloptions.dataFilePath != None: 
          self.dataPath = cloptions.dataFilePath
          if self.dataPath[-1] != "/": self.dataPath+= "/"
          orList.append("dataPath = "+str(cloptions.dataFilePath))
-         self.makeTrainingSamples()
-         self.makeValidationSamples()
+         doCleanup = True
 
       if cloptions.keepProb != None:
          self.keepProb = cloptions.keepProb
          orList.append("keepProb = "+str(cloptions.keepProb))
+
+      if doCleanup:
+         self.makeTrainingSamples()
+         self.makeValidationSamples()
 
       if len(orList):
          info = "runOptions overriden by command line:"
@@ -362,7 +401,7 @@ class networkOptions:
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
                       denseLayers         = [400, 200],
-                      denseActivationFunc = "tanh",
+                      denseActivationFunc = "relu",
                       convLayers          = [],
                       rnnNodes            = 30,
                       rnnLayers           = 2,
@@ -393,7 +432,7 @@ class networkOptions:
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
       self.jetVariablesList = getJetVarNames(self.jetVariables)
-      self.vNames            = self.inputVariables+self.jetVariablesList
+      self.vNames, self.vCategories = splitVarAndCatagory(self.inputVariables+self.jetVariablesList)
 
       self.convNDenseOnlyVar = len(self.inputVariables)
       self.convNChannels     = len(self.jetVariables)
@@ -445,7 +484,8 @@ class networkOptions:
          self.jetVariablesList = getJetVarNames(jetVariables)
 
          self.convNDenseOnlyVar = len(inputVariables)
-         self.vNames            = self.inputVariables+self.jetVariablesList
+         #split categories from variables
+         self.vNames, self.vCategories = splitVarAndCatagory(self.inputVariables+self.jetVariablesList)
 
          returnMessage = "Loaded standard input variables named "+cloptions.variables
 
