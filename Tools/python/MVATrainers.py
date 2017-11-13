@@ -23,10 +23,8 @@ def mainSKL(options):
   trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
-  clf = RandomForestClassifier(n_estimators=500, max_depth=12, n_jobs = 4, verbose = True)
+  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
 
-  print trainData
-  
   print "TRAINING RF"
 
   # Train random forest 
@@ -59,8 +57,8 @@ def mainXGB(options):
   # Create xgboost classifier
   # Train random forest 
   xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0], weight=trainData["weights"][:,0])
-  param = {'max_depth':3, 'eta':0.05 }
-  gbm = xgb.train(param, xgData, num_boost_round=3000)
+  param = {'max_depth':6, 'eta':0.05, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'] }
+  gbm = xgb.train(param, xgData, num_boost_round=2000)
   
   #Dump output from training
   gbm.save_model(options.directory + "/" + 'TrainingModel.xgb')
