@@ -192,6 +192,35 @@ def StandardVariables(variables):
                 "DeepCSVcc",
                 "DeepCSVl",]
 
+   elif variables == "DeepFlavor":
+      vNames = ["cand_m",
+ 		"cand_p",
+ 		"j12_m",
+ 		"j13_m",
+ 		"j23_m",
+ 		"dTheta12",
+ 		"dTheta23",
+ 		"dTheta13"]
+      jNames = ["m", "p_restFrame", “p_lab”,
+		"qgAxis1", "qgAxis2", "qgMult", "qgPtD",
+		"ChargedHadronMultiplicity",
+		"ElectronEnergyFraction",
+		"ElectronMultiplicity",
+		"MuonMultiplicity",
+		"NeutralHadronMultiplicity",
+		"PhotonEnergyFraction",
+		"PhotonMultiplicity",
+		"HFEMEnergyFraction",
+		"HFHadronEnergyFraction",
+		"chargedEmEnergyFraction",
+		"chargedHadronEnergyFraction",
+		"muonEnergyFraction",
+		"neutralEmEnergyFraction",
+		"neutralEnergyFraction",
+		"DeepCSVb", "DeepCSVbb",
+		"DeepCSVc", "DeepCSVcc",
+		"DeepCSVl"]
+
    else:
       vNames = ["cand_m"]
       jNames = ["p"]
