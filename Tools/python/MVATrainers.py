@@ -20,13 +20,11 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5"), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
-  clf = RandomForestClassifier(n_estimators=500, max_depth=12, n_jobs = 4, verbose = True)
+  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
 
-  print trainData
-  
   print "TRAINING RF"
 
   # Train random forest 
@@ -59,8 +57,8 @@ def mainXGB(options):
   # Create xgboost classifier
   # Train random forest 
   xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0], weight=trainData["weights"][:,0])
-  param = {'max_depth':3, 'eta':0.05 }
-  gbm = xgb.train(param, xgData, num_boost_round=500)
+  param = {'max_depth':6, 'eta':0.05, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'] }
+  gbm = xgb.train(param, xgData, num_boost_round=2000)
   
   #Dump output from training
   gbm.save_model(options.directory + "/" + 'TrainingModel.xgb')
@@ -97,10 +95,14 @@ def mainTF(options):
   validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
 
   #scale data inputs to mean 0, stddev 1
-  mins = validData["data"].mean(0)
-  ptps = validData["data"].std(0)
+  categories = numpy.array(options.netOp.vCategories)
+  mins = numpy.zeros(categories.shape, dtype=numpy.float32)
+  ptps = numpy.zeros(categories.shape, dtype=numpy.float32)
+  for i in xrange(categories.max()):
+    selectedCategory = categories == i
+    mins[selectedCategory] = validData["data"][:,selectedCategory].mean()
+    ptps[selectedCategory] = validData["data"][:,selectedCategory].std()
   ptps[ptps < 1e-10] = 1.0
-  #npyInputData = (npyInputData - mins)/ptps
 
   #Create filename queue
   fnq = FileNameQueue(options.runOp.trainingSamples, NEpoch, nFeatures, nLabels, nWeigts, options.runOp.nReaders, MiniBatchSize)

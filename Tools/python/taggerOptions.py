@@ -5,13 +5,34 @@ import fnmatch
 from glob import glob
 
 def getJetVarNames(jetVariables):
-   return [jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
-   
+   return [(jet+var[0], var[1]) if (isinstance(var, tuple) or isinstance(var, list)) else jet+var for jet in ["j1_","j2_","j3_"] for var in jetVariables]
+
+def splitVarAndCatagory(inVars):
+   categoryDict = {}
+   categoryCnt = 0
+   variables = []
+   categories = []
+   for v in inVars:
+      if isinstance(v, tuple) or isinstance(v, list):
+         variables.append(v[0])
+         if not v[1] in categoryDict:
+            categoryDict[v[1]] = categoryCnt
+            categoryCnt += 1
+         categories.append(categoryDict[v[1]])
+      else:
+         variables.append(v)
+         categories.append(categoryCnt)
+         categoryCnt += 1
+   return variables, categories
 
 def StandardVariables(variables):
    if variables == "TeamAlpha":
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
       jNames = ["p", "CSV", "QGL"]
+
+   elif variables == "TeamAlphaNorm":
+      vNames = [("cand_m", 1), ("j12_m", 1), ("j13_m", 1), ("j23_m", 1), ("dTheta12", 2), ("dTheta23", 2), ("dTheta13", 2)]
+      jNames = [("p", 1), "CSV", "QGL"]
 
    elif variables == "Kinematic":
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m","dTheta12", "dTheta23", "dTheta13"]
@@ -26,16 +47,20 @@ def StandardVariables(variables):
       jNames = ["m_lab", "CSV_lab", "QGL_lab"]
  
    elif variables == "TeamAlphaMoreQGL":
-      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
-      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta23"] 
+      jNames = ["m", "CSV", "qgAxis1", "qgMult", "qgPtD"]
 
    elif variables == "TeamAMoreQGL":
-      vNames = ["cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
-      jNames = ["m_lab", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
+      vNames = ["cand_m", "dRPtTop", "j23_m", "dRPtW", "j12_m", "j13_m"]
+      jNames = ["m", "CSV", "qgAxis1", "qgMult", "qgPtD"]
 
    elif variables == "MixedMoreQGLCandPt":
-      vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
-      jNames = ["p", "CSV", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "CvsL", "CvsB"]
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta23", "dRPtTop", "dRPtW"]
+      jNames = ["m", "CSV", "qgAxis1", "qgMult", "qgPtD"]
+
+   elif variables == "Mixed2":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW"]
+      jNames = ["p", "m", "CSV", "qgAxis1", "qgMult", "qgPtD"]
 
    elif variables == "MixedDeepCSV":
       vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
@@ -140,33 +165,32 @@ def StandardVariables(variables):
    elif variables == "TeamAlpha1DConvPrime":
       vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
       jNames = ["m",
-                "p",
-                "p_top",
-                "qgAxis1",
-                "qgAxis2",
-                "qgMult",
-                "qgPtD",
-                "recoJetsCharge",
-                "ChargedHadronMultiplicity",
-                "ElectronEnergyFraction",
-                "ElectronMultiplicity",
-                "MuonMultiplicity",
-                "NeutralHadronMultiplicity",
-                "PhotonEnergyFraction",
-                "PhotonMultiplicity",
-                "recoJetsHFEMEnergyFraction",
-                "recoJetsHFHadronEnergyFraction",
-                "recoJetschargedEmEnergyFraction",
-                "recoJetschargedHadronEnergyFraction",
-                "recoJetsmuonEnergyFraction",
-                "recoJetsneutralEmEnergyFraction",
-                "recoJetsneutralEnergyFraction",
-                "DeepCSVb",
-                "DeepCSVbb",
-                "DeepCSVc",
-                "DeepCSVcc",
-                "DeepCSVl",]
-
+            "p",
+            "p_top",
+            "qgAxis1",
+            "qgAxis2",
+            "qgMult",
+            "qgPtD",
+            "ChargedHadronMultiplicity",
+            "ElectronEnergyFraction",
+            "ElectronMultiplicity",
+            "MuonMultiplicity",
+            "NeutralHadronMultiplicity",
+            "PhotonEnergyFraction",
+            "PhotonMultiplicity",
+            "recoJetsHFEMEnergyFraction",
+            "recoJetsHFHadronEnergyFraction",
+            "recoJetschargedEmEnergyFraction",
+            "recoJetschargedHadronEnergyFraction",
+            "recoJetsmuonEnergyFraction",
+            "recoJetsneutralEmEnergyFraction",
+            "recoJetsneutralEnergyFraction",
+            "DeepFlavorb",
+            "DeepFlavorbb",
+            "DeepFlavorlepb",
+            "DeepFlavorc",
+            "DeepFlavoruds",
+            "DeepFlavorg"]
    else:
       vNames = ["cand_m"]
       jNames = ["p"]
@@ -407,7 +431,7 @@ class networkOptions:
    #Configuration variables can be left in an inconsistent state, this method will return them to a consistent state.
    def cleanUp(self):
       self.jetVariablesList = getJetVarNames(self.jetVariables)
-      self.vNames            = self.inputVariables+self.jetVariablesList
+      self.vNames, self.vCategories = splitVarAndCatagory(self.inputVariables+self.jetVariablesList)
 
       self.convNDenseOnlyVar = len(self.inputVariables)
       self.convNChannels     = len(self.jetVariables)
@@ -459,7 +483,8 @@ class networkOptions:
          self.jetVariablesList = getJetVarNames(jetVariables)
 
          self.convNDenseOnlyVar = len(inputVariables)
-         self.vNames            = self.inputVariables+self.jetVariablesList
+         #split categories from variables
+         self.vNames, self.vCategories = splitVarAndCatagory(self.inputVariables+self.jetVariablesList)
 
          returnMessage = "Loaded standard input variables named "+cloptions.variables
 
