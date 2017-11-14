@@ -44,6 +44,20 @@ if test ${rootcintfound} == no; then
    AC_ERROR([ROOT: rootcint not found.])
 fi   
 
+dnl root is present, lets check for TMVA
+TMVALIB=$(root-config --libdir)/libTMVA.so
+AC_CHECK_FILE($TMVALIB, [], [])
+
+TMVALIB=ac_cv_file_$(echo ${TMVALIB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure TMVA if it is found
+if test "${!TMVALIB}" = "no"; then
+   AC_WARN([Optional dependency missing: TMVA libraries are not found.  If needed you must ensure your root install is built with support for TMVA.])
+   AC_SUBST(TMVALIB, "")
+else
+   AC_SUBST(TMVALIB, -lTMVA)
+fi
+
 dnl check for python 
 AC_CHECK_PROG(pythonconfigfound, python-config, yes, no)
 

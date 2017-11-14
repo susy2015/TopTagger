@@ -644,6 +644,7 @@ XGBOOSTDIR
 OPENCVDIR
 PYTHONCFG
 pythonconfigfound
+TMVALIB
 rootcintfound
 rootconfigfound
 LIBSUFFIX
@@ -2562,6 +2563,43 @@ if test ${rootcintfound} == no; then
    { { $as_echo "$as_me:$LINENO: error: ROOT: rootcint not found." >&5
 $as_echo "$as_me: error: ROOT: rootcint not found." >&2;}
    { (exit 1); exit 1; }; }
+fi
+
+TMVALIB=$(root-config --libdir)/libTMVA.so
+as_ac_File=`$as_echo "ac_cv_file_$TMVALIB" | $as_tr_sh`
+{ $as_echo "$as_me:$LINENO: checking for $TMVALIB" >&5
+$as_echo_n "checking for $TMVALIB... " >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+$as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TMVALIB"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+as_val=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+
+
+TMVALIB=ac_cv_file_$(echo ${TMVALIB} | sed -e 's/\//_/g' -e 's/\./_/')
+
+if test "${!TMVALIB}" = "no"; then
+   { $as_echo "$as_me:$LINENO: WARNING: Optional dependency missing: TMVA libraries are not found.  If needed you must ensure your root install is built with support for TMVA." >&5
+$as_echo "$as_me: WARNING: Optional dependency missing: TMVA libraries are not found.  If needed you must ensure your root install is built with support for TMVA." >&2;}
+   TMVALIB=""
+
+else
+   TMVALIB=-lTMVA
+
 fi
 
 # Extract the first word of "python-config", so it can be a program name with args.
