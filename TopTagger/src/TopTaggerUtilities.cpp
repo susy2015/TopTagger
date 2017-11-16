@@ -139,20 +139,23 @@ namespace ttUtility
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
             // For each tagged top/W, find the corresponding subjets
-            std::vector<TLorentzVector> subjets;
+            std::vector<Constituent> subjets;
             if(vecSubjetsLVec_ != nullptr)
             {
-                subjets = (*vecSubjetsLVec_)[iJet];
+                for(auto& subjetLV : (*vecSubjetsLVec_)[iJet])
+                {
+                    subjets.push_back(Constituent(subjetLV, AK8SUBJET));
+                }
             } 
             else if (subjetsLVec_ != nullptr) 
             {
                 // Calculate matching subjets if a single list was given 
-                for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
+                for(int iSJ = 0; iSJ < subjetsLVec_->size(); ++iSJ)
                 {
-                    double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
+                    double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], (*subjetsLVec_)[iSJ]);
                     if (myDR < 0.8)
                     {
-                        subjets.push_back(puppiSubJet);
+                        subjets.emplace_back((*subjetsLVec_)[iSJ], AK8SUBJET);
                     }
                 }
 
@@ -165,7 +168,7 @@ namespace ttUtility
                     {
                         for (unsigned int k=j+1; k<subjets.size(); ++k)
                         {
-                            TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
+                            TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j].p() - subjets[k].p();
                             double diff = fabs(diff_LV.M());
                             if(diff < min_diff)
                             {
@@ -190,7 +193,7 @@ namespace ttUtility
                     {
                         for(const auto& subjet : subjets)
                         {
-                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
+                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet.p(), *genDaughter);
                             if(dR < 0.4)
                             {
                                 constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);

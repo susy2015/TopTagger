@@ -8,7 +8,11 @@ Constituent::Constituent(const TLorentzVector& p, const double& bTagDisc, const 
     type_ = AK4JET;
 }
 
-Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets, const double& wMassCorr) : p_(p), bTagDisc_(-999.9), qgLikelihood_(-999.9), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass), subjets_(subjets), wMassCorr_(wMassCorr)
+Constituent::Constituent(const TLorentzVector& p, const ConstituentType& type) : p_(p), bTagDisc_(-999.9), qgLikelihood_(-999.9), tau1_(-999.9), tau2_(-999.9), tau3_(-999.9), softDropMass_(-999.9), wMassCorr_(-999.9), type_(type)
+{
+}
+
+Constituent::Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<Constituent>& subjets, const double& wMassCorr) : p_(p), bTagDisc_(-999.9), qgLikelihood_(-999.9), tau1_(tau1), tau2_(tau2), tau3_(tau3), softDropMass_(softDropMass), subjets_(subjets), wMassCorr_(wMassCorr)
 {
     type_ = AK8JET;
 }
@@ -60,7 +64,7 @@ void Constituent::setSoftDropMass(const double& softDropMass)
     softDropMass_ = softDropMass;
 }
 
-void Constituent::setSubJets(const std::vector<TLorentzVector>& subjets)
+void Constituent::setSubJets(const std::vector<Constituent>& subjets)
 {
     subjets_ = subjets;
 }
