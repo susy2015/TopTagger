@@ -47,19 +47,19 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
         THROW_TTEXCEPTION("TMVA reader creation failed!!!");
     }
 
+    //load variables into reader
+    for(const auto& var : vars_)
+    {
+        varMap_[var]=0;
+        reader_->AddVariable(var.c_str(), &varMap_[var]);
+    }
+
     //load model file into reader
     auto* imethod = reader_->BookMVA( modelName_.c_str(), modelFile_.c_str() );
     if(imethod == nullptr)
     {
         //Throw if this is an invalid pointer
         THROW_TTEXCEPTION("TMVA reader could not load model named \"" + modelName_ + "\" from file \"" + modelFile_ + "\"!!!");        
-    }
-
-    //load variables into reader
-    for(const auto& var : vars_)
-    {
-        varMap_[var]=0;
-        reader_->AddVariable(var.c_str(), &varMap_[var]);
     }
 
 #else
