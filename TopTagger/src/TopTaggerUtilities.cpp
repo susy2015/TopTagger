@@ -23,7 +23,20 @@ namespace ttUtility
 
     ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec)
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subjetsLVec)
+    {
+        subjetsBtag_ = nullptr;
+        subjetsMult_ = nullptr;
+        subjetsPtD_ = nullptr;
+        subjetsAxis1_ = nullptr;
+        subjetsAxis2_ = nullptr;
+        puppisd_corrGEN_ = nullptr;
+        puppisd_corrRECO_cen_ = nullptr;
+        puppisd_corrRECO_for_ = nullptr;
+        vecSubjetsLVec_ = nullptr;
+    }
+
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<double>& subjetsBtag, const std::vector<double>& subjetsMult, const std::vector<double>& subjetsPtD, const std::vector<double>& subjetsAxis1, const std::vector<double>& subjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subjetsLVec), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2) 
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
@@ -39,7 +52,7 @@ namespace ttUtility
         subjetsLVec_ = nullptr;
     }
     
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subjetsLVec) 
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
@@ -132,27 +145,42 @@ namespace ttUtility
         //Safety check that jet and b-tag vectors are the same length
         if(jetsLVec_->size() != tau1_->size() || jetsLVec_->size() != tau2_->size() || jetsLVec_->size() != tau3_->size() || jetsLVec_->size() != softDropMass_->size())
         {
-            THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n");
+            THROW_TTEXCEPTION("Unequal AK8 vector size!!!!!!!\n");
+        }
+
+        //Safety check that jet and b-tag vectors are the same length
+        if(subjetsLVec_->size() != subjetsBtag_->size() || subjetsLVec_->size() != subjetsMult_->size() || subjetsLVec_->size() != subjetsPtD_->size() || subjetsLVec_->size() != subjetsAxis1_->size() || subjetsLVec_->size() != subjetsAxis2_->size())
+        {
+            std::cout << subjetsLVec_->size() << "\t" << subjetsBtag_->size() << "\t" << subjetsMult_->size() << "\t" << subjetsPtD_->size() << "\t" << subjetsAxis1_->size() << "\t" << subjetsAxis2_->size() << std::endl;
+            THROW_TTEXCEPTION("Unequal subjet vector size!!!!!!!\n");
         }
 
         //Construct constituents in place in the vector
         for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
         {
             // For each tagged top/W, find the corresponding subjets
-            std::vector<TLorentzVector> subjets;
+            std::vector<Constituent> subjets;
             if(vecSubjetsLVec_ != nullptr)
             {
-                subjets = (*vecSubjetsLVec_)[iJet];
+                for(auto& subjetLV : (*vecSubjetsLVec_)[iJet])
+                {
+                    subjets.push_back(Constituent(subjetLV, AK8SUBJET));
+                }
             } 
             else if (subjetsLVec_ != nullptr) 
             {
                 // Calculate matching subjets if a single list was given 
-                for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
+                for(int iSJ = 0; iSJ < subjetsLVec_->size(); ++iSJ)
                 {
-                    double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
+                    double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], (*subjetsLVec_)[iSJ]);
                     if (myDR < 0.8)
                     {
-                        subjets.push_back(puppiSubJet);
+                        subjets.emplace_back((*subjetsLVec_)[iSJ], AK8SUBJET);
+                        subjets.back().setBTag((*subjetsBtag_)[iSJ]);
+                        subjets.back().setExtraVar("mult", (*subjetsMult_)[iSJ]);
+                        subjets.back().setExtraVar("ptD", (*subjetsPtD_)[iSJ]);
+                        subjets.back().setExtraVar("axis1", (*subjetsAxis1_)[iSJ]);
+                        subjets.back().setExtraVar("axis2", (*subjetsAxis2_)[iSJ]);
                     }
                 }
 
@@ -165,7 +193,7 @@ namespace ttUtility
                     {
                         for (unsigned int k=j+1; k<subjets.size(); ++k)
                         {
-                            TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
+                            TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j].p() - subjets[k].p();
                             double diff = fabs(diff_LV.M());
                             if(diff < min_diff)
                             {
@@ -190,7 +218,7 @@ namespace ttUtility
                     {
                         for(const auto& subjet : subjets)
                         {
-                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
+                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet.p(), *genDaughter);
                             if(dR < 0.4)
                             {
                                 constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
@@ -290,6 +318,54 @@ namespace ttUtility
     {
         std::map<std::string, double> varMap;
 
+        //AK8 test variables
+        if(topCand.getNConstituents() == 1)
+        {
+            const auto& constituent = *topCand.getConstituents()[0];
+            varMap["ak8_sdmass"] = constituent.getSoftDropMass();
+            varMap["ak8_tau21"] =  constituent.getTau1() > 0 ? constituent.getTau2()/constituent.getTau1() : 1e9;
+            varMap["ak8_tau32"] =  constituent.getTau2() > 0 ? constituent.getTau3()/constituent.getTau2() : 1e9;
+
+            const auto* sj1 = &constituent.getSubjets()[0];
+            const auto* sj2 = &constituent.getSubjets()[1];
+            double fj_deltaR = ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
+            varMap["ak8_ptDR"] =       fj_deltaR*constituent.p().Pt();
+            varMap["ak8_rel_ptdiff"] = fabs(sj1->p().Pt() - sj2->p().Pt()) / constituent.p().Pt();
+            if(sj1->getBTagDisc() < sj2->getBTagDisc()) std::swap(sj1,sj2);
+            varMap["ak8_csv1_mass"] =  sj1->p().M();
+            varMap["ak8_csv1_csv"] =   (sj1->getBTagDisc() > 0 ? sj1->getBTagDisc() : 0.);
+            varMap["ak8_csv1_ptD"] =   sj1->getExtraVar("ptD");
+            varMap["ak8_csv1_axis1"] = sj1->getExtraVar("axis1");
+            varMap["ak8_csv1_mult"] =  sj1->getExtraVar("mult");
+            varMap["ak8_csv2_mass"] =  sj2->p().M();
+            varMap["ak8_csv2_ptD"] =   sj2->getExtraVar("ptD");
+            varMap["ak8_csv2_axis1"] = sj2->getExtraVar("axis1");
+            varMap["ak8_csv2_mult"] =  sj2->getExtraVar("mult");
+        }
+        if(topCand.getNConstituents() == 2)
+        {
+            const auto* fatjet = topCand.getConstituents()[0];
+            if(fatjet->getType() != AK8JET) fatjet = topCand.getConstituents()[1];
+            varMap["var_fj_sdmass"]   = fatjet->getSoftDropMass();
+            varMap["var_fj_tau21"]    = fatjet->getTau1() > 0 ? fatjet->getTau2()/fatjet->getTau1() : 1e9;
+            // filling subjet variables
+            const auto *sj1 = &fatjet->getSubjets()[0];
+            const auto *sj2 = &fatjet->getSubjets()[1];
+            double fj_deltaR =  ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
+            varMap["var_fj_ptDR"]     = fj_deltaR*fatjet->p().Pt();
+            varMap["var_fj_rel_ptdiff"]= std::abs(sj1->p().Pt()-sj2->p().Pt())/fatjet->p().Pt();
+            varMap["var_sj1_ptD"]     = sj1->getExtraVar("ptD");
+            varMap["var_sj1_axis1"]   = sj1->getExtraVar("axis1");
+            varMap["var_sj1_mult"]    = sj1->getExtraVar("mult");
+            varMap["var_sj2_ptD"]     = sj2->getExtraVar("ptD");
+            varMap["var_sj2_axis1"]   = sj2->getExtraVar("axis1");
+            varMap["var_sj2_mult"]    = sj2->getExtraVar("mult");
+            varMap["var_sjmax_csv"]   = std::max(std::max(sj1->getBTagDisc(),sj2->getBTagDisc()),0.0);
+            double var_sd_0 = sj2->p().Pt()/(sj1->p().Pt()+sj2->p().Pt());
+            varMap["var_sd_n2"]       = var_sd_0/std::pow(fj_deltaR,-2);
+        }
+        else
+        {
         //Get top candidate variables
         varMap["cand_pt"]    = topCand.p().Pt();
         varMap["cand_p"]     = topCand.p().P();
@@ -435,6 +511,7 @@ namespace ttUtility
             //calculate pair masses
             auto jetPair = RF_constituents[i].p() + RF_constituents[iNext].p();
             varMap["j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m"] = jetPair.M();
+        }
         }
 
         return varMap;

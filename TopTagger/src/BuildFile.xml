@@ -1,0 +1,8 @@
+<Flags CXXFLAGS="-DDOTENSORFLOWPYBIND"/>
+<library file="*.cc" name="TopTagger">
+  <use name="PhysicsTools/Utilities"/>
+  <use name="python" />
+  <use name="py2-numpy" />
+  <use name="py2-numpy-c-api" />
+  <flags   EDM_PLUGIN="0"/>
+</library>

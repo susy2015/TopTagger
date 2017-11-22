@@ -11,6 +11,7 @@ PREFIX       = @prefix@
 LDCONFIG     = @LDCONFIG@
 LIBSUFFIX    = @LIBSUFFIX@
 PYTHONCFG    = @PYTHONCFG@
+TMVALIB      = @TMVALIB@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -38,6 +39,12 @@ LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
 INCLUDESDIRS += $(shell root-config --cflags)
 # ROOT libraries
 LIBS         += $(shell root-config --glibs)
+
+# TMVA library
+ifdef TMVALIB
+	CXXFLAGS += -DSHOTTOPTAGGER_DO_TMVA
+	LIBS     += $(TMVALIB)
+endif
 
 #python includes and libraries
 ifdef PYTHONCFG

@@ -11,7 +11,7 @@
 
 enum ConstituentType
 {
-    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET
+    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET, AK8SUBJET
 };
 
 class Constituent
@@ -26,7 +26,7 @@ private:
 
     //AK8 specific variables 
     double tau1_, tau2_, tau3_, softDropMass_;
-    std::vector<TLorentzVector> subjets_;
+    std::vector<Constituent> subjets_;
     double wMassCorr_;
 
     //Extra Variables
@@ -38,7 +38,8 @@ private:
 public:
     Constituent();
     Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
-    Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<TLorentzVector>& subjets, const double& wMassCorr);
+    Constituent(const TLorentzVector& p, const ConstituentType& type);
+    Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<Constituent>& subjets, const double& wMassCorr);
     
     void setPBtag(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
     void setP(const TLorentzVector& p);
@@ -49,7 +50,7 @@ public:
     void setTau2(const double& tau2);
     void setTau3(const double& tau3);
     void setSoftDropMass(const double& softDropMass);
-    void setSubJets(const std::vector<TLorentzVector>& subjets);
+    void setSubJets(const std::vector<Constituent>& subjets);
     void setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2);
     void setWMassCorr(const double& wMassCorr);
     void setExtraVar(const std::string& name, const double var);
@@ -66,7 +67,7 @@ public:
     const double getTau2() const                          { return tau2_; }
     const double getTau3() const                          { return tau3_; }
     const double getSoftDropMass() const                  { return softDropMass_; }
-    const std::vector<TLorentzVector>& getSubjets() const { return subjets_; }
+    const decltype(subjets_)& getSubjets() const          { return subjets_; }
     const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
     const double getWMassCorr() const                     { return wMassCorr_; }
     const double getQGMult() const                        { return qgMult_; }
