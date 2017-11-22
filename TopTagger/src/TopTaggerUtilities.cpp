@@ -342,6 +342,28 @@ namespace ttUtility
             varMap["ak8_csv2_axis1"] = sj2->getExtraVar("axis1");
             varMap["ak8_csv2_mult"] =  sj2->getExtraVar("mult");
         }
+        if(topCand.getNConstituents() == 2)
+        {
+            const auto* fatjet = topCand.getConstituents()[0];
+            if(fatjet->getType() != AK8JET) fatjet = topCand.getConstituents()[1];
+            varMap["var_fj_sdmass"]   = fatjet->getSoftDropMass();
+            varMap["var_fj_tau21"]    = fatjet->getTau1() > 0 ? fatjet->getTau2()/fatjet->getTau1() : 1e9;
+            // filling subjet variables
+            const auto *sj1 = &fatjet->getSubjets()[0];
+            const auto *sj2 = &fatjet->getSubjets()[1];
+            double fj_deltaR =  ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
+            varMap["var_fj_ptDR"]     = fj_deltaR*fatjet->p().Pt();
+            varMap["var_fj_rel_ptdiff"]= std::abs(sj1->p().Pt()-sj2->p().Pt())/fatjet->p().Pt();
+            varMap["var_sj1_ptD"]     = sj1->getExtraVar("ptD");
+            varMap["var_sj1_axis1"]   = sj1->getExtraVar("axis1");
+            varMap["var_sj1_mult"]    = sj1->getExtraVar("mult");
+            varMap["var_sj2_ptD"]     = sj2->getExtraVar("ptD");
+            varMap["var_sj2_axis1"]   = sj2->getExtraVar("axis1");
+            varMap["var_sj2_mult"]    = sj2->getExtraVar("mult");
+            varMap["var_sjmax_csv"]   = std::max(std::max(sj1->getBTagDisc(),sj2->getBTagDisc()),0.0);
+            double var_sd_0 = sj2->p().Pt()/(sj1->p().Pt()+sj2->p().Pt());
+            varMap["var_sd_n2"]       = var_sd_0/std::pow(fj_deltaR,-2);
+        }
         else
         {
         //Get top candidate variables
