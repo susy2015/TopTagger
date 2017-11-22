@@ -18,6 +18,7 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
     modelName_     = cfgDoc->get("modelName",     localCxt, "");
     NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
+    filter_        = cfgDoc->get("filter",        localCxt, false);
 
     int iVar = 0;
     bool keepLooping;
@@ -95,9 +96,20 @@ void TTMTMVA::run(TopTaggerResults& ttResults)
             topCand.setDiscriminator(discriminator);
 
             //place in final top list if it passes the threshold
-            if(discriminator > discriminator_)
+            if(filter_)
             {
-                tops.push_back(&topCand);
+                if(discriminator <= discriminator_)
+                {
+                    auto iTop = std::find(tops.begin(), tops.end(), &topCand);
+                    if(iTop != tops.end()) tops.erase(iTop);
+                }
+            }
+            else
+            {
+                if(discriminator > discriminator_)
+                {
+                    tops.push_back(&topCand);
+                }
             }
         }
     }

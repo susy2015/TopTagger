@@ -19,6 +19,7 @@ private:
     std::string modelFile_, modelName_;
     std::vector<std::string> vars_;
     int NConstituents_;
+    bool filter_;
 
     //TMVA model variables 
     TMVA::Reader *reader_;
