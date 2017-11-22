@@ -327,7 +327,7 @@ namespace ttUtility
             varMap["ak8_tau32"] =  constituent.getTau2() > 0 ? constituent.getTau3()/constituent.getTau2() : 1e9;
 
             const auto* sj1 = &constituent.getSubjets()[0];
-            const auto* sj2 = &constituent.getSubjets()[0];
+            const auto* sj2 = &constituent.getSubjets()[1];
             double fj_deltaR = ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
             varMap["ak8_ptDR"] =       fj_deltaR*constituent.p().Pt();
             varMap["ak8_rel_ptdiff"] = fabs(sj1->p().Pt() - sj2->p().Pt()) / constituent.p().Pt();
