@@ -41,18 +41,29 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     while(keepLooping);
 
     //create TMVA reader
-    reader_ = new TMVA::Reader( "!Color:!Silent" );
+    reader_.reset(new TMVA::Reader( "!Color:!Silent" ));
     if(reader_ == nullptr)
     {
         //Throw if this is an invalid pointer
         THROW_TTEXCEPTION("TMVA reader creation failed!!!");
     }
 
-    //load variables into reader
-    for(const auto& var : vars_)
+    //load variables
+    varMap_.resize(vars_.size());
+    if(NConstituents_ == 1)
     {
-        varMap_[var]=0;
-        reader_->AddVariable(var.c_str(), &varMap_[var]);
+        varCalculator_.reset(new ttUtility::BDTMonojetInputCalculator());
+    }
+    else if(NConstituents_ == 2)
+    {
+        varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
+    }
+    varCalculator_->mapVars(vars_, varMap_.data());
+
+    //load variables into reader
+    for(int i = 0; i < vars_.size(); ++i)
+    {
+        reader_->AddVariable(vars_[i].c_str(), &varMap_[i]);
     }
 
     //load model file into reader
@@ -81,15 +92,8 @@ void TTMTMVA::run(TopTaggerResults& ttResults)
         //We only want to apply the MVA algorithm to triplet tops
         if(topCand.getNConstituents() == NConstituents_)
         {
-            //Prepare data from top candidate (this code is shared with training tuple producer)
-            //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, 0.8);
-
-            //Set the values in the reader (as usual, this is inefficient, rework createMVAInputs)
-            for(const auto& var : vars_)
-            {
-                varMap_[var] = varMap[var];
-            }
+            //Prepare data from top candidate
+            varCalculator_->calculateVars(topCand);
 
             //predict value
             double discriminator = reader_->EvaluateMVA(modelName_);

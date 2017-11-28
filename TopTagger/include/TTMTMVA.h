@@ -5,11 +5,17 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #ifdef SHOTTOPTAGGER_DO_TMVA
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
 #endif
+
+namespace ttUtility
+{
+    class MVAInputCalculator;
+}
 
 class TTMTMVA : public TTModule
 {
@@ -22,8 +28,11 @@ private:
     bool filter_;
 
     //TMVA model variables 
-    TMVA::Reader *reader_;
-    std::map<std::string, float> varMap_;
+    std::unique_ptr<TMVA::Reader> reader_;
+    std::vector<float> varMap_;
+
+    //variable calclator
+    std::unique_ptr<ttUtility::MVAInputCalculator> varCalculator_; 
 
 #endif
 
