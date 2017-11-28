@@ -738,17 +738,17 @@ namespace ttUtility
     {
         for(int j = 0; j < vars.size(); ++j)
         {
-            if(vars[j].compare("cand_pt") == 1) cand_pt_ = data + j;
-            if(vars[j].compare("cand_p") == 1) cand_p_ = data + j;
-            if(vars[j].compare("cand_eta") == 1) cand_eta_ = data + j;
-            if(vars[j].compare("cand_phi") == 1) cand_phi_ = data + j;
-            if(vars[j].compare("cand_m") == 1) cand_m_ = data + j;
-            if(vars[j].compare("cand_dRMax") == 1) cand_dRMax_ = data + j;
-            if(vars[j].compare("cand_dThetaMin") == 1) cand_dThetaMin_ = data + j;
-            if(vars[j].compare("cand_dThetaMax") == 1) cand_dThetaMax_ = data + j;
-            if(vars[j].compare("dRPtTop") == 1) dRPtTop_ = data + j;
-            if(vars[j].compare("dRPtW") == 1) dRPtW_ = data + j;
-            if(vars[j].compare("sd_n2") == 1) sd_n2_ = data + j;
+            if(vars[j].compare("cand_pt") == 0) cand_pt_ = data + j;
+            if(vars[j].compare("cand_p") == 0) cand_p_ = data + j;
+            if(vars[j].compare("cand_eta") == 0) cand_eta_ = data + j;
+            if(vars[j].compare("cand_phi") == 0) cand_phi_ = data + j;
+            if(vars[j].compare("cand_m") == 0) cand_m_ = data + j;
+            if(vars[j].compare("cand_dRMax") == 0) cand_dRMax_ = data + j;
+            if(vars[j].compare("cand_dThetaMin") == 0) cand_dThetaMin_ = data + j;
+            if(vars[j].compare("cand_dThetaMax") == 0) cand_dThetaMax_ = data + j;
+            if(vars[j].compare("dRPtTop") == 0) dRPtTop_ = data + j;
+            if(vars[j].compare("dRPtW") == 0) dRPtW_ = data + j;
+            if(vars[j].compare("sd_n2") == 0) sd_n2_ = data + j;
 
             for(unsigned int i = 0; i < NCONST; ++i)
             {
