@@ -20,10 +20,12 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
-    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
-    inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
-    outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
+    discriminator_ = cfgDoc->get("discCut",       localCxt, -999.9);
+    modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
+    inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
+    outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
+    NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
+    nCores_        = cfgDoc->get("NCores",        localCxt, 1);
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -55,11 +57,30 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
     //get the booster from the file
     status =  XGBoosterCreate({}, 0, &h_booster);
     status |= XGBoosterLoadModel(h_booster, modelFile_.c_str());
+    status |= XGBoosterSetParam(h_booster, "nthread", std::to_string(nCores_).c_str());
 
     if(status) 
     {
         THROW_TTEXCEPTION("ERROR: Unable to import model from file: " + modelFile_);
     }
+
+    //resize data vector and map data vector to variable calclator 
+    data_.resize(vars_.size());
+    //load variables
+    if(NConstituents_ == 1)
+    {
+        varCalculator_.reset(new ttUtility::BDTMonojetInputCalculator());
+    }
+    else if(NConstituents_ == 2)
+    {
+        varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
+    }
+    else if(NConstituents_ == 3)
+    {
+        varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    }
+    //map variables
+    varCalculator_->mapVars(vars_, data_.data());
 
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with XGBoost support!!!");
@@ -77,28 +98,14 @@ void TTMXGBoost::run(TopTaggerResults& ttResults)
     //xgboost status variable
     int status = 0;
 
-
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        //Prepare the data!
+        if(varCalculator_->calculateVars(topCand))
         {
-            //Prepare data from top candidate (this code is shared with training tuple producer)
-            //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
-
-            //temp vector to translate from map to DMatrix ... should be unneeded with a tiny bit more thought
-            std::vector<float> data(vars_.size());
-
-            //populate tensor based on desired input variables 
-            for(unsigned int i = 0; i < vars_.size(); ++i)
-            {
-                data[i] = varMap[vars_[i]];
-            }
-
-            // convert to DMatrix
+            // convert to DMatrix (is this unnecessary deep copy necessary?)
             DMatrixHandle h_data;
-            status = XGDMatrixCreateFromMat(data.data(), 1, data.size(), -1, &h_data);
+            status = XGDMatrixCreateFromMat(data_.data(), 1, data_.size(), -1, &h_data);
 
             //predict value
             bst_ulong out_len;
