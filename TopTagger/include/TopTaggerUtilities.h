@@ -114,7 +114,7 @@ namespace ttUtility
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
     
     //Tool to calcualte MT2 from tagger results
-    double calculateMT2(const TopTaggerResults& ttr);
+    double calculateMT2(const TopTaggerResults& ttr, const TLorentzVector& metLVec);
 
     //MVA helper functions
     std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
