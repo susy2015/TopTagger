@@ -172,7 +172,11 @@ namespace ttUtility
         }
 
         //Safety check that jet and b-tag vectors are the same length
-        if(subjetsLVec_->size() != subjetsBtag_->size() || subjetsLVec_->size() != subjetsMult_->size() || subjetsLVec_->size() != subjetsPtD_->size() || subjetsLVec_->size() != subjetsAxis1_->size() || subjetsLVec_->size() != subjetsAxis2_->size())
+        if((subjetsBtag_ &&  subjetsLVec_->size() != subjetsBtag_->size()) || 
+           (subjetsMult_ &&  subjetsLVec_->size() != subjetsMult_->size()) || 
+           (subjetsPtD_ &&   subjetsLVec_->size() != subjetsPtD_->size()) || 
+           (subjetsAxis1_ && subjetsLVec_->size() != subjetsAxis1_->size()) || 
+           (subjetsAxis2_ && subjetsLVec_->size() != subjetsAxis2_->size()))
         {
             std::cout << subjetsLVec_->size() << "\t" << subjetsBtag_->size() << "\t" << subjetsMult_->size() << "\t" << subjetsPtD_->size() << "\t" << subjetsAxis1_->size() << "\t" << subjetsAxis2_->size() << std::endl;
             THROW_TTEXCEPTION("Unequal subjet vector size!!!!!!!\n");
@@ -199,11 +203,11 @@ namespace ttUtility
                     if (myDR < 0.8)
                     {
                         subjets.emplace_back((*subjetsLVec_)[iSJ], AK8SUBJET);
-                        subjets.back().setBTag((*subjetsBtag_)[iSJ]);
-                        subjets.back().setExtraVar("mult", (*subjetsMult_)[iSJ]);
-                        subjets.back().setExtraVar("ptD", (*subjetsPtD_)[iSJ]);
-                        subjets.back().setExtraVar("axis1", (*subjetsAxis1_)[iSJ]);
-                        subjets.back().setExtraVar("axis2", (*subjetsAxis2_)[iSJ]);
+                        if(subjetsBtag_)  subjets.back().setBTag((*subjetsBtag_)[iSJ]);
+                        if(subjetsMult_)  subjets.back().setExtraVar("mult", (*subjetsMult_)[iSJ]);
+                        if(subjetsPtD_)   subjets.back().setExtraVar("ptD", (*subjetsPtD_)[iSJ]);
+                        if(subjetsAxis1_) subjets.back().setExtraVar("axis1", (*subjetsAxis1_)[iSJ]);
+                        if(subjetsAxis2_) subjets.back().setExtraVar("axis2", (*subjetsAxis2_)[iSJ]);
                     }
                 }
 
