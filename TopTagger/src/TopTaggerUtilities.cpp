@@ -3,6 +3,8 @@
 #include "TopTagger/TopTagger/include/Constituent.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
 
+#include "TopTagger/TopTagger/include/lester_mt2_bisect.h"
+
 #include "TopTagger/CfgParser/include/TTException.h"
 
 #include "Math/VectorUtil.h"
@@ -331,8 +333,81 @@ namespace ttUtility
         return packageConstituents(ConstAK4Inputs(jetsLVec, btagFactors, qgLikelihood));
     }
 
-    double calculateMT2(const TopTaggerResults& ttr)
+    double coreMT2calc(const TLorentzVector & fatJet1LVec, const TLorentzVector & fatJet2LVec, const TLorentzVector& metLVec)
     {
+        // The input parameters associated with the particle
+        // (or collection of particles) associated with the
+        // first "side" of the event: 
+        const double massOfSystemA =  fatJet1LVec.M(); // GeV
+        const double pxOfSystemA   =  fatJet1LVec.Px(); // GeV
+        const double pyOfSystemA   =  fatJet1LVec.Py(); // GeV
+  
+        // The input parameters associated with the particle
+        // (or collection of particles) associated with the
+        // second "side" of the event:
+        const double massOfSystemB =  fatJet2LVec.M(); // GeV
+        const double pxOfSystemB   =  fatJet2LVec.Px(); // GeV
+        const double pyOfSystemB   =  fatJet2LVec.Py(); // GeV
+  
+        // The missing transverse momentum:
+        const double pxMiss        = metLVec.Px(); // GeV
+        const double pyMiss        = metLVec.Py(); // GeV
+  
+        // The mass of the "inivisible" particle presumed to have
+        // been produced at the end of the decay chain in each
+        // "half" of the event:    
+        const double invis_mass    = metLVec.M(); // GeV
+
+        double desiredPrecisionOnMt2 = 0; // Must be >=0.  If 0 alg aims for machine precision.  if >0, MT2 computed to supplied absolute precision.
+
+        //asymm_mt2_lester_bisect::disableCopyrightMessage();
+
+        double mt2 =  asymm_mt2_lester_bisect::get_mT2(
+            massOfSystemA, pxOfSystemA, pyOfSystemA,
+            massOfSystemB, pxOfSystemB, pyOfSystemB,
+            pxMiss, pyMiss,
+            invis_mass, invis_mass,
+            desiredPrecisionOnMt2);
+
+        return mt2;
+
+    }
+
+    double calculateMT2(const TopTaggerResults& ttr, const TLorentzVector& metLVec)
+    {
+        TLorentzVector fatJet1LVec(0, 0, 0,0);
+        TLorentzVector fatJet2LVec(0, 0, 0,0);
+        //Use result for top var
+        const std::vector<TopObject*> &Ntop = ttr.getTops();  
+
+        if (Ntop.size() == 0)
+        {
+            return 0.0;
+        }
+
+        if (Ntop.size() == 1)
+        {
+            fatJet1LVec = Ntop.at(0)->P();
+            fatJet2LVec = ttr.getRsys().P();
+     
+            return coreMT2calc(fatJet1LVec, fatJet2LVec, metLVec);
+        }
+
+        if (Ntop.size() >= 2)
+        {
+            std::vector<double> cachedMT2vec;
+            for(unsigned int it=0; it<Ntop.size(); it++)
+            {
+                for(unsigned int jt=it+1; jt<Ntop.size(); jt++)
+                {
+                    cachedMT2vec.push_back(coreMT2calc(Ntop.at(it)->P(), Ntop.at(jt)->P(), metLVec));
+                } 
+            }
+            std::sort(cachedMT2vec.begin(), cachedMT2vec.end());
+
+            return cachedMT2vec.front();
+        }
+
         return 0.0;
     }
 
