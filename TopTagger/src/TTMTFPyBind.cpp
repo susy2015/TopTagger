@@ -32,7 +32,7 @@ static std::string embeddedTensorflowScript = ""
 "def start_session(frozen_graph_filename):\n"
 "    global sess\n"
 "    graph = load_graph(frozen_graph_filename)\n"
-"    sess = tf.Session(graph=graph)\n"
+"    sess = tf.Session(graph=graph, config=tf.ConfigProto(intra_op_parallelism_threads=1))\n"
 "\n"
 "def eval_session(inputs, outputs):\n"
 "    outputs.update(sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n";
@@ -141,12 +141,9 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        //Prepare data from top candidate and calculate discriminator
+        if(varCalculator_->calculateVars(topCand))
         {
-            //Prepare data from top candidate
-            varCalculator_->calculateVars(topCand);
-
             //Run python session to network on input data
             callPython("eval_session", pArgs);
 

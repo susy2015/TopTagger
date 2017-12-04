@@ -89,12 +89,9 @@ void TTMTMVA::run(TopTaggerResults& ttResults)
 
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == NConstituents_)
+        //Prepare data from top candidate and calculate discriminators 
+        if(varCalculator_->calculateVars(topCand))
         {
-            //Prepare data from top candidate
-            varCalculator_->calculateVars(topCand);
-
             //predict value
             double discriminator = reader_->EvaluateMVA(modelName_);
             topCand.setDiscriminator(discriminator);
