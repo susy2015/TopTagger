@@ -32,7 +32,7 @@ static std::string embeddedTensorflowScript = ""
 "def start_session(frozen_graph_filename):\n"
 "    global sess\n"
 "    graph = load_graph(frozen_graph_filename)\n"
-"    sess = tf.Session(graph=graph)\n"
+"    sess = tf.Session(graph=graph, config=tf.ConfigProto(intra_op_parallelism_threads=1))\n"
 "\n"
 "def eval_session(inputs, outputs):\n"
 "    outputs.update(sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n";
