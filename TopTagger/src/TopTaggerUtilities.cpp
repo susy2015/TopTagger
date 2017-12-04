@@ -428,21 +428,24 @@ namespace ttUtility
             varMap["ak8_tau21"] =  constituent.getTau1() > 0 ? constituent.getTau2()/constituent.getTau1() : 1e9;
             varMap["ak8_tau32"] =  constituent.getTau2() > 0 ? constituent.getTau3()/constituent.getTau2() : 1e9;
 
-            const auto* sj1 = &constituent.getSubjets()[0];
-            const auto* sj2 = &constituent.getSubjets()[1];
-            double fj_deltaR = ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
-            varMap["ak8_ptDR"] =       fj_deltaR*constituent.p().Pt();
-            varMap["ak8_rel_ptdiff"] = fabs(sj1->p().Pt() - sj2->p().Pt()) / constituent.p().Pt();
-            if(sj1->getBTagDisc() < sj2->getBTagDisc()) std::swap(sj1,sj2);
-            varMap["ak8_csv1_mass"] =  sj1->p().M();
-            varMap["ak8_csv1_csv"] =   (sj1->getBTagDisc() > 0 ? sj1->getBTagDisc() : 0.);
-            varMap["ak8_csv1_ptD"] =   sj1->getExtraVar("ptD");
-            varMap["ak8_csv1_axis1"] = sj1->getExtraVar("axis1");
-            varMap["ak8_csv1_mult"] =  sj1->getExtraVar("mult");
-            varMap["ak8_csv2_mass"] =  sj2->p().M();
-            varMap["ak8_csv2_ptD"] =   sj2->getExtraVar("ptD");
-            varMap["ak8_csv2_axis1"] = sj2->getExtraVar("axis1");
-            varMap["ak8_csv2_mult"] =  sj2->getExtraVar("mult");
+            if(constituent.getSubjets().size() >= 2)
+            {
+                const auto* sj1 = &constituent.getSubjets()[0];
+                const auto* sj2 = &constituent.getSubjets()[1];
+                double fj_deltaR = ROOT::Math::VectorUtil::DeltaR(sj1->p(), sj2->p());
+                varMap["ak8_ptDR"] =       fj_deltaR*constituent.p().Pt();
+                varMap["ak8_rel_ptdiff"] = fabs(sj1->p().Pt() - sj2->p().Pt()) / constituent.p().Pt();
+                if(sj1->getBTagDisc() < sj2->getBTagDisc()) std::swap(sj1,sj2);
+                varMap["ak8_csv1_mass"] =  sj1->p().M();
+                varMap["ak8_csv1_csv"] =   (sj1->getBTagDisc() > 0 ? sj1->getBTagDisc() : 0.);
+                varMap["ak8_csv1_ptD"] =   sj1->getExtraVar("ptD");
+                varMap["ak8_csv1_axis1"] = sj1->getExtraVar("axis1");
+                varMap["ak8_csv1_mult"] =  sj1->getExtraVar("mult");
+                varMap["ak8_csv2_mass"] =  sj2->p().M();
+                varMap["ak8_csv2_ptD"] =   sj2->getExtraVar("ptD");
+                varMap["ak8_csv2_axis1"] = sj2->getExtraVar("axis1");
+                varMap["ak8_csv2_mult"] =  sj2->getExtraVar("mult");
+            }
         }
         if(topCand.getNConstituents() == 2)
         {
