@@ -141,12 +141,9 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        //Prepare data from top candidate and calculate discriminator
+        if(varCalculator_->calculateVars(topCand))
         {
-            //Prepare data from top candidate
-            varCalculator_->calculateVars(topCand);
-
             //Run python session to network on input data
             callPython("eval_session", pArgs);
 
