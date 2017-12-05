@@ -61,7 +61,7 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     varCalculator_->mapVars(vars_, varMap_.data());
 
     //load variables into reader
-    for(int i = 0; i < vars_.size(); ++i)
+    for(unsigned int i = 0; i < vars_.size(); ++i)
     {
         reader_->AddVariable(vars_[i].c_str(), &varMap_[i]);
     }
