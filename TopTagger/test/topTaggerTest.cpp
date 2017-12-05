@@ -32,24 +32,34 @@ int main()
     //Each entry in these vectors refers to information for 1 AK4 jet
     std::vector<TLorentzVector>** AK4JetLV = new std::vector<TLorentzVector>*();
     std::vector<double>** AK4JetBtag = new std::vector<double>*();
+    std::vector<double>** AK4JetQGL = new std::vector<double>*();
 
     //AK8 jet varaibles
     //The elements of each vector refer to one AK8 jet
     std::vector<TLorentzVector>** AK8JetLV = new std::vector<TLorentzVector>*();
-    std::vector<TLorentzVector>** AK8SubjetLV = new std::vector<TLorentzVector>*();
     std::vector<double>** AK8JetTau1 = new std::vector<double>*();
     std::vector<double>** AK8JetTau2 = new std::vector<double>*();
     std::vector<double>** AK8JetTau3 = new std::vector<double>*();
     std::vector<double>** AK8JetSoftdropMass = new std::vector<double>*();
+    std::vector<TLorentzVector>** AK8SubjetLV = new std::vector<TLorentzVector>*();
+    std::vector<double>** AK8SubjetBtag  = new std::vector<double>*();
+    std::vector<double>** AK8SubjetMult  = new std::vector<double>*();
+    std::vector<double>** AK8SubjetPtD   = new std::vector<double>*();
+    std::vector<double>** AK8SubjetAxis1 = new std::vector<double>*();
+    std::vector<double>** AK8SubjetAxis2 = new std::vector<double>*();
 
     //Activate branches of interest
     //AK4 jet lorentz vectors
-    tree->SetBranchStatus( "jetsLVec_forTagger", 1);
-    tree->SetBranchAddress("jetsLVec_forTagger", AK4JetLV);
+    tree->SetBranchStatus( "jetsLVec", 1);
+    tree->SetBranchAddress("jetsLVec", AK4JetLV);
     
     //AK4 jet b-tag values (0 not a b, 1 is a b)
-    tree->SetBranchStatus( "recoJetsBtag_forTagger", 1);
-    tree->SetBranchAddress("recoJetsBtag_forTagger", AK4JetBtag);
+    tree->SetBranchStatus( "recoJetsBtag_0", 1);
+    tree->SetBranchAddress("recoJetsBtag_0", AK4JetBtag);
+
+    //AK4 jet QGL
+    tree->SetBranchStatus( "qgLikelihood", 1);
+    tree->SetBranchAddress("qgLikelihood", AK4JetQGL);
     
     //AK8 jet lorentz vectors
     tree->SetBranchStatus( "puppiJetsLVec", 1);
@@ -59,7 +69,22 @@ int main()
     //All are present in this list and dR matching associates them to the approperiate AK8 jet
     tree->SetBranchStatus( "puppiSubJetsLVec", 1);
     tree->SetBranchAddress("puppiSubJetsLVec", AK8SubjetLV);
-    
+
+    tree->SetBranchStatus( "puppiSubJetsBdisc", 1);
+    tree->SetBranchAddress("puppiSubJetsBdisc", AK8SubjetBtag);
+
+    tree->SetBranchStatus( "puppiSubJetstotalMult", 1);
+    tree->SetBranchAddress("puppiSubJetstotalMult", AK8SubjetMult);
+
+    tree->SetBranchStatus( "puppiSubJetsptD", 1);
+    tree->SetBranchAddress("puppiSubJetsptD", AK8SubjetPtD);
+
+    tree->SetBranchStatus( "puppiSubJetsaxis1", 1);
+    tree->SetBranchAddress("puppiSubJetsaxis1", AK8SubjetAxis1);
+
+    tree->SetBranchStatus( "puppiSubJetsaxis2", 1);
+    tree->SetBranchAddress("puppiSubJetsaxis2", AK8SubjetAxis2);
+
     //AK8 jet tau1 variable
     tree->SetBranchStatus( "puppitau1", 1);
     tree->SetBranchAddress("puppitau1", AK8JetTau1);
@@ -97,7 +122,7 @@ int main()
 
             //Use helper function to create input list 
             //Create AK4 inputs object
-            ttUtility::ConstAK4Inputs AK4Inputs = ttUtility::ConstAK4Inputs(**AK4JetLV, **AK4JetBtag);
+            ttUtility::ConstAK4Inputs AK4Inputs = ttUtility::ConstAK4Inputs(**AK4JetLV, **AK4JetBtag, **AK4JetQGL);
 
             //Create AK8 inputs object
             ttUtility::ConstAK8Inputs AK8Inputs = ttUtility::ConstAK8Inputs(
@@ -106,7 +131,12 @@ int main()
                 **AK8JetTau2,
                 **AK8JetTau3,
                 **AK8JetSoftdropMass,
-                **AK8JetLV
+                **AK8SubjetLV,
+                **AK8SubjetBtag,
+                **AK8SubjetMult,
+                **AK8SubjetPtD,
+                **AK8SubjetAxis1,
+                **AK8SubjetAxis2
                 );
 
             //Create jets constituents list combining AK4 and AK8 jets, these are used to construct top candiates
