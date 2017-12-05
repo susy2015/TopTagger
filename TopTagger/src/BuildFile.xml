@@ -1,8 +1,10 @@
-<Flags CXXFLAGS="-DDOTENSORFLOWPYBIND"/>
+<Flags CXXFLAGS="-DDOTENSORFLOWPYBIND -DSHOTTOPTAGGER_DO_TMVA"/>
+<use name="TopTagger/CfgParser"/>
+<use name="root"/>
+<use name="roottmva"/>
+<use name="python" />
+<use name="py2-numpy" />
+<use name="py2-numpy-c-api" />
 <library file="*.cc" name="TopTagger">
-  <use name="PhysicsTools/Utilities"/>
-  <use name="python" />
-  <use name="py2-numpy" />
-  <use name="py2-numpy-c-api" />
-  <flags   EDM_PLUGIN="0"/>
+  <flags EDM_PLUGIN="0"/>
 </library>
