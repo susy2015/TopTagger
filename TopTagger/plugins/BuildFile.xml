@@ -1,10 +1,8 @@
-<library file="*.cc" name="SHOTPlugins">
-  <use name="PhysicsTools/Utilities"/>
-  <use name="DataFormats/Common"/>
-  <use name="DataFormats/PatCandidates"/>
-  <use name="FWCore/Framework"/>
-  <use name="FWCore/MessageLogger"/>
-  <use name="TopTagger/TopTagger"/>
-  <use name="TopTagger/CfgParser"/>
-  <flags   EDM_PLUGIN="1"/>
-</library>
+<use name="PhysicsTools/Utilities"/>
+<use name="DataFormats/Common"/>
+<use name="DataFormats/PatCandidates"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/MessageLogger"/>
+<use name="TopTagger/TopTagger"/>
+<use name="TopTagger/CfgParser"/>
+<flags EDM_PLUGIN="1"/>

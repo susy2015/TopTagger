@@ -5,6 +5,7 @@
 <use name="python" />
 <use name="py2-numpy" />
 <use name="py2-numpy-c-api" />
-<library file="*.cc" name="TopTagger">
-  <flags EDM_PLUGIN="0"/>
-</library>
+<flags EDM_PLUGIN="0"/>
+<export>
+  <lib name="1"/>
+</export>
