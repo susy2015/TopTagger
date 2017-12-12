@@ -73,7 +73,8 @@ private:
 SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 {
     //register vector of top objects 
-    produces<std::vector<TLorentzVector>>("shotTops");
+    produces<std::vector<TLorentzVector>>("shotTopsP4");
+    produces<std::vector<int>>("shotTopsType");
  
     //now do what ever other initialization is needed
     jetSrc_ = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
@@ -196,13 +197,16 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     const std::vector<TopObject*>& tops = ttr.getTops();
 
     std::unique_ptr<std::vector<TLorentzVector>> top4vecs(new std::vector<TLorentzVector>());
+    std::unique_ptr<std::vector<int>> toptype(new std::vector<int>());
     
     for(auto* top : tops)
     {
         top4vecs->emplace_back(top->p());
+        toptype->emplace_back(top->getNConstituents());
     }
 
-    iEvent.put(std::move(top4vecs), "shotTops");
+    iEvent.put(std::move(top4vecs), "shotTopsP4");
+    iEvent.put(std::move(toptype), "shotTopsType");
  
 }
 
