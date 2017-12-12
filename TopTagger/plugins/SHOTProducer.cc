@@ -64,7 +64,7 @@ private:
     edm::InputTag jetSrc_;
     edm::EDGetTokenT<std::vector<pat::Jet> > JetTok_;
 
-    std::string qgTaggerKey_, deepFlavorBJetTags_, deepCSVBJetTags_, bTagKeyString_, taggerCfg_;
+    std::string qgTaggerKey_, deepFlavorBJetTags_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
     double ak4ptCut_;
 
     TopTagger tt;
@@ -73,7 +73,7 @@ private:
 SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 {
     //register vector of top objects 
-    produces<std::vector<TopObject>>("shotTops");
+    produces<std::vector<TLorentzVector>>("shotTops");
  
     //now do what ever other initialization is needed
     jetSrc_ = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
@@ -84,12 +84,12 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     deepCSVBJetTags_ = iConfig.getParameter<std::string>("deepCSVBJetTags");
     bTagKeyString_ = iConfig.getParameter<std::string>("bTagKeyString");
 
-    taggerCfg_ = iConfig.getParameter<std::string>("taggerCfg");
+    taggerCfgFile_ = iConfig.getParameter<std::string>("taggerCfgFile");
 
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc_);
 
     //configure the top tagger 
-    tt.setCfgFileDirect(taggerCfg_);
+    tt.setCfgFile(taggerCfgFile_);
 }
 
 
