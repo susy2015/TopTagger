@@ -68,7 +68,7 @@ else:
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
@@ -102,12 +102,6 @@ process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents  = cms.untracked.PSet( 
     input = cms.untracked.int32 (-1) 
 )
-
-outFileName = "stopFlatNtuples.root"#options.outputFile + '_' + str(options.job) +  '.root'
-print ('Using output file ' + outFileName)
-
-process.TFileService = cms.Service("TFileService", 
-                                   fileName = cms.string(outFileName))
 
 
 ################################################################################################################################
@@ -188,7 +182,8 @@ process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
 ###############################################################################################################################
 
 process.load('RecoJets.JetProducers.QGTagger_cfi')
-process.QGTagger.srcJets   = cms.InputTag("selectedPatJetsDeepFlavour")
+#process.QGTagger.srcJets   = cms.InputTag("selectedPatJetsDeepFlavour")
+process.QGTagger.srcJets   = cms.InputTag("slimmedJets")
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
 #process, jetTag = addJetInfo(process, cms.InputTag("selectedPatJetsDeepFlavour"), userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
@@ -225,10 +220,12 @@ process.SHOTProducer.ak4JetSrc = jetTag
 ###############################################################################################################################
 
 process.out = cms.OutputModule("PoolOutputModule",
-                               fileName = cms.untracked.string ("test.root")
-                               )
+                               fileName = cms.untracked.string ("test.root"),
+                               outputCommands = cms.untracked.vstring('keep *_SHOTProducer_*_*')
+)
 
 ###############################################################################################################################
 
-process.P = cms.EndPath(process.out)
+process.p = cms.Path(process.SHOTProducer)
+process.endP = cms.EndPath(process.out)
 

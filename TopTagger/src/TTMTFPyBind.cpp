@@ -16,26 +16,50 @@
 
 #ifdef DOTENSORFLOWPYBIND
 static std::string embeddedTensorflowScript = ""
-"import os\n"
+"import os, sys\n"
 "import numpy as np\n"
-"import tensorflow as tf\n"
-"sess = x = y = None\n"
+"shottf = tfw = None\n"
 "\n"
-"def load_graph(frozen_graph_filename):\n"
-"    graph_def = tf.GraphDef()\n"
-"    with tf.gfile.GFile(frozen_graph_filename, \"rb\") as f:\n"
-"        graph_def.ParseFromString(f.read())\n"
-"    with tf.Graph().as_default() as graph:\n"
-"        tf.import_graph_def(graph_def, input_map=None, return_elements=None, name=\"\", op_dict=None, producer_op_list=None)\n"
-"    return graph\n"
+"class TFWrapper:\n"
+"    def insert_path(self):\n"
+"        path = os.path.expandvars(os.path.expanduser(os.environ['CMSSW_BASE'] + '/python/RecoBTag/Tensorflow/'))\n"
+"        sys.path.append(path)\n"
 "\n"
-"def start_session(frozen_graph_filename):\n"
-"    global sess\n"
-"    graph = load_graph(frozen_graph_filename)\n"
-"    sess = tf.Session(graph=graph, config=tf.ConfigProto(intra_op_parallelism_threads=1))\n"
+"    def load_graph(self, frozen_graph_filename):\n"
+"        graph_def = shottf.GraphDef()\n"
+"        with shottf.gfile.GFile(frozen_graph_filename, 'rb') as f:\n"
+"            graph_def.ParseFromString(f.read())\n"
+"        with shottf.Graph().as_default() as graph:\n"
+"            shottf.import_graph_def(graph_def, input_map=None, return_elements=None, name='', op_dict=None, producer_op_list=None)\n"
+"        return graph\n"
 "\n"
-"def eval_session(inputs, outputs):\n"
-"    outputs.update(sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n";
+"    def start_session(self, frozen_graph_filename):\n"
+"        global shottf\n"
+"        try:\n"
+"            import tensorflow as shottf\n"
+"        except ImportError:\n"
+"            self.insert_path()\n"
+"            import tensorflow as shottf\n"
+"        graph = self.load_graph(frozen_graph_filename)\n"
+"        self.sess = shottf.Session(graph=graph, config=shottf.ConfigProto(intra_op_parallelism_threads=1))\n"
+"\n"
+"    def __init__(self, frozen_graph_filename):\n"
+"        self.sess = None\n"
+"        self.start_session(frozen_graph_filename)\n"
+"\n"
+"    def eval_session(self, inputs, outputs):\n"
+"        outputs.update(self.sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n"
+"\n"
+"    def __del__(self):\n"
+"        if self.sess != None: self.sess.close()\n"
+"\n"
+"def initTFWrapper(frozen_graph_filename):\n"
+"    global tfw\n"
+"    tfw = TFWrapper(frozen_graph_filename)\n"
+"\n"
+"def eval_session_shot(inputs, outputs):\n"
+"    tfw.eval_session(inputs, outputs)\n"
+"";
 #endif
 
 void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
@@ -84,7 +108,7 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     PyTuple_SetItem(pArgs, 0, PyString_FromString(modelFile_.c_str()));
 
     //start the tensorflow session
-    callPython("start_session", pArgs);
+    callPython("initTFWrapper", pArgs);
 
     Py_DECREF(pArgs);
 
@@ -145,7 +169,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
         if(varCalculator_->calculateVars(topCand))
         {
             //Run python session to network on input data
-            callPython("eval_session", pArgs);
+            callPython("eval_session_shot", pArgs);
 
             //Get output discriminator
             PyObject *discriminators = PyDict_GetItem(outputs, outputOpName);
@@ -182,6 +206,11 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 
 TTMTFPyBind::~TTMTFPyBind()
 {
+    //close the tensorflow session 
+    PyObject *pArgs = PyTuple_New(0);
+    callPython("closeSession_shot", pArgs);
+    Py_DECREF(pArgs);
+
     //finish cleanup of python objects and close interpreter
     Py_DECREF(inputs_);
     Py_DECREF(nparray_);
@@ -204,6 +233,12 @@ void TTMTFPyBind::initializePyInterpreter()
     // create the main module
     pMain_ = PyImport_AddModule("__main__");
 
+    if(!pMain_)
+    {
+        PyErr_Print();
+        THROW_TTEXCEPTION("AddModule failed!!!");
+    }
+
     // define the globals of the main module as our context
     pGlobal_ = PyModule_GetDict(pMain_);
 
@@ -215,6 +250,13 @@ void TTMTFPyBind::initializePyInterpreter()
 
     // initialize numpy api
     import_array();
+
+    if(!pModule_)
+    {
+        Py_DECREF(pMain_);
+        PyErr_Print();
+        THROW_TTEXCEPTION("PyRun_String failed!!!");        
+    }
 }
 
 PyObject* TTMTFPyBind::callPython(const std::string& func, PyObject* pArgs)
