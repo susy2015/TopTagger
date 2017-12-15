@@ -103,6 +103,14 @@ process.maxEvents  = cms.untracked.PSet(
     input = cms.untracked.int32 (-1) 
 )
 
+################################################################################################################################
+
+ELECTRON_CUT = ""
+
+process.electrons = cms.EDFilter("PATElectronRefSelector",
+                                 src = cms.InputTag("slimmedElectrons"),
+                                 cut = cms.string(ELECTRON_CUT)
+                                 )
 
 ################################################################################################################################
 #

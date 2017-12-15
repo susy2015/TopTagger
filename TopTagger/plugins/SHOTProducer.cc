@@ -322,10 +322,10 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             subjetVec.emplace_back(perSubJetLVec, AK8SUBJET);
             subjetVec.back().setBTag(subjetBDiscriminator);
-            subjetVec.back().setExtraVar("qgMult"      , totalMult);
-            subjetVec.back().setExtraVar("qgPtD"       , ptD);
-            subjetVec.back().setExtraVar("qgAxis1"     , axis1);
-            subjetVec.back().setExtraVar("qgAxis2"     , axis2);
+            subjetVec.back().setExtraVar("mult" , totalMult);
+            subjetVec.back().setExtraVar("ptD"  , ptD);
+            subjetVec.back().setExtraVar("axis1", axis1);
+            subjetVec.back().setExtraVar("axis2", axis2);
         }
 
         constituents.emplace_back(perJetLVec, puppi_tau1_uf, puppi_tau2_uf, puppi_tau3_uf, puppisoftDropMass_uf, subjetVec, 1.0);
