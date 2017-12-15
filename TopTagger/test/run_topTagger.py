@@ -42,12 +42,7 @@ options.parseArguments()
 
 print("Using release "+options.release)
 
-
-#if hasattr(sys, "argv"):
-#    options.parseArguments()
-
-
-process = cms.Process("DNNFiller")
+process = cms.Process("SHOTTagger")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.EventContent.EventContent_cff")
@@ -80,13 +75,8 @@ from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAO
 ###############################################################################################################################
 
 process.source = cms.Source('PoolSource',
-#    fileNames=cms.untracked.vstring (["/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/423685A0-BFE6-E611-B2B5-001E67DBE36D.root"]),
-                            fileNames=cms.untracked.vstring (["file:/uscms_data/d3/pastika/zinv/dev/CMSSW_8_0_26_patch1/src/SusyAnaTools/SkimsAUX/workdir/prod/80X_crab_example/423685A0-BFE6-E611-B2B5-001E67DBE36D.root"]),
-#            '/store/data/Run2016C/SingleMuon/MINIAOD/23Sep2016-v1/90000/109B7DBF-0C91-E611-A5EC-0CC47A4D7690.root',]),
+                            fileNames=cms.untracked.vstring (["/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/423685A0-BFE6-E611-B2B5-001E67DBE36D.root"]),
 )
-
-#if options.inputScript != '' and options.inputScript != 'DeepNTuples.DeepNtuplizer.samples.TEST':
-#    process.load(options.inputScript)
 
 numberOfFiles = len(process.source.fileNames)
 numberOfJobs = options.nJobs
@@ -96,7 +86,6 @@ process.source.fileNames = process.source.fileNames[jobNumber:numberOfFiles:numb
 if options.nJobs > 1:
     print ("running over these files:")
     print (process.source.fileNames)
-#process.source.fileNames = ['file:/uscms/home/verzetti/nobackup/CMSSW_8_0_25/src/DeepNTuples/copy_numEvent100.root']
 
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents  = cms.untracked.PSet( 
@@ -105,14 +94,6 @@ process.maxEvents  = cms.untracked.PSet(
 
 ################################################################################################################################
 
-ELECTRON_CUT = ""
-
-process.electrons = cms.EDFilter("PATElectronRefSelector",
-                                 src = cms.InputTag("slimmedElectrons"),
-                                 cut = cms.string(ELECTRON_CUT)
-                                 )
-
-################################################################################################################################
 #
 #from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
 #from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
@@ -190,11 +171,9 @@ process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
 ###############################################################################################################################
 
 process.load('RecoJets.JetProducers.QGTagger_cfi')
-#process.QGTagger.srcJets   = cms.InputTag("selectedPatJetsDeepFlavour")
 process.QGTagger.srcJets   = cms.InputTag("slimmedJets")
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
-#process, jetTag = addJetInfo(process, cms.InputTag("selectedPatJetsDeepFlavour"), userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
 process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
 
 ###############################################################################################################################
@@ -232,7 +211,7 @@ from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
 #                                          src = cms.InputTag("pfCandidatesNoMu"), 
 #                                          veto = cms.InputTag("prodElectrons", "ele2Clean"))
 #jetToolbox( process, 'ak8', 'ak8JetSubsNoLep', 'out', 
-#            runOnMC = options.mcInfo, 
+#            runOnMC = not options.isData, 
 #            PUMethod='Puppi', 
 #            newPFCollection=True,
 #            nameNewPFCollection='pfCandidatesNoEle',
