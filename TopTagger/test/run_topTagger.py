@@ -214,8 +214,42 @@ jetTag = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
 
 ###############################################################################################################################
 
+from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
+
+# To get the lepton cleaned collection
+#process.pfCandidatesNoMu =  cms.EDProducer("CandPtrProjector", 
+#                                          src = cms.InputTag("packedPFCandidates"), 
+#                                          veto = cms.InputTag("prodMuons", "mu2Clean"))
+#process.pfCandidatesNoEle = cms.EDProducer("CandPtrProjector", 
+#                                          src = cms.InputTag("pfCandidatesNoMu"), 
+#                                          veto = cms.InputTag("prodElectrons", "ele2Clean"))
+#jetToolbox( process, 'ak8', 'ak8JetSubsNoLep', 'out', 
+#            runOnMC = options.mcInfo, 
+#            PUMethod='Puppi', 
+#            newPFCollection=True,
+#            nameNewPFCollection='pfCandidatesNoEle',
+#            addSoftDropSubjets = True, 
+#            addSoftDrop = True, 
+#            addNsub = True, 
+#            bTagDiscriminators = ['pfCombinedInclusiveSecondaryVertexV2BJetTags'], 
+#            addCMSTopTagger = False,
+#            postFix="NoLep")
+
+# Keep this behind the cleaned version for now, otherwise everything will be lepton cleaned
+jetToolbox( process, 'ak8', 'ak8JetSubs', 'out', 
+            runOnMC = not options.isData, 
+            PUMethod='Puppi', 
+            addSoftDropSubjets = True, 
+            addSoftDrop = True, 
+            addNsub = True, 
+            bTagDiscriminators = ['pfCombinedInclusiveSecondaryVertexV2BJetTags'], 
+            addCMSTopTagger = False)
+
+###############################################################################################################################
+
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
 process.SHOTProducer.ak4JetSrc = jetTag
+process.SHOTProducer.ak8JetSrc = cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop')
 
 ###############################################################################################################################
 
