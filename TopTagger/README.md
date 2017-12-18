@@ -13,8 +13,64 @@ This will download the configuration file along with the MVA training file if ap
 
 ## Installing the tagger in CMS software release
 
-Instructions for installing openCV on the LPC are found in the readme in the Tools/ folder of the repository.  To build in CMSSW simply checkout the repository in the src folder of CMSSW and run "scram b" in the base TopTagger directory.
+### Standalone (edm free) install instructions within CMSSW
 
+If you would rather not go through the hassle of installing ROOT/python/tensorflow the CMSSW environment can be used to provide the necessary libraries and python modules 
+
+```
+cmsrel CMSSW_9_3_3
+cd CMSSW_9_3_3/src
+cmsenv
+git clone git@github.com:susy2015/TopTagger.git
+cd TopTagger/TopTagger/test
+./configure
+make -j8 
+```
+
+The test code can then be run identically to the completely standalone instructions.
+
+### Install tagger integrated in the edm framework
+
+The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases.  In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qf producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix, 
+
+```
+#get CMSSW release
+cmsrel CMSSW_8_0_28_patch1
+cd CMSSW_8_0_28_patch1/src/
+cmsenv
+git cms-init
+#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet
+git cms-merge-topic -u mverzett:Experimental_DeepFlavour_80X
+cd RecoBTag/DeepFlavour/scripts/
+wget -nv http://www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz
+tar -zxf tensorflow-cmssw8-0-26.tar.gz
+mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python
+rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/
+cd "$CMSSW_BASE/src"
+scram setup "RecoBTag/Tensorflow/py2-numpy-c-api.xml"
+cmsenv
+#patch to gq producer to ass axis1
+git cms-merge-topic -u pastika:AddJetAxis1
+#patched version of jet toolbox
+git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix_NoLep_jetToolbox_80X_V3
+#download top tagger code 
+git clone git@github.com:susy2015/TopTagger.git
+cd TopTagger/
+git checkout IntermediateRecipe
+cd ..
+#compile everything 
+scram b -j12
+cd TopTagger/TopTagger/test
+#get qgl database file
+wget https://raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL_cmssw8020_v2.db
+#get top tager cfg file and MVA model files 
+../../Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
+#run example code
+voms-proxy-init
+cmsRun run_topTagger.py
+```
+
+The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).  
 
 ## Top tagger structure
 
@@ -299,3 +355,5 @@ This module is used to sort the final list of tops after overlap resolution.
 
 This parameter defines the sorting order.  The possible options are "topMass", "topPt", and "none".
 
+
+ LocalWords:  edm TopTagger
