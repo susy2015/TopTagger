@@ -49,7 +49,7 @@ rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/
 cd "$CMSSW_BASE/src"
 scram setup "RecoBTag/Tensorflow/py2-numpy-c-api.xml"
 cmsenv
-#patch to gq producer to ass axis1
+#patch to gq producer to add axis1
 git cms-merge-topic -u pastika:AddJetAxis1
 #patched version of jet toolbox
 git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix_NoLep_jetToolbox_80X_V3

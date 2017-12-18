@@ -45,7 +45,7 @@ A basic standalone example using the top tagging code is provided in "TopTagger/
 
 The example executable is compiled along with the standalone library as described above.  If either openCV or the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
 
-```
+```sh
 #do once per terminal if opencv or the top tagger are not installed system wide
 source taggerSetup.sh
 #do once in any directory where you will run the top tagger example
