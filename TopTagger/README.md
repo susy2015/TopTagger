@@ -4,7 +4,7 @@
 
 Before the top tagger can be used the top tagger configuration file must be checked out.  Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "Tools/getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the standard working point for use with the example code (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
 
-```
+```sh
 ./getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
 ```
 
@@ -17,7 +17,7 @@ This will download the configuration file along with the MVA training file if ap
 
 If you would rather not go through the hassle of installing ROOT/python/tensorflow the CMSSW environment can be used to provide the necessary libraries and python modules 
 
-```
+```sh
 cmsrel CMSSW_9_3_3
 cd CMSSW_9_3_3/src
 cmsenv
@@ -33,7 +33,7 @@ The test code can then be run identically to the completely standalone instructi
 
 The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases.  In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qf producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix, 
 
-```
+```sh
 #get CMSSW release
 cmsrel CMSSW_8_0_28_patch1
 cd CMSSW_8_0_28_patch1/src/

@@ -25,7 +25,7 @@ Follow the instructions to install tensorflow for python.  GPU support is not ne
 
 After all the necessary packages are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root/tensorflow)
 
-```
+```sh
 #After downloading the code from github or untaring the standalone tarball 
 cd TopTagger/TopTagger/test
 ./configure
