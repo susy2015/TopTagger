@@ -1,0 +1,5 @@
+PROJECT_NAME     = test
+OUTPUT_DIRECTORY = docs
+WARNINGS         = YES
+INPUT            = CfgParser/include CfgParser/src TopTagger/include TopTagger/src TopTagger/test Tools/python
+FILE_PATTERNS    = *.cc *.cpp *.C *.c *.h *.hpp *.hh *.py

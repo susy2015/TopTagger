@@ -22,8 +22,6 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
 
     discriminator_ = cfgDoc->get("discCut",       localCxt, -999.9);
     modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
-    inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
-    outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
     NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
     nCores_        = cfgDoc->get("NCores",        localCxt, 1);
 
