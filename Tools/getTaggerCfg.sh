@@ -86,28 +86,39 @@ fi
 cd $REPO_NAME-$TAG
 DOWNLOAD_DIR=$PWD
 
-MVAFILE=
+MVAFILES=
 
 if [ -f TopTagger.cfg ]
 then
-    MVAFILE=$(grep "modelFile" TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
-    if [[ ! -z ${MVAFILE// } ]]
+    MVAFILES=$(grep "modelFile" TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
+    MISSING=
+    if [[ ! -z ${MVAFILES// } ]]
     then
-        MVATARBALL=${MVAFILE%.*}.tar.gz
-        echo $MVAFILE
-        if [ ! -f $MVAFILE ]
-        then
-            wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
-            if [ -f $MVATARBALL ]
+        for MVAFILE in $MVAFILES; do
+            if [ ! -f $MVAFILE ]
             then
-                tar xzf $MVATARBALL
-                rm $MVATARBALL
-            else
-                echo "File "$MVATARBALL" failed to download"
-                exit 0
+                MISSING="yes"
+                break
             fi
-        else
-            echo "Model file already present "$MVAFILE
+        done
+        if [[ ! -z ${MISSING// } ]]
+        then
+            MVATARBALL=MVAFILES.tar.gz
+            wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
+            if [ ! -f $MVATARBALL ]
+            then
+                echo "MVA tarball "$MVATARBALL" not found!!!"
+                MVATARBALL=${MVAFILES%.*}.tar.gz
+                echo "trying "$MVATARBALL
+                wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
+                if [ ! -f $MVATARBALL ]
+                then
+                    echo "MVA tarball "$MVATARBALL" not found!!!"
+                    exit 0
+                fi
+            fi
+            tar xzf $MVATARBALL
+            rm $MVATARBALL
         fi
     fi
 fi
@@ -117,8 +128,10 @@ cd $STARTING_DIR
 if [[ -z $NO_SOFTLINK ]]
 then
     ln -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
-    if [[ ! -z ${MVAFILE// } ]] 
+    if [[ ! -z ${MVAFILES// } ]] 
     then
-        ln -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+        for MVAFILE in $MVAFILES; do
+            ln -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+        done
     fi
 fi
