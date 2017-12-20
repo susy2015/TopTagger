@@ -54,10 +54,7 @@ git cms-merge-topic -u pastika:AddJetAxis1
 #patched version of jet toolbox
 git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix_NoLep_jetToolbox_80X_V3
 #download top tagger code 
-git clone git@github.com:susy2015/TopTagger.git
-cd TopTagger/
-git checkout IntermediateRecipe
-cd ..
+git clone -b IntermediateRecipeV0 git@github.com:susy2015/TopTagger.git
 #compile everything 
 scram b -j12
 cd TopTagger/TopTagger/test
