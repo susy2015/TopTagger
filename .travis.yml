@@ -54,9 +54,13 @@ script:
   - source $VO_CMS_SW_DIR/cmsset_default.sh 
   - scramv1 project CMSSW CMSSW_9_3_3
   - cd CMSSW_9_3_3/src/
-  - cmsenv
+  - eval `scramv1 runtime -sh`
   - cd $TRAVIS_BUILD_DIR/TopTagger/test
+  - ./configure
   - make -j
+  - source taggerSetup.sh
+  - $TRAVIS_BUILD_DIR/TopTagger/Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
+  - ./topTaggerTest
 
 # Generate and deploy documentation
 after_success:
