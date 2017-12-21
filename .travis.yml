@@ -25,7 +25,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -qq cvmfs cvmfs-config-default
   - sudo cvmfs_config setup
-  - sudo echo CVMFS_HTTP_PROXY=\"DIRECT\ " | sudo tee /etc/cvmfs/default.local > /dev/null
+  - sudo echo "CVMFS_HTTP_PROXY=\"DIRECT\"" | sudo tee /etc/cvmfs/default.local > /dev/null
   - sudo echo CVMFS_REPOSITORIES=cms.cern.ch | sudo tee -a /etc/cvmfs/default.local > /dev/null
   - sudo service autofs restart
   - cvmfs_config probe
