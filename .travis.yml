@@ -57,6 +57,8 @@ script:
   - eval `scramv1 runtime -sh`
   - cd $TRAVIS_BUILD_DIR/TopTagger/test
   - which g++
+  - echo "int main() {}" > test.cpp
+  - g++ test.cpp
   - ./configure
   - make -j
   - source taggerSetup.sh
