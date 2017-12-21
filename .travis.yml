@@ -30,6 +30,7 @@ before_install:
   - sudo service autofs restart
   - cvmfs_config probe
   - sudo cvmfs_config chksetup
+  - sudo apt-get install -qq libc6-dev
 
 # Install dependencies
 #addons:
