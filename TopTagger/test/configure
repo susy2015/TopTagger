@@ -644,6 +644,7 @@ XGBOOSTDIR
 OPENCVDIR
 PYTHONCFG
 pythonconfigfound
+SCRAMNUMPYCFG
 scramfound
 TMVALIB
 rootcintfound
@@ -2603,7 +2604,6 @@ else
 
 fi
 
-
 # Extract the first word of "scram", so it can be a program name with args.
 set dummy scram; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -2642,6 +2642,14 @@ $as_echo "no" >&6; }
 fi
 
 
+
+if test ${pythonconfigfound} == yes; then
+   SCRAMNUMPYCFG=$(scram tool tag py2-numpy PY2_NUMPY_BASE)
+
+else
+   SCRAMNUMPYCFG=""
+
+fi
 
 # Extract the first word of "python-config", so it can be a program name with args.
 set dummy python-config; ac_word=$2
