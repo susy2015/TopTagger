@@ -61,7 +61,7 @@ fi
 dnl check if scram is avaliable, and if so, get the numpy include path
 AC_CHECK_PROG(scramfound, scram, yes, no)
 
-if test ${pythonconfigfound} == yes; then
+if test ${scramfound} == yes; then
    AC_SUBST(SCRAMNUMPYCFG, $(scram tool tag py2-numpy PY2_NUMPY_BASE))
 else
    AC_SUBST(SCRAMNUMPYCFG, "")

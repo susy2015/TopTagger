@@ -2643,7 +2643,7 @@ fi
 
 
 
-if test ${pythonconfigfound} == yes; then
+if test ${scramfound} == yes; then
    SCRAMNUMPYCFG=$(scram tool tag py2-numpy PY2_NUMPY_BASE)
 
 else
