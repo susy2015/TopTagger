@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -ex
-
 TRAVIS_BUILD_DIR=$1
 echo $TRAVIS_BUILD_DIR
 cd $TRAVIS_BUILD_DIR
@@ -14,8 +12,8 @@ cd CMSSW_9_3_3/src/
 pwd
 eval `scramv1 runtime -sh`
 cd $TRAVIS_BUILD_DIR/TopTagger/test
-echo "int main() {}" > test.cpp
-g++ test.cpp
+scram tool info py2-numpy
+scram tool tag py2-numpy PY2_NUMPY_BASE
 ./configure
 make -j
 source taggerSetup.sh
