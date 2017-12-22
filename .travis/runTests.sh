@@ -2,6 +2,7 @@
 
 TRAVIS_BUILD_DIR=$1
 echo $TRAVIS_BUILD_DIR
+ls $TRAVIS_BUILD_DIR
 cd $TRAVIS_BUILD_DIR/..
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        
 export SCRAM_ARCH=slc6_amd64_gcc630
@@ -11,7 +12,7 @@ scramv1 project CMSSW CMSSW_9_3_3
 cd CMSSW_9_3_3/src/
 pwd
 eval `scramv1 runtime -sh`
-mv $TRAVIS_BUILD_DIR .
+cp -r $TRAVIS_BUILD_DIR .
 cd TopTagger/test
 scram tool info py2-numpy
 scram tool tag py2-numpy PY2_NUMPY_BASE
