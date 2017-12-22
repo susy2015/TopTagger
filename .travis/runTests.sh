@@ -15,7 +15,7 @@ cd TopTagger/TopTagger/test
 ./configure
 make -j
 source taggerSetup.sh
-$TRAVIS_BUILD_DIR/TopTagger/Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
+$TRAVIS_BUILD_DIR/Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 ./topTaggerTest
 cd ../..
 scram b -j

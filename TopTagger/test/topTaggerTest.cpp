@@ -189,6 +189,8 @@ int main()
         e.print();
         printf("Terminating run\n");
         fflush(stdout);
+
+        exit(1);
     }
     
     //clean up pointers 
@@ -200,4 +202,6 @@ int main()
     delete AK8JetTau2;
     delete AK8JetTau3;
     delete AK8JetSoftdropMass;
+
+    exit 0;
 }
