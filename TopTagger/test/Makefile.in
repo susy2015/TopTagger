@@ -57,7 +57,7 @@ endif
 
 #scram specific numpy c-api
 ifdef SCRAMNUMPYCFG
-	INCLUDESDIRS += -I$SCRAMNUMPYCFG/c-api/core/include
+	INCLUDESDIRS += -I$(SCRAMNUMPYCFG)/c-api/core/include
 endif
 
 # openCV includes and libraries
