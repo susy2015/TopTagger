@@ -1,5 +1,6 @@
 #!/bin/bash
 
+TRAVIS_BUILD_DIR=$1
 echo $TRAVIS_BUILD_DIR
 cd $TRAVIS_BUILD_DIR
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        
