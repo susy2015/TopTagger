@@ -1,7 +1,9 @@
 #!/bin/bash
 
+#stop upon failed command
+set -x
+
 TRAVIS_BUILD_DIR=$1
-echo $TRAVIS_BUILD_DIR
 cd $TRAVIS_BUILD_DIR/..
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        
 export SCRAM_ARCH=slc6_amd64_gcc630
@@ -12,10 +14,13 @@ cd CMSSW_9_3_3/src/
 eval `scramv1 runtime -sh`
 cp -r $TRAVIS_BUILD_DIR .
 cd TopTagger/TopTagger/test
+echo "========================================================================="
 ./configure
 make -j
+echo "========================================================================="
 source taggerSetup.sh
 $TRAVIS_BUILD_DIR/Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 ./topTaggerTest
+echo "========================================================================="
 cd ../..
 scram b -j
