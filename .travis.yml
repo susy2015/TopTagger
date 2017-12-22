@@ -50,7 +50,7 @@ compiler:
 # Build steps
 script:
   - chmod +x $TRAVIS_BUILD_DIR/.travis/runTests.sh
-  - sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR
+  - sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR
 
 # Generate and deploy documentation
 after_success:
