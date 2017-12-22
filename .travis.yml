@@ -5,8 +5,9 @@ dist: trusty
 language: cpp
 
 # Environment variables
-#env:
-#  global:
+env:
+  global:
+     - DOCKER_CONTAINER: pastika/centos6:withPerl
 #    - GH_REPO_NAME: Othello
 #    - DOXYFILE: $TRAVIS_BUILD_DIR/Doxyfile
 #    - GH_REPO_REF: github.com/pastika/Othello.git
@@ -30,7 +31,7 @@ before_install:
   - sudo service autofs restart
   - cvmfs_config probe
   - sudo cvmfs_config chksetup
-  - sudo docker pull pastika/centos6:testWithPerl
+  - sudo docker pull $DOCKER_CONTAINER
 
 # Install dependencies
 #addons:
@@ -49,7 +50,7 @@ compiler:
 # Build steps
 script:
   - chmod +x $TRAVIS_BUILD_DIR/.travis/runTests.sh
-  - sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR pastika/centos6:withPerl $TRAVIS_BUILD_DIR/.travis/runTests.sh
+  - sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR
 
 # Generate and deploy documentation
 after_success:
