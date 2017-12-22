@@ -7,7 +7,7 @@ language: cpp
 # Environment variables
 env:
   global:
-     - DOCKER_CONTAINER: cmssw/slc6-installer:latest
+     - DOCKER_CONTAINER: cmssw/slc6-base:latest
 #    - GH_REPO_NAME: Othello
 #    - DOXYFILE: $TRAVIS_BUILD_DIR/Doxyfile
 #    - GH_REPO_REF: github.com/pastika/Othello.git
