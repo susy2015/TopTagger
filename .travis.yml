@@ -48,7 +48,7 @@ compiler:
 
 # Build steps
 script:
-  - docker exec -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR cmssw/slc6-base:latest
+  - docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR cmssw/slc6-base:latest $TRAVIS_BUILD_DIR/.travis/runTests.sh
 
 # Generate and deploy documentation
 after_success:
