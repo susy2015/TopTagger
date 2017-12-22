@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 TRAVIS_BUILD_DIR=$1
 echo $TRAVIS_BUILD_DIR
 cd $TRAVIS_BUILD_DIR
@@ -9,9 +11,9 @@ export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git/
 source $VO_CMS_SW_DIR/cmsset_default.sh 
 scramv1 project CMSSW CMSSW_9_3_3
 cd CMSSW_9_3_3/src/
+pwd
 eval `scramv1 runtime -sh`
 cd $TRAVIS_BUILD_DIR/TopTagger/test
-which g++
 echo "int main() {}" > test.cpp
 g++ test.cpp
 ./configure
