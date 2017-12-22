@@ -3,15 +3,16 @@ OPENCV_DIRECTORY  = @OPENCVDIR@
 XGBOOST_DIRECTORY = @XGBOOSTDIR@
 TAGGERDIR         = @TAGGERDIR@
 
-CXX          = @CXX@
-LD           = @CXX@
-CXXFLAGS     = @CXXFLAGS@
-LDFLAGS      = @LDFLAGS@
-PREFIX       = @prefix@
-LDCONFIG     = @LDCONFIG@
-LIBSUFFIX    = @LIBSUFFIX@
-PYTHONCFG    = @PYTHONCFG@
-TMVALIB      = @TMVALIB@
+CXX           = @CXX@
+LD            = @CXX@
+CXXFLAGS      = @CXXFLAGS@
+LDFLAGS       = @LDFLAGS@
+PREFIX        = @prefix@
+LDCONFIG      = @LDCONFIG@
+LIBSUFFIX     = @LIBSUFFIX@
+PYTHONCFG     = @PYTHONCFG@
+SCRAMNUMPYCFG = @SCRAMNUMPYCFG@
+TMVALIB       = @TMVALIB@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -52,6 +53,11 @@ ifdef PYTHONCFG
 
 	CXXFLAGS += -DDOTENSORFLOWPYBIND
 	LIBS     += -L$(shell $(PYTHONCFG) --prefix)/lib $(shell $(PYTHONCFG) --libs)
+endif
+
+#scram specific numpy c-api
+ifdef SCRAMNUMPYCFG
+	INCLUDESDIRS += -I$SCRAMNUMPYCFG/c-api/core/include
 endif
 
 # openCV includes and libraries
