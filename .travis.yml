@@ -30,7 +30,7 @@ before_install:
   - sudo service autofs restart
   - cvmfs_config probe
   - sudo cvmfs_config chksetup
-  - docker pull pastika/centos6:testWithPerl
+  - sudo docker pull pastika/centos6:testWithPerl
 
 # Install dependencies
 #addons:
@@ -48,7 +48,7 @@ compiler:
 
 # Build steps
 script:
-  - docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR cmssw/slc6-base:latest $TRAVIS_BUILD_DIR/.travis/runTests.sh
+  - sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR pastika/centos6:testWithPerl $TRAVIS_BUILD_DIR/.travis/runTests.sh
 
 # Generate and deploy documentation
 after_success:
