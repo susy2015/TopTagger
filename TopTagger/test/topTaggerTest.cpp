@@ -203,5 +203,5 @@ int main()
     delete AK8JetTau3;
     delete AK8JetSoftdropMass;
 
-    exit 0;
+    exit(0);
 }
