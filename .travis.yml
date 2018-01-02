@@ -8,10 +8,10 @@ language: cpp
 env:
   global:
      - DOCKER_CONTAINER: cmssw/slc6-base:latest
-#    - GH_REPO_NAME: Othello
-#    - DOXYFILE: $TRAVIS_BUILD_DIR/Doxyfile
-#    - GH_REPO_REF: github.com/pastika/Othello.git
-#    - secure: "NaC04+uMsQ3SpLwyQcCVvCMFvExgGrVTDc4CplYYq4cTrE77L4cQ3MlbGaasjGcAfo9Umglgd6UHjJuSgcNgu5dUYp22HOzb7vxOFG1XpJIOz3p/01d8+K9wv0sz5MvxlekI8G6F/42FCGvQwJRhu/C5ydtjIf6GBwg24PvHxgEKhzDZtXBaOoMAXdjss9SLuYVvUijc2dTfzsnkiZ233FwlRbEKeUjHok3Ugc/w87WwTdsOHIXdJJAtC8qaGkppd6Q+GciDz7RKWsS9AFlPzpxo3ypWS9BgGQ6k3rNITIaFg25HDfZLaseu2PJQeAOYCOSjGdRNvgT0NYIFAot32GWJkJ19hn6D0fbIFXsTl/vCrEUuC2JQbmIA9pCWn9jvPvrtgvYAFwcm1TDH5Dj9bftwUv9C2yYvIdez8z9GKQIvHeAnYrx2oTylf2vaK2so8Ayc9yEiLA+Oh+74ZO6a2Z6ZH/cIOWIZP2dmXmbRtBElLemz4/8fmVq2oacgLu2o0EF7nCqwdsOq9ljTG9VnU417CcQ4oz8Y5ETVxocDWcAgNUEev4cyZcIi2ep9TTFD8ZDP1qhRi+f9lx8J2LBycnx34Wt7JuZAZ86ZwbzbL0Gul68/MeM71dLtrsQTJ3pNHr4jCiyXj3Im2cSltxKwN4v00hGmGC/0F6c7VLsdyrk="
+     - GH_REPO_NAME: TopTagger
+     - DOXYFILE: $TRAVIS_BUILD_DIR/.Doxyfile
+     - GH_REPO_REF: github.com/susy2015/TopTagger.git
+     - secure: "ThkpvOxh84cWY/MHV14RDah0LHmRkwouW9uoOC0DVDUdZOi6xMPZJX5tQJvIOFjZgWeumlrjDRaeODLMlMLTikKWvrGh8vOZ6C1q2pSftDSlkqhqdzivb45FtfW4MiPdZ9uZwmV4V2EOKmiiU1SU+VsaeQoREHAcWE0JP3kYxABcxjBXQy3QSESJZkvTf4hx1BwuuvjRF79HymUzoL83MKwcTYfv65U7Yae0XF8Yzl/ym5THHzYuFqiatqJtLT8kjDfY2fThXavZswTCKP/yO9LPkYbwKvLzlFNuzVwEsmJNhWholb/hhgEjhXs5/ELc8mCLNftjJMiVs1V4kTXO7RQb/5TzVU+FkiYQaP6C3efciTq1mGIX6hmVq9p8i3wcuxNededj4MRv/7qlV9B8AToNludx1CQRJDIJWIMsC8fGm13ilOU3m/RI0zJKAg6HVgCazPiFivrjP2O0xZqCyyQfqmeda0ZJKvckSddn2fHMV780144xxAcdV3IsdZiUhvShWNeNReoMjmNMjML4hvLOZJu88/Mki5SrK1MkPj/uVUS0X+tkGstN/vl1tOJVEkEmmWfBC64yGpeMb6tBNlXbs1gC4bBa5lECSM+q3Zr4SxGGl0OniFSXLvQCTSUb7J7OzENATO/ljDquzI+dnDYArtKjBunmW3apROBeWdo="
 
 # Enable build tests on all branches
 branches:
@@ -20,6 +20,7 @@ branches:
 
 before_install:
   - sudo apt-get -qq update
+  - sudo apt-get install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz
   - sudo apt-get install -qq autofs attr gdb git uuid-dev uuid fuse
   - wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
   - sudo dpkg -i cvmfs-release-latest_all.deb
@@ -33,15 +34,6 @@ before_install:
   - sudo cvmfs_config chksetup
   - sudo docker pull $DOCKER_CONTAINER
 
-# Install dependencies
-#addons:
-#  apt:
-#    packages:
-#      - doxygen
-#      - doxygen-doc
-#      - doxygen-latex
-#      - doxygen-gui
-#      - graphviz
 
 # Compiler selection
 compiler:
@@ -54,7 +46,7 @@ script:
 
 # Generate and deploy documentation
 after_success:
-  - cd $TRAVIS_BUILD_DIR
+  - cd $TRAVIS_BUILD_DIR/.travis
   - chmod +x generateDocumentationAndDeploy.sh
   - ./generateDocumentationAndDeploy.sh
 
