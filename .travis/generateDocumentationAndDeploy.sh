@@ -89,6 +89,7 @@ echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://pastika.g
 
 #If this is a tag, generate the pdf 
 if [ "$TRAVIS_BRANCH" == "master" ]
+then
     echo "TEST"
     cd latex
     make
