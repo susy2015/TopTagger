@@ -58,3 +58,6 @@ after_success:
   - chmod +x generateDocumentationAndDeploy.sh
   - ./generateDocumentationAndDeploy.sh
 
+#disable email notifications 
+notifications:
+  email: false
