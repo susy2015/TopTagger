@@ -36,7 +36,6 @@ __AUTHOR__="Jeroen de Bruijn"
 #Abort if this is not the master branch or a tag
 echo "branch: "$TRAVIS_BRANCH
 echo "tag: "$TRAVIS_TAG
-TARGET_BRANCH="master"
 if [ "$TRAVIS_BRANCH" != "$TARGET_BRANCH" ] && [ -z $TRAVIS_TAG ]
 then 
     exit 0
@@ -95,9 +94,6 @@ then
     echo "TEST"
     cd latex
     make
-    ls
-    LATEX_FILE_NAME=refman.pdf
-    github-release upload -u $GH_ORG_NAME -r $GH_REPO_NAME -t $TRAVIS_TAG -n $LATEX_FILE_NAME -f $LATEX_FILE_NAME -l "Doxygen documentation for tagged code"
     cd ..
 fi
 
