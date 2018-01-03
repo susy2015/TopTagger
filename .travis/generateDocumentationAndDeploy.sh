@@ -34,7 +34,8 @@ __AUTHOR__="Jeroen de Bruijn"
 ################################################################################
 
 #Abort if this is not the master branch or a tag
-echo $TRAVIS_BRANCH
+echo "branch: "$TRAVIS_BRANCH
+echo "tag: "$TRAVIS_TAG
 if [ "$TRAVIS_BRANCH" != "master" ] && [ ! -z $TRAVIS_TAG ]
 then 
     exit 0
