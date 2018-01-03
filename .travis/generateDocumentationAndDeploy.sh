@@ -36,7 +36,8 @@ __AUTHOR__="Jeroen de Bruijn"
 #Abort if this is not the master branch or a tag
 echo "branch: "$TRAVIS_BRANCH
 echo "tag: "$TRAVIS_TAG
-if [ "$TRAVIS_BRANCH" != "master" ] && [ ! -z $TRAVIS_TAG ]
+TARGET_BRANCH="master"
+if [ "$TRAVIS_BRANCH" != "$TARGET_BRANCH" ] && [ -z $TRAVIS_TAG ]
 then 
     exit 0
 fi
@@ -89,12 +90,14 @@ doxygen $DOXYFILE 2>&1 | tee doxygen.log
 echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://$GH_ORG_NAME.github.io/$GH_REPO_NAME/html/index.html\" /></head></html>" > index.html
 
 #If this is a tag, generate the pdf 
-if [ "$TRAVIS_BRANCH" = "master" ]
+if [ ! -z $TRAVIS_TAG ]
 then
     echo "TEST"
     cd latex
     make
     ls
+    LATEX_FILE_NAME=refman.pdf
+    github-release upload -u $GH_ORG_NAME -r $GH_REPO_NAME -t $TRAVIS_TAG -n $LATEX_FILE_NAME -f $LATEX_FILE_NAME -l "Doxygen documentation for tagged code"
     cd ..
 fi
 
@@ -103,7 +106,7 @@ fi
 # Only upload if Doxygen successfully created the documentation.
 # Check this by verifying that the html directory and the file html/index.html
 # both exist. This is a good indication that Doxygen did it's work.
-if [ "$TRAVIS_BRANCH" = "master" ] && [ -d "html" ] && [ -f "html/index.html" ]; then
+if [ "$TRAVIS_BRANCH" = "$TARGET_BRANCH" ] && [ -d "html" ] && [ -f "html/index.html" ]; then
 
     echo 'Uploading documentation to the gh-pages branch...'
     # Add everything in this directory (the Doxygen code documentation) to the
@@ -120,7 +123,7 @@ if [ "$TRAVIS_BRANCH" = "master" ] && [ -d "html" ] && [ -f "html/index.html" ];
     # The ouput is redirected to /dev/null to hide any sensitive credential data
     # that might otherwise be exposed.
     git push --force "https://${GH_REPO_TOKEN}@${GH_REPO_REF}" > /dev/null 2>&1
-elif [ "$TRAVIS_BRANCH" = "master" ]
+elif [ "$TRAVIS_BRANCH" = "$TARGET_BRANCH" ]
 then
     echo '' >&2
     echo 'Warning: No documentation (html) files have been found!' >&2
