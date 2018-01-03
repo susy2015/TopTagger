@@ -120,6 +120,7 @@ if [ "$TRAVIS_BRANCH" == "master" ] && [ -d "html" ] && [ -f "html/index.html" ]
     # that might otherwise be exposed.
     git push --force "https://${GH_REPO_TOKEN}@${GH_REPO_REF}" > /dev/null 2>&1
 elif [ "$TRAVIS_BRANCH" == "master" ]
+then
     echo '' >&2
     echo 'Warning: No documentation (html) files have been found!' >&2
     echo 'Warning: Not going to push the documentation to GitHub!' >&2
