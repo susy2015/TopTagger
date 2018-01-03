@@ -85,10 +85,10 @@ echo 'Generating Doxygen code documentation...'
 # Redirect both stderr and stdout to the log file AND the console.
 doxygen $DOXYFILE 2>&1 | tee doxygen.log
 #create dummy index.html to redirect to the main index.html
-echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://pastika.github.io/Othello/html/index.html\" /></head></html>" > index.html
+echo "<html><head><meta http-equiv=\"refresh\" content=\"0; url=http://$GH_ORG_NAME.github.io/$GH_REPO_NAME/html/index.html\" /></head></html>" > index.html
 
 #If this is a tag, generate the pdf 
-if [ "$TRAVIS_BRANCH" == "master" ]
+if [ "$TRAVIS_BRANCH" = "master" ]
 then
     echo "TEST"
     cd latex
