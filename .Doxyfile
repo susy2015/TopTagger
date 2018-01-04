@@ -1,0 +1,6 @@
+PROJECT_NAME     = TopTagger
+OUTPUT_DIRECTORY = 
+WARNINGS         = NO
+RECURSIVE        = YES
+INPUT            = $(TRAVIS_BUILD_DIR)
+FILE_PATTERNS    = *.cc *.cpp *.C *.c *.h *.hpp *.hh *.py
