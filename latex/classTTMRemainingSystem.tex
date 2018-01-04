@@ -1,0 +1,73 @@
+\hypertarget{classTTMRemainingSystem}{\section{T\-T\-M\-Remaining\-System Class Reference}
+\label{classTTMRemainingSystem}\index{T\-T\-M\-Remaining\-System@{T\-T\-M\-Remaining\-System}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Remaining\-System.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Remaining\-System\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classTTMRemainingSystem}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMRemainingSystem_a4d72b9607c336e2de3d2f7876c89f5db}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMRemainingSystem_ab9f2abe56c30f34c2319f752c403fb09}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+This module calclates the remaining system. The purpose of the remaining system is to partially reconstruct a top quark to give a second input into the M\-T2 calculation for the 1-\/top catagory. The reconstruction algorithm used here starts by looking for a b-\/jet not included in a top. If no b jet is found then the highest pt jet not in a top is selected. The algorithm can then combine nearby jets with the first selected jet if certain requirements are satisified. If no second jet satisifies these requirments, the fist chosen jet is used by itself. This algorithm only finds one such object using this method. If multiple jet pairings satisify the requirements, the pairing with the smallest d\-R is chosen.
+
+
+\begin{DoxyParams}{Parameters}
+{\em csv\-Threshold} & (float) Threshold on b-\/tag discriminator to be considered a b-\/jet \\
+\hline
+{\em low\-Rsys\-Mass} & (float) Lower limit on the mass of the remaining system \\
+\hline
+{\em high\-Rsys\-Mass} & (float) Upper limit on the mass of the remaining system \\
+\hline
+{\em d\-R\-Max\-Rsys} & (float) Maximum allowed seperation in d\-R between the jets of the remaining system and their centroid \\
+\hline
+{\em use\-Second\-Jet} & (bool) Sets whether the algorithm will look for a second jet to combine with the seed jet \\
+\hline
+{\em allow\-W} & (bool) Sets whether a A\-K8\-W candidate can be a seed for the remaining system \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMRemainingSystem_a4d72b9607c336e2de3d2f7876c89f5db}{\index{T\-T\-M\-Remaining\-System@{T\-T\-M\-Remaining\-System}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMRemainingSystem@{T\-T\-M\-Remaining\-System}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Remaining\-System\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMRemainingSystem_a4d72b9607c336e2de3d2f7876c89f5db}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMRemainingSystem_ab9f2abe56c30f34c2319f752c403fb09}{\index{T\-T\-M\-Remaining\-System@{T\-T\-M\-Remaining\-System}!run@{run}}
+\index{run@{run}!TTMRemainingSystem@{T\-T\-M\-Remaining\-System}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Remaining\-System\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMRemainingSystem_ab9f2abe56c30f34c2319f752c403fb09}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Remaining\-System.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Remaining\-System.\-cpp\end{DoxyCompactItemize}

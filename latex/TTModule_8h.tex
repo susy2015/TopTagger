@@ -1,0 +1,29 @@
+\hypertarget{TTModule_8h}{\section{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-T\-T\-Module.h File Reference}
+\label{TTModule_8h}\index{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-T\-T\-Module.\-h@{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-T\-T\-Module.\-h}}
+}
+{\ttfamily \#include \char`\"{}Top\-Tagger/\-Top\-Tagger/include/\-T\-T\-M\-Factory.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$functional$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classTTModule}{T\-T\-Module}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{TTModule_8h_a503a61d6a681bacd3074975a6402d0cc}{\#define {\bfseries T\-T\-\_\-\-V\-A\-R\-I\-A\-B\-L\-E\-\_\-\-I\-S\-\_\-\-N\-O\-T\-\_\-\-U\-S\-E\-D}}\label{TTModule_8h_a503a61d6a681bacd3074975a6402d0cc}
+
+\item 
+\#define \hyperlink{TTModule_8h_a5aff241e827824ffd2c2efc4c5bf1fda}{R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E}(\-\_\-module)~static bool T\-T\-\_\-\-V\-A\-R\-I\-A\-B\-L\-E\-\_\-\-I\-S\-\_\-\-N\-O\-T\-\_\-\-U\-S\-E\-D \-\_\-module \#\# \-\_\-module\-\_\-created = \hyperlink{classTTMFactory_a4651a7e0c90b7c36acbdada8de05a4b4}{T\-T\-M\-Factory\-::register\-Module}( \#\-\_\-module, \mbox{[}$\,$\mbox{]}()-\/$>$\hyperlink{classTTModule}{T\-T\-Module}$\ast$\{ return new \-\_\-module(); \} )
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{TTModule_8h_a5aff241e827824ffd2c2efc4c5bf1fda}{\index{T\-T\-Module.\-h@{T\-T\-Module.\-h}!R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E@{R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E}}
+\index{R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E@{R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E}!TTModule.h@{T\-T\-Module.\-h}}
+\subsubsection[{R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E(
+\begin{DoxyParamCaption}
+\item[{}]{\-\_\-module}
+\end{DoxyParamCaption}
+)~static bool T\-T\-\_\-\-V\-A\-R\-I\-A\-B\-L\-E\-\_\-\-I\-S\-\_\-\-N\-O\-T\-\_\-\-U\-S\-E\-D \-\_\-module \#\# \-\_\-module\-\_\-created = {\bf T\-T\-M\-Factory\-::register\-Module}( \#\-\_\-module, \mbox{[}$\,$\mbox{]}()-\/$>${\bf T\-T\-Module}$\ast$\{ return new \-\_\-module(); \} )}}\label{TTModule_8h_a5aff241e827824ffd2c2efc4c5bf1fda}
+Magic macro for registering classes with the factory object. Every module definition must contain the line \char`\"{}\-R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E(\-Module\-Class\-Name);\char`\"{}. 

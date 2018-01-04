@@ -1,0 +1,82 @@
+\hypertarget{classTTMTFPyBind}{\section{T\-T\-M\-T\-F\-Py\-Bind Class Reference}
+\label{classTTMTFPyBind}\index{T\-T\-M\-T\-F\-Py\-Bind@{T\-T\-M\-T\-F\-Py\-Bind}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-T\-F\-Py\-Bind.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-T\-F\-Py\-Bind\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMTFPyBind}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMTFPyBind_a3c9f2ca6bc095df3bad89c531cd45544}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMTFPyBind_a5815a77655f5500c117cf71269105242}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module implements an interface to Tensorflow through python for filtering top candidates. This module places top candidates which pass the requirements directly into the final top list.
+
+
+\begin{DoxyParams}{Parameters}
+{\em disc\-Cut} & (float) Highest minimum discriminator threshold allowed (If disc\-Offest is set $>$ 1 and disc\-Slope is positive then this serves as a basic discriminator threshold) \\
+\hline
+{\em disc\-Offset} & (float) Discriminator cut for zero pt top candidates \\
+\hline
+{\em disc\-Slope} & (float) Pt dependent slopt for discriminator cut \\
+\hline
+{\em model\-File} & (string) Path to the model file \\
+\hline
+{\em N\-Constituents} & (int) Type of constituent to apply selection to (1 -\/ monojet, 2 -\/ dijet, 3 -\/ trijet) \\
+\hline
+{\em input\-Op} & (string) Input operation for the tensorflow graph \\
+\hline
+{\em output\-Op} & (string) Output operation of the tensorflow graph \\
+\hline
+{\em csv\-Threshold} & (float) Threshold on b-\/tag discriminator to be considered a b-\/jet. \\
+\hline
+{\em b\-Eta\-Cut} & (float) Requirment on $\vert$eta$\vert$ for a constituent to be considered a b-\/jet \\
+\hline
+{\em max\-Nb\-In\-Top} & (int) The maximum number of constituent jets which can be b-\/tagged for the candidate to be a final top (set $<$ 0 to disable) \\
+\hline
+{\em mva\-Var\mbox{[}$\,$\mbox{]}} & (string -\/ array) M\-V\-A variable input names \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMTFPyBind_a3c9f2ca6bc095df3bad89c531cd45544}{\index{T\-T\-M\-T\-F\-Py\-Bind@{T\-T\-M\-T\-F\-Py\-Bind}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMTFPyBind@{T\-T\-M\-T\-F\-Py\-Bind}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-T\-F\-Py\-Bind\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMTFPyBind_a3c9f2ca6bc095df3bad89c531cd45544}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMTFPyBind_a5815a77655f5500c117cf71269105242}{\index{T\-T\-M\-T\-F\-Py\-Bind@{T\-T\-M\-T\-F\-Py\-Bind}!run@{run}}
+\index{run@{run}!TTMTFPyBind@{T\-T\-M\-T\-F\-Py\-Bind}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-T\-F\-Py\-Bind\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMTFPyBind_a5815a77655f5500c117cf71269105242}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-T\-F\-Py\-Bind.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-T\-F\-Py\-Bind.\-cpp\end{DoxyCompactItemize}

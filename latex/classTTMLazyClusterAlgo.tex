@@ -1,0 +1,48 @@
+\hypertarget{classTTMLazyClusterAlgo}{\section{T\-T\-M\-Lazy\-Cluster\-Algo Class Reference}
+\label{classTTMLazyClusterAlgo}\index{T\-T\-M\-Lazy\-Cluster\-Algo@{T\-T\-M\-Lazy\-Cluster\-Algo}}
+}
+Inheritance diagram for T\-T\-M\-Lazy\-Cluster\-Algo\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMLazyClusterAlgo}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMLazyClusterAlgo_a4c07980bb9bc073862bb3b6f7238692c}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMLazyClusterAlgo_a1ec9281c5d6c04ae788b72ca2884d870}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMLazyClusterAlgo_a4c07980bb9bc073862bb3b6f7238692c}{\index{T\-T\-M\-Lazy\-Cluster\-Algo@{T\-T\-M\-Lazy\-Cluster\-Algo}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMLazyClusterAlgo@{T\-T\-M\-Lazy\-Cluster\-Algo}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Lazy\-Cluster\-Algo\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMLazyClusterAlgo_a4c07980bb9bc073862bb3b6f7238692c}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMLazyClusterAlgo_a1ec9281c5d6c04ae788b72ca2884d870}{\index{T\-T\-M\-Lazy\-Cluster\-Algo@{T\-T\-M\-Lazy\-Cluster\-Algo}!run@{run}}
+\index{run@{run}!TTMLazyClusterAlgo@{T\-T\-M\-Lazy\-Cluster\-Algo}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Lazy\-Cluster\-Algo\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMLazyClusterAlgo_a1ec9281c5d6c04ae788b72ca2884d870}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Lazy\-Cluster\-Algo.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Lazy\-Cluster\-Algo.\-cpp\end{DoxyCompactItemize}

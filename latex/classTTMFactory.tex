@@ -1,0 +1,31 @@
+\hypertarget{classTTMFactory}{\section{T\-T\-M\-Factory Class Reference}
+\label{classTTMFactory}\index{T\-T\-M\-Factory@{T\-T\-M\-Factory}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Factory.\-h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTTMFactory_a728fa564c6c1e78450c69a9a875746da}{static \hyperlink{classTTMFactory}{T\-T\-M\-Factory} $\ast$ \hyperlink{classTTMFactory_a728fa564c6c1e78450c69a9a875746da}{get\-Instance} ()}\label{classTTMFactory_a728fa564c6c1e78450c69a9a875746da}
+
+\begin{DoxyCompactList}\small\item\em Get the static instance of the factory (or make it if it does not exist) \end{DoxyCompactList}\item 
+\hypertarget{classTTMFactory_a4651a7e0c90b7c36acbdada8de05a4b4}{static bool \hyperlink{classTTMFactory_a4651a7e0c90b7c36acbdada8de05a4b4}{register\-Module} (const std\-::string \&, std\-::function$<$ \hyperlink{classTTModule}{T\-T\-Module} $\ast$()$>$)}\label{classTTMFactory_a4651a7e0c90b7c36acbdada8de05a4b4}
+
+\begin{DoxyCompactList}\small\item\em register a new module in the map, this is called automatically by the magic macro \char`\"{}\-R\-E\-G\-I\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E\char`\"{} \end{DoxyCompactList}\item 
+\hypertarget{classTTMFactory_a163845785c393c0439208813162be341}{static bool \hyperlink{classTTMFactory_a163845785c393c0439208813162be341}{module\-Exists} (const std\-::string \&)}\label{classTTMFactory_a163845785c393c0439208813162be341}
+
+\begin{DoxyCompactList}\small\item\em checks if a module with the requested name exists in the map \end{DoxyCompactList}\item 
+\hypertarget{classTTMFactory_abe788ca7a99e646c7b4d89fa41eec5aa}{static \hyperlink{classTTModule}{T\-T\-Module} $\ast$ \hyperlink{classTTMFactory_abe788ca7a99e646c7b4d89fa41eec5aa}{create\-Module} (const std\-::string \&)}\label{classTTMFactory_abe788ca7a99e646c7b4d89fa41eec5aa}
+
+\begin{DoxyCompactList}\small\item\em Called to create an instance of a module by name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class acts as a factory to allow dynamic creation of modules. Its functioning should be invisible to the end user and it should never be directly called. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Factory.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Factory.\-cpp\end{DoxyCompactItemize}

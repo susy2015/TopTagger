@@ -1,0 +1,74 @@
+\hypertarget{classTTMHEPRequirements}{\section{T\-T\-M\-H\-E\-P\-Requirements Class Reference}
+\label{classTTMHEPRequirements}\index{T\-T\-M\-H\-E\-P\-Requirements@{T\-T\-M\-H\-E\-P\-Requirements}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-H\-E\-P\-Requirements.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-H\-E\-P\-Requirements\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMHEPRequirements}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMHEPRequirements_ad86f4c8dc3dfc9b2a3925892e9ea82ec}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMHEPRequirements_a5815a6c66595320c1d0f0f006dd67a4d}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module applies the H\-E\-P top tagging criterion to the candidates as well as applying basic requirements on the number of b-\/jets in the candidate. For trijet candidates the full H\-E\-P requirements are applied. For dijet candidates the module applies a simplified version of the H\-E\-P criterion designed for use with a W and an additional jet. The dijet and trijet categories will function with either inputs from \hyperlink{classTTMLazyClusterAlgo}{T\-T\-M\-Lazy\-Cluster\-Algo} or \hyperlink{classTTMBasicClusterAlgo}{T\-T\-M\-Basic\-Cluster\-Algo}. If the monojet mode is activated it will simply pass all A\-K4 monojet top candidates, but not A\-K8 monojet tops (this is instead done by \char`\"{}\-T\-T\-M\-A\-K8\-Top\-Filter\char`\"{}). Candidates passed by this module are placed into the final top list.
+
+
+\begin{DoxyParams}{Parameters}
+{\em Rmin,Rmax} & (float) These parameters define the valid range for the R parameter in the H\-E\-P top tagging requirements. Under the basic assumption that the input jets are massless, this requires that ratio of dijet to trijet masses (inside a jet triplet) is consistent with the ratio of the w to top masses within the specified bounds. This applies to the full trijet H\-E\-P requirements as well as the simplified requirements for the dijet case. \\
+\hline
+{\em csv\-Threshold} & (float) The minimum cut value on the C\-S\-V discriminator for an A\-K4 jet to be considered a b-\/tagged jet. \\
+\hline
+{\em b\-Eta\-Cut} & (float) The maximum absolute psudorapidity requirement placed on jets to be considered b-\/tagged. \\
+\hline
+{\em max\-Nb\-In\-Top} & (integer) The maximum number of b-\/jets to allow in a single top candidate. \\
+\hline
+{\em do\-Monojet} & (boolean) Enable the processing of A\-K4 monojet top candidates by this module (they are currently all automatically passed by this module). \\
+\hline
+{\em do\-Dijet} & (boolean) Enable the processing of A\-K4 dijet candidates or A\-K8 W + A\-K4 jet candidates (depending which clustering algorithm is used). \\
+\hline
+{\em do\-Trijet} & (boolean) Enable the selection criterion for resolved A\-K4 trijet top candidates. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMHEPRequirements_ad86f4c8dc3dfc9b2a3925892e9ea82ec}{\index{T\-T\-M\-H\-E\-P\-Requirements@{T\-T\-M\-H\-E\-P\-Requirements}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMHEPRequirements@{T\-T\-M\-H\-E\-P\-Requirements}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-H\-E\-P\-Requirements\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMHEPRequirements_ad86f4c8dc3dfc9b2a3925892e9ea82ec}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMHEPRequirements_a5815a6c66595320c1d0f0f006dd67a4d}{\index{T\-T\-M\-H\-E\-P\-Requirements@{T\-T\-M\-H\-E\-P\-Requirements}!run@{run}}
+\index{run@{run}!TTMHEPRequirements@{T\-T\-M\-H\-E\-P\-Requirements}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-H\-E\-P\-Requirements\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMHEPRequirements_a5815a6c66595320c1d0f0f006dd67a4d}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-H\-E\-P\-Requirements.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-H\-E\-P\-Requirements.\-cpp\end{DoxyCompactItemize}

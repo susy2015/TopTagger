@@ -1,0 +1,48 @@
+\hypertarget{classTTMAK8TopFilter}{\section{T\-T\-M\-A\-K8\-Top\-Filter Class Reference}
+\label{classTTMAK8TopFilter}\index{T\-T\-M\-A\-K8\-Top\-Filter@{T\-T\-M\-A\-K8\-Top\-Filter}}
+}
+Inheritance diagram for T\-T\-M\-A\-K8\-Top\-Filter\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMAK8TopFilter}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMAK8TopFilter_aed52bd6877ec9b8ac3a2f45769f05856}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMAK8TopFilter_a28a8fcd8a829caae32b2a106037d3a6f}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMAK8TopFilter_aed52bd6877ec9b8ac3a2f45769f05856}{\index{T\-T\-M\-A\-K8\-Top\-Filter@{T\-T\-M\-A\-K8\-Top\-Filter}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMAK8TopFilter@{T\-T\-M\-A\-K8\-Top\-Filter}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-A\-K8\-Top\-Filter\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMAK8TopFilter_aed52bd6877ec9b8ac3a2f45769f05856}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMAK8TopFilter_a28a8fcd8a829caae32b2a106037d3a6f}{\index{T\-T\-M\-A\-K8\-Top\-Filter@{T\-T\-M\-A\-K8\-Top\-Filter}!run@{run}}
+\index{run@{run}!TTMAK8TopFilter@{T\-T\-M\-A\-K8\-Top\-Filter}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-A\-K8\-Top\-Filter\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMAK8TopFilter_a28a8fcd8a829caae32b2a106037d3a6f}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-A\-K8\-Top\-Filter.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-A\-K8\-Top\-Filter.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,54 @@
+\hypertarget{TopTaggerUtilities_8h}{\section{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-Top\-Tagger\-Utilities.h File Reference}
+\label{TopTaggerUtilities_8h}\index{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-Top\-Tagger\-Utilities.\-h@{/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\-Top\-Tagger\-Utilities.\-h}}
+}
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$map$>$}\\*
+{\ttfamily \#include \char`\"{}T\-Lorentz\-Vector.\-h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classttUtility_1_1ConstGenInputs}{tt\-Utility\-::\-Const\-Gen\-Inputs}
+\item 
+class \hyperlink{classttUtility_1_1ConstAK4Inputs}{tt\-Utility\-::\-Const\-A\-K4\-Inputs}
+\item 
+class \hyperlink{classttUtility_1_1ConstAK8Inputs}{tt\-Utility\-::\-Const\-A\-K8\-Inputs}
+\item 
+class \hyperlink{classttUtility_1_1MVAInputCalculator}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}
+\item 
+class \hyperlink{classttUtility_1_1BDTMonojetInputCalculator}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}
+\item 
+class \hyperlink{classttUtility_1_1BDTDijetInputCalculator}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}
+\item 
+class \hyperlink{classttUtility_1_1TrijetInputCalculator}{tt\-Utility\-::\-Trijet\-Input\-Calculator}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{namespacettUtility_a2b026c6cf169e2c1554b51b3c095cf2b}{{\footnotesize template$<$typename T , typename... Args$>$ }\\void {\bfseries tt\-Utility\-::package\-Constituents\-Recurse} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents, T input, Args...\-args)}\label{namespacettUtility_a2b026c6cf169e2c1554b51b3c095cf2b}
+
+\begin{DoxyCompactList}\small\item\em Resurcive function to assemble constituents from arbitrary list of input classes. Don't call this function! \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_a81539600933a20ad472d9cdc3061266a}{{\footnotesize template$<$typename T $>$ }\\void {\bfseries tt\-Utility\-::package\-Constituents\-Recurse} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents, T input)}\label{namespacettUtility_a81539600933a20ad472d9cdc3061266a}
+
+\begin{DoxyCompactList}\small\item\em recursion termimnation specialization. Don't call this function! \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_afe8c7a2d46380c2f4d17d1ac0d140571}{{\footnotesize template$<$typename... Args$>$ }\\std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ {\bfseries tt\-Utility\-::package\-Constituents} (Args...\-args)}\label{namespacettUtility_afe8c7a2d46380c2f4d17d1ac0d140571}
+
+\begin{DoxyCompactList}\small\item\em Function to fill constituent list based upon arbitrary list of input objects. \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_af895527e07e2dc4f5a9b275aa20965d3}{std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ {\bfseries tt\-Utility\-::package\-Constituents} (const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&jets\-L\-Vec, const std\-::vector$<$ double $>$ \&btag\-Factors, const std\-::vector$<$ double $>$ \&qg\-Likelihood)}\label{namespacettUtility_af895527e07e2dc4f5a9b275aa20965d3}
+
+\begin{DoxyCompactList}\small\item\em backwards compatability overload \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_af52621678213f55c02a51ed2c271c9ec}{double {\bfseries tt\-Utility\-::calculate\-M\-T2} (const \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&ttr, const T\-Lorentz\-Vector \&met\-L\-Vec)}\label{namespacettUtility_af52621678213f55c02a51ed2c271c9ec}
+
+\begin{DoxyCompactList}\small\item\em Tool to calcualte M\-T2 from tagger results. \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_a31cf8792b103cf3153fd76d48b62075d}{std\-::map$<$ std\-::string, double $>$ {\bfseries tt\-Utility\-::create\-M\-V\-A\-Inputs} (const \hyperlink{classTopObject}{Top\-Object} \&top\-Cand, const double csv\-Thresh)}\label{namespacettUtility_a31cf8792b103cf3153fd76d48b62075d}
+
+\begin{DoxyCompactList}\small\item\em Function to calculate M\-V\-A input variables from a \hyperlink{classTopObject}{Top\-Object}. This function is depricated in favor of the new \hyperlink{classttUtility_1_1MVAInputCalculator}{M\-V\-A\-Input\-Calculator} based approach. \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_a6b84aa7ccd9d2f792a232cf93fc4a8d1}{std\-::vector$<$ std\-::string $>$ {\bfseries tt\-Utility\-::get\-M\-V\-A\-Vars} ()}\label{namespacettUtility_a6b84aa7ccd9d2f792a232cf93fc4a8d1}
+
+\item 
+\hypertarget{namespacettUtility_a0497406d35fac347b288d37aa55c71e2}{std\-::vector$<$ T\-Lorentz\-Vector $>$ {\bfseries tt\-Utility\-::\-Get\-Had\-Top\-L\-Vec} (const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&gen\-Decay\-L\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Pdg\-Id\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Idx\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Mom\-Idx\-Vec)}\label{namespacettUtility_a0497406d35fac347b288d37aa55c71e2}
+
+\begin{DoxyCompactList}\small\item\em Helper function to help find the hadronically decaying gen tops. \end{DoxyCompactList}\item 
+\hypertarget{namespacettUtility_ab836e0b87270859faba59ee5a8e883ce}{std\-::vector$<$ const \\*
+T\-Lorentz\-Vector $\ast$ $>$ {\bfseries tt\-Utility\-::\-Get\-Topdau\-L\-Vec} (const T\-Lorentz\-Vector \&top, const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&gen\-Decay\-L\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Pdg\-Id\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Idx\-Vec, const std\-::vector$<$ int $>$ \&gen\-Decay\-Mom\-Idx\-Vec)}\label{namespacettUtility_ab836e0b87270859faba59ee5a8e883ce}
+
+\begin{DoxyCompactList}\small\item\em Helper function to get the direct decay products of the gen tops. \end{DoxyCompactList}\end{DoxyCompactItemize}

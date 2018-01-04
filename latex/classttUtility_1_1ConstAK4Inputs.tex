@@ -1,0 +1,138 @@
+\hypertarget{classttUtility_1_1ConstAK4Inputs}{\section{tt\-Utility\-:\-:Const\-A\-K4\-Inputs Class Reference}
+\label{classttUtility_1_1ConstAK4Inputs}\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+}
+
+
+{\ttfamily \#include $<$Top\-Tagger\-Utilities.\-h$>$}
+
+Inheritance diagram for tt\-Utility\-:\-:Const\-A\-K4\-Inputs\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classttUtility_1_1ConstAK4Inputs}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classttUtility_1_1ConstAK4Inputs_ad0e86d264508a72505aeb1b3494fd938}{Const\-A\-K4\-Inputs} (const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&jets\-L\-Vec, const std\-::vector$<$ double $>$ \&btag\-Factors, const std\-::vector$<$ double $>$ \&qg\-Likelihood)
+\item 
+\hyperlink{classttUtility_1_1ConstAK4Inputs_ac6216883dca5dcb2d0d5b1263cd6482e}{Const\-A\-K4\-Inputs} (const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&jets\-L\-Vec, const std\-::vector$<$ double $>$ \&btag\-Factors)
+\item 
+\hyperlink{classttUtility_1_1ConstAK4Inputs_adbf97c650df9cea213968e7daa878e32}{Const\-A\-K4\-Inputs} (const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&jets\-L\-Vec, const std\-::vector$<$ double $>$ \&btag\-Factors, const std\-::vector$<$ double $>$ \&qg\-Likelihood, const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&had\-Gen\-Tops, const std\-::vector$<$ std\-::vector$<$ const T\-Lorentz\-Vector $\ast$ $>$$>$ \&had\-Gen\-Top\-Daughters)
+\item 
+void \hyperlink{classttUtility_1_1ConstAK4Inputs_a1f0268275cbc047d7a689ceb9ab5ff78}{add\-Q\-G\-L\-Vectors} (const std\-::vector$<$ int $>$ \&qg\-Mult, const std\-::vector$<$ double $>$ \&qg\-Pt\-D, const std\-::vector$<$ double $>$ \&qg\-Axis1, const std\-::vector$<$ double $>$ \&qg\-Axis2)
+\item 
+void \hyperlink{classttUtility_1_1ConstAK4Inputs_a528690054575d44f293e984b70cb2856}{add\-Supplamental\-Vector} (const std\-::string \&name, const std\-::vector$<$ double $>$ \&vector)
+\item 
+void \hyperlink{classttUtility_1_1ConstAK4Inputs_ae1171e58b4a1ca748d7b3abd87476047}{package\-Constituents} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Class to gather the information necessary to construct the A\-K4 jet constituents 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classttUtility_1_1ConstAK4Inputs_ad0e86d264508a72505aeb1b3494fd938}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}}
+\index{Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{Const\-A\-K4\-Inputs}]{\setlength{\rightskip}{0pt plus 5cm}tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::\-Const\-A\-K4\-Inputs (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&}]{jets\-L\-Vec, }
+\item[{const std\-::vector$<$ double $>$ \&}]{btag\-Factors, }
+\item[{const std\-::vector$<$ double $>$ \&}]{qg\-Likelihood}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_ad0e86d264508a72505aeb1b3494fd938}
+Basic constructor with Q\-G\-L 
+\begin{DoxyParams}{Parameters}
+{\em jets\-L\-Vec} & Jet T\-Lorentz\-Vectors for each jet \\
+\hline
+{\em btag\-Factors} & B-\/tag discriminators for each jet \\
+\hline
+{\em qg\-Likelihood} & Quark-\/gluon likelihoods for each jet \\
+\hline
+\end{DoxyParams}
+\hypertarget{classttUtility_1_1ConstAK4Inputs_ac6216883dca5dcb2d0d5b1263cd6482e}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}}
+\index{Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{Const\-A\-K4\-Inputs}]{\setlength{\rightskip}{0pt plus 5cm}tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::\-Const\-A\-K4\-Inputs (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&}]{jets\-L\-Vec, }
+\item[{const std\-::vector$<$ double $>$ \&}]{btag\-Factors}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_ac6216883dca5dcb2d0d5b1263cd6482e}
+Basic constructor 
+\begin{DoxyParams}{Parameters}
+{\em jets\-L\-Vec} & Jet T\-Lorentz\-Vectors for each jet \\
+\hline
+{\em btag\-Factors} & B-\/tag discriminators for each jet \\
+\hline
+\end{DoxyParams}
+\hypertarget{classttUtility_1_1ConstAK4Inputs_adbf97c650df9cea213968e7daa878e32}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}}
+\index{Const\-A\-K4\-Inputs@{Const\-A\-K4\-Inputs}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{Const\-A\-K4\-Inputs}]{\setlength{\rightskip}{0pt plus 5cm}tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::\-Const\-A\-K4\-Inputs (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&}]{jets\-L\-Vec, }
+\item[{const std\-::vector$<$ double $>$ \&}]{btag\-Factors, }
+\item[{const std\-::vector$<$ double $>$ \&}]{qg\-Likelihood, }
+\item[{const std\-::vector$<$ T\-Lorentz\-Vector $>$ \&}]{had\-Gen\-Tops, }
+\item[{const std\-::vector$<$ std\-::vector$<$ const T\-Lorentz\-Vector $\ast$ $>$$>$ \&}]{had\-Gen\-Top\-Daughters}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_adbf97c650df9cea213968e7daa878e32}
+Constructor with gen informaion 
+\begin{DoxyParams}{Parameters}
+{\em jets\-L\-Vec} & Jet T\-Lorentz\-Vectors for each jet \\
+\hline
+{\em btag\-Factors} & B-\/tag discriminators for each jet \\
+\hline
+{\em qg\-Likelihood} & Quark-\/gluon likelihoods for each jet \\
+\hline
+{\em had\-Gen\-Tops} & Vector of hadronicly decaying gen top T\-Lorentz\-Vectors \\
+\hline
+{\em had\-Gen\-Top\-Daughters} & Vector of direct decay daughters of the top quarks \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classttUtility_1_1ConstAK4Inputs_a1f0268275cbc047d7a689ceb9ab5ff78}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!add\-Q\-G\-L\-Vectors@{add\-Q\-G\-L\-Vectors}}
+\index{add\-Q\-G\-L\-Vectors@{add\-Q\-G\-L\-Vectors}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{add\-Q\-G\-L\-Vectors}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::add\-Q\-G\-L\-Vectors (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ int $>$ \&}]{qg\-Mult, }
+\item[{const std\-::vector$<$ double $>$ \&}]{qg\-Pt\-D, }
+\item[{const std\-::vector$<$ double $>$ \&}]{qg\-Axis1, }
+\item[{const std\-::vector$<$ double $>$ \&}]{qg\-Axis2}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_a1f0268275cbc047d7a689ceb9ab5ff78}
+Adds jet shape inputs from the quark-\/gluon likelihood calculator \hypertarget{classttUtility_1_1ConstAK4Inputs_a528690054575d44f293e984b70cb2856}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!add\-Supplamental\-Vector@{add\-Supplamental\-Vector}}
+\index{add\-Supplamental\-Vector@{add\-Supplamental\-Vector}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{add\-Supplamental\-Vector}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::add\-Supplamental\-Vector (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{name, }
+\item[{const std\-::vector$<$ double $>$ \&}]{vector}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_a528690054575d44f293e984b70cb2856}
+Adds a vector holding additional variables which will be inserted into the \char`\"{}extra\-Vars\char`\"{} map of the \hyperlink{classConstituent}{Constituent} 
+\begin{DoxyParams}{Parameters}
+{\em name} & The name to use to store the extra variables \\
+\hline
+{\em vector} & the values for the extra variable for each jet \\
+\hline
+\end{DoxyParams}
+\hypertarget{classttUtility_1_1ConstAK4Inputs_ae1171e58b4a1ca748d7b3abd87476047}{\index{tt\-Utility\-::\-Const\-A\-K4\-Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}!package\-Constituents@{package\-Constituents}}
+\index{package\-Constituents@{package\-Constituents}!ttUtility::ConstAK4Inputs@{tt\-Utility\-::\-Const\-A\-K4\-Inputs}}
+\subsubsection[{package\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-Const\-A\-K4\-Inputs\-::package\-Constituents (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ {\bf Constituent} $>$ \&}]{constituents}
+\end{DoxyParamCaption}
+)}}\label{classttUtility_1_1ConstAK4Inputs_ae1171e58b4a1ca748d7b3abd87476047}
+Called to fill the constituents using the information collected in the class. Not intended to be called directly. 
+\begin{DoxyParams}{Parameters}
+{\em constituents} & vector to insert A\-K4 constituents into \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\hyperlink{TopTaggerUtilities_8h}{Top\-Tagger\-Utilities.\-h}\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/Top\-Tagger\-Utilities.\-cpp\end{DoxyCompactItemize}

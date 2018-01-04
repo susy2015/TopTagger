@@ -1,0 +1,83 @@
+\hypertarget{classTTMBasicClusterAlgo}{\section{T\-T\-M\-Basic\-Cluster\-Algo Class Reference}
+\label{classTTMBasicClusterAlgo}\index{T\-T\-M\-Basic\-Cluster\-Algo@{T\-T\-M\-Basic\-Cluster\-Algo}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Basic\-Cluster\-Algo.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Basic\-Cluster\-Algo\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classTTMBasicClusterAlgo}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMBasicClusterAlgo_afdbe472d26a753268dac63d897169299}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMBasicClusterAlgo_ae1d464bf1db5762318766d109c843932}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+This module is used to cluster top candidates using a combination of A\-K4 and A\-K8 jets. This algorithm uses A\-K8 jets for the merged W and top candidates, and A\-K4 jets for the resolved category as well as to combine with W jets to for top candidates. This module is capable of clustering trijet (resolved tops), dijet (W+jet), and monojet (fully merged top) candidates.
+
+
+\begin{DoxyParams}{Parameters}
+{\em do\-Trijet} & (bool) Enable the resolved top category clustering. \\
+\hline
+{\em min\-Top\-Cand\-Mass} & (float) Minimum trijet mass for resolved candidates \\
+\hline
+{\em max\-Top\-Cand\-Mass} & (float) Maximum trijet mass for resolved candidates \\
+\hline
+{\em d\-R\-Max\-Trijet} & (float) The maximum d\-R seperation between any A\-K4 jet and te trijet centroid for resolved A\-K4 candidates to be considered as a top candidate. \\
+\hline
+{\em nb\-Seed} & (int) If greater than 0, the number of highest b-\/tag discriminator jets to use as clustering seeds for trijet candidates. (Default -\/1) \\
+\hline
+{\em min\-Trijet\-A\-K4\-Jet\-Pt} & (float) Minimum pt threshold for the lowest pt A\-K4 jet in th etrijet candidate. \\
+\hline
+{\em mid\-Trijet\-A\-K4\-Jet\-Pt} & (float) Minimum pt threshold for the medium pt A\-K4 jet in th etrijet candidate. \\
+\hline
+{\em max\-Trijet\-A\-K4\-Jet\-Pt} & (float) Minimum pt threshold for the highest pt A\-K4 jet in th etrijet candidate. \\
+\hline
+{\em do\-Dijet} & (bool) Enable the A\-K8\-W + A\-K4 jet category clustering. \\
+\hline
+{\em d\-R\-Max\-Dijet} & (float) The maximum allowed seperation if d\-R between the A\-K4 and A\-K8 jet and the dijet centroid for the dijet catagory. \\
+\hline
+{\em do\-Monojet} & (bool) Enable the fully merged top category clustering.\\
+\hline
+\end{DoxyParams}
+See \hyperlink{classTTMConstituentReqs}{T\-T\-M\-Constituent\-Reqs} for more parameters 
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMBasicClusterAlgo_afdbe472d26a753268dac63d897169299}{\index{T\-T\-M\-Basic\-Cluster\-Algo@{T\-T\-M\-Basic\-Cluster\-Algo}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMBasicClusterAlgo@{T\-T\-M\-Basic\-Cluster\-Algo}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Basic\-Cluster\-Algo\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMBasicClusterAlgo_afdbe472d26a753268dac63d897169299}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMBasicClusterAlgo_ae1d464bf1db5762318766d109c843932}{\index{T\-T\-M\-Basic\-Cluster\-Algo@{T\-T\-M\-Basic\-Cluster\-Algo}!run@{run}}
+\index{run@{run}!TTMBasicClusterAlgo@{T\-T\-M\-Basic\-Cluster\-Algo}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Basic\-Cluster\-Algo\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMBasicClusterAlgo_ae1d464bf1db5762318766d109c843932}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Basic\-Cluster\-Algo.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Basic\-Cluster\-Algo.\-cpp\end{DoxyCompactItemize}

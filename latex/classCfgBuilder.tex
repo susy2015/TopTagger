@@ -1,0 +1,80 @@
+\hypertarget{classCfgBuilder}{\section{Cfg\-Builder Class Reference}
+\label{classCfgBuilder}\index{Cfg\-Builder@{Cfg\-Builder}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCfgBuilder_a5af2d2e469dbe4c403727f27bcad6ba3}{void {\bfseries setup} ()}\label{classCfgBuilder_a5af2d2e469dbe4c403727f27bcad6ba3}
+
+\item 
+\hypertarget{classCfgBuilder_afd5db277b02899116fb115e23a2ffd50}{std\-::unique\-\_\-ptr$<$ \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $>$ {\bfseries take\-Doc} ()}\label{classCfgBuilder_afd5db277b02899116fb115e23a2ffd50}
+
+\item 
+\hypertarget{classCfgBuilder_ac105e810c5cf5c7f8a053614f3f2987a}{\hyperlink{classcfg_1_1SimpleTerm}{cfg\-::\-Simple\-Term} $\ast$ {\bfseries simple\-Term} (const std\-::string \&ident, const std\-::string \&op)}\label{classCfgBuilder_ac105e810c5cf5c7f8a053614f3f2987a}
+
+\item 
+\hypertarget{classCfgBuilder_acb5a4d224b4a0dbc23d8bdde4fbf3312}{\hyperlink{classcfg_1_1SimpleTerm}{cfg\-::\-Simple\-Term} $\ast$ {\bfseries list\-Term} (const std\-::string \&ident, const std\-::string \&op)}\label{classCfgBuilder_acb5a4d224b4a0dbc23d8bdde4fbf3312}
+
+\item 
+\hypertarget{classCfgBuilder_aa8c4e0c4b955a6ada763bafce754d3a2}{void {\bfseries assign} ()}\label{classCfgBuilder_aa8c4e0c4b955a6ada763bafce754d3a2}
+
+\item 
+\hypertarget{classCfgBuilder_af74e188fb692e1895b36ec09bd9a1afe}{void {\bfseries i\-Literal} (wchar\-\_\-t $\ast$data)}\label{classCfgBuilder_af74e188fb692e1895b36ec09bd9a1afe}
+
+\item 
+\hypertarget{classCfgBuilder_a59e3ae228a32d5d04f929f032c9cdd42}{void {\bfseries f\-Literal} (wchar\-\_\-t $\ast$data)}\label{classCfgBuilder_a59e3ae228a32d5d04f929f032c9cdd42}
+
+\item 
+\hypertarget{classCfgBuilder_a1e908f4837c367f05385dd63e38d3e4c}{void {\bfseries b\-Literal} (bool b)}\label{classCfgBuilder_a1e908f4837c367f05385dd63e38d3e4c}
+
+\item 
+\hypertarget{classCfgBuilder_ab213a7e0ed2e294ced2f08e1f79b5d37}{void {\bfseries s\-Literal} (const wchar\-\_\-t $\ast$data)}\label{classCfgBuilder_ab213a7e0ed2e294ced2f08e1f79b5d37}
+
+\item 
+\hypertarget{classCfgBuilder_a6afd2f47b9a7e107e236e9015d9be3a7}{\hyperlink{classcfg_1_1Condition}{cfg\-::\-Condition} $\ast$ {\bfseries new\-Condition} ()}\label{classCfgBuilder_a6afd2f47b9a7e107e236e9015d9be3a7}
+
+\item 
+\hypertarget{classCfgBuilder_aa995c209a3708a6776de7b568d37fcbf}{void {\bfseries pop\-Condition} ()}\label{classCfgBuilder_aa995c209a3708a6776de7b568d37fcbf}
+
+\item 
+\hypertarget{classCfgBuilder_a50ddecd4930af4282b10f31d3e17578d}{void {\bfseries set\-Namespace} (const std\-::string \&s)}\label{classCfgBuilder_a50ddecd4930af4282b10f31d3e17578d}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCfgBuilder_a7bd5f3def6b00f071877b2b81bb4c25a}{static std\-::string {\bfseries to\-String} (const wchar\-\_\-t $\ast$d)}\label{classCfgBuilder_a7bd5f3def6b00f071877b2b81bb4c25a}
+
+\item 
+\hypertarget{classCfgBuilder_aa620acd787a50158dd4a7e879a7fa8e3}{static int {\bfseries to\-Int} (const wchar\-\_\-t $\ast$d)}\label{classCfgBuilder_aa620acd787a50158dd4a7e879a7fa8e3}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCfgBuilder_aa4534dcb2ec75d02d178b24c9cf30b8d}{std\-::vector$<$ \hyperlink{classcfg_1_1Literal}{cfg\-::\-Literal} $>$ {\bfseries literal\-Stack}}\label{classCfgBuilder_aa4534dcb2ec75d02d178b24c9cf30b8d}
+
+\item 
+\hypertarget{classCfgBuilder_ac326d1e9426b9d15afae30a4f6c1313f}{\hyperlink{classcfg_1_1ConditionChain}{cfg\-::\-Condition\-Chain} {\bfseries active\-Chain}}\label{classCfgBuilder_ac326d1e9426b9d15afae30a4f6c1313f}
+
+\item 
+\hypertarget{classCfgBuilder_ab376ec6aad26f59bf931c3e6f5c2b20f}{\hyperlink{classcfg_1_1Term}{cfg\-::\-Term} $\ast$ {\bfseries last\-Term}}\label{classCfgBuilder_ab376ec6aad26f59bf931c3e6f5c2b20f}
+
+\item 
+\hypertarget{classCfgBuilder_a5dcb7004ac3ff2ee353c828339343569}{std\-::string {\bfseries the\-Namespace}}\label{classCfgBuilder_a5dcb7004ac3ff2ee353c828339343569}
+
+\item 
+\hypertarget{classCfgBuilder_a103ff056b767b8456ae538f26370ba78}{std\-::string {\bfseries the\-Item\-Name}}\label{classCfgBuilder_a103ff056b767b8456ae538f26370ba78}
+
+\item 
+\hypertarget{classCfgBuilder_a2f69af14667df0c44f4052f653bd6067}{int {\bfseries the\-Item\-Index}}\label{classCfgBuilder_a2f69af14667df0c44f4052f653bd6067}
+
+\item 
+\hypertarget{classCfgBuilder_acdcea7422a4c083bd0dc6dfb27ea10b1}{std\-::unique\-\_\-ptr$<$ \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $>$ {\bfseries the\-Doc}}\label{classCfgBuilder_acdcea7422a4c083bd0dc6dfb27ea10b1}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Cfg\-Parser/include/Defs.\-h\end{DoxyCompactItemize}

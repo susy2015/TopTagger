@@ -1,0 +1,99 @@
+\hypertarget{classTopTaggerResults}{\section{Top\-Tagger\-Results Class Reference}
+\label{classTopTaggerResults}\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}}
+}
+
+
+{\ttfamily \#include $<$Top\-Tagger\-Results.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classTopTaggerResults_a661fa9c839fd16be88ea1205cf274c7e}{Top\-Tagger\-Results} (const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents)
+\item 
+void \hyperlink{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}{set\-Constituents} (const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents)
+\item 
+\hypertarget{classTopTaggerResults_a36f6d9d5d0de2835f9d2eb904c937ba1}{decltype(top\-Candidates\-\_\-)\& {\bfseries get\-Top\-Candidates} ()}\label{classTopTaggerResults_a36f6d9d5d0de2835f9d2eb904c937ba1}
+
+\item 
+\hypertarget{classTopTaggerResults_a4a8dbb53762a071549d79297a4368881}{decltype(used\-Constituents\-\_\-)\& {\bfseries get\-Used\-Constituents} ()}\label{classTopTaggerResults_a4a8dbb53762a071549d79297a4368881}
+
+\item 
+\hypertarget{classTopTaggerResults_ac05c9403224d1146581d69486b1a3a29}{decltype(tops\-\_\-)\& {\bfseries get\-Tops} ()}\label{classTopTaggerResults_ac05c9403224d1146581d69486b1a3a29}
+
+\item 
+\hypertarget{classTopTaggerResults_a4fc99173e33deb2efc0f5d79f05d8c8b}{decltype(rsys\-\_\-)\& {\bfseries get\-Rsys} ()}\label{classTopTaggerResults_a4fc99173e33deb2efc0f5d79f05d8c8b}
+
+\item 
+const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \& \hyperlink{classTopTaggerResults_ac1cf35b9f88753c844265a33954c5678}{get\-Constituents} () const 
+\item 
+decltype(used\-Constituents\-\_\-) const \& \hyperlink{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}{get\-Used\-Constituents} () const 
+\item 
+decltype(top\-Candidates\-\_\-) const \& \hyperlink{classTopTaggerResults_af73f385ccfed5d95edceff6fce6c749b}{get\-Top\-Candidates} () const 
+\item 
+decltype(tops\-\_\-) const \& \hyperlink{classTopTaggerResults_a247c5fe21e474217d21059d9648367c5}{get\-Tops} () const 
+\item 
+decltype(rsys\-\_\-) const \& \hyperlink{classTopTaggerResults_a9618cf005aa6b206e70462ceeea5f6c4}{get\-Rsys} () const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This is a holder class which holds the final collection of top objects, along with the constituents used to construct them and any intermediate information used by modules. This serves both as the user interface for the results and a container to pass between modules. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classTopTaggerResults_a661fa9c839fd16be88ea1205cf274c7e}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!Top\-Tagger\-Results@{Top\-Tagger\-Results}}
+\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{Top\-Tagger\-Results}]{\setlength{\rightskip}{0pt plus 5cm}Top\-Tagger\-Results\-::\-Top\-Tagger\-Results (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{constituents}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a661fa9c839fd16be88ea1205cf274c7e}
+This constructor makes a copy of constituents to ensure it remains in scope while the top tagger results are in scope. This copy is totally internal and is managed by the shared pointer. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classTopTaggerResults_ac1cf35b9f88753c844265a33954c5678}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Constituents@{get\-Constituents}}
+\index{get\-Constituents@{get\-Constituents}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}const std\-::vector$<${\bf Constituent}$>$\& Top\-Tagger\-Results\-::get\-Constituents (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_ac1cf35b9f88753c844265a33954c5678}
+Get the internal vector of constituents \hypertarget{classTopTaggerResults_a9618cf005aa6b206e70462ceeea5f6c4}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Rsys@{get\-Rsys}}
+\index{get\-Rsys@{get\-Rsys}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Rsys}]{\setlength{\rightskip}{0pt plus 5cm}decltype(rsys\-\_\-) const\& Top\-Tagger\-Results\-::get\-Rsys (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a9618cf005aa6b206e70462ceeea5f6c4}
+Get the remaining system used for M\-T2 calculations in the case when there is only one reconstructed top \hypertarget{classTopTaggerResults_af73f385ccfed5d95edceff6fce6c749b}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Top\-Candidates@{get\-Top\-Candidates}}
+\index{get\-Top\-Candidates@{get\-Top\-Candidates}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Top\-Candidates}]{\setlength{\rightskip}{0pt plus 5cm}decltype(top\-Candidates\-\_\-) const\& Top\-Tagger\-Results\-::get\-Top\-Candidates (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_af73f385ccfed5d95edceff6fce6c749b}
+Get the vector of top candidates \hypertarget{classTopTaggerResults_a247c5fe21e474217d21059d9648367c5}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Tops@{get\-Tops}}
+\index{get\-Tops@{get\-Tops}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Tops}]{\setlength{\rightskip}{0pt plus 5cm}decltype(tops\-\_\-) const\& Top\-Tagger\-Results\-::get\-Tops (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a247c5fe21e474217d21059d9648367c5}
+Get the vector of final reconstructed tops \hypertarget{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Used\-Constituents@{get\-Used\-Constituents}}
+\index{get\-Used\-Constituents@{get\-Used\-Constituents}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Used\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}decltype(used\-Constituents\-\_\-) const\& Top\-Tagger\-Results\-::get\-Used\-Constituents (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}
+Get the set of constituens which have been flagged as used in final reconstructed Top\-Objects \hypertarget{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!set\-Constituents@{set\-Constituents}}
+\index{set\-Constituents@{set\-Constituents}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{set\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-Results\-::set\-Constituents (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{constituents}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}
+Set/reset the internal copy of the constituents vector 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/Top\-Tagger\-Results.\-h\end{DoxyCompactItemize}

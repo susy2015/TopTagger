@@ -1,0 +1,72 @@
+\hypertarget{classTTMOpenCVMVA}{\section{T\-T\-M\-Open\-C\-V\-M\-V\-A Class Reference}
+\label{classTTMOpenCVMVA}\index{T\-T\-M\-Open\-C\-V\-M\-V\-A@{T\-T\-M\-Open\-C\-V\-M\-V\-A}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Open\-C\-V\-M\-V\-A.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Open\-C\-V\-M\-V\-A\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMOpenCVMVA}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMOpenCVMVA_a9842e490d60a486958ba93b6f0f5d00e}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMOpenCVMVA_af51d1bf351304ef8c6e732763d58c433}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module implements an interface to the Open\-C\-V randomforest package for filtering top candidates. This module can either pass entries directly into the final top list, or filter entries out of the final top list if they do not pass the selection criteria.
+
+
+\begin{DoxyParams}{Parameters}
+{\em disc\-Cut} & (float) Minimum threshold for the T\-M\-V\-A discriminator for the candidate to pass the selection \\
+\hline
+{\em model\-File} & (string) Path to the model file \\
+\hline
+{\em csv\-Threshold} & (float) Threshold on b-\/tag discriminator to be considered a b-\/jet. \\
+\hline
+{\em b\-Eta\-Cut} & (float) Requirment on $\vert$eta$\vert$ for a constituent to be considered a b-\/jet \\
+\hline
+{\em max\-Nb\-In\-Top} & (int) The maximum number of constituent jets which can be b-\/tagged for the candidate to be a final $\ast$\\
+\hline
+{\em mva\-Var\mbox{[}$\,$\mbox{]}} & (string -\/ array) M\-V\-A variable input names \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMOpenCVMVA_a9842e490d60a486958ba93b6f0f5d00e}{\index{T\-T\-M\-Open\-C\-V\-M\-V\-A@{T\-T\-M\-Open\-C\-V\-M\-V\-A}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMOpenCVMVA@{T\-T\-M\-Open\-C\-V\-M\-V\-A}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Open\-C\-V\-M\-V\-A\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMOpenCVMVA_a9842e490d60a486958ba93b6f0f5d00e}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMOpenCVMVA_af51d1bf351304ef8c6e732763d58c433}{\index{T\-T\-M\-Open\-C\-V\-M\-V\-A@{T\-T\-M\-Open\-C\-V\-M\-V\-A}!run@{run}}
+\index{run@{run}!TTMOpenCVMVA@{T\-T\-M\-Open\-C\-V\-M\-V\-A}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Open\-C\-V\-M\-V\-A\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMOpenCVMVA_af51d1bf351304ef8c6e732763d58c433}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Open\-C\-V\-M\-V\-A.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Open\-C\-V\-M\-V\-A.\-cpp\end{DoxyCompactItemize}

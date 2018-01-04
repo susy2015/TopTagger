@@ -1,0 +1,67 @@
+\hypertarget{classttUtility_1_1TrijetInputCalculator}{\section{tt\-Utility\-:\-:Trijet\-Input\-Calculator Class Reference}
+\label{classttUtility_1_1TrijetInputCalculator}\index{tt\-Utility\-::\-Trijet\-Input\-Calculator@{tt\-Utility\-::\-Trijet\-Input\-Calculator}}
+}
+
+
+{\ttfamily \#include $<$Top\-Tagger\-Utilities.\-h$>$}
+
+Inheritance diagram for tt\-Utility\-:\-:Trijet\-Input\-Calculator\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classttUtility_1_1TrijetInputCalculator}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classttUtility_1_1TrijetInputCalculator_ae51335839fc75caf28e4ec030a3cfb40}{map\-Vars} (const std\-::vector$<$ std\-::string $>$ \&, float $\ast$)
+\item 
+bool \hyperlink{classttUtility_1_1TrijetInputCalculator_a02c32e65787b891edfe9b85c32aff8b0}{calculate\-Vars} (const \hyperlink{classTopObject}{Top\-Object} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class to calculate the input variables for the A\-K4 based resolved top catagory 
+
+\subsection{Member Function Documentation}
+\hypertarget{classttUtility_1_1TrijetInputCalculator_a02c32e65787b891edfe9b85c32aff8b0}{\index{tt\-Utility\-::\-Trijet\-Input\-Calculator@{tt\-Utility\-::\-Trijet\-Input\-Calculator}!calculate\-Vars@{calculate\-Vars}}
+\index{calculate\-Vars@{calculate\-Vars}!ttUtility::TrijetInputCalculator@{tt\-Utility\-::\-Trijet\-Input\-Calculator}}
+\subsubsection[{calculate\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}bool tt\-Utility\-::\-Trijet\-Input\-Calculator\-::calculate\-Vars (
+\begin{DoxyParamCaption}
+\item[{const {\bf Top\-Object} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1TrijetInputCalculator_a02c32e65787b891edfe9b85c32aff8b0}
+Calculate the requested variables and store the values directly in the input array for the M\-V\-A 
+\begin{DoxyParams}{Parameters}
+{\em top\-Cand} & the top candidate to calculate the input variables for \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150537c86e9f85038}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
+
+\hypertarget{classttUtility_1_1TrijetInputCalculator_ae51335839fc75caf28e4ec030a3cfb40}{\index{tt\-Utility\-::\-Trijet\-Input\-Calculator@{tt\-Utility\-::\-Trijet\-Input\-Calculator}!map\-Vars@{map\-Vars}}
+\index{map\-Vars@{map\-Vars}!ttUtility::TrijetInputCalculator@{tt\-Utility\-::\-Trijet\-Input\-Calculator}}
+\subsubsection[{map\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-Trijet\-Input\-Calculator\-::map\-Vars (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ std\-::string $>$ \&}]{, }
+\item[{float $\ast$}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1TrijetInputCalculator_ae51335839fc75caf28e4ec030a3cfb40}
+The job of map\-Vars is to populate the internal pointers for all variables in the input variable list with their memory location in the data array. To be called only once for the creation of the array pointed to by data. 
+\begin{DoxyParams}{Parameters}
+{\em vars} & list of variables used for the model \\
+\hline
+{\em data} & pointer to start of the data array which willbe used as input to the M\-V\-A \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classttUtility_1_1MVAInputCalculator_a9fd6fa53268079fa590b86ee9791c344}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/\hyperlink{TopTaggerUtilities_8h}{Top\-Tagger\-Utilities.\-h}\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/Top\-Tagger\-Utilities.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,75 @@
+\hypertarget{classTTMFilterBase}{\section{T\-T\-M\-Filter\-Base Class Reference}
+\label{classTTMFilterBase}\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Filter\-Base.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Filter\-Base\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classTTMFilterBase}
+\end{center}
+\end{figure}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}{constituents\-Are\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double) const 
+\item 
+void \hyperlink{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}{mark\-Constituents\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&, std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double) const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class provides several common functions which can be used by \hyperlink{classTTModule}{T\-T\-Module} objects (it is not one itself) to assist in overlap resolution when top candidates sharing the same constituents are selected. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!constituents\-Are\-Used@{constituents\-Are\-Used}}
+\index{constituents\-Are\-Used@{constituents\-Are\-Used}!TTMFilterBase@{T\-T\-M\-Filter\-Base}}
+\subsubsection[{constituents\-Are\-Used}]{\setlength{\rightskip}{0pt plus 5cm}bool T\-T\-M\-Filter\-Base\-::constituents\-Are\-Used (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ const {\bf Constituent} $\ast$ $>$ \&}]{constituents, }
+\item[{const std\-::set$<$ const {\bf Constituent} $\ast$ $>$ \&}]{used\-Consts, }
+\item[{const double}]{d\-R\-Max}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}
+Checks if the constituents are used
+
+
+\begin{DoxyParams}{Parameters}
+{\em constituents} & List of constituents to check \\
+\hline
+{\em used\-Consts} & Set of all constituents already used in final reconstructed tops \\
+\hline
+{\em d\-R\-Match} & The d\-R requirement used to select whether an A\-K4 jet matches a A\-K8 subjet \\
+\hline
+\end{DoxyParams}
+\hypertarget{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!mark\-Constituents\-Used@{mark\-Constituents\-Used}}
+\index{mark\-Constituents\-Used@{mark\-Constituents\-Used}!TTMFilterBase@{T\-T\-M\-Filter\-Base}}
+\subsubsection[{mark\-Constituents\-Used}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Filter\-Base\-::mark\-Constituents\-Used (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ const {\bf Constituent} $\ast$ $>$ \&}]{constituents, }
+\item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{all\-Constituents, }
+\item[{std\-::set$<$ const {\bf Constituent} $\ast$ $>$ \&}]{used\-Constituents, }
+\item[{const double}]{d\-R\-Max}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}
+Marks constituents as being used in a final reconstructed top
+
+
+\begin{DoxyParams}{Parameters}
+{\em constituents} & List of constituents to mark as used \\
+\hline
+{\em all\-Constituents} & List of all constituents \\
+\hline
+{\em used\-Constituents} & Set of all constituents already used in final reconstructed tops \\
+\hline
+{\em d\-R\-Match} & The d\-R requirement used to select whether an A\-K4 jet matches a A\-K8 subjet \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Filter\-Base.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Filter\-Base.\-cpp\end{DoxyCompactItemize}

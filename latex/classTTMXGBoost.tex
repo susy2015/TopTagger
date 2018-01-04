@@ -1,0 +1,76 @@
+\hypertarget{classTTMXGBoost}{\section{T\-T\-M\-X\-G\-Boost Class Reference}
+\label{classTTMXGBoost}\index{T\-T\-M\-X\-G\-Boost@{T\-T\-M\-X\-G\-Boost}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-X\-G\-Boost.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-X\-G\-Boost\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMXGBoost}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMXGBoost_a852aba8afb6f453187871e232927e622}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMXGBoost_afd522be937c0e1c8226c83cc6888c666}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module implements an interface to the Open\-C\-V randomforest package for filtering top candidates. This module can either pass entries directly into the final top list, or filter entries out of the final top list if they do not pass the selection criteria.
+
+
+\begin{DoxyParams}{Parameters}
+{\em disc\-Cut} & (float) Minimum threshold for the T\-M\-V\-A discriminator for the candidate to pass the selection \\
+\hline
+{\em model\-File} & (string) Path to the model file \\
+\hline
+{\em N\-Constituents} & (int) Category of top to apply selection too (1 -\/ monojet, 2 -\/ dijet, 3 -\/ trijet) \\
+\hline
+{\em N\-Cores} & (int) Number of cpu to allow X\-G\-Boost to use (default 1) \\
+\hline
+{\em csv\-Threshold} & (float) Threshold on b-\/tag discriminator to be considered a b-\/jet. \\
+\hline
+{\em b\-Eta\-Cut} & (float) Requirment on $\vert$eta$\vert$ for a constituent to be considered a b-\/jet \\
+\hline
+{\em max\-Nb\-In\-Top} & (int) The maximum number of constituent jets which can be b-\/tagged for the candidate to be a final $\ast$\\
+\hline
+{\em mva\-Var\mbox{[}$\,$\mbox{]}} & (string -\/ array) M\-V\-A variable input names \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMXGBoost_a852aba8afb6f453187871e232927e622}{\index{T\-T\-M\-X\-G\-Boost@{T\-T\-M\-X\-G\-Boost}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMXGBoost@{T\-T\-M\-X\-G\-Boost}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-X\-G\-Boost\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMXGBoost_a852aba8afb6f453187871e232927e622}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMXGBoost_afd522be937c0e1c8226c83cc6888c666}{\index{T\-T\-M\-X\-G\-Boost@{T\-T\-M\-X\-G\-Boost}!run@{run}}
+\index{run@{run}!TTMXGBoost@{T\-T\-M\-X\-G\-Boost}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-X\-G\-Boost\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMXGBoost_afd522be937c0e1c8226c83cc6888c666}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-X\-G\-Boost.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-X\-G\-Boost.\-cpp\end{DoxyCompactItemize}

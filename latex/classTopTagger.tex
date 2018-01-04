@@ -1,0 +1,93 @@
+\hypertarget{classTopTagger}{\section{Top\-Tagger Class Reference}
+\label{classTopTagger}\index{Top\-Tagger@{Top\-Tagger}}
+}
+
+
+{\ttfamily \#include $<$Top\-Tagger.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}{\hyperlink{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}{Top\-Tagger} ()}\label{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}
+
+\begin{DoxyCompactList}\small\item\em Default constructor to create an empty \hyperlink{classTopTagger}{Top\-Tagger} object. \end{DoxyCompactList}\item 
+\hypertarget{classTopTagger_a21d623a93398346401fb78bb09fe98b6}{\hyperlink{classTopTagger_a21d623a93398346401fb78bb09fe98b6}{Top\-Tagger} (const std\-::string \&)}\label{classTopTagger_a21d623a93398346401fb78bb09fe98b6}
+
+\begin{DoxyCompactList}\small\item\em Constructor to initialize \hyperlink{classTopTagger}{Top\-Tagger} object from the provided configuration file. \end{DoxyCompactList}\item 
+void \hyperlink{classTopTagger_ad7e22571559cb7afe0f0cf0e14d1ef41}{set\-Verbosity} (const int verbosity)
+\item 
+void \hyperlink{classTopTagger_ae117c09fc42674a09247fd1ad8dcb3ce}{set\-Rethrow} (const bool re\-Throw)
+\item 
+void \hyperlink{classTopTagger_ac18bfe0673dbd05973f45c668ed2b190}{set\-Cfg\-File} (const std\-::string \&)
+\item 
+void \hyperlink{classTopTagger_ae7a38be12023643495adea6f9a696ff3}{set\-Cfg\-File\-Direct} (const std\-::string \&)
+\item 
+void \hyperlink{classTopTagger_accf43da3b1469e524bfe6f568116219a}{run\-Tagger} (const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&)
+\item 
+const \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \& \hyperlink{classTopTagger_ac6f06aeb683b0b761ad09ac018e11d08}{get\-Results} () const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class holds the primary structure of the tagger. It is responsible for parsing the configuration file for the tagger, instantiating and running the requested modules, and storing the common results objects for the modules and user.
+
+The \hyperlink{classTopTagger}{Top\-Tagger} module is the primary (and only mandatory) section in every top tagger configuration. This section defines all the other top tagger modules which will be run and in which order. This module has 2 variables (both arrays) Which are used to define the module run order and if necessary the module context name. 
+\begin{DoxyParams}{Parameters}
+{\em module\mbox{[}$\,$\mbox{]}} & (string) This variable is an array and is used to define which other modules will be run and in which order. This can be any module listed here in this section. \\
+\hline
+{\em context\mbox{[}$\,$\mbox{]}} & (string) This variable must be specified for any module being run more than once to specify what context name to read its configuration from. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTopTagger_ac6f06aeb683b0b761ad09ac018e11d08}{\index{Top\-Tagger@{Top\-Tagger}!get\-Results@{get\-Results}}
+\index{get\-Results@{get\-Results}!TopTagger@{Top\-Tagger}}
+\subsubsection[{get\-Results}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Top\-Tagger\-Results} \& Top\-Tagger\-::get\-Results (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classTopTagger_ac6f06aeb683b0b761ad09ac018e11d08}
+Gets the top tagger results object from the external user. Results are returned as a const reference to a \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object. \hypertarget{classTopTagger_accf43da3b1469e524bfe6f568116219a}{\index{Top\-Tagger@{Top\-Tagger}!run\-Tagger@{run\-Tagger}}
+\index{run\-Tagger@{run\-Tagger}!TopTagger@{Top\-Tagger}}
+\subsubsection[{run\-Tagger}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::run\-Tagger (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{constituents}
+\end{DoxyParamCaption}
+)}}\label{classTopTagger_accf43da3b1469e524bfe6f568116219a}
+Runs the top tagger modules specified in the configuration file. Run once per event. \hypertarget{classTopTagger_ac18bfe0673dbd05973f45c668ed2b190}{\index{Top\-Tagger@{Top\-Tagger}!set\-Cfg\-File@{set\-Cfg\-File}}
+\index{set\-Cfg\-File@{set\-Cfg\-File}!TopTagger@{Top\-Tagger}}
+\subsubsection[{set\-Cfg\-File}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::set\-Cfg\-File (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{cfg\-File\-Name}
+\end{DoxyParamCaption}
+)}}\label{classTopTagger_ac18bfe0673dbd05973f45c668ed2b190}
+Set the configuration file to use to configure the \hyperlink{classTopTagger}{Top\-Tagger} object. This function expects the path to an external configuration file. \hypertarget{classTopTagger_ae7a38be12023643495adea6f9a696ff3}{\index{Top\-Tagger@{Top\-Tagger}!set\-Cfg\-File\-Direct@{set\-Cfg\-File\-Direct}}
+\index{set\-Cfg\-File\-Direct@{set\-Cfg\-File\-Direct}!TopTagger@{Top\-Tagger}}
+\subsubsection[{set\-Cfg\-File\-Direct}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::set\-Cfg\-File\-Direct (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{cfg\-Text}
+\end{DoxyParamCaption}
+)}}\label{classTopTagger_ae7a38be12023643495adea6f9a696ff3}
+Set the configuration file directly from a string. This function expects the configuration in the format of a raw string. \hypertarget{classTopTagger_ae117c09fc42674a09247fd1ad8dcb3ce}{\index{Top\-Tagger@{Top\-Tagger}!set\-Rethrow@{set\-Rethrow}}
+\index{set\-Rethrow@{set\-Rethrow}!TopTagger@{Top\-Tagger}}
+\subsubsection[{set\-Rethrow}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::set\-Rethrow (
+\begin{DoxyParamCaption}
+\item[{const bool}]{re\-Throw}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTagger_ae117c09fc42674a09247fd1ad8dcb3ce}
+If set to true the \hyperlink{classTopTagger}{Top\-Tagger} internal error handeling will rethrow T\-T\-Exceptions, otherwise the exceptions will be handled internally. \hypertarget{classTopTagger_ad7e22571559cb7afe0f0cf0e14d1ef41}{\index{Top\-Tagger@{Top\-Tagger}!set\-Verbosity@{set\-Verbosity}}
+\index{set\-Verbosity@{set\-Verbosity}!TopTagger@{Top\-Tagger}}
+\subsubsection[{set\-Verbosity}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::set\-Verbosity (
+\begin{DoxyParamCaption}
+\item[{const int}]{verbosity}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTagger_ad7e22571559cb7afe0f0cf0e14d1ef41}
+Set the verbosity level of the top tagger \par
+ 0 -\/ print nothing \par
+ 1 -\/ print exception error messages 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/Top\-Tagger.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/Top\-Tagger.\-cpp\end{DoxyCompactItemize}

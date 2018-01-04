@@ -1,0 +1,73 @@
+\hypertarget{classTTMOverlapResolution}{\section{T\-T\-M\-Overlap\-Resolution Class Reference}
+\label{classTTMOverlapResolution}\index{T\-T\-M\-Overlap\-Resolution@{T\-T\-M\-Overlap\-Resolution}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Overlap\-Resolution.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Overlap\-Resolution\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMOverlapResolution}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMOverlapResolution_a4dd88bd8480301018cfba596ae226157}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMOverlapResolution_a4099ee72e105acbcca10078068775bef}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+After top candidates are added to the final top list it is possible that some constituent jets can be included in more than one top in the list. This module is used to remove the tops which share constituents. It functions by first sorting the list of tops by a figure of merit, and then in the case that 2 tops share a constituent, the top with the better figure of merit is removed. The module can by run on the entire list of tops, or it can be run category by category.
+
+
+\begin{DoxyParams}{Parameters}
+{\em mt} & (float) {\bfseries  Common context } Mass of the top quark \\
+\hline
+{\em max\-Top\-Eta} & (float) {\bfseries  Common context } Maximum $\vert$eta$\vert$ of a top candidate to be considered a final reconstructed top \\
+\hline
+{\em d\-R\-Match} & (float) {\bfseries  Common context } The d\-R requirement used to select whether an A\-K4 jet matches a A\-K8 subjet \\
+\hline
+{\em cvs\-Threshold} & (float) Minimum cut value on the C\-S\-V discriminator for an A\-K4 jet to be considered a b-\/tagged jet \\
+\hline
+{\em N\-Constituents} & (int) This parameter determines which tops to include in the overlap resolution process. The options include \char`\"{}-\/1\char`\"{} for all tops, or 1, 2, or 3, for monojet, dijet, or trijet categories respectively. \\
+\hline
+{\em sort\-Method} & (string) The initial sorting order used to prioritize one top over another when resolving overlapping. The options include \char`\"{}top\-Mass\char`\"{}, \char`\"{}top\-Pt\char`\"{}, \char`\"{}mva\-Disc\char`\"{}, \char`\"{}mva\-Disc\-Withb\char`\"{}, and \char`\"{}none\char`\"{}. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMOverlapResolution_a4dd88bd8480301018cfba596ae226157}{\index{T\-T\-M\-Overlap\-Resolution@{T\-T\-M\-Overlap\-Resolution}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMOverlapResolution@{T\-T\-M\-Overlap\-Resolution}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Overlap\-Resolution\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMOverlapResolution_a4dd88bd8480301018cfba596ae226157}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMOverlapResolution_a4099ee72e105acbcca10078068775bef}{\index{T\-T\-M\-Overlap\-Resolution@{T\-T\-M\-Overlap\-Resolution}!run@{run}}
+\index{run@{run}!TTMOverlapResolution@{T\-T\-M\-Overlap\-Resolution}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Overlap\-Resolution\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMOverlapResolution_a4099ee72e105acbcca10078068775bef}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Overlap\-Resolution.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Overlap\-Resolution.\-cpp\end{DoxyCompactItemize}

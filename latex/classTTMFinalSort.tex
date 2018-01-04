@@ -1,0 +1,64 @@
+\hypertarget{classTTMFinalSort}{\section{T\-T\-M\-Final\-Sort Class Reference}
+\label{classTTMFinalSort}\index{T\-T\-M\-Final\-Sort@{T\-T\-M\-Final\-Sort}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Final\-Sort.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Final\-Sort\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMFinalSort}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMFinalSort_a1d26fb550c790fb08476c3d4eab99cfd}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMFinalSort_ae4a9797de31364e116fe4b99c57c4afd}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This module is used to sort the final list of tops after overlap resolution.
+
+
+\begin{DoxyParams}{Parameters}
+{\em mt} & (float) {\bfseries  Common context } Mass of the top quark \\
+\hline
+{\em sort\-Method} & (string) This parameter defines the sorting order. The possible options are \char`\"{}top\-Mass\char`\"{}, \char`\"{}top\-Pt\char`\"{}, and \char`\"{}none\char`\"{}. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMFinalSort_a1d26fb550c790fb08476c3d4eab99cfd}{\index{T\-T\-M\-Final\-Sort@{T\-T\-M\-Final\-Sort}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMFinalSort@{T\-T\-M\-Final\-Sort}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Final\-Sort\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMFinalSort_a1d26fb550c790fb08476c3d4eab99cfd}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMFinalSort_ae4a9797de31364e116fe4b99c57c4afd}{\index{T\-T\-M\-Final\-Sort@{T\-T\-M\-Final\-Sort}!run@{run}}
+\index{run@{run}!TTMFinalSort@{T\-T\-M\-Final\-Sort}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Final\-Sort\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMFinalSort_ae4a9797de31364e116fe4b99c57c4afd}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/include/T\-T\-M\-Final\-Sort.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Final\-Sort.\-cpp\end{DoxyCompactItemize}
