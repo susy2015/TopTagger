@@ -1,23 +1,30 @@
 set OPENCVPATH=@OPENCVDIR@
 set XGBOOSTPATH=@XGBOOSTDIR@
+set TENSORFLOWPATH=@TENSORFLOWDIR@
 set TAGGERDIR=@TAGGERDIR@/TopTagger/test
 
 set OSNAME=`uname -s`
 if ( "$OSNAME" == "Darwin" ) then
-    if ! ( $DYLD_LIBRARY_PATH:q =~ $OPENCVPATH:q) then
+    if ! ( $DYLD_LIBRARY_PATH:q =~ *$OPENCVPATH:q* ) then
         if ! ( "${OPENCVPATH}" == "" ) then
-            setenv LD_LIBRARY_PATH ${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
+            setenv DYLD_LIBRARY_PATH ${OPENCVPATH}/lib:${DYLD_LIBRARY_PATH}
         endif
     endif
     
-    if ! ( $DYLD_LIBRARY_PATH:q =~ $XGBOOSTPATH:q ) then 
+    if ! ( $DYLD_LIBRARY_PATH:q =~ *$XGBOOSTPATH:q* ) then 
         if ! ( "${XGBOOSTPATH}" == "" ) then
-            setenv LD_LIBRARY_PATH ${XGBOOSTPATH}/lib:${LD_LIBRARY_PATH}
+            setenv DYLD_LIBRARY_PATH ${XGBOOSTPATH}/lib:${DYLD_LIBRARY_PATH}
         endif
     endif
     
-    if ! ( $DYLD_LIBRARY_PATH:q =~ $TAGGERDIR:q ) then
-	setenv LD_LIBRARY_PATH ${TAGGERDIR}:${LD_LIBRARY_PATH}
+    if ! ( $DYLD_LIBRARY_PATH:q =~ *$TENSORFLOWPATH:q* ) then 
+        if ! ( "${TENSORFLOWPATH}" == "" ) then
+            setenv DYLD_LIBRARY_PATH ${TENSORFLOWPATH}/lib:${DYLD_LIBRARY_PATH}
+        endif
+    endif
+    
+    if ! ( $DYLD_LIBRARY_PATH:q =~ *$TAGGERDIR:q* ) then
+	setenv DYLD_LIBRARY_PATH ${TAGGERDIR}:${DYLD_LIBRARY_PATH}
     endif
 else
     if ! ( $LD_LIBRARY_PATH:q =~ *$OPENCVPATH:q*) then
@@ -29,6 +36,12 @@ else
     if ! ( $LD_LIBRARY_PATH:q =~ *$XGBOOSTPATH:q* ) then 
         if ! ( "${XGBOOSTPATH}" == "" ) then
             setenv LD_LIBRARY_PATH ${XGBOOSTPATH}/lib:${LD_LIBRARY_PATH}
+        endif
+    endif
+    
+    if ! ( $LD_LIBRARY_PATH:q =~ *$TENSORFLOWPATH:q* ) then 
+        if ! ( "${TENSORFLOWPATH}" == "" ) then
+            setenv LD_LIBRARY_PATH ${TENSORFLOWPATH}/lib:${LD_LIBRARY_PATH}
         endif
     endif
     

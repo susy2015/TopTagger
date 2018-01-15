@@ -641,6 +641,7 @@ EGREP
 GREP
 CXXCPP
 XGBOOSTDIR
+TENSORFLOWDIR
 OPENCVDIR
 PYTHONCFG
 pythonconfigfound
@@ -2817,6 +2818,76 @@ else
 
 fi
 
+if test -z ${TENSORFLOWDIR+x}; then
+   if test ${scramfound} == yes; then
+      TENSORFLOWDIR=$(scram tool tag tensorflow-c TENSORFLOW_C_BASE)
+   else
+      TENSORFLOWDIR=/usr/local/
+   fi
+fi
+
+TENSORFLOWINCLUDE=$TENSORFLOWDIR/include/tensorflow/c/c_api.h
+as_ac_File=`$as_echo "ac_cv_file_$TENSORFLOWINCLUDE" | $as_tr_sh`
+{ $as_echo "$as_me:$LINENO: checking for $TENSORFLOWINCLUDE" >&5
+$as_echo_n "checking for $TENSORFLOWINCLUDE... " >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+$as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TENSORFLOWINCLUDE"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+as_val=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+
+
+TENSORFLOWLIB=$TENSORFLOWDIR/lib/libtensorflow.${LIBSUFFIX}
+as_ac_File=`$as_echo "ac_cv_file_$TENSORFLOWLIB" | $as_tr_sh`
+{ $as_echo "$as_me:$LINENO: checking for $TENSORFLOWLIB" >&5
+$as_echo_n "checking for $TENSORFLOWLIB... " >&6; }
+if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+$as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$TENSORFLOWLIB"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+ac_res=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+as_val=`eval 'as_val=${'$as_ac_File'}
+		 $as_echo "$as_val"'`
+
+
+TENSORFLOWINCLUDE=ac_cv_file_$(echo ${TENSORFLOWINCLUDE} | sed -e 's/\//_/g' -e 's/\./_/')
+TENSORFLOWLIB=ac_cv_file_$(echo ${TENSORFLOWLIBXGB} | sed -e 's/\//_/g' -e 's/\./_/')
+
+if test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWLIB}" = "no"; then
+   { $as_echo "$as_me:$LINENO: WARNING: Optional dependency missing: Tensorflow c-api includes or libraries are not found. Specify location with \"./configure TENSORFLOWDIR=/Path\" if required." >&5
+$as_echo "$as_me: WARNING: Optional dependency missing: Tensorflow c-api includes or libraries are not found. Specify location with \"./configure TENSORFLOWDIR=/Path\" if required." >&2;}
+   TENSORFLOWDIR=""
+
+else
+   TENSORFLOWDIR=$TENSORFLOWDIR
+
+fi
 
 if test -z ${XGBOOSTDIR+x}; then
    XGBOOSTDIR=/usr/local/
