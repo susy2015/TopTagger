@@ -199,7 +199,7 @@ TTMTensorflow::~TTMTensorflow()
 
     if (TF_GetCode(status) != TF_OK)
     {
-        THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
+        //THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
     }
 
     TF_DeleteStatus(status);
