@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <iostream>
 
 void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
@@ -188,22 +187,14 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
         THROW_TTEXCEPTION("ERROR: Unable to run graph: " + std::string(TF_Message(status)));
     }
 
-    for(int i = 0; i < TF_Dim(input_values_0, 0); ++i)
-    {
-        for(int j = 0; j < TF_Dim(input_values_0, 1); ++j)
-        {
-            std::cout << *(static_cast<float*>(TF_TensorData(input_values_0)) + i * TF_Dim(input_values_0, 1) + j) << "\t";
-        }
-        std::cout << "|\t" << *(static_cast<float*>(TF_TensorData(output_values[0])) + i) << std::endl;
-    }
-
     //Get output discriminators 
     auto discriminators = static_cast<float*>(TF_TensorData(output_values[0]));                
     for(iCand = 0; iCand < validCands.size(); ++iCand)
     {
         auto* topCand = validCands[iCand];
         
-        double discriminator = static_cast<double>(discriminators[iCand]);
+        //discriminators is a 2D array, we only want the first entry of every array
+        double discriminator = static_cast<double>(discriminators[iCand*TF_Dim(output_values[0], 1)]);
         topCand->setDiscriminator(discriminator);
         
         //Check number of b-tagged jets in the top
