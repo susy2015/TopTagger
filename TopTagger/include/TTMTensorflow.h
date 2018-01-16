@@ -4,6 +4,7 @@
 #include "TopTagger/TopTagger/include/TTModule.h"
 
 #include <string>
+#include <memory>
 #include <vector>
 
 #ifdef DOTENSORFLOW
@@ -14,6 +15,11 @@
 //class TF_Buffer;
 //class TF_Output;
 //class TF_Operation;
+
+namespace ttUtility
+{
+    class MVAInputCalculator;
+}
 
 /**
  *This module implements an interface to Tensorflow through the tensorflow c-api for filtering top candidates.  This module places top candidates which pass the requirements directly into the final top list.
@@ -41,6 +47,7 @@ private:
     double csvThreshold_;
     double bEtaCut_;
     int maxNbInTop_;
+    int NConstituents_;
 
     //Tensoflow session pointer
     TF_Session *session_;
@@ -48,11 +55,15 @@ private:
     //Input variable names 
     std::vector<std::string> vars_;
 
+    std::vector<TF_Tensor*> input_values_;
     std::vector<TF_Output>     inputs_;
     std::vector<TF_Output>     outputs_;
     std::vector<TF_Operation*> targets_;
 
     TF_Buffer* read_file(const std::string& file);
+
+    //variable calclator                                                                                                                                                                                                                     
+    std::unique_ptr<ttUtility::MVAInputCalculator> varCalculator_;
 #endif
 
 public:

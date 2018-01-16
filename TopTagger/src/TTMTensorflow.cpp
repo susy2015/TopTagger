@@ -10,9 +10,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <memory>
-#include <vector>
-
 void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
 #ifdef DOTENSORFLOW
@@ -20,12 +17,13 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
-    discOffset_    = cfgDoc->get("discOffset",   localCxt, 999.9);
-    discSlope_     = cfgDoc->get("discSlope",    localCxt, 0.0);
-    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
-    inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
-    outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
+    discriminator_ = cfgDoc->get("discCut",       localCxt, -999.9);
+    discOffset_    = cfgDoc->get("discOffset",    localCxt, 999.9);
+    discSlope_     = cfgDoc->get("discSlope",     localCxt, 0.0);
+    modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
+    inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
+    outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
+    NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -71,6 +69,8 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     //Create tensorflow session from imported graph
     TF_SessionOptions* sess_opts = TF_NewSessionOptions();
+    uint8_t config[] = {0x10, 0x01};
+    TF_SetConfig(sess_opts, static_cast<void*>(config), 2, status);
     session_ = TF_NewSession(graph, sess_opts, status);
     TF_DeleteSessionOptions(sess_opts);
 
@@ -99,7 +99,33 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     outputs_.emplace_back(TF_Output({op_y, 0}));
     targets_.emplace_back(op_y);
 
+    //Construct tensorflow input tensor
+    const int elemSize = sizeof(float);
+    std::vector<int64_t> dims = {1, static_cast<int64_t>(vars_.size())};
+    int nelem = 1;
+    for(const auto dimLen : dims) nelem += dimLen;
+    TF_Tensor* input_values_0 =  TF_AllocateTensor(TF_FLOAT, dims.data(), dims.size(), elemSize*nelem);
+
+    input_values_ = {  input_values_0 };
+
     TF_DeleteStatus(status);
+
+    //load variables
+    if(NConstituents_ == 1)
+    {
+        varCalculator_.reset(new ttUtility::BDTMonojetInputCalculator());
+    }
+    else if(NConstituents_ == 2)
+    {
+        varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
+    }
+    else if(NConstituents_ == 3)
+    {
+        varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    }
+    //map variables
+    varCalculator_->mapVars(vars_, static_cast<float*>(TF_TensorData(input_values_0)));
+
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow support!!!");
 #endif
@@ -116,41 +142,20 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     //tensorflow status variable
     TF_Status* status = TF_NewStatus();
 
-    //Construct tensorflow input tensor
-    const int elemSize = sizeof(float);
-    std::vector<int64_t> dims = {1, static_cast<int64_t>(vars_.size())};
-    int nelem = 1;
-    for(const auto dimLen : dims) nelem += dimLen;
-    TF_Tensor* input_values_0 =  TF_AllocateTensor(TF_FLOAT, dims.data(), dims.size(), elemSize*nelem);
-
-    auto data = static_cast<float*>(TF_TensorData(input_values_0));
-
-    std::vector<TF_Tensor*>    input_values  = {  input_values_0 };
-
     //Create place to store the output vectors 
     std::vector<TF_Tensor*>    output_values(1);
 
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        //Prepare data from top candidate (this code is shared with training tuple producer)
+        if(varCalculator_->calculateVars(topCand))
         {
-            //Prepare data from top candidate (this code is shared with training tuple producer)
-            //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
-
-            //populate tensor based on desired input variables 
-            for(unsigned int i = 0; i < vars_.size(); ++i)
-            {
-                data[i] = varMap[vars_[i]];
-            }
-
             //predict value
             TF_SessionRun(session_,
                           // RunOptions
                           nullptr,
                           // Input tensors
-                          inputs_.data(), input_values.data(), inputs_.size(),
+                          inputs_.data(), input_values_.data(), inputs_.size(),
                           // Output tensors
                           outputs_.data(), output_values.data(), outputs_.size(),
                           // Target operations
@@ -180,9 +185,8 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
                 tops.push_back(&topCand);
             }
         }
+        break;
     }
-
-    for(auto tensor : input_values)  TF_DeleteTensor(tensor);
 
     TF_DeleteStatus(status);
 #endif
@@ -194,6 +198,8 @@ TTMTensorflow::~TTMTensorflow()
 {
     //tensorflow status variable
     TF_Status* status = TF_NewStatus();
+
+    for(auto tensor : input_values_)  TF_DeleteTensor(tensor);
     
     TF_DeleteSession(session_, status);
 
