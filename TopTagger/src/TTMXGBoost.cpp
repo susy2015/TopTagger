@@ -78,7 +78,8 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
         varCalculator_.reset(new ttUtility::TrijetInputCalculator());
     }
     //map variables
-    varCalculator_->mapVars(vars_, data_.data());
+    varCalculator_->mapVars(vars_);
+    varCalculator_->setPtr(data_.data());
 
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with XGBoost support!!!");
@@ -99,7 +100,7 @@ void TTMXGBoost::run(TopTaggerResults& ttResults)
     for(auto& topCand : topCandidates)
     {
         //Prepare the data!
-        if(varCalculator_->calculateVars(topCand))
+        if(varCalculator_->calculateVars(topCand, 0))
         {
             // convert to DMatrix (is this unnecessary deep copy necessary?)
             DMatrixHandle h_data;

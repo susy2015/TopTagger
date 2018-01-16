@@ -55,7 +55,6 @@ private:
     //Input variable names 
     std::vector<std::string> vars_;
 
-    std::vector<TF_Tensor*> input_values_;
     std::vector<TF_Output>     inputs_;
     std::vector<TF_Output>     outputs_;
     std::vector<TF_Operation*> targets_;
