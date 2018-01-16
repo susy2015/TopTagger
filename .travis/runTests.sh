@@ -21,7 +21,7 @@ set -x
 cp -r $TRAVIS_BUILD_DIR .
 cd TopTagger/TopTagger/test
 echo "========================================================================="
-./configure
+./configure TENSORFLOWDIR=
 make -j
 echo "========================================================================="
 source taggerSetup.sh
