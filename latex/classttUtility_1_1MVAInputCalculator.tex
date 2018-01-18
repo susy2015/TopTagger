@@ -14,9 +14,22 @@ Inheritance diagram for tt\-Utility\-:\-:M\-V\-A\-Input\-Calculator\-:\begin{fig
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-virtual void \hyperlink{classttUtility_1_1MVAInputCalculator_a9fd6fa53268079fa590b86ee9791c344}{map\-Vars} (const std\-::vector$<$ std\-::string $>$ \&, float $\ast$)=0
+virtual void \hyperlink{classttUtility_1_1MVAInputCalculator_aca315e5c5ce1d110660eb54cd7facfd8}{map\-Vars} (const std\-::vector$<$ std\-::string $>$ \&)=0
 \item 
-virtual bool \hyperlink{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150537c86e9f85038}{calculate\-Vars} (const \hyperlink{classTopObject}{Top\-Object} \&)=0
+virtual void \hyperlink{classttUtility_1_1MVAInputCalculator_afae8a686f0fd4310a75c79216a39fa53}{set\-Ptr} (float $\ast$data)
+\item 
+virtual bool \hyperlink{classttUtility_1_1MVAInputCalculator_a86793cfa66ca816b2e1667a6b12db7d8}{calculate\-Vars} (const \hyperlink{classTopObject}{Top\-Object} \&, int)=0
+\item 
+virtual bool \hyperlink{classttUtility_1_1MVAInputCalculator_ae8df426d7943b921c0b9d086d1ccde30}{check\-Cand} (const \hyperlink{classTopObject}{Top\-Object} \&)=0
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classttUtility_1_1MVAInputCalculator_ae7ecc7c4f0679e8adbb09104362f77e9}{float $\ast$ {\bfseries base\-Ptr\-\_\-}}\label{classttUtility_1_1MVAInputCalculator_ae7ecc7c4f0679e8adbb09104362f77e9}
+
+\item 
+\hypertarget{classttUtility_1_1MVAInputCalculator_aef257aed71b9b66adfb59b1807c8f0a4}{int {\bfseries len\-\_\-}}\label{classttUtility_1_1MVAInputCalculator_aef257aed71b9b66adfb59b1807c8f0a4}
+
 \end{DoxyCompactItemize}
 
 
@@ -24,13 +37,14 @@ virtual bool \hyperlink{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150
 Base class for M\-V\-A input variable calculator 
 
 \subsection{Member Function Documentation}
-\hypertarget{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150537c86e9f85038}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!calculate\-Vars@{calculate\-Vars}}
+\hypertarget{classttUtility_1_1MVAInputCalculator_a86793cfa66ca816b2e1667a6b12db7d8}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!calculate\-Vars@{calculate\-Vars}}
 \index{calculate\-Vars@{calculate\-Vars}!ttUtility::MVAInputCalculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}}
 \subsubsection[{calculate\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool tt\-Utility\-::\-M\-V\-A\-Input\-Calculator\-::calculate\-Vars (
 \begin{DoxyParamCaption}
-\item[{const {\bf Top\-Object} \&}]{}
+\item[{const {\bf Top\-Object} \&}]{, }
+\item[{int}]{}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150537c86e9f85038}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classttUtility_1_1MVAInputCalculator_a86793cfa66ca816b2e1667a6b12db7d8}
 Calculate the requested variables and store the values directly in the input array for the M\-V\-A 
 \begin{DoxyParams}{Parameters}
 {\em top\-Cand} & the top candidate to calculate the input variables for \\
@@ -38,27 +52,52 @@ Calculate the requested variables and store the values directly in the input arr
 \end{DoxyParams}
 
 
-Implemented in \hyperlink{classttUtility_1_1TrijetInputCalculator_a02c32e65787b891edfe9b85c32aff8b0}{tt\-Utility\-::\-Trijet\-Input\-Calculator}, \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a02307c325d6cdf2d158da6ce930189c9}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}, and \hyperlink{classttUtility_1_1BDTMonojetInputCalculator_a77d0d0a41b482f0522866584093cb71d}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}.
+Implemented in \hyperlink{classttUtility_1_1TrijetInputCalculator_ab691e5a8ecd3698a609b34b6e6aff20d}{tt\-Utility\-::\-Trijet\-Input\-Calculator}, \hyperlink{classttUtility_1_1BDTDijetInputCalculator_aabe1eff89a230cc1a02606eaadc74fdc}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}, and \hyperlink{classttUtility_1_1BDTMonojetInputCalculator_ade65c192d67eb363a4b4028b4f0ec7c5}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}.
 
-\hypertarget{classttUtility_1_1MVAInputCalculator_a9fd6fa53268079fa590b86ee9791c344}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!map\-Vars@{map\-Vars}}
-\index{map\-Vars@{map\-Vars}!ttUtility::MVAInputCalculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}}
-\subsubsection[{map\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tt\-Utility\-::\-M\-V\-A\-Input\-Calculator\-::map\-Vars (
+\hypertarget{classttUtility_1_1MVAInputCalculator_ae8df426d7943b921c0b9d086d1ccde30}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!check\-Cand@{check\-Cand}}
+\index{check\-Cand@{check\-Cand}!ttUtility::MVAInputCalculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}}
+\subsubsection[{check\-Cand}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool tt\-Utility\-::\-M\-V\-A\-Input\-Calculator\-::check\-Cand (
 \begin{DoxyParamCaption}
-\item[{const std\-::vector$<$ std\-::string $>$ \&}]{, }
-\item[{float $\ast$}]{}
+\item[{const {\bf Top\-Object} \&}]{}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classttUtility_1_1MVAInputCalculator_a9fd6fa53268079fa590b86ee9791c344}
-The job of map\-Vars is to populate the internal pointers for all variables in the input variable list with their memory location in the data array. To be called only once for the creation of the array pointed to by data. 
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classttUtility_1_1MVAInputCalculator_ae8df426d7943b921c0b9d086d1ccde30}
+Check if the \hyperlink{classTopObject}{Top\-Object} passes basic selection for this category. 
 \begin{DoxyParams}{Parameters}
-{\em vars} & list of variables used for the model \\
-\hline
-{\em data} & pointer to start of the data array which willbe used as input to the M\-V\-A \\
+{\em top\-Cand} & the top candidate to check \\
 \hline
 \end{DoxyParams}
 
 
-Implemented in \hyperlink{classttUtility_1_1TrijetInputCalculator_ae51335839fc75caf28e4ec030a3cfb40}{tt\-Utility\-::\-Trijet\-Input\-Calculator}, \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a918f73990d9b0528abca108f1617474b}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}, and \hyperlink{classttUtility_1_1BDTMonojetInputCalculator_a1200a5b57fd939ee71cfac9ff1885f08}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}.
+Implemented in \hyperlink{classttUtility_1_1TrijetInputCalculator_abeb8edb896b264a185a2f37747a97912}{tt\-Utility\-::\-Trijet\-Input\-Calculator}, \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a2832dae8ebcb1572c05379776c67d4ef}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}, and \hyperlink{classttUtility_1_1BDTMonojetInputCalculator_aabe30d40a85c15a5c4df89f39b44be88}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}.
 
+\hypertarget{classttUtility_1_1MVAInputCalculator_aca315e5c5ce1d110660eb54cd7facfd8}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!map\-Vars@{map\-Vars}}
+\index{map\-Vars@{map\-Vars}!ttUtility::MVAInputCalculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}}
+\subsubsection[{map\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tt\-Utility\-::\-M\-V\-A\-Input\-Calculator\-::map\-Vars (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ std\-::string $>$ \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classttUtility_1_1MVAInputCalculator_aca315e5c5ce1d110660eb54cd7facfd8}
+The job of map\-Vars is to populate the internal offests for all variables in the input variable list with their memory location in the data array. To be called only once. 
+\begin{DoxyParams}{Parameters}
+{\em vars} & list of variables used for the model \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classttUtility_1_1TrijetInputCalculator_a22f76e3d58040a99324f6748f340a4fc}{tt\-Utility\-::\-Trijet\-Input\-Calculator}, \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a8b3197ff6ced189b17e3d666ef8f24a7}{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}, and \hyperlink{classttUtility_1_1BDTMonojetInputCalculator_af929778a33ce64a1c5102712a2858aa0}{tt\-Utility\-::\-B\-D\-T\-Monojet\-Input\-Calculator}.
+
+\hypertarget{classttUtility_1_1MVAInputCalculator_afae8a686f0fd4310a75c79216a39fa53}{\index{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}!set\-Ptr@{set\-Ptr}}
+\index{set\-Ptr@{set\-Ptr}!ttUtility::MVAInputCalculator@{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}}
+\subsubsection[{set\-Ptr}]{\setlength{\rightskip}{0pt plus 5cm}virtual void tt\-Utility\-::\-M\-V\-A\-Input\-Calculator\-::set\-Ptr (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{data}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classttUtility_1_1MVAInputCalculator_afae8a686f0fd4310a75c79216a39fa53}
+The job of set\-Ptr is to set hte starting place of memory block where the data will be written. To be called only once for the creation of the array pointed to by data. 
+\begin{DoxyParams}{Parameters}
+{\em data} & pointer to start of the data array which will be used as input to the M\-V\-A \\
+\hline
+\end{DoxyParams}
 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}

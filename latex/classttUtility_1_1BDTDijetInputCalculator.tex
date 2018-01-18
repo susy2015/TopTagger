@@ -14,23 +14,27 @@ Inheritance diagram for tt\-Utility\-:\-:B\-D\-T\-Dijet\-Input\-Calculator\-:\be
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a918f73990d9b0528abca108f1617474b}{map\-Vars} (const std\-::vector$<$ std\-::string $>$ \&, float $\ast$)
+void \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a8b3197ff6ced189b17e3d666ef8f24a7}{map\-Vars} (const std\-::vector$<$ std\-::string $>$ \&)
 \item 
-bool \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a02307c325d6cdf2d158da6ce930189c9}{calculate\-Vars} (const \hyperlink{classTopObject}{Top\-Object} \&)
+bool \hyperlink{classttUtility_1_1BDTDijetInputCalculator_aabe1eff89a230cc1a02606eaadc74fdc}{calculate\-Vars} (const \hyperlink{classTopObject}{Top\-Object} \&, int)
+\item 
+bool \hyperlink{classttUtility_1_1BDTDijetInputCalculator_a2832dae8ebcb1572c05379776c67d4ef}{check\-Cand} (const \hyperlink{classTopObject}{Top\-Object} \&)
 \end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
 
 
 \subsection{Detailed Description}
 Class to calculate the input variables for the B\-D\-T based A\-K8 W selection 
 
 \subsection{Member Function Documentation}
-\hypertarget{classttUtility_1_1BDTDijetInputCalculator_a02307c325d6cdf2d158da6ce930189c9}{\index{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}!calculate\-Vars@{calculate\-Vars}}
+\hypertarget{classttUtility_1_1BDTDijetInputCalculator_aabe1eff89a230cc1a02606eaadc74fdc}{\index{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}!calculate\-Vars@{calculate\-Vars}}
 \index{calculate\-Vars@{calculate\-Vars}!ttUtility::BDTDijetInputCalculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}}
 \subsubsection[{calculate\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}bool tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator\-::calculate\-Vars (
 \begin{DoxyParamCaption}
-\item[{const {\bf Top\-Object} \&}]{}
+\item[{const {\bf Top\-Object} \&}]{, }
+\item[{int}]{}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1BDTDijetInputCalculator_a02307c325d6cdf2d158da6ce930189c9}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1BDTDijetInputCalculator_aabe1eff89a230cc1a02606eaadc74fdc}
 Calculate the requested variables and store the values directly in the input array for the M\-V\-A 
 \begin{DoxyParams}{Parameters}
 {\em top\-Cand} & the top candidate to calculate the input variables for \\
@@ -38,26 +42,39 @@ Calculate the requested variables and store the values directly in the input arr
 \end{DoxyParams}
 
 
-Implements \hyperlink{classttUtility_1_1MVAInputCalculator_ac48dbe37b01a207150537c86e9f85038}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
+Implements \hyperlink{classttUtility_1_1MVAInputCalculator_a86793cfa66ca816b2e1667a6b12db7d8}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
 
-\hypertarget{classttUtility_1_1BDTDijetInputCalculator_a918f73990d9b0528abca108f1617474b}{\index{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}!map\-Vars@{map\-Vars}}
-\index{map\-Vars@{map\-Vars}!ttUtility::BDTDijetInputCalculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}}
-\subsubsection[{map\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator\-::map\-Vars (
+\hypertarget{classttUtility_1_1BDTDijetInputCalculator_a2832dae8ebcb1572c05379776c67d4ef}{\index{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}!check\-Cand@{check\-Cand}}
+\index{check\-Cand@{check\-Cand}!ttUtility::BDTDijetInputCalculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}}
+\subsubsection[{check\-Cand}]{\setlength{\rightskip}{0pt plus 5cm}bool tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator\-::check\-Cand (
 \begin{DoxyParamCaption}
-\item[{const std\-::vector$<$ std\-::string $>$ \&}]{, }
-\item[{float $\ast$}]{}
+\item[{const {\bf Top\-Object} \&}]{}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1BDTDijetInputCalculator_a918f73990d9b0528abca108f1617474b}
-The job of map\-Vars is to populate the internal pointers for all variables in the input variable list with their memory location in the data array. To be called only once for the creation of the array pointed to by data. 
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1BDTDijetInputCalculator_a2832dae8ebcb1572c05379776c67d4ef}
+Check if the \hyperlink{classTopObject}{Top\-Object} passes basic selection for this category. 
 \begin{DoxyParams}{Parameters}
-{\em vars} & list of variables used for the model \\
-\hline
-{\em data} & pointer to start of the data array which willbe used as input to the M\-V\-A \\
+{\em top\-Cand} & the top candidate to check \\
 \hline
 \end{DoxyParams}
 
 
-Implements \hyperlink{classttUtility_1_1MVAInputCalculator_a9fd6fa53268079fa590b86ee9791c344}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
+Implements \hyperlink{classttUtility_1_1MVAInputCalculator_ae8df426d7943b921c0b9d086d1ccde30}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
+
+\hypertarget{classttUtility_1_1BDTDijetInputCalculator_a8b3197ff6ced189b17e3d666ef8f24a7}{\index{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}!map\-Vars@{map\-Vars}}
+\index{map\-Vars@{map\-Vars}!ttUtility::BDTDijetInputCalculator@{tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator}}
+\subsubsection[{map\-Vars}]{\setlength{\rightskip}{0pt plus 5cm}void tt\-Utility\-::\-B\-D\-T\-Dijet\-Input\-Calculator\-::map\-Vars (
+\begin{DoxyParamCaption}
+\item[{const std\-::vector$<$ std\-::string $>$ \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classttUtility_1_1BDTDijetInputCalculator_a8b3197ff6ced189b17e3d666ef8f24a7}
+The job of map\-Vars is to populate the internal offests for all variables in the input variable list with their memory location in the data array. To be called only once. 
+\begin{DoxyParams}{Parameters}
+{\em vars} & list of variables used for the model \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classttUtility_1_1MVAInputCalculator_aca315e5c5ce1d110660eb54cd7facfd8}{tt\-Utility\-::\-M\-V\-A\-Input\-Calculator}.
 
 
 

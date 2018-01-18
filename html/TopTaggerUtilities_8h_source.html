@@ -209,156 +209,169 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00178"></a><span class="lineno"><a class="line" href="classttUtility_1_1MVAInputCalculator.html">  178</a></span>&#160;<span class="comment"></span>    <span class="keyword">class </span><a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#a9fd6fa53268079fa590b86ee9791c344">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;, <span class="keywordtype">float</span>*) = 0;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#ac48dbe37b01a207150537c86e9f85038">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;) = 0;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    };</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
-<div class="line"><a name="l00198"></a><span class="lineno"><a class="line" href="classttUtility_1_1BDTMonojetInputCalculator.html">  198</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html">BDTMonojetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <span class="keywordtype">float</span> *ak8_sdmass_, *ak8_tau21_, *ak8_tau32_, *ak8_ptDR_, *ak8_rel_ptdiff_, *ak8_csv1_mass_, *ak8_csv1_csv_, *ak8_csv1_ptD_, *ak8_csv1_axis1_, *ak8_csv1_mult_, *ak8_csv2_mass_, *ak8_csv2_ptD_, *ak8_csv2_axis1_, *ak8_csv2_mult_;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html">BDTMonojetInputCalculator</a>();</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html#a1200a5b57fd939ee71cfac9ff1885f08">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;, <span class="keywordtype">float</span> *);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html#a77d0d0a41b482f0522866584093cb71d">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    };</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
-<div class="line"><a name="l00211"></a><span class="lineno"><a class="line" href="classttUtility_1_1BDTDijetInputCalculator.html">  211</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html">BDTDijetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    {</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        <span class="keywordtype">float</span> *var_fj_sdmass_, *var_fj_tau21_, *var_fj_ptDR_, *var_fj_rel_ptdiff_, *var_sj1_ptD_, *var_sj1_axis1_, *var_sj1_mult_, *var_sj2_ptD_, *var_sj2_axis1_, *var_sj2_mult_, *var_sjmax_csv_, *var_sd_n2_;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html">BDTDijetInputCalculator</a>();</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html#a918f73990d9b0528abca108f1617474b">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;, <span class="keywordtype">float</span> *);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html#a02307c325d6cdf2d158da6ce930189c9">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    };</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno"><a class="line" href="classttUtility_1_1TrijetInputCalculator.html">  225</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1TrijetInputCalculator.html">TrijetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        <span class="comment">//Nconstituents</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keyword">static</span> constexpr <span class="keywordtype">int</span> NCONST = 3;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <span class="comment">//Get top candidate variables</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordtype">float</span>* cand_pt_;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordtype">float</span>* cand_p_;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordtype">float</span>* cand_eta_;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <span class="keywordtype">float</span>* cand_phi_;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordtype">float</span>* cand_m_;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordtype">float</span>* cand_dRMax_;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keywordtype">float</span>* cand_dThetaMin_;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keywordtype">float</span>* cand_dThetaMax_;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <span class="keywordtype">float</span>* j_m_lab_[NCONST];</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        <span class="keywordtype">float</span>* j_CSV_lab_[NCONST];</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="keywordtype">float</span>* j_QGL_lab_[NCONST];</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordtype">float</span>* j_qgMult_lab_[NCONST];</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <span class="keywordtype">float</span>* j_qgPtD_lab_[NCONST];</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordtype">float</span>* j_qgAxis1_lab_[NCONST];</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordtype">float</span>* j_qgAxis2_lab_[NCONST];</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordtype">float</span>* dR12_lab_[NCONST];</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="keywordtype">float</span>* dR12_3_lab_[NCONST];</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordtype">float</span>* j12_m_lab_[NCONST];</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordtype">float</span>* dRPtTop_;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordtype">float</span>* dRPtW_;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordtype">float</span>* sd_n2_;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordtype">float</span>* j_p_[NCONST];</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordtype">float</span>* j_p_top_[NCONST];</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keywordtype">float</span>* j_theta_top_[NCONST];</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordtype">float</span>* j_phi_top_[NCONST];</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        <span class="keywordtype">float</span>* j_phi_lab_[NCONST];</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keywordtype">float</span>* j_eta_lab_[NCONST];</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <span class="keywordtype">float</span>* j_pt_lab_[NCONST];</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="keywordtype">float</span>* j_m_[NCONST];</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keywordtype">float</span>* j_CSV_[NCONST];</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="keywordtype">float</span>* j_QGL_[NCONST];</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsJecScaleRawToFull_[NCONST];</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <span class="keywordtype">float</span>* j_qgLikelihood_[NCONST];</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keywordtype">float</span>* j_qgPtD_[NCONST];</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordtype">float</span>* j_qgAxis1_[NCONST];</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordtype">float</span>* j_qgAxis2_[NCONST];</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="keywordtype">float</span>* j_recoJetschargedHadronEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="keywordtype">float</span>* j_recoJetschargedEmEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsneutralEmEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsmuonEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsHFHadronEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsHFEMEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsneutralEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordtype">float</span>* j_PhotonEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="keywordtype">float</span>* j_ElectronEnergyFraction_[NCONST];</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordtype">float</span>* j_ChargedHadronMultiplicity_[NCONST];</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="keywordtype">float</span>* j_NeutralHadronMultiplicity_[NCONST];</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordtype">float</span>* j_PhotonMultiplicity_[NCONST];</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keywordtype">float</span>* j_ElectronMultiplicity_[NCONST];</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordtype">float</span>* j_MuonMultiplicity_[NCONST];</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordtype">float</span>* j_DeepCSVb_[NCONST];</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        <span class="keywordtype">float</span>* j_DeepCSVc_[NCONST];</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordtype">float</span>* j_DeepCSVl_[NCONST];</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <span class="keywordtype">float</span>* j_DeepCSVbb_[NCONST];</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="keywordtype">float</span>* j_DeepCSVcc_[NCONST];</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavorb_[NCONST];</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavorbb_[NCONST];</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavorlepb_[NCONST];</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavorc_[NCONST];</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavoruds_[NCONST];</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keywordtype">float</span>* j_DeepFlavorg_[NCONST];</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keywordtype">float</span>* j_CvsL_[NCONST];</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keywordtype">float</span>* j_CvsB_[NCONST];</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="keywordtype">float</span>* j_CombinedSvtx_[NCONST];</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordtype">float</span>* j_JetProba_[NCONST];</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        <span class="keywordtype">float</span>* j_JetBprob_[NCONST];</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsBtag_[NCONST];</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        <span class="keywordtype">float</span>* j_recoJetsCharge_[NCONST];</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="keywordtype">float</span>* j_qgMult_[NCONST];</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="keywordtype">float</span>* dTheta_[NCONST];</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="keywordtype">float</span>* j12_m_[NCONST];</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <a class="code" href="classttUtility_1_1TrijetInputCalculator.html">TrijetInputCalculator</a>();</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1TrijetInputCalculator.html#ae51335839fc75caf28e4ec030a3cfb40">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;, <span class="keywordtype">float</span> *);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1TrijetInputCalculator.html#a02c32e65787b891edfe9b85c32aff8b0">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    };</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    std::vector&lt;std::string&gt; getMVAVars();</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;}</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        <span class="keywordtype">float</span>* basePtr_;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordtype">int</span> len_;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#aca315e5c5ce1d110660eb54cd7facfd8">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;) = 0;</div>
+<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53">  194</a></span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53">setPtr</a>(<span class="keywordtype">float</span>* data) {basePtr_ = data;}</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#a86793cfa66ca816b2e1667a6b12db7d8">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;, <span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html#ae8df426d7943b921c0b9d086d1ccde30">checkCand</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;) = 0;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    };</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
+<div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="classttUtility_1_1BDTMonojetInputCalculator.html">  210</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html">BDTMonojetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keywordtype">int</span> ak8_sdmass_, ak8_tau21_, ak8_tau32_, ak8_ptDR_, ak8_rel_ptdiff_, ak8_csv1_mass_, ak8_csv1_csv_, ak8_csv1_ptD_, ak8_csv1_axis1_, ak8_csv1_mult_, ak8_csv2_mass_, ak8_csv2_ptD_, ak8_csv2_axis1_, ak8_csv2_mult_;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html">BDTMonojetInputCalculator</a>();</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html#af929778a33ce64a1c5102712a2858aa0">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;);</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html#ade65c192d67eb363a4b4028b4f0ec7c5">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTMonojetInputCalculator.html#aabe30d40a85c15a5c4df89f39b44be88">checkCand</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    };</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
+<div class="line"><a name="l00224"></a><span class="lineno"><a class="line" href="classttUtility_1_1BDTDijetInputCalculator.html">  224</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html">BDTDijetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        <span class="keywordtype">int</span> var_fj_sdmass_, var_fj_tau21_, var_fj_ptDR_, var_fj_rel_ptdiff_, var_sj1_ptD_, var_sj1_axis1_, var_sj1_mult_, var_sj2_ptD_, var_sj2_axis1_, var_sj2_mult_, var_sjmax_csv_, var_sd_n2_;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html">BDTDijetInputCalculator</a>();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html#a8b3197ff6ced189b17e3d666ef8f24a7">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html#aabe1eff89a230cc1a02606eaadc74fdc">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1BDTDijetInputCalculator.html#a2832dae8ebcb1572c05379776c67d4ef">checkCand</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    };</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
+<div class="line"><a name="l00239"></a><span class="lineno"><a class="line" href="classttUtility_1_1TrijetInputCalculator.html">  239</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classttUtility_1_1TrijetInputCalculator.html">TrijetInputCalculator</a> : <span class="keyword">public</span> <a class="code" href="classttUtility_1_1MVAInputCalculator.html">MVAInputCalculator</a></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        <span class="comment">//Nconstituents</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keyword">static</span> constexpr <span class="keywordtype">int</span> NCONST = 3;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <span class="comment">//Get top candidate variables</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordtype">int</span> cand_pt_;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordtype">int</span> cand_p_;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordtype">int</span> cand_eta_;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="keywordtype">int</span> cand_phi_;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordtype">int</span> cand_m_;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordtype">int</span> cand_dRMax_;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordtype">int</span> cand_dThetaMin_;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordtype">int</span> cand_dThetaMax_;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <span class="keywordtype">int</span> j_m_lab_[NCONST];</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordtype">int</span> j_CSV_lab_[NCONST];</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordtype">int</span> j_QGL_lab_[NCONST];</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keywordtype">int</span> j_qgMult_lab_[NCONST];</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordtype">int</span> j_qgPtD_lab_[NCONST];</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        <span class="keywordtype">int</span> j_qgAxis1_lab_[NCONST];</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keywordtype">int</span> j_qgAxis2_lab_[NCONST];</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <span class="keywordtype">int</span> dR12_lab_[NCONST];</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="keywordtype">int</span> dR12_3_lab_[NCONST];</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keywordtype">int</span> j12_m_lab_[NCONST];</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="keywordtype">int</span> dRPtTop_;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <span class="keywordtype">int</span> dRPtW_;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keywordtype">int</span> sd_n2_;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordtype">int</span> j_p_[NCONST];</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="keywordtype">int</span> j_p_top_[NCONST];</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="keywordtype">int</span> j_theta_top_[NCONST];</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <span class="keywordtype">int</span> j_phi_top_[NCONST];</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordtype">int</span> j_phi_lab_[NCONST];</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <span class="keywordtype">int</span> j_eta_lab_[NCONST];</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="keywordtype">int</span> j_pt_lab_[NCONST];</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordtype">int</span> j_m_[NCONST];</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordtype">int</span> j_CSV_[NCONST];</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="keywordtype">int</span> j_QGL_[NCONST];</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordtype">int</span> j_recoJetsJecScaleRawToFull_[NCONST];</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="keywordtype">int</span> j_qgLikelihood_[NCONST];</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordtype">int</span> j_qgPtD_[NCONST];</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keywordtype">int</span> j_qgAxis1_[NCONST];</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordtype">int</span> j_qgAxis2_[NCONST];</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordtype">int</span> j_recoJetschargedHadronEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        <span class="keywordtype">int</span> j_recoJetschargedEmEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordtype">int</span> j_recoJetsneutralEmEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <span class="keywordtype">int</span> j_recoJetsmuonEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <span class="keywordtype">int</span> j_recoJetsHFHadronEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        <span class="keywordtype">int</span> j_recoJetsHFEMEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="keywordtype">int</span> j_recoJetsneutralEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordtype">int</span> j_PhotonEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="keywordtype">int</span> j_ElectronEnergyFraction_[NCONST];</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        <span class="keywordtype">int</span> j_ChargedHadronMultiplicity_[NCONST];</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        <span class="keywordtype">int</span> j_NeutralHadronMultiplicity_[NCONST];</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keywordtype">int</span> j_PhotonMultiplicity_[NCONST];</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        <span class="keywordtype">int</span> j_ElectronMultiplicity_[NCONST];</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        <span class="keywordtype">int</span> j_MuonMultiplicity_[NCONST];</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        <span class="keywordtype">int</span> j_DeepCSVb_[NCONST];</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        <span class="keywordtype">int</span> j_DeepCSVc_[NCONST];</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        <span class="keywordtype">int</span> j_DeepCSVl_[NCONST];</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        <span class="keywordtype">int</span> j_DeepCSVbb_[NCONST];</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="keywordtype">int</span> j_DeepCSVcc_[NCONST];</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavorb_[NCONST];</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavorbb_[NCONST];</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavorlepb_[NCONST];</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavorc_[NCONST];</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavoruds_[NCONST];</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordtype">int</span> j_DeepFlavorg_[NCONST];</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        <span class="keywordtype">int</span> j_CvsL_[NCONST];</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <span class="keywordtype">int</span> j_CvsB_[NCONST];</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        <span class="keywordtype">int</span> j_CombinedSvtx_[NCONST];</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;        <span class="keywordtype">int</span> j_JetProba_[NCONST];</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <span class="keywordtype">int</span> j_JetBprob_[NCONST];</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        <span class="keywordtype">int</span> j_recoJetsBtag_[NCONST];</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        <span class="keywordtype">int</span> j_recoJetsCharge_[NCONST];</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        <span class="keywordtype">int</span> j_qgMult_[NCONST];</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;        <span class="keywordtype">int</span> dTheta_[NCONST];</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;        <span class="keywordtype">int</span> j12_m_[NCONST];</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <a class="code" href="classttUtility_1_1TrijetInputCalculator.html">TrijetInputCalculator</a>();</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classttUtility_1_1TrijetInputCalculator.html#a22f76e3d58040a99324f6748f340a4fc">mapVars</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp;);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1TrijetInputCalculator.html#ab691e5a8ecd3698a609b34b6e6aff20d">calculateVars</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;, <span class="keywordtype">int</span>);</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classttUtility_1_1TrijetInputCalculator.html#abeb8edb896b264a185a2f37747a97912">checkCand</a>(<span class="keyword">const</span> <a class="code" href="classTopObject.html">TopObject</a>&amp;);</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    };</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    std::vector&lt;std::string&gt; getMVAVars();</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;}</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html_ad0e86d264508a72505aeb1b3494fd938"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html#ad0e86d264508a72505aeb1b3494fd938">ttUtility::ConstAK4Inputs::ConstAK4Inputs</a></div><div class="ttdeci">ConstAK4Inputs(const std::vector&lt; TLorentzVector &gt; &amp;jetsLVec, const std::vector&lt; double &gt; &amp;btagFactors, const std::vector&lt; double &gt; &amp;qgLikelihood)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:22</div></div>
+<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_af929778a33ce64a1c5102712a2858aa0"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#af929778a33ce64a1c5102712a2858aa0">ttUtility::BDTMonojetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:589</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html">ttUtility::ConstAK4Inputs</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:43</div></div>
 <div class="ttc" id="classttUtility_1_1ConstGenInputs_html_a520c5a594261d877f0fb4ad46aedc71e"><div class="ttname"><a href="classttUtility_1_1ConstGenInputs.html#a520c5a594261d877f0fb4ad46aedc71e">ttUtility::ConstGenInputs::ConstGenInputs</a></div><div class="ttdeci">ConstGenInputs()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:18</div></div>
-<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html">ttUtility::BDTMonojetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:198</div></div>
-<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html">ttUtility::BDTDijetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:211</div></div>
-<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html_ae51335839fc75caf28e4ec030a3cfb40"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html#ae51335839fc75caf28e4ec030a3cfb40">ttUtility::TrijetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;, float *)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:779</div></div>
+<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html">ttUtility::BDTMonojetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:210</div></div>
+<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html">ttUtility::BDTDijetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:224</div></div>
 <div class="ttc" id="classConstituent_html"><div class="ttname"><a href="classConstituent.html">Constituent</a></div><div class="ttdef"><b>Definition:</b> Constituent.h:20</div></div>
-<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_a9fd6fa53268079fa590b86ee9791c344"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#a9fd6fa53268079fa590b86ee9791c344">ttUtility::MVAInputCalculator::mapVars</a></div><div class="ttdeci">virtual void mapVars(const std::vector&lt; std::string &gt; &amp;, float *)=0</div></div>
-<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_ac48dbe37b01a207150537c86e9f85038"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#ac48dbe37b01a207150537c86e9f85038">ttUtility::MVAInputCalculator::calculateVars</a></div><div class="ttdeci">virtual bool calculateVars(const TopObject &amp;)=0</div></div>
-<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html_a02307c325d6cdf2d158da6ce930189c9"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html#a02307c325d6cdf2d158da6ce930189c9">ttUtility::BDTDijetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:666</div></div>
+<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_ae8df426d7943b921c0b9d086d1ccde30"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#ae8df426d7943b921c0b9d086d1ccde30">ttUtility::MVAInputCalculator::checkCand</a></div><div class="ttdeci">virtual bool checkCand(const TopObject &amp;)=0</div></div>
+<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_afae8a686f0fd4310a75c79216a39fa53"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53">ttUtility::MVAInputCalculator::setPtr</a></div><div class="ttdeci">virtual void setPtr(float *data)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:194</div></div>
+<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_aabe30d40a85c15a5c4df89f39b44be88"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#aabe30d40a85c15a5c4df89f39b44be88">ttUtility::BDTMonojetInputCalculator::checkCand</a></div><div class="ttdeci">bool checkCand(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:642</div></div>
+<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html_a22f76e3d58040a99324f6748f340a4fc"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html#a22f76e3d58040a99324f6748f340a4fc">ttUtility::TrijetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:793</div></div>
+<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html_aabe1eff89a230cc1a02606eaadc74fdc"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html#aabe1eff89a230cc1a02606eaadc74fdc">ttUtility::BDTDijetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;, int)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:675</div></div>
+<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_aca315e5c5ce1d110660eb54cd7facfd8"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#aca315e5c5ce1d110660eb54cd7facfd8">ttUtility::MVAInputCalculator::mapVars</a></div><div class="ttdeci">virtual void mapVars(const std::vector&lt; std::string &gt; &amp;)=0</div></div>
+<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html_abeb8edb896b264a185a2f37747a97912"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html#abeb8edb896b264a185a2f37747a97912">ttUtility::TrijetInputCalculator::checkCand</a></div><div class="ttdeci">bool checkCand(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:1028</div></div>
+<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_ade65c192d67eb363a4b4028b4f0ec7c5"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#ade65c192d67eb363a4b4028b4f0ec7c5">ttUtility::BDTMonojetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;, int)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:612</div></div>
+<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html_ab691e5a8ecd3698a609b34b6e6aff20d"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html#ab691e5a8ecd3698a609b34b6e6aff20d">ttUtility::TrijetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;, int)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:881</div></div>
 <div class="ttc" id="classTopObject_html"><div class="ttname"><a href="classTopObject.html">TopObject</a></div><div class="ttdef"><b>Definition:</b> TopObject.h:12</div></div>
 <div class="ttc" id="classttUtility_1_1ConstGenInputs_html"><div class="ttname"><a href="classttUtility_1_1ConstGenInputs.html">ttUtility::ConstGenInputs</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:24</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html_a1f0268275cbc047d7a689ceb9ab5ff78"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html#a1f0268275cbc047d7a689ceb9ab5ff78">ttUtility::ConstAK4Inputs::addQGLVectors</a></div><div class="ttdeci">void addQGLVectors(const std::vector&lt; int &gt; &amp;qgMult, const std::vector&lt; double &gt; &amp;qgPtD, const std::vector&lt; double &gt; &amp;qgAxis1, const std::vector&lt; double &gt; &amp;qgAxis2)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:52</div></div>
-<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_a77d0d0a41b482f0522866584093cb71d"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#a77d0d0a41b482f0522866584093cb71d">ttUtility::BDTMonojetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:610</div></div>
-<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html_a918f73990d9b0528abca108f1617474b"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html#a918f73990d9b0528abca108f1617474b">ttUtility::BDTDijetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;, float *)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:647</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html_a528690054575d44f293e984b70cb2856"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html#a528690054575d44f293e984b70cb2856">ttUtility::ConstAK4Inputs::addSupplamentalVector</a></div><div class="ttdeci">void addSupplamentalVector(const std::string &amp;name, const std::vector&lt; double &gt; &amp;vector)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:60</div></div>
 <div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:14</div></div>
 <div class="ttc" id="classttUtility_1_1MVAInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html">ttUtility::MVAInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:178</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html_ae1171e58b4a1ca748d7b3abd87476047"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html#ae1171e58b4a1ca748d7b3abd87476047">ttUtility::ConstAK4Inputs::packageConstituents</a></div><div class="ttdeci">void packageConstituents(std::vector&lt; Constituent &gt; &amp;constituents)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:65</div></div>
-<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html">ttUtility::TrijetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:225</div></div>
-<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html_a02c32e65787b891edfe9b85c32aff8b0"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html#a02c32e65787b891edfe9b85c32aff8b0">ttUtility::TrijetInputCalculator::calculateVars</a></div><div class="ttdeci">bool calculateVars(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:865</div></div>
+<div class="ttc" id="classttUtility_1_1TrijetInputCalculator_html"><div class="ttname"><a href="classttUtility_1_1TrijetInputCalculator.html">ttUtility::TrijetInputCalculator</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:239</div></div>
+<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html_a8b3197ff6ced189b17e3d666ef8f24a7"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html#a8b3197ff6ced189b17e3d666ef8f24a7">ttUtility::BDTDijetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:654</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK8Inputs_html"><div class="ttname"><a href="classttUtility_1_1ConstAK8Inputs.html">ttUtility::ConstAK8Inputs</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:100</div></div>
-<div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_a1200a5b57fd939ee71cfac9ff1885f08"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#a1200a5b57fd939ee71cfac9ff1885f08">ttUtility::BDTMonojetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;, float *)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:589</div></div>
+<div class="ttc" id="classttUtility_1_1BDTDijetInputCalculator_html_a2832dae8ebcb1572c05379776c67d4ef"><div class="ttname"><a href="classttUtility_1_1BDTDijetInputCalculator.html#a2832dae8ebcb1572c05379776c67d4ef">ttUtility::BDTDijetInputCalculator::checkCand</a></div><div class="ttdeci">bool checkCand(const TopObject &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:709</div></div>
+<div class="ttc" id="classttUtility_1_1MVAInputCalculator_html_a86793cfa66ca816b2e1667a6b12db7d8"><div class="ttname"><a href="classttUtility_1_1MVAInputCalculator.html#a86793cfa66ca816b2e1667a6b12db7d8">ttUtility::MVAInputCalculator::calculateVars</a></div><div class="ttdeci">virtual bool calculateVars(const TopObject &amp;, int)=0</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 01:03:05 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 18 2018 18:46:53 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

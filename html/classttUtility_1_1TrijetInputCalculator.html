@@ -106,15 +106,30 @@ Inheritance diagram for ttUtility::TrijetInputCalculator:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae51335839fc75caf28e4ec030a3cfb40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1TrijetInputCalculator.html#ae51335839fc75caf28e4ec030a3cfb40">mapVars</a> (const std::vector&lt; std::string &gt; &amp;, float *)</td></tr>
-<tr class="separator:ae51335839fc75caf28e4ec030a3cfb40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02c32e65787b891edfe9b85c32aff8b0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1TrijetInputCalculator.html#a02c32e65787b891edfe9b85c32aff8b0">calculateVars</a> (const <a class="el" href="classTopObject.html">TopObject</a> &amp;)</td></tr>
-<tr class="separator:a02c32e65787b891edfe9b85c32aff8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22f76e3d58040a99324f6748f340a4fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1TrijetInputCalculator.html#a22f76e3d58040a99324f6748f340a4fc">mapVars</a> (const std::vector&lt; std::string &gt; &amp;)</td></tr>
+<tr class="separator:a22f76e3d58040a99324f6748f340a4fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab691e5a8ecd3698a609b34b6e6aff20d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1TrijetInputCalculator.html#ab691e5a8ecd3698a609b34b6e6aff20d">calculateVars</a> (const <a class="el" href="classTopObject.html">TopObject</a> &amp;, int)</td></tr>
+<tr class="separator:ab691e5a8ecd3698a609b34b6e6aff20d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abeb8edb896b264a185a2f37747a97912"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1TrijetInputCalculator.html#abeb8edb896b264a185a2f37747a97912">checkCand</a> (const <a class="el" href="classTopObject.html">TopObject</a> &amp;)</td></tr>
+<tr class="separator:abeb8edb896b264a185a2f37747a97912"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classttUtility_1_1MVAInputCalculator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classttUtility_1_1MVAInputCalculator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classttUtility_1_1MVAInputCalculator.html">ttUtility::MVAInputCalculator</a></td></tr>
+<tr class="memitem:afae8a686f0fd4310a75c79216a39fa53 inherit pub_methods_classttUtility_1_1MVAInputCalculator"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53">setPtr</a> (float *data)</td></tr>
+<tr class="separator:afae8a686f0fd4310a75c79216a39fa53 inherit pub_methods_classttUtility_1_1MVAInputCalculator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_attribs_classttUtility_1_1MVAInputCalculator"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classttUtility_1_1MVAInputCalculator')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classttUtility_1_1MVAInputCalculator.html">ttUtility::MVAInputCalculator</a></td></tr>
+<tr class="memitem:ae7ecc7c4f0679e8adbb09104362f77e9 inherit pro_attribs_classttUtility_1_1MVAInputCalculator"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7ecc7c4f0679e8adbb09104362f77e9"></a>
+float *&#160;</td><td class="memItemRight" valign="bottom"><b>basePtr_</b></td></tr>
+<tr class="separator:ae7ecc7c4f0679e8adbb09104362f77e9 inherit pro_attribs_classttUtility_1_1MVAInputCalculator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef257aed71b9b66adfb59b1807c8f0a4 inherit pro_attribs_classttUtility_1_1MVAInputCalculator"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef257aed71b9b66adfb59b1807c8f0a4"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>len_</b></td></tr>
+<tr class="separator:aef257aed71b9b66adfb59b1807c8f0a4 inherit pro_attribs_classttUtility_1_1MVAInputCalculator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to calculate the input variables for the AK4 based resolved top catagory </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a02c32e65787b891edfe9b85c32aff8b0"></a>
+<a class="anchor" id="ab691e5a8ecd3698a609b34b6e6aff20d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -125,8 +140,18 @@ Public Member Functions</h2></td></tr>
           <td class="memname">bool ttUtility::TrijetInputCalculator::calculateVars </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classTopObject.html">TopObject</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -143,11 +168,44 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classttUtility_1_1MVAInputCalculator.html#ac48dbe37b01a207150537c86e9f85038">ttUtility::MVAInputCalculator</a>.</p>
+<p>Implements <a class="el" href="classttUtility_1_1MVAInputCalculator.html#a86793cfa66ca816b2e1667a6b12db7d8">ttUtility::MVAInputCalculator</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae51335839fc75caf28e4ec030a3cfb40"></a>
+<a class="anchor" id="abeb8edb896b264a185a2f37747a97912"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ttUtility::TrijetInputCalculator::checkCand </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classTopObject.html">TopObject</a> &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Check if the <a class="el" href="classTopObject.html">TopObject</a> passes basic selection for this category. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">topCand</td><td>the top candidate to check </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classttUtility_1_1MVAInputCalculator.html#ae8df426d7943b921c0b9d086d1ccde30">ttUtility::MVAInputCalculator</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a22f76e3d58040a99324f6748f340a4fc"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -158,18 +216,8 @@ Public Member Functions</h2></td></tr>
           <td class="memname">void ttUtility::TrijetInputCalculator::mapVars </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype">float *&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -178,16 +226,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>The job of mapVars is to populate the internal pointers for all variables in the input variable list with their memory location in the data array. To be called only once for the creation of the array pointed to by data. </p>
+<p>The job of mapVars is to populate the internal offests for all variables in the input variable list with their memory location in the data array. To be called only once. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vars</td><td>list of variables used for the model </td></tr>
-    <tr><td class="paramname">data</td><td>pointer to start of the data array which willbe used as input to the MVA </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classttUtility_1_1MVAInputCalculator.html#a9fd6fa53268079fa590b86ee9791c344">ttUtility::MVAInputCalculator</a>.</p>
+<p>Implements <a class="el" href="classttUtility_1_1MVAInputCalculator.html#aca315e5c5ce1d110660eb54cd7facfd8">ttUtility::MVAInputCalculator</a>.</p>
 
 </div>
 </div>
@@ -198,7 +245,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 4 2018 01:03:09 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 18 2018 18:46:58 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
