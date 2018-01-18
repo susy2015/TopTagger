@@ -58,7 +58,8 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     {
         varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
     }
-    varCalculator_->mapVars(vars_, varMap_.data());
+    varCalculator_->mapVars(vars_);
+    varCalculator_->setPtr(varMap_.data());
 
     //load variables into reader
     for(unsigned int i = 0; i < vars_.size(); ++i)
@@ -90,7 +91,7 @@ void TTMTMVA::run(TopTaggerResults& ttResults)
     for(auto& topCand : topCandidates)
     {
         //Prepare data from top candidate and calculate discriminators 
-        if(varCalculator_->calculateVars(topCand))
+        if(varCalculator_->calculateVars(topCand, 0))
         {
             //predict value
             double discriminator = reader_->EvaluateMVA(modelName_);

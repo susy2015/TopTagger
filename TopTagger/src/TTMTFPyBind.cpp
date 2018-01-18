@@ -59,6 +59,8 @@ static std::string embeddedTensorflowScript = ""
 "\n"
 "def eval_session_shot(inputs, outputs):\n"
 "    tfw.eval_session(inputs, outputs)\n"
+"    print inputs\n"
+"    print outputs\n"
 "";
 #endif
 
@@ -135,8 +137,8 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
         varCalculator_.reset(new ttUtility::TrijetInputCalculator());
     }
     //map variables
-    varCalculator_->mapVars(vars_, static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(nparray_), 0, 0)));
-
+    varCalculator_->mapVars(vars_);
+    varCalculator_->setPtr(static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(nparray_), 0, 0)));
 
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with python support!!!");
@@ -166,7 +168,7 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
     for(auto& topCand : topCandidates)
     {
         //Prepare data from top candidate and calculate discriminator
-        if(varCalculator_->calculateVars(topCand))
+        if(varCalculator_->calculateVars(topCand, 0))
         {
             //Run python session to network on input data
             callPython("eval_session_shot", pArgs);

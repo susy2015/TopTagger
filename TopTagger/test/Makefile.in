@@ -1,6 +1,7 @@
 ## Variables set by configure 
 OPENCV_DIRECTORY  = @OPENCVDIR@
 XGBOOST_DIRECTORY = @XGBOOSTDIR@
+TENSORFLOW_DIR    = @TENSORFLOWDIR@
 TAGGERDIR         = @TAGGERDIR@
 
 CXX           = @CXX@
@@ -78,6 +79,14 @@ ifdef XGBOOST_DIRECTORY
 
 	CXXFLAGS += -DDOXGBOOST
 	LIBS     += -L$(XGBOOST_DIRECTORY)/lib -lxgboost
+endif
+
+# tensorflow includes and libraries
+ifdef TENSORFLOW_DIR
+	INCLUDESDIRS  += -I$(TENSORFLOW_DIR)/include
+
+	CXXFLAGS += -DDOTENSORFLOW
+	LIBS     += -L$(TENSORFLOW_DIR)/lib -ltensorflow
 endif
 
 PROGRAMS = topTaggerTest

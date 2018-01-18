@@ -10,8 +10,6 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <memory>
-#include <vector>
 
 void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
@@ -20,12 +18,13 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
-    discOffset_    = cfgDoc->get("discOffset",   localCxt, 999.9);
-    discSlope_     = cfgDoc->get("discSlope",    localCxt, 0.0);
-    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
-    inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
-    outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
+    discriminator_ = cfgDoc->get("discCut",       localCxt, -999.9);
+    discOffset_    = cfgDoc->get("discOffset",    localCxt, 999.9);
+    discSlope_     = cfgDoc->get("discSlope",     localCxt, 0.0);
+    modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
+    inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
+    outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
+    NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -71,6 +70,8 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     //Create tensorflow session from imported graph
     TF_SessionOptions* sess_opts = TF_NewSessionOptions();
+    uint8_t config[] = {0x10, 0x01};
+    TF_SetConfig(sess_opts, static_cast<void*>(config), 2, status);
     session_ = TF_NewSession(graph, sess_opts, status);
     TF_DeleteSessionOptions(sess_opts);
 
@@ -100,6 +101,23 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     targets_.emplace_back(op_y);
 
     TF_DeleteStatus(status);
+
+    //load variables
+    if(NConstituents_ == 1)
+    {
+        varCalculator_.reset(new ttUtility::BDTMonojetInputCalculator());
+    }
+    else if(NConstituents_ == 2)
+    {
+        varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
+    }
+    else if(NConstituents_ == 3)
+    {
+        varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    }
+    //map variables
+    varCalculator_->mapVars(vars_);
+
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow support!!!");
 #endif
@@ -113,76 +131,84 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     //Get the list of final tops into which we will stick candidates
     std::vector<TopObject*>& tops = ttResults.getTops();
 
+
+    std::vector<TopObject*> validCands;
+    for(auto& topCand : topCandidates)
+    {
+        //Prepare data from top candidate (this code is shared with training tuple producer)
+        if(varCalculator_->checkCand(topCand))
+        {
+            validCands.emplace_back(&topCand);
+        }
+    }
+
     //tensorflow status variable
     TF_Status* status = TF_NewStatus();
-
-    //Construct tensorflow input tensor
-    const int elemSize = sizeof(float);
-    std::vector<int64_t> dims = {1, static_cast<int64_t>(vars_.size())};
-    int nelem = 1;
-    for(const auto dimLen : dims) nelem += dimLen;
-    TF_Tensor* input_values_0 =  TF_AllocateTensor(TF_FLOAT, dims.data(), dims.size(), elemSize*nelem);
-
-    auto data = static_cast<float*>(TF_TensorData(input_values_0));
-
-    std::vector<TF_Tensor*>    input_values  = {  input_values_0 };
 
     //Create place to store the output vectors 
     std::vector<TF_Tensor*>    output_values(1);
 
-    for(auto& topCand : topCandidates)
+    //Construct tensorflow input tensor
+    std::vector<TF_Tensor*> input_values;
+    const int elemSize = sizeof(float);
+    std::vector<int64_t> dims = {static_cast<int64_t>(validCands.size()), static_cast<int64_t>(vars_.size())};
+    int nelem = 1;
+    for(const auto dimLen : dims) nelem *= dimLen;
+    TF_Tensor* input_values_0 =  TF_AllocateTensor(TF_FLOAT, dims.data(), dims.size(), elemSize*nelem);
+
+    input_values = { input_values_0 };
+    varCalculator_->setPtr(static_cast<float*>(TF_TensorData(input_values_0)));
+
+    //Prepare data from top candidate (this code is shared with training tuple producer)
+    int iCand = 0;
+    for(auto& topCand : validCands)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        if(varCalculator_->calculateVars(*topCand, iCand)) ++iCand;
+    }
+
+    //predict values
+    TF_SessionRun(session_,
+                  // RunOptions
+                  nullptr,
+                  // Input tensors
+                  inputs_.data(), input_values.data(), inputs_.size(),
+                  // Output tensors
+                  outputs_.data(), output_values.data(), outputs_.size(),
+                  // Target operations
+                  targets_.data(), targets_.size(),
+                  // RunMetadata
+                  nullptr,
+                  // Output status
+                  status);
+
+    
+    if (TF_GetCode(status) != TF_OK)
+    {
+        THROW_TTEXCEPTION("ERROR: Unable to run graph: " + std::string(TF_Message(status)));
+    }
+
+    //Get output discriminators 
+    auto discriminators = static_cast<float*>(TF_TensorData(output_values[0]));                
+    for(iCand = 0; iCand < validCands.size(); ++iCand)
+    {
+        auto* topCand = validCands[iCand];
+        
+        //discriminators is a 2D array, we only want the first entry of every array
+        double discriminator = static_cast<double>(discriminators[iCand*TF_Dim(output_values[0], 1)]);
+        topCand->setDiscriminator(discriminator);
+        
+        //Check number of b-tagged jets in the top
+        bool passBrequirements = maxNbInTop_ < 0 || topCand->getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
+        
+        //place in final top list if it passes the threshold
+        if(discriminator > std::min(discriminator_, discOffset_ + topCand->p().Pt()*discSlope_) && passBrequirements)
         {
-            //Prepare data from top candidate (this code is shared with training tuple producer)
-            //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
-
-            //populate tensor based on desired input variables 
-            for(unsigned int i = 0; i < vars_.size(); ++i)
-            {
-                data[i] = varMap[vars_[i]];
-            }
-
-            //predict value
-            TF_SessionRun(session_,
-                          // RunOptions
-                          nullptr,
-                          // Input tensors
-                          inputs_.data(), input_values.data(), inputs_.size(),
-                          // Output tensors
-                          outputs_.data(), output_values.data(), outputs_.size(),
-                          // Target operations
-                          targets_.data(), targets_.size(),
-                          // RunMetadata
-                          nullptr,
-                          // Output status
-                          status);
-
-            if (TF_GetCode(status) != TF_OK)
-            {
-                THROW_TTEXCEPTION("ERROR: Unable to run graph: " + std::string(TF_Message(status)));
-            }
-
-            //Get output discriminator 
-            auto discriminators = static_cast<float*>(TF_TensorData(output_values[0]));            
-            double discriminator = static_cast<double>(discriminators[0]);
-            topCand.setDiscriminator(discriminator);
-            for(auto tensor : output_values) TF_DeleteTensor(tensor);
-            
-            //Check number of b-tagged jets in the top
-            bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
-
-            //place in final top list if it passes the threshold
-            if(discriminator > std::min(discriminator_, discOffset_ + topCand.p().Pt()*discSlope_) && passBrequirements)
-            {
-                tops.push_back(&topCand);
-            }
+            tops.push_back(topCand);
         }
     }
 
     for(auto tensor : input_values)  TF_DeleteTensor(tensor);
+    for(auto tensor : output_values) TF_DeleteTensor(tensor);
 
     TF_DeleteStatus(status);
 #endif
@@ -194,12 +220,12 @@ TTMTensorflow::~TTMTensorflow()
 {
     //tensorflow status variable
     TF_Status* status = TF_NewStatus();
-    
+
     TF_DeleteSession(session_, status);
 
     if (TF_GetCode(status) != TF_OK)
     {
-        THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
+        //THROW_TTEXCEPTION("ERROR: Unable to delete tf session: " + std::string(TF_Message(status)));
     }
 
     TF_DeleteStatus(status);
