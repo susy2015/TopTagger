@@ -134,7 +134,6 @@ namespace ttUtility
         //Safety check that jet and b-tag vectors are the same length
         if(jetsLVec_->size() != tau1_->size() || jetsLVec_->size() != tau2_->size() || jetsLVec_->size() != tau3_->size() || jetsLVec_->size() != softDropMass_->size())
         {
-	    std::cout << jetsLVec_->size() << " " << tau1_->size() << " " << tau2_->size()<< " " << tau3_->size() << " " << softDropMass_->size()<<std::endl;
             THROW_TTEXCEPTION("Unequal AK8 vector size!!!!!!!\n");
         }
 
