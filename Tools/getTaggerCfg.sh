@@ -6,6 +6,7 @@ REPO_NAME=TopTaggerCfg
 CFG_DIRECTORY=$PWD
 TAG=
 NO_SOFTLINK=
+OVERWRITE=
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -24,13 +25,14 @@ function print_help {
     echo "-t RELEASE_TAG :         This is the github release tag to check out (required option)"
     echo "-d checkout_directory :  This is the directory where the configuration files will be downloaded to (default: .)"
     echo "-f cfg_filename :        Specify this option to name the softlink to the cfg file something other than \"TopTagger.cfg\""
+    echo "-o :                     Overwrite the softlinks if they already exist"
     echo "-n :                     Download files without producing softlinks"
 }
 
 
 # Initialize our own variables:
 
-while getopts "h?d:f:t:n" opt; do
+while getopts "h?d:f:t:no" opt; do
     case "$opt" in
     h|\?)
         print_help
@@ -41,6 +43,8 @@ while getopts "h?d:f:t:n" opt; do
     f)  TOP_CFG_NAME=$OPTARG
         ;;
     t)  TAG=$OPTARG
+        ;;
+    o) OVERWRITE="-f"
         ;;
     n) NO_SOFTLINK=NO
         ;;
@@ -127,11 +131,11 @@ cd $STARTING_DIR
 
 if [[ -z $NO_SOFTLINK ]]
 then
-    ln -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
+    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
     if [[ ! -z ${MVAFILES// } ]] 
     then
         for MVAFILE in $MVAFILES; do
-            ln -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
         done
     fi
 fi
