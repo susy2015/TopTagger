@@ -59,8 +59,6 @@ static std::string embeddedTensorflowScript = ""
 "\n"
 "def eval_session_shot(inputs, outputs):\n"
 "    tfw.eval_session(inputs, outputs)\n"
-"    print inputs\n"
-"    print outputs\n"
 "";
 #endif
 
