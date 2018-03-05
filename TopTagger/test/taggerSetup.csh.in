@@ -28,9 +28,9 @@ if ( "$OSNAME" == "Darwin" ) then
 	setenv DYLD_LIBRARY_PATH ${TAGGERDIR}:${DYLD_LIBRARY_PATH}
     endif
 else
-    if (! $?var) then
-        setenv LD_LIBRARY_PATH
-    endif
+    #if ( ! ($?var) ) then
+    #    setenv LD_LIBRARY_PATH
+    #endif
 
     if ! ( $LD_LIBRARY_PATH:q =~ *$OPENCVPATH:q*) then
         if ! ( "${OPENCVPATH}" == "" ) then
