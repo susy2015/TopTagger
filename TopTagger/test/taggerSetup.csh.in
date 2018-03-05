@@ -2,6 +2,7 @@ set OPENCVPATH=@OPENCVDIR@
 set XGBOOSTPATH=@XGBOOSTDIR@
 set TENSORFLOWPATH=@TENSORFLOWDIR@
 set TAGGERDIR=@TAGGERDIR@/TopTagger/test
+set SCRIPTDIR=@TAGGERDIR@/TopTagger/scripts
 
 set OSNAME=`uname -s`
 if ( "$OSNAME" == "Darwin" ) then
@@ -27,6 +28,10 @@ if ( "$OSNAME" == "Darwin" ) then
 	setenv DYLD_LIBRARY_PATH ${TAGGERDIR}:${DYLD_LIBRARY_PATH}
     endif
 else
+    if (! $?var) then
+        setenv LD_LIBRARY_PATH
+    endif
+
     if ! ( $LD_LIBRARY_PATH:q =~ *$OPENCVPATH:q*) then
         if ! ( "${OPENCVPATH}" == "" ) then
             setenv LD_LIBRARY_PATH ${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
@@ -48,4 +53,8 @@ else
     if ! ( $LD_LIBRARY_PATH:q =~ *$TAGGERDIR:q* ) then
 	setenv LD_LIBRARY_PATH ${TAGGERDIR}:${LD_LIBRARY_PATH}
     endif
+endif
+
+if ! ( $PATH:q =~ *$SCRIPTDIR:q* ) then
+    setenv PATH ${SCRIPTDIR}:${PATH}
 endif

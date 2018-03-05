@@ -49,7 +49,7 @@ The example executable is compiled along with the standalone library as describe
 #do once per terminal if opencv or the top tagger are not installed system wide
 source taggerSetup.sh
 #do once in any directory where you will run the top tagger example
-../../Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
+getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 #run the example code
 ./topTaggerTest
 ``` 

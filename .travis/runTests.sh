@@ -25,7 +25,7 @@ echo "========================================================================="
 make -j
 echo "========================================================================="
 source taggerSetup.sh
-$TRAVIS_BUILD_DIR/Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0
+getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 ./topTaggerTest
 echo "========================================================================="
 cd ../..
