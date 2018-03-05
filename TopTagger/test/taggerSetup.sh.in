@@ -2,6 +2,7 @@ OPENCVPATH=@OPENCVDIR@
 XGBOOSTPATH=@XGBOOSTDIR@
 TENSORFLOWPATH=@TENSORFLOWDIR@
 TAGGERDIR=@TAGGERDIR@/TopTagger/test
+SCRIPTDIR=@TAGGERDIR@/TopTagger/scripts
 
 OSNAME=$(uname -s)
 if [[ "$OSNAME" == "Darwin" ]]; then
@@ -36,4 +37,9 @@ else
     if [[ $LD_LIBRARY_PATH != *"${TENSORFLOWPATH}"* ]]; then
 	export LD_LIBRARY_PATH=${TENSORFLOWPATH}:${LD_LIBRARY_PATH}
     fi
+fi
+
+
+if [[ $PATH != *"${SCRIPTDIR}"* ]]; then
+    export PATH=${SCRIPTDIR}:${PATH}
 fi
