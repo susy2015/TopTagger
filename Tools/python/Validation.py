@@ -157,13 +157,6 @@ if options.dataFilePath != None:
         options.dataFilePath += "/"
     trainingOptions.runOp.dataPath = options.dataFilePath
 
-if options.sklrf:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
-elif options.xgboost:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
-else:
-    dataTTbarName = "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
-
 
 def getData(dataName):
     if ".pkl" in dataName:
@@ -227,14 +220,6 @@ dataTTbarAll = dataTTbarAll[dataTTbarAll.Njet >= 4]
 dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
-
-#Training data for overfitting check
-if options.sklrf:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
-elif options.xgboost:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
-else:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
 
 dataTTbarAllTrain, dataTTbarGenTrain = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_0_TTbarSingleLepTbar_training_0.h5")
 
