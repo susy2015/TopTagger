@@ -12,6 +12,38 @@ class CreateModel:
         initial = tf.constant(0.01, shape=shape, name=name)
         return tf.Variable(initial)
     
+
+    #See https://r2rt.com/implementing-batch-normalization-in-tensorflow.html
+    # this is a simpler version of Tensorflow's 'official' version. See:
+    # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/layers/python/layers/layers.py#L102
+    def batch_norm_wrapper(self, inputs, is_training, decay = 0.999, suffix="None"):
+
+        epsilon = 1e-3
+
+        if suffix == "None":
+            scale = tf.Variable(tf.ones([inputs.get_shape()[-1]]))
+            beta = tf.Variable(tf.zeros([inputs.get_shape()[-1]]))
+            pop_mean = tf.Variable(tf.zeros([inputs.get_shape()[-1]]), trainable=False)
+            pop_var = tf.Variable(tf.ones([inputs.get_shape()[-1]]), trainable=False)
+        else:
+            scale = tf.Variable(tf.ones([inputs.get_shape()[-1]]),name="bns_"+suffix)
+            beta = tf.Variable(tf.zeros([inputs.get_shape()[-1]]),name="bnb_"+suffix)
+            pop_mean = tf.Variable(tf.zeros([inputs.get_shape()[-1]]), trainable=False, name="bnpm_"+suffix)
+            pop_var = tf.Variable(tf.ones([inputs.get_shape()[-1]]), trainable=False, name="bnpv_"+suffix)
+
+        if is_training:
+            batch_mean, batch_var = tf.nn.moments(inputs,[0])
+            train_mean = tf.assign(pop_mean,
+                               pop_mean * decay + batch_mean * (1 - decay))
+            train_var = tf.assign(pop_var,
+                              pop_var * decay + batch_var * (1 - decay))
+            with tf.control_dependencies([train_mean, train_var]):
+                return tf.nn.batch_normalization(inputs,
+                    batch_mean, batch_var, beta, scale, epsilon)
+        else:
+            return tf.nn.batch_normalization(inputs,
+                pop_mean, pop_var, beta, scale, epsilon)
+
     def createRecurentLayers(self, inputs, nodes=0, layers=0, keep_prob=1.0, share=None):
         #define variable scope
         with tf.variable_scope("rnn") as scope:
@@ -61,8 +93,12 @@ class CreateModel:
 
         return denseInputLayer
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, prefix="", batchNormalize = False):
         with tf.variable_scope("dense") as scope:
+
+            if prefix=="_ph": is_training = False
+            else: is_training = True
+
             #constants 
             NLayer = len(nnStruct)
             
@@ -81,7 +117,13 @@ class CreateModel:
             # create hidden layers 
             for layer in xrange(1, NLayer - 1):
                 #use relu for hidden layers as this seems to give best result
-                addResult = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix))
+
+                if batchNormalize:
+                    addResult = self.batch_norm_wrapper(tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix)), is_training, suffix=str(layer-1))
+                else:
+                    addResult = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix))
+
+
                 if self.options.netOp.denseActivationFunc == "relu":
                     layerOutput = tf.nn.relu(addResult, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "sigmoid":
@@ -174,8 +216,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob)
-        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, prefix="_ph")
+        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, batchNormalize = self.options.netOp.batchNormalize)
+        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, prefix="_ph", batchNormalize = self.options.netOp.batchNormalize)
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")

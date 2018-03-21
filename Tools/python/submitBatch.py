@@ -6,7 +6,7 @@ import errno
 #from generic import *
 import imp
 
-qsubStr = "qsub -q gpu -l nodes=1:ppn=36 "
+qsubStr = "qsub -q gpu -l nodes=gpu001:ppn=36 "
 
 class SubmitJobs:
 
@@ -107,8 +107,15 @@ if __name__ == '__main__':
    parser.add_option('-c', "--cfgfile", dest = 'cfgfile', action = 'store',                                        help = "Example configfile from which to draw default values")
    parser.add_option('-p', "--prefix" , dest = 'prefix',  action = 'store', default = "batch",                     help = "Prefix to use in config identification")
    parser.add_option('-m', "--makejob", dest = 'makejob', action = 'store',                                        help = "Code to produce the jobs in the batch")
+   parser.add_option('-n', "--node", dest = 'node', action = 'store', default = "gpu001", help = "Specify specific node to which the jobs will be submitted (default: gpu001)")
 
    options, _ = parser.parse_args()   
+
+   #Let's specify the correct node
+   if options.node != "gpu001" and options.node != "gpu002" and options.node !="1":
+      print options.node, "is not an acceptable option. Please specify gpu001 or gpu002"
+   else:
+      qsubStr = "qsub -q gpu -l nodes="+options.node+":ppn=36 "
 
    #We need to load the makeJobs code
    batchCode = imp.load_source("batchCode",options.makejob)

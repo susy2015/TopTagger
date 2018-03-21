@@ -407,7 +407,8 @@ class networkOptions:
                       convNConstituents   = 3,
                       convFilterWidth     = 1,
                       useCNN              = True,
-                      useRNN              = True):
+                      useRNN              = True,
+                      batchNormalize      = False):
 
       self.networkName      = networkName
       self.inputVariables   = inputVariables
@@ -425,6 +426,7 @@ class networkOptions:
 
       self.useCNN            = useCNN
       self.useRNN            = useRNN
+      self.batchNormalize    = batchNormalize
 
       self.cleanUp()
 
@@ -448,6 +450,7 @@ class networkOptions:
 
       parser.add_option ('-v', "--variables", dest='variables', action='store', help="Input features to use (default TeamAlpha)")
       parser.add_option ('-m', "--modelCfg",  dest="modelJSON", action='store', help="JSON with model definitions")
+      parser.add_option ('-z', "--batchNormalize",  dest="batchNormalize", action='store_true', help="Enable batch normalization of dense network layers")
 
       return parser    
 
@@ -461,7 +464,10 @@ class networkOptions:
    #This methods will take options provided by the parser, and if it is not the default value, it will what is currently saved
    def override(self, cloptions):
 
-      returnMessage = None
+      returnMessage = []
+      if cloptions.batchNormalize == True:
+         self.batchNormalize = cloptions.batchNormalize
+         returnMessage.append("Batch normalization enabled")
       if cloptions.modelJSON != None:
          try:
             f = open(cloptions.modelJSON,"r")
@@ -472,7 +478,7 @@ class networkOptions:
          else:
             print "Loading",cloptions.variables,"from",cloptions.modelJSON
             self.vNames = cfgs[cloptions.variables] #the json file is a dictionary, cloptions.variables specifies the key to use
-            returnMessage = "Loaded "+cloptions.variables+" from "+cloptions.modelJSON 
+            returnMessage.append("Loaded "+cloptions.variables+" from "+cloptions.modelJSON) 
 
       elif cloptions.variables != None:
          inputVariables, jetVariables = StandardVariables(cloptions.variables)
@@ -486,13 +492,13 @@ class networkOptions:
          #split categories from variables
          self.vNames, self.vCategories = splitVarAndCatagory(self.inputVariables+self.jetVariablesList)
 
-         returnMessage = "Loaded standard input variables named "+cloptions.variables
+         returnMessage.append("Loaded standard input variables named "+cloptions.variables)
 
-      if returnMessage == None:
-         returnMessage = "No networkOptions overriden by command-line"
+      if len(returnMessage) == 0:
+         returnMessage.append("No networkOptions overriden by command-line")
 
       self.cleanUp()
-      return returnMessage
+      return str(returnMessage)
       
 
    @classmethod
