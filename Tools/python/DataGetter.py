@@ -59,7 +59,11 @@ class DataGetter:
         
         import h5py
         for sample in samplesToRun:
-          f = h5py.File(sample, "r")
+          try:
+            f = h5py.File(sample, "r")
+          except IOError:
+            print "Cannot read file: ", sample
+            return {"data":numpy.array([]), "labels":numpy.array([]), "weights":numpy.array([]), "":numpy.array([])}
           npData = f["reco_candidates"][:]
           columnHeaders = f["reco_candidates"].attrs["column_headers"]
         
