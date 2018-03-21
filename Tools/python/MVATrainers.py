@@ -160,7 +160,9 @@ def mainTF(options):
     i = 0
     try:
       while not coord.should_stop():
-        _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
+        extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        
+        _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op,extra_update_ops[:len(extra_update_ops)/2]], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         summary_writer.add_summary(summary, i)
         i += 1
 
