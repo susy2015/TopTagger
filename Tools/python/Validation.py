@@ -157,13 +157,6 @@ if options.dataFilePath != None:
         options.dataFilePath += "/"
     trainingOptions.runOp.dataPath = options.dataFilePath
 
-if options.sklrf:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation_100K_0.h5"
-elif options.xgboost:
-    dataTTbarName = trainingOptions.runOp.dataPath + "/trainingTuple_division_1_TTbarSingleLep_validation.pkl.gz"
-else:
-    dataTTbarName = "/trainingTuple_TTbarSingleLepT_0_division_2_TTbarSingleLepT_test_0.h5"
-
 
 def getData(dataName):
     if ".pkl" in dataName:
@@ -228,14 +221,6 @@ dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
-#Training data for overfitting check
-if options.sklrf:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training_1M_0.h5"
-elif options.xgboost:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_division_0_TTbarSingleLep_training.pkl.gz"
-else:
-    dataTTbarNameTrain = trainingOptions.runOp.dataPath + "/trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5"
-
 dataTTbarAllTrain, dataTTbarGenTrain = getDataTTbar("trainingTuple_TTbarSingleLepT_0_division_0_TTbarSingleLepT_training_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_0_TTbarSingleLepTbar_training_0.h5")
 
 #Apply baseline cuts
@@ -257,11 +242,9 @@ if options.sklrf:
 
     dataTTbarAnsTrain = clf1.predict_proba(dataTTbarTrain.as_matrix(varsname))[:,1]
 
-    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
-    discCutTTbar[discCutTTbar > 0.97] = 0.97
+    discCutTTbar = numpy.array([discCut]*len(dataTTbarAns))
 
-    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
-    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+    discCutTTbarTrain = numpy.array([discCut]*len(dataTTbarAnsTrain))
 
 elif options.xgboost:
     xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
@@ -270,11 +253,9 @@ elif options.xgboost:
     xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
     dataTTbarAnsTrain = bst.predict(xgb.DMatrix(dataTTbarTrain.as_matrix(varsname)))
 
-    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
-    discCutTTbar[discCutTTbar > 0.97] = 0.97
+    discCutTTbar = numpy.array([discCut]*len(dataTTbarAns))
 
-    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
-    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+    discCutTTbarTrain = numpy.array([discCut]*len(dataTTbarAnsTrain))
 
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
@@ -537,15 +518,14 @@ print "CALCULATING ZNUNU DISCRIMINATORS"
 if options.sklrf:
     dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
 
-    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
+    discCutZnunu = numpy.array([discCut]*len(dataZnunuAns))
     discCutZnunu[discCutZnunu > 0.97] = 0.97
 
 elif options.xgboost:
     xgData = xgb.DMatrix(dataZnunu.as_matrix(varsname))
     dataZnunuAns = bst.predict(xgData)
 
-    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
-    discCutZnunu[discCutZnunu > 0.97] = 0.97
+    discCutZnunu = numpy.array([discCut]*len(dataZnunuAns))
 
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]

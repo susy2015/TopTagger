@@ -62,6 +62,14 @@ def StandardVariables(variables):
       vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW"]
       jNames = ["p", "m", "CSV", "qgAxis1", "qgMult", "qgPtD"]
 
+   elif variables == "Intermediate":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW"]
+      jNames = ["p", "m", "CSV", "qgAxis1", "qgMult", "qgPtD", "CvsL", "CvsB"]
+
+   elif variables == "Intermediate_less":
+      vNames = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW"]
+      jNames = ["m", "CSV", "qgAxis1", "qgMult", "qgPtD", "CvsL", "CvsB"]
+
    elif variables == "MixedDeepCSV":
       vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13", "dRPtTop", "dRPtW", "sd_n2"]
       jNames = ["p", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab", "DeepCSVb", "DeepCSVbb", "DeepCSVc", "DeepCSVcc", "DeepCSVl"]
@@ -211,7 +219,7 @@ class runOptions:
                       nepoch            = 50,
                       nReaders          = 4,
                       nThreadperReader  = 1,
-                      minibatchSize     = 512,
+                      minibatchSize     = 2048,
                       reportInterval    = 500,
                       nValidationEvents = 100000,
                       l2Reg             = 0.002,
@@ -219,8 +227,8 @@ class runOptions:
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.5,
-                      nTrainingFiles    = 100):
+                      keepProb          = 0.4,
+                      nTrainingFiles    = 200):
 
       self.runName           = runName
       self.directory         = directory
@@ -235,7 +243,7 @@ class runOptions:
 
       if self.dataPath[-1] != "/": self.dataPath += "/"
 
-      self.trainingGlob      = ["trainingTuple_TTbarSingleLepT_*_division_0_TTbarSingleLepT_training_[0123].h5", "trainingTuple_TTbarSingleLepTbar_*_division_0_TTbarSingleLepTbar_training_[0123].h5"]
+      self.trainingGlob      = ["trainingTuple_TTbarSingleLepT_*_division_0_TTbarSingleLepT_training_*.h5", "trainingTuple_TTbarSingleLepTbar_*_division_0_TTbarSingleLepTbar_training_*.h5", "trainingTuple_ZJetsToNuNu_HT_*_*_division_0_ZJetsToNuNu_HT_*_training_*.h5"]
       
       if(len(trainingNames) > 0):
          self.trainingNames = trainingNames
@@ -399,11 +407,11 @@ class networkOptions:
    def __init__(self, networkName         = "Network test Configuration (name not set)",
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
-                      denseLayers         = [400, 200],
+                      denseLayers         = [300, 100],
                       denseActivationFunc = "relu",
                       convLayers          = [],
                       rnnNodes            = 30,
-                      rnnLayers           = 2,
+                      rnnLayers           = 1,
                       convNConstituents   = 3,
                       convFilterWidth     = 1,
                       useCNN              = True,

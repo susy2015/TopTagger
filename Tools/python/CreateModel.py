@@ -61,14 +61,15 @@ class CreateModel:
 
         return denseInputLayer
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, training = False, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
+            share = len(prefix) > 0
             
             #variables
             h_fc = {}
-            
+
             # Fully connected input layer
             if not 0 in w_fc:
                 w_fc[0] = self.weight_variable([int(denseInputLayer.shape[1]), nnStruct[1]], name="w_fc0")
@@ -76,7 +77,7 @@ class CreateModel:
                 b_fc[0] = self.bias_variable([nnStruct[1]], name="b_fc0")
             
             #h_fc[0] = tf.nn.dropout(denseInputLayer, keep_prob)
-            h_fc[0] = denseInputLayer
+            h_fc[0] = tf.layers.batch_normalization(denseInputLayer, training=training, reuse=share, trainable=not share, name="layer0_bn")
             
             # create hidden layers 
             for layer in xrange(1, NLayer - 1):
@@ -90,7 +91,7 @@ class CreateModel:
                     layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "none":
                     layerOutput = addResult
-                h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
+                h_fc[layer] = tf.layers.batch_normalization(tf.nn.dropout(layerOutput, keep_prob), training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
                 
                 # Map the features to next layer
                 if not layer in w_fc:
@@ -118,6 +119,7 @@ class CreateModel:
             throw
         
         self.keep_prob = tf.placeholder_with_default(1.0, [], name="keep_prob")
+        self.training = tf.placeholder_with_default(False, [], name="training")
 
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
@@ -174,8 +176,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob)
-        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, prefix="_ph")
+        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training)
+        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training, prefix="_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
@@ -188,8 +190,11 @@ class CreateModel:
         tf.add_to_collection('TrainInfo', self.x)
         tf.add_to_collection('TrainInfo', self.y)
         
-        self.cross_entropy    = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    weights=tf.reshape(self.wgt, [-1]),    reduction=tf.losses.Reduction.MEAN)
-        self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
+        #self.cross_entropy    = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    weights=tf.reshape(self.wgt, [-1]),    reduction=tf.losses.Reduction.MEAN)
+        #self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
+        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
+
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
