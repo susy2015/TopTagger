@@ -242,11 +242,9 @@ if options.sklrf:
 
     dataTTbarAnsTrain = clf1.predict_proba(dataTTbarTrain.as_matrix(varsname))[:,1]
 
-    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
-    discCutTTbar[discCutTTbar > 0.97] = 0.97
+    discCutTTbar = numpy.array([discCut]*len(dataTTbarAns))
 
-    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
-    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+    discCutTTbarTrain = numpy.array([discCut]*len(dataTTbarAnsTrain))
 
 elif options.xgboost:
     xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
@@ -255,11 +253,9 @@ elif options.xgboost:
     xgData = xgb.DMatrix(dataTTbar.as_matrix(varsname))
     dataTTbarAnsTrain = bst.predict(xgb.DMatrix(dataTTbarTrain.as_matrix(varsname)))
 
-    discCutTTbar = numpy.array([0.85]*len(dataTTbarAns))
-    discCutTTbar[discCutTTbar > 0.97] = 0.97
+    discCutTTbar = numpy.array([discCut]*len(dataTTbarAns))
 
-    discCutTTbarTrain = numpy.array([0.85]*len(dataTTbarAnsTrain))
-    discCutTTbarTrain[discCutTTbarTrain > 0.97] = 0.97
+    discCutTTbarTrain = numpy.array([discCut]*len(dataTTbarAnsTrain))
 
 else:
     dataTTbarAns = sess.run(y_train, feed_dict={x: dataTTbar.as_matrix(varsname)})[:,0]
@@ -522,15 +518,14 @@ print "CALCULATING ZNUNU DISCRIMINATORS"
 if options.sklrf:
     dataZnunuAns = clf1.predict_proba(dataZnunu.as_matrix(varsname))[:,1]
 
-    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
+    discCutZnunu = numpy.array([discCut]*len(dataZnunuAns))
     discCutZnunu[discCutZnunu > 0.97] = 0.97
 
 elif options.xgboost:
     xgData = xgb.DMatrix(dataZnunu.as_matrix(varsname))
     dataZnunuAns = bst.predict(xgData)
 
-    discCutZnunu = numpy.array([0.85]*len(dataZnunuAns))
-    discCutZnunu[discCutZnunu > 0.97] = 0.97
+    discCutZnunu = numpy.array([discCut]*len(dataZnunuAns))
 
 else:
     dataZnunuAns = sess.run(y_train, feed_dict={x: dataZnunu.as_matrix(varsname)})[:,0]
