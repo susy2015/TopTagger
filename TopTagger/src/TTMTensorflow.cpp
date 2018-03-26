@@ -120,7 +120,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     varCalculator_->mapVars(vars_);
 
 #else
-    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow support!!!");
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow c-api support!!!");
 #endif
 }
 
