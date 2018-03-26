@@ -36,7 +36,7 @@ INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
 INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
 
 #hdf5 include dir
-INCLUDESDIRS  += -L$(HDF5_DIRECTORY)/$(HDF5_INC_DIRECTORY)
+INCLUDESDIRS  += -I$(HDF5_DIRECTORY)/$(HDF5_INC_DIRECTORY)
 
 ## Include ROOT
 INCLUDESDIRS  += $(shell root-config --cflags)
@@ -55,7 +55,7 @@ LIBS       = $(shell root-config --glibs)
 LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
 
 # hdf5 libs
-LIBS += -I$(HDF5_DIRECTORY)/lib -lhdf5
+LIBS += -L$(HDF5_DIRECTORY)/lib -lhdf5
 
 
 # tagger libraries
