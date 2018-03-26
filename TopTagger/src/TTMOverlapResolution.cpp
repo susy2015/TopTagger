@@ -25,23 +25,12 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
     NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
     sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "EMPTY");
-}
 
-void TTMOverlapResolution::run(TopTaggerResults& ttResults)
-{
-    //Get list of constituents used to construct tops
-    const std::vector< Constituent>& constituents = ttResults.getConstituents();
-
-    //Get vector of final tops to prune
-    std::vector<TopObject*>& tops = ttResults.getTops();
-
-    //This container will kep trach of which jets have been included in final tops
-    std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
-
-    //Sort the top vector for overlap resolution
+    //select the approperiate sorting function 
+    doSort_ = true;  //sort true unless option "none" is selected
     if(sortMethod_.compare("topMass") == 0)
     {
-        auto sortFunc = [this](TopObject* t1, TopObject* t2)
+        sortFunc_ = [this](const TopObject* t1, const TopObject* t2)
         {
             double m1 = -999.9, m2 = -999.9;
             const auto& constVec1 = t1->getConstituents();
@@ -95,19 +84,18 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             }
             return fabs(m1 - this->mt_) < fabs(m2 - this->mt_); 
         };
-        std::sort(tops.begin(), tops.end(), sortFunc);
     }
     else if(sortMethod_.compare("topPt") == 0)
     {
-        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->p().Pt() > t2->p().Pt(); } );
+        sortFunc_ = [this](const TopObject* t1, const TopObject* t2){ return t1->p().Pt() > t2->p().Pt(); };
     }
     else if(sortMethod_.compare("mvaDisc") == 0)
     {
-        std::sort(tops.begin(), tops.end(), [this](TopObject* t1, TopObject* t2){ return t1->getDiscriminator() > t2->getDiscriminator(); } );
+        sortFunc_ = [this](const TopObject* t1, const TopObject* t2){ return t1->getDiscriminator() > t2->getDiscriminator(); };
     }
     else if(sortMethod_.compare("mvaDiscWithb") == 0)
     {
-        auto sortFunc = [this](TopObject* t1, TopObject* t2)
+        sortFunc_ = [this](const TopObject* t1, const TopObject* t2)
         {
             int nb1 = t1->getNBConstituents(cvsThreshold_);
             int nb2 = t2->getNBConstituents(cvsThreshold_);
@@ -121,17 +109,32 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
             return false;
         };
-        std::sort(tops.begin(), tops.end(), sortFunc);
     }
     else if(sortMethod_.compare("none") == 0)
     {
         //do nothing 
+        doSort_ = false;
     }
     else
     {
         THROW_TTEXCEPTION("Invalid sorting option");
     }
 
+}
+
+void TTMOverlapResolution::run(TopTaggerResults& ttResults)
+{
+    //Get list of constituents used to construct tops
+    const std::vector< Constituent>& constituents = ttResults.getConstituents();
+
+    //Get vector of final tops to prune
+    std::vector<TopObject*>& tops = ttResults.getTops();
+
+    //This container will kep trach of which jets have been included in final tops
+    std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
+
+    //Sort the top vector for overlap resolution
+    if(doSort_) std::sort(tops.begin(), tops.end(), sortFunc_);
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
