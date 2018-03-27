@@ -895,7 +895,7 @@ namespace ttUtility
     {
         if(checkCand(topCand))
         {
-            std::map<std::string, double> varMap;
+            //std::map<std::string, double> varMap;
 
             //Get top candidate variables
             if(cand_pt_ >= 0)        *(basePtr_ + cand_pt_ + len_*iCand)        = topCand.p().Pt();
@@ -941,10 +941,10 @@ namespace ttUtility
                 if(j12_m_lab_[i] >= 0) *(basePtr_ + j12_m_lab_[i] + len_*iCand) = jetPair.M();
             }
 
-            if(dRPtTop_ >= 0) *(basePtr_ + dRPtTop_ + len_*iCand) = varMap["dR1_23_lab"] * varMap["cand_pt"];
-            if(dRPtW_ >= 0) *(basePtr_ + dRPtW_ + len_*iCand) = varMap["dR23_lab"] * (top_constituents[1]->p() + top_constituents[2]->p()).Pt();
-            double var_sd_0 = top_constituents[2]->p().Pt()/(top_constituents[1]->p().Pt()+top_constituents[2]->p().Pt());
-            if(sd_n2_ >= 0) *(basePtr_ + sd_n2_ + len_*iCand) = var_sd_0/std::pow(varMap["dR23_lab"], -2);
+            if(dRPtTop_ >= 0) *(basePtr_ + dRPtTop_ + len_*iCand) = ROOT::Math::VectorUtil::DeltaR(top_constituents[0]->p(), top_constituents[1]->p() + top_constituents[2]->p()) * topCand.p().Pt();
+            if(dRPtW_ >= 0) *(basePtr_ + dRPtW_ + len_*iCand) = ROOT::Math::VectorUtil::DeltaR(top_constituents[1]->p(), top_constituents[2]->p()) * (top_constituents[1]->p() + top_constituents[2]->p()).Pt();
+            //double var_sd_0 = top_constituents[2]->p().Pt()/(top_constituents[1]->p().Pt()+top_constituents[2]->p().Pt());
+            //if(sd_n2_ >= 0) *(basePtr_ + sd_n2_ + len_*iCand) = var_sd_0/std::pow(varMap["dR23_lab"], -2);
 
             std::vector<Constituent> RF_constituents;
 
