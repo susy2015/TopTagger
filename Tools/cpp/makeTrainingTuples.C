@@ -65,33 +65,11 @@ public:
                 tr.getType(var, type);
                 if(type.find("vector") != std::string::npos)
                 {
-                    //std::cout << type << std::endl;
-                    //if(type.find("*") != std::string::npos)
-                    //{
-                    //    throw "MiniTupleMaker::initBranches(...): Vectors of pointers are not allowed in MiniTuples!!!";
-                    //}
-                    //else
-                    {
-                        //if(type.find("double") != std::string::npos)
-                        {
-                            ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
-                        }
-                        //else
-                        //{
-                        //throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;           
-                        //}
-                    }
+                    ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
                 }
                 else
                 {
-                    //if(type.find("double") != std::string::npos)
-                    {
-                        ptrPair.push_back(std::make_pair(false, tr.getPtr(var)));
-                    }
-                    //else
-                    //{
-                    //    throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;
-                    //}
+                    ptrPair.push_back(std::make_pair(false, tr.getPtr(var)));
                 }
             }
         }
@@ -207,15 +185,10 @@ private:
     template<typename T>
     class VariableHolder
     {
-    public:
+    private:
         NTupleReader* tr_;
+    public:
         std::map<std::string, std::vector<T>*> variables_;
-        std::set<std::string> allowedVars_;
-
-        VariableHolder(NTupleReader& tr, const std::set<std::string>& vars) : tr_(&tr), allowedVars_(vars)
-        {
-            for(const auto& var : allowedVars_) variables_[var] = nullptr;
-        }
 
         void add(const std::string& key, const T& var)
         {
@@ -227,31 +200,20 @@ private:
             variables_[key]->push_back(var);
         }
 
-        std::set<std::string> getKeys()
-        {
-            return allowedVars_;
-        }
-
         void registerFunctions()
         {
             for(auto& entry : variables_)
             {
-//                if(allowedVars_.count(entry.first))
-                {
-                    if(entry.second == nullptr) entry.second = new std::vector<T>();
-                    tr_->registerDerivedVec(entry.first, entry.second);
-                }
-//                else
-//                {
-//                    THROW_SATEXCEPTION("You must add variable \"" + entry.first + "\" to allowedVars_");
-//                }
+                if(entry.second == nullptr) entry.second = new std::vector<T>();
+                tr_->registerDerivedVec(entry.first, entry.second);
             }
         }
+
+        VariableHolder(NTupleReader& tr) : tr_(&tr) {}
     };
   
     TopTagger* topTagger_;
     TopCat topMatcher_;
-    std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
     int eventNum_, bgPrescale_;
     const std::map<std::string, std::vector<std::string>>& variables_;
     std::shared_ptr<ttUtility::MVAInputCalculator> mvaCalc_;
@@ -359,24 +321,15 @@ private:
 
         //Get gen matching results
 
-        std::vector<TLorentzVector> genTops = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-
-        std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-
-        std::vector<double> *genMatchdR = new std::vector<double>();//genMatches.first);
-        std::vector<double> *genMatchConst = new std::vector<double>();//genMatches.second.first);
+        std::vector<double> *genMatchdR = new std::vector<double>();
+        std::vector<double> *genMatchConst = new std::vector<double>();
         std::vector<double> *genMatchVec = new std::vector<double>();
-        //for(const auto& vec : genMatches.second.second)
-        //{
-        //    genMatchVec->push_back(vec.Pt());
-        //}
 
         //Class which holds and registers vectors of variables
-        //Annoyingly this list of variables to expect is necessary
-        VariableHolder<double> vh(tr, allowedVarsD_);
+        VariableHolder<double> vh(tr);
 
         //prepare a vector of gen top pt
-        for(auto& genTop : genTops) vh.add("genTopPt", genTop.Pt());
+        for(auto& genTop : hadGenTops) vh.add("genTopPt", genTop.Pt());
 
         std::vector<double>* candNum = new std::vector<double>();
         int iTop = 0;
@@ -406,16 +359,16 @@ private:
                 genMatchdR->push_back(hasBestMatch);
                 genMatchVec->push_back(bestMatchPt);
 
-                mvaCalc_->setPtr(&values_.front());
+                mvaCalc_->setPtr(values_.data());
                 if(mvaCalc_->calculateVars(topCand, 0))
                 {
                     for(int i = 0; i < varNames.size(); ++i)
                     {
-                        if(values_[i] < std::numeric_limits<float>::max()) vh.add(varNames[i], values_[i]);
+                        if(values_[i] < std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max()) vh.add(varNames[i], values_[i]);
                     }
                 }
             }
-            if(bgPrescale_ >= 7) bgPrescale_ = 0;
+            if(bgPrescale_ >= 1) bgPrescale_ = 0;
         }
 
 
@@ -448,7 +401,7 @@ private:
     }
 
 public:
-    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<float>::max())
+    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max())
     {
         eventNum_ = 0;
         bgPrescale_ = 0;
@@ -602,7 +555,7 @@ int main(int argc, char* argv[])
                              "j1_DeepCSVl",
                              "j1_ElectronEnergyFraction",
                              "j1_ElectronMultiplicity",
-                             "j1_JetBprob",
+//                             "j1_JetBprob",
                              "j1_JetProba",
                              "j1_MuonMultiplicity",
                              "j1_NeutralHadronMultiplicity",
@@ -624,7 +577,7 @@ int main(int argc, char* argv[])
                              "j1_qgMult_lab",
                              "j1_qgPtD",
                              "j1_qgPtD_lab",
-                             "j1_recoJetsCharge",
+//                             "j1_recoJetsCharge",
                              "j1_recoJetsHFEMEnergyFraction",
                              "j1_recoJetsHFHadronEnergyFraction",
                              "j1_recoJetsJecScaleRawToFull",
@@ -648,7 +601,7 @@ int main(int argc, char* argv[])
                              "j2_DeepCSVl",
                              "j2_ElectronEnergyFraction",
                              "j2_ElectronMultiplicity",
-                             "j2_JetBprob",
+//                             "j2_JetBprob",
                              "j2_JetProba",
                              "j2_MuonMultiplicity",
                              "j2_NeutralHadronMultiplicity",
@@ -670,7 +623,7 @@ int main(int argc, char* argv[])
                              "j2_qgMult_lab",
                              "j2_qgPtD",
                              "j2_qgPtD_lab",
-                             "j2_recoJetsCharge",
+//                             "j2_recoJetsCharge",
                              "j2_recoJetsHFEMEnergyFraction",
                              "j2_recoJetsHFHadronEnergyFraction",
                              "j2_recoJetsJecScaleRawToFull",
@@ -692,7 +645,7 @@ int main(int argc, char* argv[])
                              "j3_DeepCSVl",
                              "j3_ElectronEnergyFraction",
                              "j3_ElectronMultiplicity",
-                             "j3_JetBprob",
+//                             "j3_JetBprob",
                              "j3_JetProba",
                              "j3_MuonMultiplicity",
                              "j3_NeutralHadronMultiplicity",
@@ -714,7 +667,7 @@ int main(int argc, char* argv[])
                              "j3_qgMult_lab",
                              "j3_qgPtD",
                              "j3_qgPtD_lab",
-                             "j3_recoJetsCharge",
+//                             "j3_recoJetsCharge",
                              "j3_recoJetsHFEMEnergyFraction",
                              "j3_recoJetsHFHadronEnergyFraction",
                              "j3_recoJetsJecScaleRawToFull",
@@ -723,7 +676,7 @@ int main(int argc, char* argv[])
                              "j3_recoJetsmuonEnergyFraction",
                              "j3_recoJetsneutralEmEnergyFraction",
                              "j3_recoJetsneutralEnergyFraction",
-                             "sd_n2",
+//                             "sd_n2",
                              "genTopMatchesVec",
                              "genConstiuentMatchesVec",
                              "genConstMatchGenPtVec",
@@ -747,7 +700,6 @@ int main(int argc, char* argv[])
     };
 
     //parse sample splitting and set up minituples
-    //vector<pair<std::unique_ptr<MiniTupleMaker>, int>> mtmVec;
     vector<pair<std::unique_ptr<HDF5Writer>, int>> mtmVec;
     int sumRatio = 0;
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
@@ -759,7 +711,6 @@ int main(int argc, char* argv[])
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
         else if(iter == 2) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
         else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
-        //mtmVec.emplace_back(std::unique_ptr<MiniTupleMaker>(new MiniTupleMaker(ofname, "slimmedTuple")), splitNum);
         mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 250000, ofname)), splitNum);
     }
 
@@ -821,9 +772,6 @@ int main(int argc, char* argv[])
                             //Initialize the mini tuple branches, needs to be done after first call of tr.getNextEvent()
                             for(auto& mtm : mtmVec)
                             {
-                                //auto varSet = prepVars.getVarSet();
-                                //varSet.insert("sampleWgt");
-                                //mtm.first->setTupleVars(varSet);
                                 mtm.first->initBranches(tr);
                             }
                         }
