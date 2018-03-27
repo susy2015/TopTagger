@@ -5,7 +5,9 @@
 #include "TopTagger/TopTagger/include/TTMFilterBase.h"
 
 #include <string>
+#include <functional>
 
+class TopObject;
 class TopTaggerResults;
 
 /**
@@ -24,6 +26,8 @@ private:
     double mt_, maxTopEta_, dRMatch_, cvsThreshold_;
     int NConstituents_;
     std::string sortMethod_;
+    std::function<bool (const TopObject* t1, const TopObject* t2)> sortFunc_;
+    bool doSort_;
 
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);

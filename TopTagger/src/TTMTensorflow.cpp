@@ -70,6 +70,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
 
     //Create tensorflow session from imported graph
     TF_SessionOptions* sess_opts = TF_NewSessionOptions();
+    //serialized configuration protobuffer indicating to set session intra_op_parallelism setting to 1
     uint8_t config[] = {0x10, 0x01};
     TF_SetConfig(sess_opts, static_cast<void*>(config), 2, status);
     session_ = TF_NewSession(graph, sess_opts, status);
@@ -119,7 +120,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     varCalculator_->mapVars(vars_);
 
 #else
-    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow support!!!");
+    THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow c-api support!!!");
 #endif
 }
 
