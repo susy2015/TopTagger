@@ -8,6 +8,7 @@ from glob import glob
 def mainSKL(options):
 
   from sklearn.ensemble import RandomForestClassifier
+  import xgboost as xgb
   import pickle
 
   print "PROCESSING TRAINING DATA"
@@ -20,13 +21,24 @@ def mainSKL(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
+  dataFiles = []
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_20_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_40_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_60_division_0_TTbarSingleLepT*_training_[01234].h5")
+  print dataFiles
+  trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
-  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 4, verbose = True)
+  clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
+                          gamma=0, learning_rate=0.001, max_delta_step=0, max_depth=6,
+                          min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
+                          objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
+                          scale_pos_weight=1, seed=0, silent=False, subsample=1 )
+  #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
 
   print "TRAINING RF"
-
+  
   # Train random forest 
   clf = clf.fit(trainData["data"], trainData["labels"][:,0], sample_weight=trainData["weights"][:,0])
   
@@ -50,15 +62,15 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_0.h5")), prescale=True, ptReweight=options.ptReweight)
+  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[0].h5")), prescale=True, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
   # Create xgboost classifier
   # Train random forest 
-  xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0], weight=trainData["weights"][:,0])
-  param = {'max_depth':6, 'eta':0.05, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'] }
-  gbm = xgb.train(param, xgData, num_boost_round=2000)
+  xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0])#, weight=trainData["weights"][:,0])
+  param = {'max_depth':6, 'eta':0.05, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'], 'nthread':28 }
+  gbm = xgb.train(param, xgData, num_boost_round=1000)
   
   #Dump output from training
   gbm.save_model(options.directory + "/" + 'TrainingModel.xgb')
@@ -148,7 +160,9 @@ def mainTF(options):
     i = 0
     try:
       while not coord.should_stop():
-        _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
+        extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        
+        _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op,extra_update_ops[:len(extra_update_ops)/2]], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         summary_writer.add_summary(summary, i)
         i += 1
 
