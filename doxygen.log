@@ -224,7 +224,7 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTa/home/travis/build/susy2
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TagTest1.h:28: warning: Compound BaseHistgram is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/MVAstuff.h:28: warning: Compound BaseHistgram is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:13: warning: Compound TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:31: warning: Compound HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:32: warning: Compound HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Condition.hh:33: warning: Compound cfg::SimpleTerm is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Condition.hh:49: warning: Compound cfg::Condition is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:111: warning: Compound hcalcfg::UTF8Buffer is not documented.
@@ -242,7 +242,7 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTa/home/travis/build/susy2
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:121: warning: Compound hcalcfg::StartStates is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Condition.hh:13: warning: Compound cfg::Term is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:15: warning: Compound cfg::CfgDocument is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:204: warning: Compound PrepVariables is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:183: warning: Compound PrepVariables is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:364: warning: Compound hcalcfg::ParserInitCaller< T, true > is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:313: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitExistsType is not documented.
 gger/src/TTMOverlapResolution.cpp...
@@ -434,13 +434,13 @@ Generating code for file /home/travis/build/susy2015//home/travis/build/susy2015
 /home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:95: warning: Member getQGPtD() const  (function) of class Constituent is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:96: warning: Member getQGAxis1() const  (function) of class Constituent is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:97: warning: Member getQGAxis2() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:41: warning: Member HDF5Writer(const std::map< std::string, std::vector< std::string >> &variables, int eventsPerFile, std::string ofname) (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:53: warning: Member setTupleVars(const std::set< std::string > &) (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:55: warning: Member initBranches(const NTupleReader &tr) (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:99: warning: Member saveHDF5File() (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:154: warning: Member fill() (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:765: warning: Member getVarSet() (function) of class PrepVariables is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:774: warning: Member operator()(NTupleReader &tr) (function) of class PrepVariables is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:42: warning: Member HDF5Writer(const std::map< std::string, std::vector< std::string >> &variables, int eventsPerFile, std::string ofname) (function) of class HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:54: warning: Member setTupleVars(const std::set< std::string > &) (function) of class HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:56: warning: Member initBranches(const NTupleReader &tr) (function) of class HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:78: warning: Member saveHDF5File() (function) of class HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:133: warning: Member fill() (function) of class HDF5Writer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:404: warning: Member PrepVariables(const std::map< std::string, std::vector< std::string >> &variables) (function) of class PrepVariables is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:416: warning: Member operator()(NTupleReader &tr) (function) of class PrepVariables is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:54: warning: Member SHOTProducer(const edm::ParameterSet &) (function) of class SHOTProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:57: warning: Member fillDescriptions(edm::ConfigurationDescriptions &descriptions) (function) of class SHOTProducer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:56: warning: Member GetMatchedTop(const std::vector< T > &TopCand, std::vector< TopObject > &MachedTopCand, const std::vector< TLorentzVector > &Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
@@ -953,5 +953,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1266/65536 hits=6544 misses=1357
+lookup cache used 1269/65536 hits=6534 misses=1360
 finished...
