@@ -9,11 +9,11 @@ class CustomQueueRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, variables, fileQueue, ptReweight=True):
+    def __init__(self, batchSize, variables, fileQueue, inputDataQueue, ptReweight=False):
 
         self.fileQueue = fileQueue
         # The actual queue of data. 
-        self.queueX = self.fileQueue.inputDataQueue
+        self.queueX = inputDataQueue
 
         # place holders to enqueue data with 
         self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[0][0]])
@@ -56,7 +56,6 @@ class CustomQueueRunner(object):
       for fileName in fIter:
         #read next file
         data = dg.importData(fileName, ptReweight=self.ptReweight)
-        
         batch_idx = 0
         while batch_idx + self.batch_size <= data["data"].shape[0]:
             yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
@@ -64,24 +63,32 @@ class CustomQueueRunner(object):
 
       return
 
+    def enqueueBatch(self, sess):
+        #Enqueue one batch into the main queue
+        try:
+            dataX, dataY, dataW = next(self.data_iterator())
+            sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
+            return True
+        except StopIteration:
+            return False
 
-    def thread_main(self, sess):
-      """
-      Function run on alternate thread. Basically, keep adding data to the queue.
-      """
-      for dataX, dataY, dataW in self.data_iterator():
-        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
-
-    def start_threads(self, sess, n_threads=1):
-      """ Start background threads to feed queue """
-      threads = []
-      for n in range(n_threads):
-        t = threading.Thread(target=self.thread_main, args=(sess,))
-        #p.daemon = True # thread will close when parent quits
-        t.start()
-        threads.append(t)
-
-      #pass threads to FileQueue for management
-      self.fileQueue.addCustomRunnerThreads(threads)
-      return threads
+#    def thread_main(self, sess):
+#      """
+#      Function run on alternate thread. Basically, keep adding data to the queue.
+#      """
+#      for dataX, dataY, dataW in self.data_iterator():
+#        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
+#
+#    def start_threads(self, sess, n_threads=1):
+#      """ Start background threads to feed queue """
+#      threads = []
+#      for n in range(n_threads):
+#        t = threading.Thread(target=self.thread_main, args=(sess,))
+#        #p.daemon = True # thread will close when parent quits
+#        t.start()
+#        threads.append(t)
+#
+#      #pass threads to FileQueue for management
+#      self.fileQueue.addCustomRunnerThreads(threads)
+#      return threads
 

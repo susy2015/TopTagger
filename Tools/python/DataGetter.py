@@ -80,7 +80,7 @@ class DataGetter:
           data = data[filterArray]
           inputAnswer = inputAnswer[filterArray]
           inputWgts = numpy.copy(data.as_matrix(["sampleWgt"]).astype(numpy.float32))
-          
+
           if ptReweight:
             #calculate pt weights
             #inputWgts = numpy.empty([len(inputAnswer), 1])
@@ -94,7 +94,7 @@ class DataGetter:
             ptHistBg[ptHistBg < 10] = ptHistBg.max()
             inputWgts[inputAnswer == 1] *= (1.0/ptHistSig[numpy.digitize(dataPt[inputAnswer == 1], ptBins) - 1]).reshape([-1,1])
             inputWgts[inputAnswer != 1] *= (1.0/ptHistBg [numpy.digitize(dataPt[inputAnswer != 1], ptBins) - 1]).reshape([-1,1])
-        
+                          
           if len(inputData) == 0:
             inputData = data
             npyInputWgts = inputWgts
@@ -108,7 +108,21 @@ class DataGetter:
         npyInputAnswer = (npyInputLabels[:,0] > 2.99) & (npyInputLabels[:,1] > 0.99)
         npyInputAnswers = numpy.vstack([npyInputAnswer,numpy.logical_not(npyInputAnswer)]).transpose()
         npyInputSampleWgts = inputData.as_matrix(["sampleWgt"]).astype(numpy.float32)
-          
+
+        #if ptReweight:
+        #  #calculate pt weights
+        #  #inputWgts = numpy.empty([len(inputAnswer), 1])
+        #  #ptBins = numpy.hstack([[0], numpy.linspace(50, 400, 36), numpy.linspace(450, 700, 6), [800, 10000]])
+        #  ptBins = numpy.hstack([numpy.linspace(0, 2000, 51), [10000]])
+        #  dataPt = inputData["cand_pt"]
+        #  inputSampleWgts = inputData["sampleWgt"]
+        #  ptHistSig, _ = numpy.histogram(dataPt[npyInputAnswer == 1], bins=ptBins, weights=inputSampleWgts[npyInputAnswer == 1])
+        #  ptHistBg,  _ = numpy.histogram(dataPt[npyInputAnswer != 1], bins=ptBins, weights=inputSampleWgts[npyInputAnswer != 1])
+        #  ptHistSig[ptHistSig < 10] = ptHistSig.max()
+        #  ptHistBg[ptHistBg < 10] = ptHistBg.max()
+        #  npyInputWgts[npyInputAnswer == 1] *= (1.0/ptHistSig[numpy.digitize(dataPt[npyInputAnswer == 1], ptBins) - 1]).reshape([-1,1])
+        #  npyInputWgts[npyInputAnswer != 1] *= (1.0/ptHistBg [numpy.digitize(dataPt[npyInputAnswer != 1], ptBins) - 1]).reshape([-1,1])
+
         if prescale:
           #Remove background events so that bg and signal are roughly equally represented
           prescaleRatio = max(1, (npyInputAnswer != 1).sum()/(npyInputAnswer == 1).sum())

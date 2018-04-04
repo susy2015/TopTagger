@@ -226,7 +226,7 @@ class runOptions:
                       l2Reg             = 0.002,
                       dataPath          = "data",
                       trainingNames     = [],
-                      validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
+                      validationNames   = ["trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
                       keepProb          = 0.4,
                       nTrainingFiles    = 200):
