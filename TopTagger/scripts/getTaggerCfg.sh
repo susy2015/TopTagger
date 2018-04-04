@@ -6,6 +6,7 @@ REPO_NAME=TopTaggerCfg
 CFG_DIRECTORY=$PWD
 TAG=
 NO_SOFTLINK=
+OVERWRITE=
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -24,13 +25,14 @@ function print_help {
     echo "-t RELEASE_TAG :         This is the github release tag to check out (required option)"
     echo "-d checkout_directory :  This is the directory where the configuration files will be downloaded to (default: .)"
     echo "-f cfg_filename :        Specify this option to name the softlink to the cfg file something other than \"TopTagger.cfg\""
+    echo "-o :                     Overwrite the softlinks if they already exist"
     echo "-n :                     Download files without producing softlinks"
 }
 
 
 # Initialize our own variables:
 
-while getopts "h?d:f:t:n" opt; do
+while getopts "h?d:f:t:no" opt; do
     case "$opt" in
     h|\?)
         print_help
@@ -41,6 +43,8 @@ while getopts "h?d:f:t:n" opt; do
     f)  TOP_CFG_NAME=$OPTARG
         ;;
     t)  TAG=$OPTARG
+        ;;
+    o) OVERWRITE="-f"
         ;;
     n) NO_SOFTLINK=NO
         ;;
@@ -86,28 +90,39 @@ fi
 cd $REPO_NAME-$TAG
 DOWNLOAD_DIR=$PWD
 
-MVAFILE=
+MVAFILES=
 
 if [ -f TopTagger.cfg ]
 then
-    MVAFILE=$(grep "modelFile" TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
-    if [[ ! -z ${MVAFILE// } ]]
+    MVAFILES=$(grep "modelFile" TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
+    MISSING=
+    if [[ ! -z ${MVAFILES// } ]]
     then
-        MVATARBALL=${MVAFILE%.*}.tar.gz
-        echo $MVAFILE
-        if [ ! -f $MVAFILE ]
-        then
-            wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
-            if [ -f $MVATARBALL ]
+        for MVAFILE in $MVAFILES; do
+            if [ ! -f $MVAFILE ]
             then
-                tar xzf $MVATARBALL
-                rm $MVATARBALL
-            else
-                echo "File "$MVATARBALL" failed to download"
-                exit 0
+                MISSING="yes"
+                break
             fi
-        else
-            echo "Model file already present "$MVAFILE
+        done
+        if [[ ! -z ${MISSING// } ]]
+        then
+            MVATARBALL=MVAFILES.tar.gz
+            wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
+            if [ ! -f $MVATARBALL ]
+            then
+                echo "MVA tarball "$MVATARBALL" not found!!!"
+                MVATARBALL=${MVAFILES%.*}.tar.gz
+                echo "trying "$MVATARBALL
+                wget $GITHUB_SUSY2015_URL/$REPO_NAME/releases/download/$TAG/$MVATARBALL
+                if [ ! -f $MVATARBALL ]
+                then
+                    echo "MVA tarball "$MVATARBALL" not found!!!"
+                    exit 0
+                fi
+            fi
+            tar xzf $MVATARBALL
+            rm $MVATARBALL
         fi
     fi
 fi
@@ -116,9 +131,11 @@ cd $STARTING_DIR
 
 if [[ -z $NO_SOFTLINK ]]
 then
-    ln -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
-    if [[ ! -z ${MVAFILE// } ]] 
+    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
+    if [[ ! -z ${MVAFILES// } ]] 
     then
-        ln -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+        for MVAFILE in $MVAFILES; do
+            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+        done
     fi
 fi

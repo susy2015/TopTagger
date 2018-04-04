@@ -16,26 +16,50 @@
 
 #ifdef DOTENSORFLOWPYBIND
 static std::string embeddedTensorflowScript = ""
-"import os\n"
+"import os, sys\n"
 "import numpy as np\n"
-"import tensorflow as tf\n"
-"sess = x = y = None\n"
+"shottf = tfw = None\n"
 "\n"
-"def load_graph(frozen_graph_filename):\n"
-"    graph_def = tf.GraphDef()\n"
-"    with tf.gfile.GFile(frozen_graph_filename, \"rb\") as f:\n"
-"        graph_def.ParseFromString(f.read())\n"
-"    with tf.Graph().as_default() as graph:\n"
-"        tf.import_graph_def(graph_def, input_map=None, return_elements=None, name=\"\", op_dict=None, producer_op_list=None)\n"
-"    return graph\n"
+"class TFWrapper:\n"
+"    def insert_path(self):\n"
+"        path = os.path.expandvars(os.path.expanduser(os.environ['CMSSW_BASE'] + '/python/RecoBTag/Tensorflow/'))\n"
+"        sys.path.append(path)\n"
 "\n"
-"def start_session(frozen_graph_filename):\n"
-"    global sess\n"
-"    graph = load_graph(frozen_graph_filename)\n"
-"    sess = tf.Session(graph=graph)\n"
+"    def load_graph(self, frozen_graph_filename):\n"
+"        graph_def = shottf.GraphDef()\n"
+"        with shottf.gfile.GFile(frozen_graph_filename, 'rb') as f:\n"
+"            graph_def.ParseFromString(f.read())\n"
+"        with shottf.Graph().as_default() as graph:\n"
+"            shottf.import_graph_def(graph_def, input_map=None, return_elements=None, name='', op_dict=None, producer_op_list=None)\n"
+"        return graph\n"
 "\n"
-"def eval_session(inputs, outputs):\n"
-"    outputs.update(sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n";
+"    def start_session(self, frozen_graph_filename):\n"
+"        global shottf\n"
+"        try:\n"
+"            import tensorflow as shottf\n"
+"        except ImportError:\n"
+"            self.insert_path()\n"
+"            import tensorflow as shottf\n"
+"        graph = self.load_graph(frozen_graph_filename)\n"
+"        self.sess = shottf.Session(graph=graph, config=shottf.ConfigProto(intra_op_parallelism_threads=1))\n"
+"\n"
+"    def __init__(self, frozen_graph_filename):\n"
+"        self.sess = None\n"
+"        self.start_session(frozen_graph_filename)\n"
+"\n"
+"    def eval_session(self, inputs, outputs):\n"
+"        outputs.update(self.sess.run(dict(zip(outputs.keys(), outputs.keys())), feed_dict=inputs))\n"
+"\n"
+"    def __del__(self):\n"
+"        if self.sess != None: self.sess.close()\n"
+"\n"
+"def initTFWrapper(frozen_graph_filename):\n"
+"    global tfw\n"
+"    tfw = TFWrapper(frozen_graph_filename)\n"
+"\n"
+"def eval_session_shot(inputs, outputs):\n"
+"    tfw.eval_session(inputs, outputs)\n"
+"";
 #endif
 
 void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
@@ -45,12 +69,13 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    discriminator_ = cfgDoc->get("discCut",      localCxt, -999.9);
-    discOffset_    = cfgDoc->get("discOffset",   localCxt, 999.9);
-    discSlope_     = cfgDoc->get("discSlope",    localCxt, 0.0);
-    modelFile_     = cfgDoc->get("modelFile",    localCxt, "");
-    inputOp_       = cfgDoc->get("inputOp",      localCxt, "x");
-    outputOp_      = cfgDoc->get("outputOp",     localCxt, "y");
+    discriminator_ = cfgDoc->get("discCut",       localCxt, -999.9);
+    discOffset_    = cfgDoc->get("discOffset",    localCxt, 999.9);
+    discSlope_     = cfgDoc->get("discSlope",     localCxt, 0.0);
+    modelFile_     = cfgDoc->get("modelFile",     localCxt, "");
+    NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
+    inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
+    outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -83,9 +108,35 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     PyTuple_SetItem(pArgs, 0, PyString_FromString(modelFile_.c_str()));
 
     //start the tensorflow session
-    callPython("start_session", pArgs);
+    callPython("initTFWrapper", pArgs);
 
     Py_DECREF(pArgs);
+
+    //create numpy array for input data
+    npy_intp sizearray[2] = {1, static_cast<npy_intp>(vars_.size())};
+    //PyObject* nparray_ = PyArray_SimpleNewFromData(2, sizearray, NPY_FLOAT, data);
+    nparray_ = PyArray_SimpleNew(2, sizearray, NPY_FLOAT);
+
+    // create input feed dict
+    inputs_ = PyDict_New();
+    PyDict_SetItemString(inputs_, inputOp_.c_str(), nparray_);
+
+    //load variables
+    if(NConstituents_ == 1)
+    {
+        varCalculator_.reset(new ttUtility::BDTMonojetInputCalculator());
+    }
+    else if(NConstituents_ == 2)
+    {
+        varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
+    }
+    else if(NConstituents_ == 3)
+    {
+        varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    }
+    //map variables
+    varCalculator_->mapVars(vars_);
+    varCalculator_->setPtr(static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(nparray_), 0, 0)));
 
 #else
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with python support!!!");
@@ -100,48 +151,32 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
     //Get the list of final tops into which we will stick candidates
     std::vector<TopObject*>& tops = ttResults.getTops();
 
-    //create numpy array for input data
-    npy_intp sizearray[2] = {1, static_cast<npy_intp>(vars_.size())};
-    //PyObject* nparray = PyArray_SimpleNewFromData(2, sizearray, NPY_FLOAT, data);
-    PyObject* nparray = PyArray_SimpleNew(2, sizearray, NPY_FLOAT);
-
-    // create input feed dict 
-    PyObject *inputs = PyDict_New();
-    PyDict_SetItemString(inputs, inputOp_.c_str(), nparray);
-
-    // create dict of output nodes 
+    // create dict of output nodes
     PyObject *outputs = PyDict_New();
     PyObject* outputOpName = PyString_FromString(outputOp_.c_str());
     PyDict_SetItem(outputs, outputOpName, Py_None);
 
-    // create arguements tuple 
+    // create arguements tuple
     PyObject *pArgs = PyTuple_New(2);
-    PyTuple_SetItem(pArgs, 0, inputs);
+    PyTuple_SetItem(pArgs, 0, inputs_);
     PyTuple_SetItem(pArgs, 1, outputs);
-    
+    //Tuple will steal reference to inputs_, but we want it around after the tuple is destroyed
+    Py_INCREF(inputs_);
+
     for(auto& topCand : topCandidates)
     {
-        //We only want to apply the MVA algorithm to triplet tops
-        if(topCand.getNConstituents() == 3)
+        //Prepare data from top candidate and calculate discriminator
+        if(varCalculator_->calculateVars(topCand, 0))
         {
-            //Prepare data from top candidate (this code is shared with training tuple producer)
-            //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
-
-            //populate tensor based on desired input variables 
-            for(unsigned int i = 0; i < vars_.size(); ++i)
-            {
-                *static_cast<float*>(PyArray_GETPTR2(nparray, 0, i)) = varMap[vars_[i]];
-            }
-
-            callPython("eval_session", pArgs);
+            //Run python session to network on input data
+            callPython("eval_session_shot", pArgs);
 
             //Get output discriminator
             PyObject *discriminators = PyDict_GetItem(outputs, outputOpName);
             double discriminator = -999.9;
             if(PyArray_Check(discriminators))
             {
-                discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(discriminators, 0, 0)));
+                discriminator = static_cast<double>(*static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(discriminators), 0, 0)));
                 topCand.setDiscriminator(discriminator);
             }
             else
@@ -160,8 +195,6 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
         }
     }
 
-    Py_DECREF(nparray);
-    Py_DECREF(inputs);
     Py_DECREF(outputs);
     Py_DECREF(outputOpName);
     Py_DECREF(pArgs);
@@ -173,17 +206,24 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 
 TTMTFPyBind::~TTMTFPyBind()
 {
+    //close the tensorflow session 
+    PyObject *pArgs = PyTuple_New(0);
+    callPython("closeSession_shot", pArgs);
+    Py_DECREF(pArgs);
+
     //finish cleanup of python objects and close interpreter
-    Py_DECREF(pModule);
-    Py_DECREF(pMain);
-    Py_DECREF(pGlobal);
+    Py_DECREF(inputs_);
+    Py_DECREF(nparray_);
+    Py_DECREF(pModule_);
+    Py_DECREF(pMain_);
+    Py_DECREF(pGlobal_);
     Py_Finalize();
 }
 
 
 void TTMTFPyBind::initializePyInterpreter()
 {
-    // initialize the python interpreter 
+    // initialize the python interpreter
     if(!Py_IsInitialized())
     {
         PyEval_InitThreads();
@@ -191,60 +231,73 @@ void TTMTFPyBind::initializePyInterpreter()
     }
 
     // create the main module
-    pMain = PyImport_AddModule("__main__");
+    pMain_ = PyImport_AddModule("__main__");
+
+    if(!pMain_)
+    {
+        PyErr_Print();
+        THROW_TTEXCEPTION("AddModule failed!!!");
+    }
 
     // define the globals of the main module as our context
-    pGlobal = PyModule_GetDict(pMain);
+    pGlobal_ = PyModule_GetDict(pMain_);
 
     // since PyModule_GetDict returns a borrowed reference, increase the count to own one
-    Py_INCREF(pGlobal);
+    Py_INCREF(pGlobal_);
 
-    // load the python interface module 
-    pModule = PyRun_String(embeddedTensorflowScript.c_str(), Py_file_input, pGlobal, pGlobal);
+    // load the python interface module
+    pModule_ = PyRun_String(embeddedTensorflowScript.c_str(), Py_file_input, pGlobal_, pGlobal_);
 
     // initialize numpy api
     import_array();
+
+    if(!pModule_)
+    {
+        Py_DECREF(pMain_);
+        PyErr_Print();
+        THROW_TTEXCEPTION("PyRun_String failed!!!");        
+    }
 }
 
 PyObject* TTMTFPyBind::callPython(const std::string& func, PyObject* pArgs)
 {
-    if (pModule != NULL && pMain != NULL) 
+    if (pModule_ != NULL && pMain_ != NULL)
     {
-        PyObject* pFunc = PyObject_GetAttrString(pMain, func.c_str());
+        PyObject* pFunc = PyObject_GetAttrString(pMain_, func.c_str());
         // pFunc is a new reference
 
-        if (pFunc && PyCallable_Check(pFunc)) 
+        if (pFunc && PyCallable_Check(pFunc))
         {
             PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
 
-            if (pValue != NULL) 
+            if (pValue != NULL)
             {
                 Py_DECREF(pValue);
             }
-            else 
+            else
             {
                 Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                Py_DECREF(pMain);
+                Py_DECREF(pModule_);
+                Py_DECREF(pMain_);
                 PyErr_Print();
                 THROW_TTEXCEPTION("Cannot call function \"" + func + "\"!!!");
             }
         }
-        else 
+        else
         {
             if (PyErr_Occurred())
                 PyErr_Print();
             THROW_TTEXCEPTION("Cannot find function \"" + func + "\"!!!");
         }
         Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
+        Py_DECREF(pModule_);
     }
-    else 
+    else
     {
         PyErr_Print();
         THROW_TTEXCEPTION("Python interpreter not initialized!!!");
     }
-    
+
     return NULL;
 }
 

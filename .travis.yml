@@ -1,0 +1,55 @@
+dist: trusty
+
+language: cpp
+
+env:
+  global:
+  - DOCKER_CONTAINER: cmssw/slc6-base:latest
+  - GH_REPO_NAME: TopTagger
+  - GH_ORG_NAME: susy2015
+  - DOXYFILE: $TRAVIS_BUILD_DIR/.Doxyfile
+  - GH_REPO_REF: github.com/susy2015/TopTagger.git
+  - TARGET_BRANCH: master
+  - secure: ThkpvOxh84cWY/MHV14RDah0LHmRkwouW9uoOC0DVDUdZOi6xMPZJX5tQJvIOFjZgWeumlrjDRaeODLMlMLTikKWvrGh8vOZ6C1q2pSftDSlkqhqdzivb45FtfW4MiPdZ9uZwmV4V2EOKmiiU1SU+VsaeQoREHAcWE0JP3kYxABcxjBXQy3QSESJZkvTf4hx1BwuuvjRF79HymUzoL83MKwcTYfv65U7Yae0XF8Yzl/ym5THHzYuFqiatqJtLT8kjDfY2fThXavZswTCKP/yO9LPkYbwKvLzlFNuzVwEsmJNhWholb/hhgEjhXs5/ELc8mCLNftjJMiVs1V4kTXO7RQb/5TzVU+FkiYQaP6C3efciTq1mGIX6hmVq9p8i3wcuxNededj4MRv/7qlV9B8AToNludx1CQRJDIJWIMsC8fGm13ilOU3m/RI0zJKAg6HVgCazPiFivrjP2O0xZqCyyQfqmeda0ZJKvckSddn2fHMV780144xxAcdV3IsdZiUhvShWNeNReoMjmNMjML4hvLOZJu88/Mki5SrK1MkPj/uVUS0X+tkGstN/vl1tOJVEkEmmWfBC64yGpeMb6tBNlXbs1gC4bBa5lECSM+q3Zr4SxGGl0OniFSXLvQCTSUb7J7OzENATO/ljDquzI+dnDYArtKjBunmW3apROBeWdo=
+branches:
+  only:
+  - /.*/
+
+before_install:
+- sudo apt-get -qq update
+- sudo apt-get install -qq autofs attr gdb git uuid-dev uuid fuse
+- wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
+- sudo dpkg -i cvmfs-release-latest_all.deb
+- sudo apt-get update
+- sudo apt-get install -qq cvmfs cvmfs-config-default
+- sudo cvmfs_config setup
+- sudo echo "CVMFS_HTTP_PROXY=\"DIRECT\"" | sudo tee /etc/cvmfs/default.local > /dev/null
+- sudo echo CVMFS_REPOSITORIES=cms.cern.ch | sudo tee -a /etc/cvmfs/default.local > /dev/null
+- sudo service autofs restart
+- cvmfs_config probe
+- sudo cvmfs_config chksetup
+- sudo docker pull $DOCKER_CONTAINER
+
+compiler:
+- gcc
+
+script:
+- chmod +x $TRAVIS_BUILD_DIR/.travis/runTests.sh
+- sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR
+
+after_success:
+- if [ "$TRAVIS_BRANCH" = "$TARGET_BRANCH" ] || [ ! -z $TRAVIS_TAG ]; then if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sudo apt-get install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz; fi; fi
+- cd $TRAVIS_BUILD_DIR/.travis
+- chmod +x generateDocumentationAndDeploy.sh
+- ./generateDocumentationAndDeploy.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: py+YE5cALVpSRZBbfwldw26lSRUmoyJL30V/m17ZBToVYsn+dVpUswl0agsWkDPBrDXlgxr3o3wcqlOkyqww5qhYuwJ5xi4jpIDBuh7w8toANtKcdIC5y8fn475KgbtTlfeHpNkuS0Tol0iz9qYRFQ78Q/TjUfgiaBj6W6cq1fFlvUf9ByD4PWUgKagJCviel+bpABT1H+CZmKZgIMDXMlmqXijp8cdG1W3YHrRlBa6wYa913Gi/xk+4eFopdGNaQLooRczIOBx6JdE9hqk6dXBcH/yRXeVOXnZbjIP3sQ/taF1CA9WAzygXchejBE41kkxWy+oN8TpElJgzZn04Jx/Ikbxs0LwiL6iMYwkxmdw4AQouGcIeO2nhbJZEvXsXQAdIT+fU1239sfXIoZBczCtpm1Kt/K1/4qdUxjAmRIsMfz85lezDrKqFArha4n//Hf5gW3r/TOcwZZ2Gbcd8Aqhd37Hia/oFGdoEO7eCxZ4NzpeUEOF1sXhcQRiyHVR4LsWswmxMPbUyHnamltesJ+893GcVcDcCf4GffIrdyUQ0hP8hXmMZa35raxL1dfHH8DrVWWNtxBBDtYLEB1mIC15msCZ/rAZZZO+sHbdOAk/ABaAq5tavgk1WyxTSXtD3AW98m762uj1lGeuLMD1YXWORdZlLp/ay7q6amkouIyU=
+  file: $TRAVIS_BUILD_DIR/.travis/code_docs/$GH_REPO_NAME/latex/refman.pdf
+  on:
+    tags: true
+
+notifications:
+  email: false

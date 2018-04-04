@@ -44,6 +44,29 @@ if test ${rootcintfound} == no; then
    AC_ERROR([ROOT: rootcint not found.])
 fi   
 
+dnl root is present, lets check for TMVA
+TMVALIB=$(root-config --libdir)/libTMVA.so
+AC_CHECK_FILE($TMVALIB, [], [])
+
+TMVALIB=ac_cv_file_$(echo ${TMVALIB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure TMVA if it is found
+if test "${!TMVALIB}" = "no"; then
+   AC_WARN([Optional dependency missing: TMVA libraries are not found.  If needed you must ensure your root install is built with support for TMVA.])
+   AC_SUBST(TMVALIB, "")
+else
+   AC_SUBST(TMVALIB, -lTMVA)
+fi
+
+dnl check if scram is avaliable, and if so, get the numpy include path
+AC_CHECK_PROG(scramfound, scram, yes, no)
+
+if test ${scramfound} == yes; then
+   AC_SUBST(SCRAMNUMPYCFG, $(scram tool tag py2-numpy PY2_NUMPY_BASE))
+else
+   AC_SUBST(SCRAMNUMPYCFG, "")
+fi
+
 dnl check for python 
 AC_CHECK_PROG(pythonconfigfound, python-config, yes, no)
 
@@ -82,6 +105,31 @@ else
    AC_SUBST(OPENCVDIR, $OPENCVDIR)
 fi
 
+dnl check for tensorflow c-api
+if test -z ${TENSORFLOWDIR+x}; then
+   if test ${scramfound} == yes; then
+      TENSORFLOWDIR=$(scram tool tag tensorflow-c TENSORFLOW_C_BASE)
+   else
+      TENSORFLOWDIR=/usr/local/
+   fi
+fi
+
+TENSORFLOWINCLUDE=$TENSORFLOWDIR/include/tensorflow/c/c_api.h
+AC_CHECK_FILE($TENSORFLOWINCLUDE, [], [])
+
+TENSORFLOWLIB=$TENSORFLOWDIR/lib/libtensorflow.${LIBSUFFIX}
+AC_CHECK_FILE($TENSORFLOWLIB, [], [])
+
+TENSORFLOWINCLUDE=ac_cv_file_$(echo ${TENSORFLOWINCLUDE} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+TENSORFLOWLIB=ac_cv_file_$(echo ${TENSORFLOWLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+
+dnl configure Tensorflow if it is found
+if test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWLIB}" = "no"; then
+   AC_WARN([Optional dependency missing: Tensorflow c-api includes or libraries are not found. Specify location with "./configure TENSORFLOWDIR=/Path" if required.])
+   AC_SUBST(TENSORFLOWDIR, "")
+else
+   AC_SUBST(TENSORFLOWDIR, $TENSORFLOWDIR)
+fi
 
 dnl check for xgboost
 if test -z ${XGBOOSTDIR+x}; then
@@ -100,7 +148,7 @@ XGBOOSTINCLUDEXGBCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDEXGBCAPIH} | sed -e 's/[
 XGBOOSTINCLUDERABCAPIH=ac_cv_file_$(echo ${XGBOOSTINCLUDERABCAPIH} | sed -e 's/[\/]/_/g' -e 's/\./_/')
 XGBOOSTLIBXGB=ac_cv_file_$(echo ${XGBOOSTLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
 
-dnl configure OPENCV if it is found
+dnl configure XGBOOST if it is found
 if test "${!XGBOOSTINCLUDEXGBCAPIH}" = "no" || test "${!XGBOOSTINCLUDERABCAPIH}" = "no" || test "${!XGBOOSTLIBXGB}" = "no"; then
    AC_WARN([Optional dependency missing: XGBoost includes or libraries are not found. Specify location with "./configure XGBOOSTDIR=/Path" if required.])
    AC_SUBST(XGBOOSTDIR, "")

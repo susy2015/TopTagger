@@ -1,16 +1,19 @@
 ## Variables set by configure 
 OPENCV_DIRECTORY  = @OPENCVDIR@
 XGBOOST_DIRECTORY = @XGBOOSTDIR@
+TENSORFLOW_DIR    = @TENSORFLOWDIR@
 TAGGERDIR         = @TAGGERDIR@
 
-CXX          = @CXX@
-LD           = @CXX@
-CXXFLAGS     = @CXXFLAGS@
-LDFLAGS      = @LDFLAGS@
-PREFIX       = @prefix@
-LDCONFIG     = @LDCONFIG@
-LIBSUFFIX    = @LIBSUFFIX@
-PYTHONCFG    = @PYTHONCFG@
+CXX           = @CXX@
+LD            = @CXX@
+CXXFLAGS      = @CXXFLAGS@
+LDFLAGS       = @LDFLAGS@
+PREFIX        = @prefix@
+LDCONFIG      = @LDCONFIG@
+LIBSUFFIX     = @LIBSUFFIX@
+PYTHONCFG     = @PYTHONCFG@
+SCRAMNUMPYCFG = @SCRAMNUMPYCFG@
+TMVALIB       = @TMVALIB@
 ##End variables set by configure
 
 # directory to put intermediate files 
@@ -39,12 +42,23 @@ INCLUDESDIRS += $(shell root-config --cflags)
 # ROOT libraries
 LIBS         += $(shell root-config --glibs)
 
+# TMVA library
+ifdef TMVALIB
+	CXXFLAGS += -DSHOTTOPTAGGER_DO_TMVA
+	LIBS     += $(TMVALIB)
+endif
+
 #python includes and libraries
 ifdef PYTHONCFG
 	INCLUDESDIRS  += $(shell $(PYTHONCFG) --includes)
 
 	CXXFLAGS += -DDOTENSORFLOWPYBIND
 	LIBS     += -L$(shell $(PYTHONCFG) --prefix)/lib $(shell $(PYTHONCFG) --libs)
+endif
+
+#scram specific numpy c-api
+ifdef SCRAMNUMPYCFG
+	INCLUDESDIRS += -I$(SCRAMNUMPYCFG)/c-api/core/include
 endif
 
 # openCV includes and libraries
@@ -65,6 +79,14 @@ ifdef XGBOOST_DIRECTORY
 
 	CXXFLAGS += -DDOXGBOOST
 	LIBS     += -L$(XGBOOST_DIRECTORY)/lib -lxgboost
+endif
+
+# tensorflow includes and libraries
+ifdef TENSORFLOW_DIR
+	INCLUDESDIRS  += -I$(TENSORFLOW_DIR)/include
+
+	CXXFLAGS += -DDOTENSORFLOW
+	LIBS     += -L$(TENSORFLOW_DIR)/lib -ltensorflow
 endif
 
 PROGRAMS = topTaggerTest

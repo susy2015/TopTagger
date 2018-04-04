@@ -22,7 +22,7 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
             {
                 for(const auto& usedConstituent : usedConsts)
                 {
-                    if(ROOT::Math::VectorUtil::DeltaR(subjet, usedConstituent->p()) < dRMax)
+                    if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()) < dRMax)
                     {
                         //we found a match
                         return true;
@@ -50,7 +50,7 @@ void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>&
             {
                 for(const auto& matchConst : allConstituents) 
                 {
-                    if(ROOT::Math::VectorUtil::DeltaR(subjet, matchConst.p()) < dRMax)
+                    if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), matchConst.p()) < dRMax)
                     {
                         usedConstituents.insert(&matchConst);
                     }

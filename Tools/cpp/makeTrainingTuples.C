@@ -24,6 +24,7 @@
 #include <set>
 #include <math.h>
 #include <memory>
+#include <limits>
 
 #include "hdf5.h"
 
@@ -64,33 +65,11 @@ public:
                 tr.getType(var, type);
                 if(type.find("vector") != std::string::npos)
                 {
-                    //std::cout << type << std::endl;
-                    //if(type.find("*") != std::string::npos)
-                    //{
-                    //    throw "MiniTupleMaker::initBranches(...): Vectors of pointers are not allowed in MiniTuples!!!";
-                    //}
-                    //else
-                    {
-                        if(type.find("double") != std::string::npos)
-                        {
-                            ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
-                        }
-                        else
-                        {
-                        throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;           
-                        }
-                    }
+                    ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
                 }
                 else
                 {
-                    if(type.find("double") != std::string::npos)
-                    {
-                        ptrPair.push_back(std::make_pair(false, tr.getPtr(var)));
-                    }
-                    else
-                    {
-                        throw "HDF5Writer::initBranches(...): Variable type unknown!!! var: " + var + ", type: " + type;
-                    }
+                    ptrPair.push_back(std::make_pair(false, tr.getPtr(var)));
                 }
             }
         }
@@ -206,15 +185,10 @@ private:
     template<typename T>
     class VariableHolder
     {
-    public:
+    private:
         NTupleReader* tr_;
+    public:
         std::map<std::string, std::vector<T>*> variables_;
-        std::set<std::string> allowedVars_;
-
-        VariableHolder(NTupleReader& tr, const std::set<std::string>& vars) : tr_(&tr), allowedVars_(vars)
-        {
-            for(const auto& var : allowedVars_) variables_[var] = nullptr;
-        }
 
         void add(const std::string& key, const T& var)
         {
@@ -226,32 +200,24 @@ private:
             variables_[key]->push_back(var);
         }
 
-        std::set<std::string> getKeys()
-        {
-            return allowedVars_;
-        }
-
         void registerFunctions()
         {
             for(auto& entry : variables_)
             {
-                if(allowedVars_.count(entry.first))
-                {
-                    if(entry.second == nullptr) entry.second = new std::vector<T>();
-                    tr_->registerDerivedVec(entry.first, entry.second);
-                }
-                else
-                {
-                    THROW_SATEXCEPTION("You must add variable \"" + entry.first + "\" to allowedVars_");
-                }
+                if(entry.second == nullptr) entry.second = new std::vector<T>();
+                tr_->registerDerivedVec(entry.first, entry.second);
             }
         }
+
+        VariableHolder(NTupleReader& tr) : tr_(&tr) {}
     };
   
     TopTagger* topTagger_;
     TopCat topMatcher_;
-    std::set<std::string> allowedVarsD_, allowedVarsI_, allowedVarsB_;
     int eventNum_, bgPrescale_;
+    const std::map<std::string, std::vector<std::string>>& variables_;
+    std::shared_ptr<ttUtility::MVAInputCalculator> mvaCalc_;
+    std::vector<float> values_;
 
     void prepVariables(NTupleReader& tr)
     {
@@ -316,7 +282,7 @@ private:
         myConstAK4Inputs.addSupplamentalVector("qgPtD"                               , tr.getVec<double>("qgPtD"));
         myConstAK4Inputs.addSupplamentalVector("qgAxis1"                             , tr.getVec<double>("qgAxis1"));
         myConstAK4Inputs.addSupplamentalVector("qgAxis2"                             , tr.getVec<double>("qgAxis2"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsFlavor"                      , tr.getVec<double>("recoJetsFlavor"));
+//        myConstAK4Inputs.addSupplamentalVector("recoJetsFlavor"                      , tr.getVec<double>("recoJetsFlavor"));
         myConstAK4Inputs.addSupplamentalVector("recoJetsJecScaleRawToFull"           , tr.getVec<double>("recoJetsJecScaleRawToFull"));
         myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction" , tr.getVec<double>("recoJetschargedHadronEnergyFraction"));
         myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction"     , tr.getVec<double>("recoJetschargedEmEnergyFraction"));
@@ -340,44 +306,9 @@ private:
         myConstAK4Inputs.addSupplamentalVector("CvsL"                                , tr.getVec<double>("CvsL"));
         myConstAK4Inputs.addSupplamentalVector("CvsB"                                , tr.getVec<double>("CvsB"));
         myConstAK4Inputs.addSupplamentalVector("CombinedSvtx"                        , tr.getVec<double>("CombinedSvtx"));
-        myConstAK4Inputs.addSupplamentalVector("Svtx"                                , tr.getVec<double>("Svtx"));
-        myConstAK4Inputs.addSupplamentalVector("SoftM"                               , tr.getVec<double>("SoftM"));
-        myConstAK4Inputs.addSupplamentalVector("SoftE"                               , tr.getVec<double>("SoftE"));
         myConstAK4Inputs.addSupplamentalVector("JetProba"                            , tr.getVec<double>("JetProba_0"));
         myConstAK4Inputs.addSupplamentalVector("JetBprob"                            , tr.getVec<double>("JetBprob"));
         myConstAK4Inputs.addSupplamentalVector("recoJetsCharge"                      , tr.getVec<double>("recoJetsCharge_0"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackJetPt"                       , tr.getVec<double>("CSVTrackJetPt"));
-        myConstAK4Inputs.addSupplamentalVector("CSVVertexCategory"                   , tr.getVec<double>("CSVVertexCategory"));
-        myConstAK4Inputs.addSupplamentalVector("CSVJetNSecondaryVertices"            , *convertToDoubleandRegister(tr, "CSVJetNSecondaryVertices"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSumJetEtRatio"               , tr.getVec<double>("CSVTrackSumJetEtRatio"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSumJetDeltaR"                , tr.getVec<double>("CSVTrackSumJetDeltaR"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip2dValAboveCharm"          , tr.getVec<double>("CSVTrackSip2dValAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip2dSigAboveCharm"          , tr.getVec<double>("CSVTrackSip2dSigAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip3dValAboveCharm"          , tr.getVec<double>("CSVTrackSip3dValAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CSVTrackSip3dSigAboveCharm"          , tr.getVec<double>("CSVTrackSip3dSigAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CSVVertexMass"                       , tr.getVec<double>("CSVVertexMass"));
-        myConstAK4Inputs.addSupplamentalVector("CSVVertexNTracks"                    , *convertToDoubleandRegister(tr, "CSVVertexNTracks"));
-        myConstAK4Inputs.addSupplamentalVector("CSVVertexEnergyRatio"                , tr.getVec<double>("CSVVertexEnergyRatio"));
-        myConstAK4Inputs.addSupplamentalVector("CSVVertexJetDeltaR"                  , tr.getVec<double>("CSVVertexJetDeltaR"));
-        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance2dVal"              , tr.getVec<double>("CSVFlightDistance2dVal"));
-        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance2dSig"              , tr.getVec<double>("CSVFlightDistance2dSig"));
-        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance3dVal"              , tr.getVec<double>("CSVFlightDistance3dVal"));
-        myConstAK4Inputs.addSupplamentalVector("CSVFlightDistance3dSig"              , tr.getVec<double>("CSVFlightDistance3dSig"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexCategory"                  , tr.getVec<double>("CTagVertexCategory"));
-        myConstAK4Inputs.addSupplamentalVector("CTagJetNSecondaryVertices"           , *convertToDoubleandRegister(tr, "CTagJetNSecondaryVertices"));
-        myConstAK4Inputs.addSupplamentalVector("CTagTrackSumJetEtRatio"              , tr.getVec<double>("CTagTrackSumJetEtRatio"));
-        myConstAK4Inputs.addSupplamentalVector("CTagTrackSumJetDeltaR"               , tr.getVec<double>("CTagTrackSumJetDeltaR"));
-        myConstAK4Inputs.addSupplamentalVector("CTagTrackSip2dSigAboveCharm"         , tr.getVec<double>("CTagTrackSip2dSigAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CTagTrackSip3dSigAboveCharm"         , tr.getVec<double>("CTagTrackSip3dSigAboveCharm"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexMass"                      , tr.getVec<double>("CTagVertexMass"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexNTracks"                   , *convertToDoubleandRegister(tr, "CTagVertexNTracks"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexEnergyRatio"               , tr.getVec<double>("CTagVertexEnergyRatio"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexJetDeltaR"                 , tr.getVec<double>("CTagVertexJetDeltaR"));
-        myConstAK4Inputs.addSupplamentalVector("CTagFlightDistance2dSig"             , tr.getVec<double>("CTagFlightDistance2dSig"));
-        myConstAK4Inputs.addSupplamentalVector("CTagFlightDistance3dSig"             , tr.getVec<double>("CTagFlightDistance3dSig"));
-        myConstAK4Inputs.addSupplamentalVector("CTagMassVertexEnergyFraction"        , tr.getVec<double>("CTagMassVertexEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexBoostOverSqrtJetPt"        , tr.getVec<double>("CTagVertexBoostOverSqrtJetPt"));
-        myConstAK4Inputs.addSupplamentalVector("CTagVertexLeptonCategory"            , tr.getVec<double>("CTagVertexLeptonCategory"));
 
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
@@ -390,24 +321,15 @@ private:
 
         //Get gen matching results
 
-        std::vector<TLorentzVector> genTops = genUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-
-        std::pair<std::vector<int>, std::pair<std::vector<int>, std::vector<TLorentzVector>>> genMatches = topMatcher_.TopConst(topCands, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-
-        std::vector<double> *genMatchdR = new std::vector<double>();//genMatches.first);
-        std::vector<double> *genMatchConst = new std::vector<double>();//genMatches.second.first);
+        std::vector<double> *genMatchdR = new std::vector<double>();
+        std::vector<double> *genMatchConst = new std::vector<double>();
         std::vector<double> *genMatchVec = new std::vector<double>();
-        //for(const auto& vec : genMatches.second.second)
-        //{
-        //    genMatchVec->push_back(vec.Pt());
-        //}
 
         //Class which holds and registers vectors of variables
-        //Annoyingly this list of variables to expect is necessary
-        VariableHolder<double> vh(tr, allowedVarsD_);
+        VariableHolder<double> vh(tr);
 
-        //prepare a vector of get top pt
-        for(auto& genTop : genTops) vh.add("genTopPt", genTop.Pt());
+        //prepare a vector of gen top pt
+        for(auto& genTop : hadGenTops) vh.add("genTopPt", genTop.Pt());
 
         std::vector<double>* candNum = new std::vector<double>();
         int iTop = 0;
@@ -431,19 +353,22 @@ private:
 
             if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
             {
+                const auto& varNames = variables_.find("reco_candidates")->second;
                 candNum->push_back(static_cast<double>(iTop++));
                 genMatchConst->push_back(NConstMatches);
                 genMatchdR->push_back(hasBestMatch);
                 genMatchVec->push_back(bestMatchPt);
 
-                std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, AnaConsts::cutCSVS);
-
-                for(auto& var : allowedVarsD_)
+                mvaCalc_->setPtr(values_.data());
+                if(mvaCalc_->calculateVars(topCand, 0))
                 {
-                    vh.add(var, varMap[var]);
+                    for(int i = 0; i < varNames.size(); ++i)
+                    {
+                        if(values_[i] < std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max()) vh.add(varNames[i], values_[i]);
+                    }
                 }
             }
-            if(bgPrescale_ >= 7) bgPrescale_ = 0;
+            if(bgPrescale_ >= 1) bgPrescale_ = 0;
         }
 
 
@@ -476,7 +401,7 @@ private:
     }
 
 public:
-    PrepVariables()
+    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max())
     {
         eventNum_ = 0;
         bgPrescale_ = 0;
@@ -484,291 +409,8 @@ public:
         topTagger_ = new TopTagger();
         topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
 
-        //double variables list here
-        //allowedVarsD_ = {"cand_pt", "cand_eta", "cand_phi", "cand_m", "cand_dRMax", "j1_pt", "j1_eta", "j1_phi", "j1_m", "j1_CSV", "j2_pt", "j2_eta", "j2_phi", "j2_m", "j2_CSV", "j3_pt", "j3_eta", "j3_phi", "j3_m",  "j3_CSV", "dR12", "dEta12", "dPhi12", "dR13", "dEta13", "dPhi13", "dR23", "dEta23", "dPhi23", "j12_m", "j13_m", "j23_m", "j12_pt", "j13_pt", "j23_pt", "j12j3_dR", "j13j2_dR", "j23j1_dR", "genTopPt", "j1_QGL", "j2_QGL", "j3_QGL" , "MET"};
-        allowedVarsD_ = {"genTopPt", 
-                         "MET",
-                         "cand_dRMax",
-                         "cand_dThetaMin",
-                         "cand_dThetaMax",
-                         "cand_eta",
-                         "cand_m",
-                         "cand_phi",
-                         "cand_pt",
-                         "cand_p",
-                         "dR12_lab",
-                         "dR13_lab",
-                         "dR1_23_lab",
-                         "dR23_lab",
-                         "dR2_13_lab",
-                         "dR3_12_lab",
-                         "dRPtTop",
-                         "dRPtW",
-                         "dTheta12",
-                         "dTheta13",
-                         "dTheta23",
-                         "j12_m",
-                         "j12_m_lab",
-                         "j13_m",
-                         "j13_m_lab",
-                         "j1_CSV",
-                         "j1_CSVFlightDistance2dSig",
-                         "j1_CSVFlightDistance2dVal",
-                         "j1_CSVFlightDistance3dSig",
-                         "j1_CSVFlightDistance3dVal",
-                         "j1_CSVJetNSecondaryVertices",
-                         "j1_CSVTrackJetPt",
-                         "j1_CSVTrackSip2dSigAboveCharm",
-                         "j1_CSVTrackSip2dValAboveCharm",
-                         "j1_CSVTrackSip3dSigAboveCharm",
-                         "j1_CSVTrackSip3dValAboveCharm",
-                         "j1_CSVTrackSumJetDeltaR",
-                         "j1_CSVTrackSumJetEtRatio",
-                         "j1_CSVVertexCategory",
-                         "j1_CSVVertexEnergyRatio",
-                         "j1_CSVVertexJetDeltaR",
-                         "j1_CSVVertexMass",
-                         "j1_CSVVertexNTracks",
-                         "j1_CSV_lab",
-                         "j1_CTagFlightDistance2dSig",
-                         "j1_CTagFlightDistance3dSig",
-                         "j1_CTagJetNSecondaryVertices",
-                         "j1_CTagMassVertexEnergyFraction",
-                         "j1_CTagTrackSip2dSigAboveCharm",
-                         "j1_CTagTrackSip3dSigAboveCharm",
-                         "j1_CTagTrackSumJetDeltaR",
-                         "j1_CTagTrackSumJetEtRatio",
-                         "j1_CTagVertexBoostOverSqrtJetPt",
-                         "j1_CTagVertexCategory",
-                         "j1_CTagVertexEnergyRatio",
-                         "j1_CTagVertexJetDeltaR",
-                         "j1_CTagVertexLeptonCategory",
-                         "j1_CTagVertexMass",
-                         "j1_CTagVertexNTracks",
-                         "j1_ChargedHadronMultiplicity",
-                         "j1_CombinedSvtx",
-                         "j1_CvsB",
-                         "j1_CvsL",
-                         "j1_DeepCSVb",
-                         "j1_DeepCSVbb",
-                         "j1_DeepCSVc",
-                         "j1_DeepCSVcc",
-                         "j1_DeepCSVl",
-                         "j1_ElectronEnergyFraction",
-                         "j1_ElectronMultiplicity",
-                         "j1_JetBprob",
-                         "j1_JetProba",
-                         "j1_MuonMultiplicity",
-                         "j1_NeutralHadronMultiplicity",
-                         "j1_PhotonEnergyFraction",
-                         "j1_PhotonMultiplicity",
-                         "j1_QGL",
-                         "j1_QGL_lab",
-                         "j1_SoftE",
-                         "j1_SoftM",
-                         "j1_Svtx",
-                         "j1_eta_lab",
-                         "j1_m",
-                         "j1_m_lab",
-                         "j1_p",
-                         "j1_phi_lab",
-                         "j1_pt_lab",
-                         "j1_qgAxis1",
-                         "j1_qgAxis1_lab",
-                         "j1_qgAxis2",
-                         "j1_qgAxis2_lab",
-                         "j1_qgMult",
-                         "j1_qgMult_lab",
-                         "j1_qgPtD",
-                         "j1_qgPtD_lab",
-                         "j1_recoJetsCharge",
-                         "j1_recoJetsFlavor",
-                         "j1_recoJetsHFEMEnergyFraction",
-                         "j1_recoJetsHFHadronEnergyFraction",
-                         "j1_recoJetsJecScaleRawToFull",
-                         "j1_recoJetschargedEmEnergyFraction",
-                         "j1_recoJetschargedHadronEnergyFraction",
-                         "j1_recoJetsmuonEnergyFraction",
-                         "j1_recoJetsneutralEmEnergyFraction",
-                         "j1_recoJetsneutralEnergyFraction",
-                         "j23_m",
-                         "j23_m_lab",
-                         "j2_CSV",
-                         "j2_CSVFlightDistance2dSig",
-                         "j2_CSVFlightDistance2dVal",
-                         "j2_CSVFlightDistance3dSig",
-                         "j2_CSVFlightDistance3dVal",
-                         "j2_CSVJetNSecondaryVertices",
-                         "j2_CSVTrackJetPt",
-                         "j2_CSVTrackSip2dSigAboveCharm",
-                         "j2_CSVTrackSip2dValAboveCharm",
-                         "j2_CSVTrackSip3dSigAboveCharm",
-                         "j2_CSVTrackSip3dValAboveCharm",
-                         "j2_CSVTrackSumJetDeltaR",
-                         "j2_CSVTrackSumJetEtRatio",
-                         "j2_CSVVertexCategory",
-                         "j2_CSVVertexEnergyRatio",
-                         "j2_CSVVertexJetDeltaR",
-                         "j2_CSVVertexMass",
-                         "j2_CSVVertexNTracks",
-                         "j2_CSV_lab",
-                         "j2_CTagFlightDistance2dSig",
-                         "j2_CTagFlightDistance3dSig",
-                         "j2_CTagJetNSecondaryVertices",
-                         "j2_CTagMassVertexEnergyFraction",
-                         "j2_CTagTrackSip2dSigAboveCharm",
-                         "j2_CTagTrackSip3dSigAboveCharm",
-                         "j2_CTagTrackSumJetDeltaR",
-                         "j2_CTagTrackSumJetEtRatio",
-                         "j2_CTagVertexBoostOverSqrtJetPt",
-                         "j2_CTagVertexCategory",
-                         "j2_CTagVertexEnergyRatio",
-                         "j2_CTagVertexJetDeltaR",
-                         "j2_CTagVertexLeptonCategory",
-                         "j2_CTagVertexMass",
-                         "j2_CTagVertexNTracks",
-                         "j2_ChargedHadronMultiplicity",
-                         "j2_CombinedSvtx",
-                         "j2_CvsB",
-                         "j2_CvsL",
-                         "j2_DeepCSVb",
-                         "j2_DeepCSVbb",
-                         "j2_DeepCSVc",
-                         "j2_DeepCSVcc",
-                         "j2_DeepCSVl",
-                         "j2_ElectronEnergyFraction",
-                         "j2_ElectronMultiplicity",
-                         "j2_JetBprob",
-                         "j2_JetProba",
-                         "j2_MuonMultiplicity",
-                         "j2_NeutralHadronMultiplicity",
-                         "j2_PhotonEnergyFraction",
-                         "j2_PhotonMultiplicity",
-                         "j2_QGL",
-                         "j2_QGL_lab",
-                         "j2_SoftE",
-                         "j2_SoftM",
-                         "j2_Svtx",
-                         "j2_eta_lab",
-                         "j2_m",
-                         "j2_m_lab",
-                         "j2_p",
-                         "j2_phi_lab",
-                         "j2_pt_lab",
-                         "j2_qgAxis1",
-                         "j2_qgAxis1_lab",
-                         "j2_qgAxis2",
-                         "j2_qgAxis2_lab",
-                         "j2_qgMult",
-                         "j2_qgMult_lab",
-                         "j2_qgPtD",
-                         "j2_qgPtD_lab",
-                         "j2_recoJetsCharge",
-                         "j2_recoJetsFlavor",
-                         "j2_recoJetsHFEMEnergyFraction",
-                         "j2_recoJetsHFHadronEnergyFraction",
-                         "j2_recoJetsJecScaleRawToFull",
-                         "j2_recoJetschargedEmEnergyFraction",
-                         "j2_recoJetschargedHadronEnergyFraction",
-                         "j2_recoJetsmuonEnergyFraction",
-                         "j2_recoJetsneutralEmEnergyFraction",
-                         "j2_recoJetsneutralEnergyFraction",
-                         "j3_CSV",
-                         "j3_CSVFlightDistance2dSig",
-                         "j3_CSVFlightDistance2dVal",
-                         "j3_CSVFlightDistance3dSig",
-                         "j3_CSVFlightDistance3dVal",
-                         "j3_CSVJetNSecondaryVertices",
-                         "j3_CSVTrackJetPt",
-                         "j3_CSVTrackSip2dSigAboveCharm",
-                         "j3_CSVTrackSip2dValAboveCharm",
-                         "j3_CSVTrackSip3dSigAboveCharm",
-                         "j3_CSVTrackSip3dValAboveCharm",
-                         "j3_CSVTrackSumJetDeltaR",
-                         "j3_CSVTrackSumJetEtRatio",
-                         "j3_CSVVertexCategory",
-                         "j3_CSVVertexEnergyRatio",
-                         "j3_CSVVertexJetDeltaR",
-                         "j3_CSVVertexMass",
-                         "j3_CSVVertexNTracks",
-                         "j3_CSV_lab",
-                         "j3_CTagFlightDistance2dSig",
-                         "j3_CTagFlightDistance3dSig",
-                         "j3_CTagJetNSecondaryVertices",
-                         "j3_CTagMassVertexEnergyFraction",
-                         "j3_CTagTrackSip2dSigAboveCharm",
-                         "j3_CTagTrackSip3dSigAboveCharm",
-                         "j3_CTagTrackSumJetDeltaR",
-                         "j3_CTagTrackSumJetEtRatio",
-                         "j3_CTagVertexBoostOverSqrtJetPt",
-                         "j3_CTagVertexCategory",
-                         "j3_CTagVertexEnergyRatio",
-                         "j3_CTagVertexJetDeltaR",
-                         "j3_CTagVertexLeptonCategory",
-                         "j3_CTagVertexMass",
-                         "j3_CTagVertexNTracks",
-                         "j3_ChargedHadronMultiplicity",
-                         "j3_CombinedSvtx",
-                         "j3_CvsB",
-                         "j3_CvsL",
-                         "j3_DeepCSVb",
-                         "j3_DeepCSVbb",
-                         "j3_DeepCSVc",
-                         "j3_DeepCSVcc",
-                         "j3_DeepCSVl",
-                         "j3_ElectronEnergyFraction",
-                         "j3_ElectronMultiplicity",
-                         "j3_JetBprob",
-                         "j3_JetProba",
-                         "j3_MuonMultiplicity",
-                         "j3_NeutralHadronMultiplicity",
-                         "j3_PhotonEnergyFraction",
-                         "j3_PhotonMultiplicity",
-                         "j3_QGL",
-                         "j3_QGL_lab",
-                         "j3_SoftE",
-                         "j3_SoftM",
-                         "j3_Svtx",
-                         "j3_eta_lab",
-                         "j3_m",
-                         "j3_m_lab",
-                         "j3_p",
-                         "j3_phi_lab",
-                         "j3_pt_lab",
-                         "j3_qgAxis1",
-                         "j3_qgAxis1_lab",
-                         "j3_qgAxis2",
-                         "j3_qgAxis2_lab",
-                         "j3_qgMult",
-                         "j3_qgMult_lab",
-                         "j3_qgPtD",
-                         "j3_qgPtD_lab",
-                         "j3_recoJetsCharge",
-                         "j3_recoJetsFlavor",
-                         "j3_recoJetsHFEMEnergyFraction",
-                         "j3_recoJetsHFHadronEnergyFraction",
-                         "j3_recoJetsJecScaleRawToFull",
-                         "j3_recoJetschargedEmEnergyFraction",
-                         "j3_recoJetschargedHadronEnergyFraction",
-                         "j3_recoJetsmuonEnergyFraction",
-                         "j3_recoJetsneutralEmEnergyFraction",
-                         "j3_recoJetsneutralEnergyFraction",
-                         "sd_n2",
-                         "j1_p_top", "j1_theta_top", "j1_phi_top", "j2_p_top", "j2_theta_top", "j2_phi_top", "j3_p_top", "j3_theta_top", "j3_phi_top"};
-
-        //integer values list here
-        allowedVarsI_ = {"genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet"};
-	//boolean values list here    
-	allowedVarsB_ = {"passnJets", "passMET", "passdPhis", "passBJets"};
-    }
-
-    std::set<std::string> getVarSet()
-    {
-        //this is dumb
-        std::set<std::string> allowedVars = allowedVarsD_;
-        for(const auto& var : allowedVarsI_) allowedVars.insert(var);
-        for(const auto& var : allowedVarsB_) allowedVars.insert(var);
-        return allowedVars;
+        mvaCalc_.reset(new ttUtility::TrijetInputCalculator());
+        mvaCalc_->mapVars(variables_.find("reco_candidates")->second);
     }
 
     void operator()(NTupleReader& tr)
@@ -784,7 +426,7 @@ int main(int argc, char* argv[])
     int opt;
     int option_index = 0;
     static struct option long_options[] = {
-        {"fakerate",           no_argument, 0, 'f'},
+        {"fakerate",         no_argument, 0, 'f'},
 	{"condor",           no_argument, 0, 'c'},
         {"dataSets",   required_argument, 0, 'D'},
         {"numFiles",   required_argument, 0, 'N'},
@@ -874,11 +516,190 @@ int main(int argc, char* argv[])
     const std::map<std::string, std::vector<std::string>> variables =
     {
         {"gen_tops", {"eventNum", "candNum", "genTopPt", "sampleWgt","Njet"} },
-        {"reco_candidates", {"eventNum", "candNum", "ncand", "cand_dThetaMin", "cand_dThetaMax", "cand_dRMax", "cand_eta", "cand_m", "cand_phi", "cand_pt", "cand_p", "dR12_lab", "dR13_lab", "dR1_23_lab", "dR23_lab", "dR2_13_lab", "dR3_12_lab", "dRPtTop", "dRPtW", "dTheta12", "dTheta13", "dTheta23", "j12_m", "j12_m_lab", "j13_m", "j13_m_lab", "j1_CSV", "j1_CSVFlightDistance2dSig", "j1_CSVFlightDistance2dVal", "j1_CSVFlightDistance3dSig", "j1_CSVFlightDistance3dVal", "j1_CSVJetNSecondaryVertices", "j1_CSVTrackJetPt", "j1_CSVTrackSip2dSigAboveCharm", "j1_CSVTrackSip2dValAboveCharm", "j1_CSVTrackSip3dSigAboveCharm", "j1_CSVTrackSip3dValAboveCharm", "j1_CSVTrackSumJetDeltaR", "j1_CSVTrackSumJetEtRatio", "j1_CSVVertexCategory", "j1_CSVVertexEnergyRatio", "j1_CSVVertexJetDeltaR", "j1_CSVVertexMass", "j1_CSVVertexNTracks", "j1_CSV_lab", "j1_CTagFlightDistance2dSig", "j1_CTagFlightDistance3dSig", "j1_CTagJetNSecondaryVertices", "j1_CTagMassVertexEnergyFraction", "j1_CTagTrackSip2dSigAboveCharm", "j1_CTagTrackSip3dSigAboveCharm", "j1_CTagTrackSumJetDeltaR", "j1_CTagTrackSumJetEtRatio", "j1_CTagVertexBoostOverSqrtJetPt", "j1_CTagVertexCategory", "j1_CTagVertexEnergyRatio", "j1_CTagVertexJetDeltaR", "j1_CTagVertexLeptonCategory", "j1_CTagVertexMass", "j1_CTagVertexNTracks", "j1_ChargedHadronMultiplicity", "j1_CombinedSvtx", "j1_CvsB", "j1_CvsL", "j1_DeepCSVb", "j1_DeepCSVbb", "j1_DeepCSVc", "j1_DeepCSVcc", "j1_DeepCSVl", "j1_ElectronEnergyFraction", "j1_ElectronMultiplicity", "j1_JetBprob", "j1_JetProba", "j1_MuonMultiplicity", "j1_NeutralHadronMultiplicity", "j1_PhotonEnergyFraction", "j1_PhotonMultiplicity", "j1_QGL", "j1_QGL_lab", "j1_SoftE", "j1_SoftM", "j1_Svtx", "j1_eta_lab", "j1_m", "j1_m_lab", "j1_p", "j1_phi_lab", "j1_pt_lab", "j1_qgAxis1", "j1_qgAxis1_lab", "j1_qgAxis2", "j1_qgAxis2_lab", "j1_qgMult", "j1_qgMult_lab", "j1_qgPtD", "j1_qgPtD_lab", "j1_recoJetsCharge", "j1_recoJetsFlavor", "j1_recoJetsHFEMEnergyFraction", "j1_recoJetsHFHadronEnergyFraction", "j1_recoJetsJecScaleRawToFull", "j1_recoJetschargedEmEnergyFraction", "j1_recoJetschargedHadronEnergyFraction", "j1_recoJetsmuonEnergyFraction", "j1_recoJetsneutralEmEnergyFraction", "j1_recoJetsneutralEnergyFraction", "j23_m", "j23_m_lab", "j2_CSV", "j2_CSVFlightDistance2dSig", "j2_CSVFlightDistance2dVal", "j2_CSVFlightDistance3dSig", "j2_CSVFlightDistance3dVal", "j2_CSVJetNSecondaryVertices", "j2_CSVTrackJetPt", "j2_CSVTrackSip2dSigAboveCharm", "j2_CSVTrackSip2dValAboveCharm", "j2_CSVTrackSip3dSigAboveCharm", "j2_CSVTrackSip3dValAboveCharm", "j2_CSVTrackSumJetDeltaR", "j2_CSVTrackSumJetEtRatio", "j2_CSVVertexCategory", "j2_CSVVertexEnergyRatio", "j2_CSVVertexJetDeltaR", "j2_CSVVertexMass", "j2_CSVVertexNTracks", "j2_CSV_lab", "j2_CTagFlightDistance2dSig", "j2_CTagFlightDistance3dSig", "j2_CTagJetNSecondaryVertices", "j2_CTagMassVertexEnergyFraction", "j2_CTagTrackSip2dSigAboveCharm", "j2_CTagTrackSip3dSigAboveCharm", "j2_CTagTrackSumJetDeltaR", "j2_CTagTrackSumJetEtRatio", "j2_CTagVertexBoostOverSqrtJetPt", "j2_CTagVertexCategory", "j2_CTagVertexEnergyRatio", "j2_CTagVertexJetDeltaR", "j2_CTagVertexLeptonCategory", "j2_CTagVertexMass", "j2_CTagVertexNTracks", "j2_ChargedHadronMultiplicity", "j2_CombinedSvtx", "j2_CvsB", "j2_CvsL", "j2_DeepCSVb", "j2_DeepCSVbb", "j2_DeepCSVc", "j2_DeepCSVcc", "j2_DeepCSVl", "j2_ElectronEnergyFraction", "j2_ElectronMultiplicity", "j2_JetBprob", "j2_JetProba", "j2_MuonMultiplicity", "j2_NeutralHadronMultiplicity", "j2_PhotonEnergyFraction", "j2_PhotonMultiplicity", "j2_QGL", "j2_QGL_lab", "j2_SoftE", "j2_SoftM", "j2_Svtx", "j2_eta_lab", "j2_m", "j2_m_lab", "j2_p", "j2_phi_lab", "j2_pt_lab", "j2_qgAxis1", "j2_qgAxis1_lab", "j2_qgAxis2", "j2_qgAxis2_lab", "j2_qgMult", "j2_qgMult_lab", "j2_qgPtD", "j2_qgPtD_lab", "j2_recoJetsCharge", "j2_recoJetsFlavor", "j2_recoJetsHFEMEnergyFraction", "j2_recoJetsHFHadronEnergyFraction", "j2_recoJetsJecScaleRawToFull", "j2_recoJetschargedEmEnergyFraction", "j2_recoJetschargedHadronEnergyFraction", "j2_recoJetsmuonEnergyFraction", "j2_recoJetsneutralEmEnergyFraction", "j2_recoJetsneutralEnergyFraction", "j3_CSV", "j3_CSVFlightDistance2dSig", "j3_CSVFlightDistance2dVal", "j3_CSVFlightDistance3dSig", "j3_CSVFlightDistance3dVal", "j3_CSVJetNSecondaryVertices", "j3_CSVTrackJetPt", "j3_CSVTrackSip2dSigAboveCharm", "j3_CSVTrackSip2dValAboveCharm", "j3_CSVTrackSip3dSigAboveCharm", "j3_CSVTrackSip3dValAboveCharm", "j3_CSVTrackSumJetDeltaR", "j3_CSVTrackSumJetEtRatio", "j3_CSVVertexCategory", "j3_CSVVertexEnergyRatio", "j3_CSVVertexJetDeltaR", "j3_CSVVertexMass", "j3_CSVVertexNTracks", "j3_CSV_lab", "j3_CTagFlightDistance2dSig", "j3_CTagFlightDistance3dSig", "j3_CTagJetNSecondaryVertices", "j3_CTagMassVertexEnergyFraction", "j3_CTagTrackSip2dSigAboveCharm", "j3_CTagTrackSip3dSigAboveCharm", "j3_CTagTrackSumJetDeltaR", "j3_CTagTrackSumJetEtRatio", "j3_CTagVertexBoostOverSqrtJetPt", "j3_CTagVertexCategory", "j3_CTagVertexEnergyRatio", "j3_CTagVertexJetDeltaR", "j3_CTagVertexLeptonCategory", "j3_CTagVertexMass", "j3_CTagVertexNTracks", "j3_ChargedHadronMultiplicity", "j3_CombinedSvtx", "j3_CvsB", "j3_CvsL", "j3_DeepCSVb", "j3_DeepCSVbb", "j3_DeepCSVc", "j3_DeepCSVcc", "j3_DeepCSVl", "j3_ElectronEnergyFraction", "j3_ElectronMultiplicity", "j3_JetBprob", "j3_JetProba", "j3_MuonMultiplicity", "j3_NeutralHadronMultiplicity", "j3_PhotonEnergyFraction", "j3_PhotonMultiplicity", "j3_QGL", "j3_QGL_lab", "j3_SoftE", "j3_SoftM", "j3_Svtx", "j3_eta_lab", "j3_m", "j3_m_lab", "j3_p", "j3_phi_lab", "j3_pt_lab", "j3_qgAxis1", "j3_qgAxis1_lab", "j3_qgAxis2", "j3_qgAxis2_lab", "j3_qgMult", "j3_qgMult_lab", "j3_qgPtD", "j3_qgPtD_lab", "j3_recoJetsCharge", "j3_recoJetsFlavor", "j3_recoJetsHFEMEnergyFraction", "j3_recoJetsHFHadronEnergyFraction", "j3_recoJetsJecScaleRawToFull", "j3_recoJetschargedEmEnergyFraction", "j3_recoJetschargedHadronEnergyFraction", "j3_recoJetsmuonEnergyFraction", "j3_recoJetsneutralEmEnergyFraction", "j3_recoJetsneutralEnergyFraction", "sd_n2", "genTopMatchesVec", "genConstiuentMatchesVec", "genConstMatchGenPtVec", "Njet", "Bjet", "passnJets", "passMET", "passdPhis", "passBJets", "MET", "sampleWgt", "j1_p_top", "j1_theta_top", "j1_phi_top", "j2_p_top", "j2_theta_top", "j2_phi_top", "j3_p_top", "j3_theta_top", "j3_phi_top"} }
+        {"reco_candidates", {"eventNum",
+                             "candNum",
+                             "ncand",
+                             "cand_dThetaMin",
+                             "cand_dThetaMax",
+                             "cand_dRMax",
+                             "cand_eta",
+                             "cand_m",
+                             "cand_phi",
+                             "cand_pt",
+                             "cand_p",
+                             "dR12_lab",
+                             "dR13_lab",
+                             "dR1_23_lab",
+                             "dR23_lab",
+                             "dR2_13_lab",
+                             "dR3_12_lab",
+                             "dRPtTop",
+                             "dRPtW",
+                             "dTheta12",
+                             "dTheta13",
+                             "dTheta23",
+                             "j12_m",
+                             "j12_m_lab",
+                             "j13_m",
+                             "j13_m_lab",
+                             "j1_CSV",
+                             "j1_CSV_lab",
+                             "j1_ChargedHadronMultiplicity",
+                             "j1_CombinedSvtx",
+                             "j1_CvsB",
+                             "j1_CvsL",
+                             "j1_DeepCSVb",
+                             "j1_DeepCSVbb",
+                             "j1_DeepCSVc",
+                             "j1_DeepCSVcc",
+                             "j1_DeepCSVl",
+                             "j1_ElectronEnergyFraction",
+                             "j1_ElectronMultiplicity",
+//                             "j1_JetBprob",
+                             "j1_JetProba",
+                             "j1_MuonMultiplicity",
+                             "j1_NeutralHadronMultiplicity",
+                             "j1_PhotonEnergyFraction",
+                             "j1_PhotonMultiplicity",
+                             "j1_QGL",
+                             "j1_QGL_lab",
+                             "j1_eta_lab",
+                             "j1_m",
+                             "j1_m_lab",
+                             "j1_p",
+                             "j1_phi_lab",
+                             "j1_pt_lab",
+                             "j1_qgAxis1",
+                             "j1_qgAxis1_lab",
+                             "j1_qgAxis2",
+                             "j1_qgAxis2_lab",
+                             "j1_qgMult",
+                             "j1_qgMult_lab",
+                             "j1_qgPtD",
+                             "j1_qgPtD_lab",
+//                             "j1_recoJetsCharge",
+                             "j1_recoJetsHFEMEnergyFraction",
+                             "j1_recoJetsHFHadronEnergyFraction",
+                             "j1_recoJetsJecScaleRawToFull",
+                             "j1_recoJetschargedEmEnergyFraction",
+                             "j1_recoJetschargedHadronEnergyFraction",
+                             "j1_recoJetsmuonEnergyFraction",
+                             "j1_recoJetsneutralEmEnergyFraction",
+                             "j1_recoJetsneutralEnergyFraction",
+                             "j23_m",
+                             "j23_m_lab",
+                             "j2_CSV",
+                             "j2_CSV_lab",
+                             "j2_ChargedHadronMultiplicity",
+                             "j2_CombinedSvtx",
+                             "j2_CvsB",
+                             "j2_CvsL",
+                             "j2_DeepCSVb",
+                             "j2_DeepCSVbb",
+                             "j2_DeepCSVc",
+                             "j2_DeepCSVcc",
+                             "j2_DeepCSVl",
+                             "j2_ElectronEnergyFraction",
+                             "j2_ElectronMultiplicity",
+//                             "j2_JetBprob",
+                             "j2_JetProba",
+                             "j2_MuonMultiplicity",
+                             "j2_NeutralHadronMultiplicity",
+                             "j2_PhotonEnergyFraction",
+                             "j2_PhotonMultiplicity",
+                             "j2_QGL",
+                             "j2_QGL_lab",
+                             "j2_eta_lab",
+                             "j2_m",
+                             "j2_m_lab",
+                             "j2_p",
+                             "j2_phi_lab",
+                             "j2_pt_lab",
+                             "j2_qgAxis1",
+                             "j2_qgAxis1_lab",
+                             "j2_qgAxis2",
+                             "j2_qgAxis2_lab",
+                             "j2_qgMult",
+                             "j2_qgMult_lab",
+                             "j2_qgPtD",
+                             "j2_qgPtD_lab",
+//                             "j2_recoJetsCharge",
+                             "j2_recoJetsHFEMEnergyFraction",
+                             "j2_recoJetsHFHadronEnergyFraction",
+                             "j2_recoJetsJecScaleRawToFull",
+                             "j2_recoJetschargedEmEnergyFraction",
+                             "j2_recoJetschargedHadronEnergyFraction",
+                             "j2_recoJetsmuonEnergyFraction",
+                             "j2_recoJetsneutralEmEnergyFraction",
+                             "j2_recoJetsneutralEnergyFraction",
+                             "j3_CSV",
+                             "j3_CSV_lab",
+                             "j3_ChargedHadronMultiplicity",
+                             "j3_CombinedSvtx",
+                             "j3_CvsB",
+                             "j3_CvsL",
+                             "j3_DeepCSVb",
+                             "j3_DeepCSVbb",
+                             "j3_DeepCSVc",
+                             "j3_DeepCSVcc",
+                             "j3_DeepCSVl",
+                             "j3_ElectronEnergyFraction",
+                             "j3_ElectronMultiplicity",
+//                             "j3_JetBprob",
+                             "j3_JetProba",
+                             "j3_MuonMultiplicity",
+                             "j3_NeutralHadronMultiplicity",
+                             "j3_PhotonEnergyFraction",
+                             "j3_PhotonMultiplicity",
+                             "j3_QGL",
+                             "j3_QGL_lab",
+                             "j3_eta_lab",
+                             "j3_m",
+                             "j3_m_lab",
+                             "j3_p",
+                             "j3_phi_lab",
+                             "j3_pt_lab",
+                             "j3_qgAxis1",
+                             "j3_qgAxis1_lab",
+                             "j3_qgAxis2",
+                             "j3_qgAxis2_lab",
+                             "j3_qgMult",
+                             "j3_qgMult_lab",
+                             "j3_qgPtD",
+                             "j3_qgPtD_lab",
+//                             "j3_recoJetsCharge",
+                             "j3_recoJetsHFEMEnergyFraction",
+                             "j3_recoJetsHFHadronEnergyFraction",
+                             "j3_recoJetsJecScaleRawToFull",
+                             "j3_recoJetschargedEmEnergyFraction",
+                             "j3_recoJetschargedHadronEnergyFraction",
+                             "j3_recoJetsmuonEnergyFraction",
+                             "j3_recoJetsneutralEmEnergyFraction",
+                             "j3_recoJetsneutralEnergyFraction",
+//                             "sd_n2",
+                             "genTopMatchesVec",
+                             "genConstiuentMatchesVec",
+                             "genConstMatchGenPtVec",
+                             "Njet",
+                             "Bjet",
+                             "passnJets",
+                             "passMET",
+                             "passdPhis",
+                             "passBJets",
+                             "MET",
+                             "sampleWgt",
+                             "j1_p_top",
+                             "j1_theta_top",
+                             "j1_phi_top",
+                             "j2_p_top",
+                             "j2_theta_top",
+                             "j2_phi_top",
+                             "j3_p_top",
+                             "j3_theta_top",
+                             "j3_phi_top"} }
     };
 
     //parse sample splitting and set up minituples
-    //vector<pair<std::unique_ptr<MiniTupleMaker>, int>> mtmVec;
     vector<pair<std::unique_ptr<HDF5Writer>, int>> mtmVec;
     int sumRatio = 0;
     for(size_t pos = 0, iter = 0; pos != string::npos; pos = sampleRatios.find(":", pos + 1), ++iter)
@@ -890,7 +711,6 @@ int main(int argc, char* argv[])
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
         else if(iter == 2) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
         else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
-        //mtmVec.emplace_back(std::unique_ptr<MiniTupleMaker>(new MiniTupleMaker(ofname, "slimmedTuple")), splitNum);
         mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 250000, ofname)), splitNum);
     }
 
@@ -934,7 +754,7 @@ int main(int argc, char* argv[])
                     NTupleReader tr(t);
 
                     //register variable prep class with NTupleReader
-                    PrepVariables prepVars;
+                    PrepVariables prepVars(variables);
                     tr.registerFunction(prepVars);
 
                     int splitCounter = 0, mtmIndex = 0;
@@ -952,9 +772,6 @@ int main(int argc, char* argv[])
                             //Initialize the mini tuple branches, needs to be done after first call of tr.getNextEvent()
                             for(auto& mtm : mtmVec)
                             {
-                                auto varSet = prepVars.getVarSet();
-                                varSet.insert("sampleWgt");
-                                mtm.first->setTupleVars(varSet);
                                 mtm.first->initBranches(tr);
                             }
                         }

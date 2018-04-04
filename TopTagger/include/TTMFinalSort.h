@@ -8,6 +8,12 @@
 
 class TopTaggerResults;
 
+/**
+ *This module is used to sort the final list of tops after overlap resolution.  
+ *
+ *@param mt (float) <b> Common context </b> Mass of the top quark
+ *@param sortMethod (string) This parameter defines the sorting order.  The possible options are "topMass", "topPt", and "none".
+*/
 class TTMFinalSort : public TTModule
 {
 private:
