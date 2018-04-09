@@ -27,16 +27,20 @@ class FileNameQueue:
     def get(self):
         return self.fileQueue.get(False)
 
-    def queueProcess(self):
+    def queueProcess(self, coord):
         for i in xrange(self.nEpoch):
+            if coord.should_stop():
+                break
             perms = numpy.random.permutation(self.files.shape[0])
             self.files = self.files[perms]
             
             for fileName in self.files:
+                if coord.should_stop():
+                    break
                 self.fileQueue.put(tuple((fileName,) ))
 
-    def startQueueProcess(self):
-        p = threading.Thread(target=self.queueProcess)
+    def startQueueProcess(self, coord):
+        p = threading.Thread(target=self.queueProcess, args=(coord,))
         p.daemon = True # thread will close when parent quits
         p.start()
         return p

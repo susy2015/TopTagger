@@ -7,9 +7,13 @@ from CustomQueueRunner import CustomQueueRunner
 from FileNameQueue import FileNameQueue
 
 class DataSample:
-    def __init__(self, dataSet, nEpoch, batchSize, variables, inputDataQueue, sumScaleFactor, ptReweight=False):
+    def __init__(self, dataSet, nEpoch, batchSize, variables, inputDataQueue, sumScaleFactor, signal = True, background = True, ptReweight=False):
 
         self.dataSet = dataSet
+
+        self.inputDataQueue = inputDataQueue
+
+        self.queue = tf.FIFOQueue(capacity = 32768, shapes = inputDataQueue.shapes, dtypes = inputDataQueue.dtypes)
 
         #enqueue delay
         self.scaleFactor = self.dataSet.xsec*self.dataSet.rescale*self.dataSet.kFactor/self.dataSet.Nevts
@@ -21,11 +25,11 @@ class DataSample:
         self.fileQueue = FileNameQueue(self.fileList, nEpoch)
 
         #create CustomRunner for this dataset 
-        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, inputDataQueue, ptReweight)
+        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, self.queue, signal, background, ptReweight)
 
 
-    def enqueueBatch(self, sess):
-        return self.customRunner.enqueueBatch(sess)
+    def start_threads(self, sess, coord, n_threads=1):
+        return self.customRunner.start_threads(sess, coord, n_threads)
 
-    def abort(self):
-        self.fileQueueThread = self.fileQueue.fileQueue.close()
+    def getEnqueueOp(self, nSample):
+        return [self.inputDataQueue.enqueue_many(self.queue.dequeue_many(nSample)),]

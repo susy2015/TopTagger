@@ -62,15 +62,21 @@ def mainXGB(options):
 
   # Import data
   dg = DataGetter(allVars)
-  trainData = dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[0].h5")), prescale=True, ptReweight=options.ptReweight)
+  dataFiles = []
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_20_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_40_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_60_division_0_TTbarSingleLepT*_training_[01234].h5")
+  trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
+  #= dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[0].h5")), prescale=True, ptReweight=options.ptReweight)
 
   print "TRAINING XGB"
 
   # Create xgboost classifier
   # Train random forest 
   xgData = xgb.DMatrix(trainData["data"], label=trainData["labels"][:,0])#, weight=trainData["weights"][:,0])
-  param = {'max_depth':6, 'eta':0.05, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'], 'nthread':28 }
-  gbm = xgb.train(param, xgData, num_boost_round=1000)
+  param = {'max_depth':6, 'eta':0.03, 'objective':'binary:logistic', 'eval_metric':['error', 'auc', 'logloss'], 'nthread':28 }
+  gbm = xgb.train(param, xgData, num_boost_round=2000)
   
   #Dump output from training
   gbm.save_model(options.directory + "/" + 'TrainingModel.xgb')
@@ -87,13 +93,18 @@ def mainTF(options):
 
   print "PROCESSING TRAINING DATA"
 
-  dg = DataGetter.DefinedVariables(options.netOp.vNames)
+  dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True)
+  dgBg = DataGetter.DefinedVariables(options.netOp.vNames, background = True)
 
-  print "Input Variables: ",len(dg.getList())
+  print "Input Variables: ",len(dgSig.getList())
 
   # Import data
   print options.runOp.validationSamples
-  validData = dg.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
+  validData = dgSig.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
+  validDataBG = dgBg.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
+
+  for key in validData:
+    validData[key] = numpy.vstack([validData[key], validDataBG[key][:validData[key].shape[0]]])
 
   #get input/output sizes
   print validData["data"].shape
@@ -139,8 +150,11 @@ def mainTF(options):
   with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=8) ) as sess:
     sess.run(tf.global_variables_initializer())
 
+    # Create a coordinator, launch the queue runner threads.
+    coord = tf.train.Coordinator()
+
     #start queue runners
-    dm.startSampleQueue(sess)
+    threads = dm.launchQueueThreads(sess, coord)
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, nEpoch)
 
@@ -150,23 +164,26 @@ def mainTF(options):
     extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
     i = 0
-    while True:
+    try:
+      while not coord.should_stop():
 
-      try:
         _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op,extra_update_ops[:len(extra_update_ops)/2]], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         summary_writer.add_summary(summary, i)
         i += 1
-        print i
-      except tf.errors.OutOfRangeError:
-        print('Done training -- epoch limit reached')
-        dm.join()
-        break
 
-      if i == 1 or not i % ReportInterval:
-        validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
-        summary_writer.add_summary(summary_vl, i)
-        print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
-          
+        if i == 1 or not i % ReportInterval:
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl, i)
+          print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
+
+
+    except Exception, e:
+      # Report exceptions to the coordinator.
+      coord.request_stop(e)
+    finally:
+      # Terminate as usual. It is safe to call `coord.request_stop()` twice.
+      coord.request_stop()
+      coord.join(threads)          
 
     mlp.saveCheckpoint(sess, options.runOp.directory)
     mlp.saveModel(sess, options.runOp.directory)

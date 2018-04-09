@@ -13,17 +13,17 @@ class DataManager:
         self.nEpoch = nEpoch
 
         #Define input data queue
-        self.inputDataQueue = tf.RandomShuffleQueue(capacity=65536, min_after_dequeue=65536-16384, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
+        self.inputDataQueue = tf.RandomShuffleQueue(capacity=65536*2, min_after_dequeue=65536*2 - 65536/2, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
 
         #Add DataSample objects for each data set used 
         self.sigScaleSum = 0
         for dataSet in signalDataSets:
             self.sigScaleSum += dataSet.xsec*dataSet.rescale*dataSet.kFactor/dataSet.Nevts
 
+        batchSize = 65536 / 4
         self.sigDataSamples = []
         for dataSet in signalDataSets:
-            batchSize = 1024
-            self.sigDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, ptReweight))
+            self.sigDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, True, False,  ptReweight))
 
         self.bgScaleSum = 0
         for dataSet in signalDataSets:
@@ -31,42 +31,47 @@ class DataManager:
 
         self.bgDataSamples = []
         for dataSet in backgroundDataSets:
-            self.bgDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, ptReweight))
+            self.bgDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, False, True, ptReweight))
 
-    def startFileQueues(self):
+    def startFileQueues(self, coord):
+        threads = []
         for ds in self.sigDataSamples:
-            ds.fileQueue.startQueueProcess()
+            threads.append(ds.fileQueue.startQueueProcess(coord))
 
         for ds in self.bgDataSamples:
-            ds.fileQueue.startQueueProcess()
+            threads.append(ds.fileQueue.startQueueProcess(coord))
 
-    def queueProcess(self, sess):
-        self.startFileQueues()
+        return threads
+
+    def launchQueueThreads(self, sess, coord):
+        threads = self.startFileQueues(coord)
 
         sleep(2)
 
-        while True:
-            status = True
-            for ds in self.sigDataSamples:
-                status = status and ds.enqueueBatch(sess)
+        enqueueOps = []
+        for ds in self.sigDataSamples:
+            threads += ds.start_threads(sess, coord)
+            enqueueOps += ds.getEnqueueOp(2048)
+            
+        for ds in self.bgDataSamples:
+            threads += ds.start_threads(sess, coord)
+            enqueueOps += ds.getEnqueueOp(2048)
 
-            for ds in self.bgDataSamples:
-                status = status and ds.enqueueBatch(sess)
+        self.qr = tf.train.QueueRunner(self.inputDataQueue, enqueueOps)
 
-            if not status:
-                break
+        threads += self.qr.create_threads(sess, coord=coord, start=True)
 
-        sess.run(self.inputDataQueue.close())  
+        return threads
 
-    def startSampleQueue(self, sess):
-        self.p = threading.Thread(target=self.queueProcess, args=(sess,))
-        self.p.daemon = True # thread will close when parent quits
-        self.p.start()
-        return self.p
-
-    def join(self):
-        self.p.join()
-
+#    def startSampleQueue(self, sess, coord):
+#        self.p = threading.Thread(target=self.queueProcess, args=(sess,coord,))
+#        self.p.daemon = True # thread will close when parent quits
+#        self.p.start()
+#        return self.p
+#
+#    def join(self):
+#        self.p.join()
+#
 #    def thread_main(self, sess):
 #      """
 #      Function run on alternate thread. Basically, keep adding data to the queue.
