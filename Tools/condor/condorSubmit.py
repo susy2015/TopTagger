@@ -20,18 +20,20 @@ import subprocess
 filestoTransferGTP = [environ["CMSSW_BASE"] + "/src/TopTagger/Tools/makeTrainingTuples",
                       environ["CMSSW_BASE"] + "/src/TopTagger/TopTagger/test/libTopTagger.so",
                       environ["CMSSW_BASE"] + "/src/TopTagger/Tools/TopTaggerClusterOnly.cfg",
-                      environ["CMSSW_BASE"] + "/src/opencv/lib/libopencv_core.so.3.1",
-                      environ["CMSSW_BASE"] + "/src/opencv/lib/libopencv_ml.so.3.1",
-                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so",
-                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10",
-                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10.3.0",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets.txt",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections.txt",
+                      "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_core.so.3.1",
+                      "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_ml.so.3.1",
+#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so",
+#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10",
+#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10.3.0",
                       ]
 
 
 #go make top plots!
 submitFileGTP = """universe = vanilla
 Executable = $ENV(CMSSW_BASE)/src/TopTagger/Tools/condor/goMakeTrainingTuples.sh
-request_memory = 3100
+request_memory = 5100
 Should_Transfer_Files = YES
 WhenToTransferOutput = ON_EXIT
 Transfer_Input_Files = $ENV(CMSSW_BASE)/src/TopTagger/Tools/condor/goMakeTrainingTuples.sh,$ENV(CMSSW_BASE)/src/TopTagger/Tools/condor/gtp.tar.gz,$ENV(CMSSW_BASE)/src/TopTagger/Tools/condor/$ENV(CMSSW_VERSION).tar.gz 
@@ -83,7 +85,7 @@ makeExeAndFriendsTarrball(filestoTransferGTP, "gtp")
 nFilesPerJob = options.numfile
 
 fileParts = [submitFile]
-sc = SampleCollection()
+sc = SampleCollection("../sampleSets.txt", "../sampleCollections.txt")
 datasets = []
 
 if options.dataCollections or options.dataCollectionslong:

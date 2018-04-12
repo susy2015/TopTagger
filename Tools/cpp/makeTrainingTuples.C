@@ -482,8 +482,8 @@ int main(int argc, char* argv[])
         sampleloc = "condor";
     }
 
-    AnaSamples::SampleSet        ss(sampleloc);
-    AnaSamples::SampleCollection sc(ss);
+    AnaSamples::SampleSet        ss("sampleSets.txt", runOnCondor);
+    AnaSamples::SampleCollection sc("sampleCollections.txt", ss);
 
     map<string, vector<AnaSamples::FileSummary>> fileMap;
 
