@@ -43,9 +43,6 @@ class CustomQueueRunner(object):
             except Queue.Empty:
                 return
 
-    def thread_readFile(self, dg, fname, dataOut):
-      dataOut.append( dg.importData([fname]) )
-
     def data_iterator(self):
       """ A simple data iterator """
 
@@ -60,20 +57,16 @@ class CustomQueueRunner(object):
         #read next file
         data = dg.importData(fileName, ptReweight=self.ptReweight)
         batch_idx = 0
-        while batch_idx + self.batch_size <= data["data"].shape[0]:
+        nSamples = data["data"].shape[0]
+        while batch_idx + self.batch_size <= nSamples:
             yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
             batch_idx += self.batch_size
 
-      return
+        #yield the last bit of data from the file 
+        if batch_idx < nSamples:
+            yield data["data"][batch_idx:], data["labels"][batch_idx:], data["weights"][batch_idx:]
 
-#    def enqueueBatch(self, sess):
-#        #Enqueue one batch into the main queue
-#        try:
-#            dataX, dataY, dataW = next(self.data_iterator())
-#            sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
-#            return True
-#        except StopIteration:
-#            return False
+      return
 
     def thread_main(self, sess, coord):
       """
@@ -85,6 +78,7 @@ class CustomQueueRunner(object):
         sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
 
       sess.run(self.queueX.close())
+      coord.request_stop()
 
     def start_threads(self, sess, coord, n_threads):
       """ Start background threads to feed queue """
@@ -95,7 +89,5 @@ class CustomQueueRunner(object):
         t.start()
         threads.append(t)
 
-      #pass threads to FileQueue for management
-      #self.fileQueue.addCustomRunnerThreads(threads)
       return threads
 

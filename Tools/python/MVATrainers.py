@@ -131,8 +131,10 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_0_division_0_TTbarSingleLepTbar_training_*.h5", 182.70, 61901450, 1.0, True, 1.0, 1.0),]
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_0_division_0_TTbarSingleLepTbar_training_*.h5", 182.70, 61901450, 1.0, False, 1.0, 1.0),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0),]
+  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 1.0, 1.0),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 1.0, 1.0),]
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nWeigts, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
   # Build the graph
@@ -151,10 +153,11 @@ def mainTF(options):
     sess.run(tf.global_variables_initializer())
 
     # Create a coordinator, launch the queue runner threads.
-    coord = tf.train.Coordinator()
+    coordS1 = tf.train.Coordinator()
+    coordS2 = tf.train.Coordinator()
 
     #start queue runners
-    threads = dm.launchQueueThreads(sess, coord)
+    threadsS1, threadsS2 = dm.launchQueueThreads(sess, coordS1, coordS2)
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, nEpoch)
 
@@ -165,8 +168,9 @@ def mainTF(options):
 
     i = 0
     try:
-      while not coord.should_stop():
-
+      while not coordS1.should_stop():
+#        data = sess.run(dm.inputDataQueue.dequeue_many(n=1024))
+#        print data[1]
         _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op,extra_update_ops[:len(extra_update_ops)/2]], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         summary_writer.add_summary(summary, i)
         i += 1
@@ -176,14 +180,16 @@ def mainTF(options):
           summary_writer.add_summary(summary_vl, i)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
 
-
     except Exception, e:
       # Report exceptions to the coordinator.
-      coord.request_stop(e)
+      coordS1.request_stop(e)
+      coordS2.request_stop(e)
     finally:
       # Terminate as usual. It is safe to call `coord.request_stop()` twice.
-      coord.request_stop()
-      coord.join(threads)          
+      coordS1.request_stop()
+      coordS1.join(threadsS1)
+      coordS2.request_stop()
+      coordS2.join(threadsS2)
 
     mlp.saveCheckpoint(sess, options.runOp.directory)
     mlp.saveModel(sess, options.runOp.directory)

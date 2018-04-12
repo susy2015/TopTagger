@@ -50,6 +50,7 @@ class DataGetter:
     
     def importData(self, samplesToRun, prescale = True, ptReweight=True, randomize = True):
 
+      #check if this file was cached 
       if (samplesToRun, prescale, ptReweight) in self.dataMap:
         npyInputData, npyInputAnswers, npyInputWgts, npyInputSampleWgts = self.dataMap[samplesToRun, prescale, ptReweight]
 
@@ -67,6 +68,12 @@ class DataGetter:
         f = h5py.File(samplesToRun[0], "r")
         columnHeaders = f["reco_candidates"].attrs["column_headers"]
         f.close()
+
+        print len(columnHeaders)
+
+        for v in variables:
+            if not v in columnHeaders:
+                print v
 
         dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
         
@@ -105,6 +112,8 @@ class DataGetter:
         npyInputAnswers = da.vstack([npyInputAnswer,da.logical_not(npyInputAnswer)]).transpose()[filterArray].compute()
         npyInputSampleWgts = x[:,wgtColumns][filterArray].compute()
         npyInputWgts = npyInputSampleWgts
+
+        return {"data":npyInputData, "labels":npyInputAnswers, "weights":npyInputWgts, "":npyInputSampleWgts}
 
         #for sample in samplesToRun:
         #  try:
@@ -200,5 +209,5 @@ class DataGetter:
       #  npyInputWgts = npyInputWgts[perms]
       #  npyInputSampleWgts = npyInputSampleWgts[perms]
     
-      return {"data":npyInputData, "labels":npyInputAnswers, "weights":npyInputWgts, "":npyInputSampleWgts}
+
 

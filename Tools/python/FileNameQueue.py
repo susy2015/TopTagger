@@ -35,9 +35,15 @@ class FileNameQueue:
             self.files = self.files[perms]
             
             for fileName in self.files:
-                if coord.should_stop():
-                    break
-                self.fileQueue.put(tuple((fileName,) ))
+                breakLoop = False
+                while not breakLoop:
+                    if coord.should_stop():
+                        break
+                    try:
+                        self.fileQueue.put(tuple((fileName,)), timeout=10 )
+                    except Queue.Full:
+                        continue
+                    breakLoop = True
 
     def startQueueProcess(self, coord):
         p = threading.Thread(target=self.queueProcess, args=(coord,))
