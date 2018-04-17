@@ -43,25 +43,64 @@ class DataManager:
 
         return threads
 
-    def launchQueueThreads(self, sess, coordS1, coordS2):
-        threadsS2 = self.startFileQueues(coordS2)
-
-        sleep(2)
-
+    def startDataQueues(self, sess, coord):
         enqueueOps = []
+        threads = []
         for ds in self.sigDataSamples:
-            threadsS2 += ds.start_threads(sess, coordS2)
-            enqueueOps += ds.getEnqueueOp(2048)
+            threads += ds.start_threads(sess, coord)
+            enqueueOps += ds.getEnqueueOp(2048, ds.dataSet.nEnqueueThreads)
             
         for ds in self.bgDataSamples:
-            threadsS2 += ds.start_threads(sess, coordS2)
-            enqueueOps += ds.getEnqueueOp(2048)
+            threads += ds.start_threads(sess, coord)
+            enqueueOps += ds.getEnqueueOp(2048, ds.dataSet.nEnqueueThreads)
 
+        return threads, enqueueOps
+
+    def launchQueueThreads(self, sess):
+
+        # Create a coordinator, launch the queue runner threads.
+        #stage 1 data cooridnator manages final random shuffle queue
+        self.coordS1 = tf.train.Coordinator()
+        #stage 2 data cooridnator manages FIFO queues, custom runner queues, and file name queues 
+        self.coordS2 = tf.train.Coordinator()
+
+        self.threadsS2 = self.startFileQueues(self.coordS2)
+
+        #ensure that the filename queues are all populated before continuing 
+        sleep(2)
+
+        dataThreads, enqueueOps = self.startDataQueues(sess, self.coordS2)
+        self.threadsS2 += dataThreads
+
+        #create tf queue runner to manage the final random shuffle queue
         self.qr = tf.train.QueueRunner(self.inputDataQueue, enqueueOps, queue_closed_exception_types=(tf.errors.OutOfRangeError, tf.errors.CancelledError))
 
-        threadsS1 = self.qr.create_threads(sess, coord=coordS1, start=True)
+        self.threadsS1 = self.qr.create_threads(sess, coord=self.coordS1, start=True)
 
-        return threadsS1, threadsS2
+    def continueTrainingLoop(self):
+        try:
+            return not self.coordS1.should_stop()
+        except AttributeError:
+            print "Run launchQueueThreads before starting the training loop"
+
+    def requestStop(self, e = None):
+        try:
+            if e == None:
+                self.coordS1.request_stop()
+                self.coordS2.request_stop()
+            else:
+                self.coordS1.request_stop(e)
+                self.coordS2.request_stop(e)
+        except AttributeError:
+            print "Run launchQueueThreads before starting the training loop"
+
+    def join(self):
+        try:
+            self.coordS1.join(self.threadsS1)
+            self.coordS2.join(self.threadsS2)
+        except AttributeError:
+            print "Run launchQueueThreads before starting the training loop"
+        
 
 #    def startSampleQueue(self, sess, coord):
 #        self.p = threading.Thread(target=self.queueProcess, args=(sess,coord,))

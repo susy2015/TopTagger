@@ -203,7 +203,13 @@ class CreateModel:
         self.loss = self.cross_entropy + self.l2_norm*self.reg
         self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
 
-        self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+        self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+
+        #these operations are necessary to run batch normalization 
+        extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        # forgive the hack which removes the operations associated with the placeholder copy of the network
+        #if another copy of the network were added /2 would need to be /3
+        self.batch_norm_ops = extra_update_ops[:len(extra_update_ops)/2]
 
 
     def createSummaries(self):

@@ -1,6 +1,6 @@
 
 class DataSet:
-    def __init__(self, fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale):
+    def __init__(self, fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale, nEnqueueThreads):
         self.fileGlob = fileGlob
         self.xsec = xsec
         self.Nevts = Nevts
@@ -8,3 +8,4 @@ class DataSet:
         self.sig = sig
         self.prescale = prescale
         self.rescale = rescale
+        self.nEnqueueThreads = nEnqueueThreads

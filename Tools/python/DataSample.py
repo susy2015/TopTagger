@@ -31,5 +31,5 @@ class DataSample:
     def start_threads(self, sess, coord, n_threads=1):
         return self.customRunner.start_threads(sess, coord, n_threads)
 
-    def getEnqueueOp(self, nSample):
-        return [self.inputDataQueue.enqueue_many(self.queue.dequeue_many(nSample)),]
+    def getEnqueueOp(self, nSample, nQueue = 1):
+        return [self.inputDataQueue.enqueue_many(self.queue.dequeue_many(nSample)),] * nQueue

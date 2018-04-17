@@ -131,10 +131,20 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0),]
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 1.0, 1.0),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v4/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 1.0, 1.0),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0, 5),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0, 5),]
+  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 1.0, 1.0, 1), 
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 1.0, 1.0, 1),
+                        ]
+
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nWeigts, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
   # Build the graph
@@ -152,44 +162,36 @@ def mainTF(options):
   with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=8) ) as sess:
     sess.run(tf.global_variables_initializer())
 
-    # Create a coordinator, launch the queue runner threads.
-    coordS1 = tf.train.Coordinator()
-    coordS2 = tf.train.Coordinator()
-
     #start queue runners
-    threadsS1, threadsS2 = dm.launchQueueThreads(sess, coordS1, coordS2)
+    dm.launchQueueThreads(sess)
 
     print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, nEpoch)
 
     #preload the first data into staging area
     sess.run([mlp.stagingOp], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
 
-    extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-
     i = 0
     try:
-      while not coordS1.should_stop():
-#        data = sess.run(dm.inputDataQueue.dequeue_many(n=1024))
-#        print data[1]
-        _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op,extra_update_ops[:len(extra_update_ops)/2]], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
+      while dm.continueTrainingLoop():
+        #print sess.run(dm.inputDataQueue.dequeue_many(1000))[1]
+        #run training operations 
+        _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op, mlp.batch_norm_ops], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         summary_writer.add_summary(summary, i)
         i += 1
 
         if i == 1 or not i % ReportInterval:
+          #run validation operations 
           validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl, i)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
 
     except Exception, e:
       # Report exceptions to the coordinator.
-      coordS1.request_stop(e)
-      coordS2.request_stop(e)
+      dm.requestStop(e)
     finally:
       # Terminate as usual. It is safe to call `coord.request_stop()` twice.
-      coordS1.request_stop()
-      coordS1.join(threadsS1)
-      coordS2.request_stop()
-      coordS2.join(threadsS2)
+      dm.requestStop(e)
+      dm.join()
 
     mlp.saveCheckpoint(sess, options.runOp.directory)
     mlp.saveModel(sess, options.runOp.directory)
