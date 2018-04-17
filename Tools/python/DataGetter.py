@@ -69,11 +69,9 @@ class DataGetter:
         columnHeaders = f["reco_candidates"].attrs["column_headers"]
         f.close()
 
-        print len(columnHeaders)
-
         for v in variables:
             if not v in columnHeaders:
-                print v
+                print "Variable not found: %s"%v
 
         dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
         
