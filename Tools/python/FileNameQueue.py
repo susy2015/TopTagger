@@ -13,14 +13,6 @@ class FileNameQueue:
         #filename queue
         self.fileQueue = Queue.Queue(self.files.shape[0])
 
-#    def addCustomRunnerThreads(self, crs):
-#        try:
-#            for cr in crs:
-#                self.customRunnerThreads.append(cr)
-#        except TypeError:
-#            #it is not a list, so assume it is a single CustomRunner
-#            self.customRunnerThreads.append(crs)
-
     def getQueue(self):
         return self.fileQueue
 

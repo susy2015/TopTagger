@@ -102,31 +102,3 @@ class DataManager:
             print "Run launchQueueThreads before starting the training loop"
         
 
-#    def startSampleQueue(self, sess, coord):
-#        self.p = threading.Thread(target=self.queueProcess, args=(sess,coord,))
-#        self.p.daemon = True # thread will close when parent quits
-#        self.p.start()
-#        return self.p
-#
-#    def join(self):
-#        self.p.join()
-#
-#    def thread_main(self, sess):
-#      """
-#      Function run on alternate thread. Basically, keep adding data to the queue.
-#      """
-#      for dataX, dataY, dataW in self.data_iterator():
-#        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
-#
-#    def start_threads(self, sess, n_threads=1):
-#      """ Start background threads to feed queue """
-#      threads = []
-#      for n in range(n_threads):
-#        t = threading.Thread(target=self.thread_main, args=(sess,))
-#        #p.daemon = True # thread will close when parent quits
-#        t.start()
-#        threads.append(t)
-#
-#      #pass threads to FileQueue for management
-#      self.fileQueue.addCustomRunnerThreads(threads)
-#      return thread
