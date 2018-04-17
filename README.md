@@ -43,7 +43,7 @@ A basic standalone example using the top tagging code is provided in "TopTagger/
 
 ### Running the example
 
-The example executable is compiled along with the standalone library as described above.  If either openCV or the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately.
+The example executable is compiled along with the standalone library as described above.  If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded"
 
 ```sh
 #do once per terminal if opencv or the top tagger are not installed system wide
@@ -56,7 +56,7 @@ getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 
 ### Tagger input variables
 
-The top tagging algorithm takes both a collection of all AK4 jets and all AK8 jets (passing basic pt and |eta| acceptance requirments) along with supporting variables.  The input variables are listed below
+The top tagging algorithm takes both a collection of all AK4 jets and all AK8 jets (passing basic pt and |eta| acceptance requirments) along with supporting variables.  The input variables used for the example program are listed below
 
 ``` c++
 //Variables to hold inputs

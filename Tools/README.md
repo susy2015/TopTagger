@@ -1,10 +1,10 @@
 # Tagger development tools
 
-We use scikit package for MVA based tagger studies. Its python based.  For the final random forest algorithm we use OpenCV as it provides a native C++ interface with a Python binding for training.  
+We use Tensorflow package for MVA based tagger studies. The training/validation is python based.  The model is integrated into the c++ side of the framework via the Tensorflow c-api or through a call to python if the Tensorflow c-api is inavaliable.
 
 ## Samples for training and validation
 
-Slimmed tuples containing only the information needed for training and validation can be made with "makeTrainingTuples.C".  The training and validation currently require input from the semileptonic ttbar and znunu samples.  The instructions for creating these files are found below.
+Slimmed tuples containing only the information needed for training and validation can be made with "cpp/makeTrainingTuples.C".  The training and validation currently require input from several samples including semileptonic ttbar, QCD, and znunu.  The instructions for creating these files are found below.
 
 Run the following commands (at the LPC)
 
@@ -14,7 +14,7 @@ make
 ./makeTrainingTuples -D ZJetsToNuNu -E 200000 -R 1:1
 ```
 
-You can change the input sample name with -D, #events with -E and ratio (training sample to validation sample) with -R.  Additional sample splits can be added with -R (i.e. -R 2:2:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd)
+You can change the input sample name with -D, #events with -E and ratio (training sample to validation sample) with -R.  Additional sample splits can be added with -R (i.e. -R 2:2:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd).  To produce the training files for an entire dataset a condor submit script is provided in condor/condorSubmit.py.  This code requires the repository "susy2015/SusyAnaTools" to be checked out in the same directory as the TopTagger repository to compile.run.  
 
 
 ## Running ANN training code 
@@ -80,22 +80,12 @@ libhdf5_hl.so -> libhdf5_hl-shared.so
 
 https://root.cern.ch/downloading-root
 
-### Training file preperation 
-
-The training files made using "makeTrainingTuples" must be translated to HDF5 format before they can be used in training.  A script is provided to facilitate this
-
-```
-python translateData.py -d -f inputfile.root
-```
-
-This command will produce the output file in hdf5 format (with the name "inputfile.h5").  
-
 ### Training
 
 The script "Training_tf.py" is used to train produce and train the MVA algorithm.  The script is primarily intended to train neural networks with tensorflow, but it also is able to train random forests with scikit learn and boosted decision trees with the extreme gradient boost package.
 
 ```
-python Training_tf.py -d DIRECTORY
+python Training.py -d DIRECTORY
 ```
 
 ### Validation 
@@ -103,36 +93,16 @@ python Training_tf.py -d DIRECTORY
 The script "Validation_tf.py" produces a series of validation plots including plots of all MVA input variables, the output discriminator, purity, fake rate, efficiency, and ROC curves.  It also produces a vrsion of the ROC curve in a pkl file for reploting.  The validation code will look for the trained network file in the directory specified with the -d option, so this should be the same directory name given to the training script.  Additionally, the output files will b ewritten to this directoty.  
 
 ```
-python Validation_tf.py -d DIRECTORY
+python Validation.py -d DIRECTORY
 ```
 
 ### Combined ROC curve plots
 
 The script "rocPlots.py" is provided to help many compairson ROC plots to draw multiple ROC curves on the same axis.  
 
-# Old instructions
+# Legacy Instructions
 
-## Running sklearn mva code
-
-There are two python files: 
-
-Training.py for training the mva
-
-Validation.py to validate the mva training result
-
-Run the following command
-
-```
-python Training.py
-```
-
-It will create a ouput file with training output (with .pkl extension). Then run the following
-
-```
-python Validation.py
-```
-
-It will create plots of Efficincy, Fakerate, Purity, input variables and also roc curve in png format. It will also creates a root file containing those distributions in histogram format.
+These instructions are only necessary to use the old openCV based random forest trainings.  
 
 ## OpenCV Instructions 
 
@@ -147,7 +117,7 @@ To install from github do the following in your "CMSSW_X_Y_Z/src"
 ```
 git clone git@github.com:susy2015/opencv.git
 cd opencv
-git checkout 3.1.0_StopBugFix
+git checkout 3.1.1_BugFix
 ```
 
 To compile openCV run the following commands in the "opencv" folder
