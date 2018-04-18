@@ -192,8 +192,10 @@ class CreateModel:
         
         #self.cross_entropy    = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_,    logits=self.yt),    weights=tf.reshape(self.wgt, [-1]),    reduction=tf.losses.Reduction.MEAN)
         #self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
-        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
-        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
+        #self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
+        #self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
+        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
 
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
@@ -201,7 +203,13 @@ class CreateModel:
         self.loss = self.cross_entropy + self.l2_norm*self.reg
         self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
 
-        self.train_step = tf.train.AdamOptimizer(1e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+        self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+
+        #these operations are necessary to run batch normalization 
+        extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        # forgive the hack which removes the operations associated with the placeholder copy of the network
+        #if another copy of the network were added /2 would need to be /3
+        self.batch_norm_ops = extra_update_ops[:len(extra_update_ops)/2]
 
 
     def createSummaries(self):
