@@ -16,9 +16,6 @@ Inheritance diagram for Custom\-Queue\-Runner.\-Custom\-Queue\-Runner\-:\begin{f
 \hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_a53f6b52ead2366c4c9982f7b0f76a8c9}{def {\bfseries file\-Name\-\_\-iterator}}\label{classCustomQueueRunner_1_1CustomQueueRunner_a53f6b52ead2366c4c9982f7b0f76a8c9}
 
 \item 
-\hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_a597a93bdb86013eed4892c0722d3a313}{def {\bfseries thread\-\_\-read\-File}}\label{classCustomQueueRunner_1_1CustomQueueRunner_a597a93bdb86013eed4892c0722d3a313}
-
-\item 
 def \hyperlink{classCustomQueueRunner_1_1CustomQueueRunner_aa15d0ce6375f74387b8b85f28356bd8c}{data\-\_\-iterator}
 \item 
 def \hyperlink{classCustomQueueRunner_1_1CustomQueueRunner_a9146cfaf42a1bcd9b5511fb99a2c7115}{thread\-\_\-main}
@@ -32,6 +29,12 @@ def \hyperlink{classCustomQueueRunner_1_1CustomQueueRunner_ad43f2e2230cba3ee0e11
 
 \item 
 \hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_ab12ec1deb2c6373efdb06769bfb42bd5}{{\bfseries queue\-X}}\label{classCustomQueueRunner_1_1CustomQueueRunner_ab12ec1deb2c6373efdb06769bfb42bd5}
+
+\item 
+\hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_a3518357b00d1c5a1da382067c4e8cffd}{{\bfseries signal}}\label{classCustomQueueRunner_1_1CustomQueueRunner_a3518357b00d1c5a1da382067c4e8cffd}
+
+\item 
+\hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_a43d853e67530cdf094e78f6d974b0658}{{\bfseries background}}\label{classCustomQueueRunner_1_1CustomQueueRunner_a43d853e67530cdf094e78f6d974b0658}
 
 \item 
 \hypertarget{classCustomQueueRunner_1_1CustomQueueRunner_af400c5ebfdcb41ba6d7e7404e75cd3ea}{{\bfseries data\-X}}\label{classCustomQueueRunner_1_1CustomQueueRunner_af400c5ebfdcb41ba6d7e7404e75cd3ea}
@@ -78,7 +81,8 @@ def \hyperlink{classCustomQueueRunner_1_1CustomQueueRunner_ad43f2e2230cba3ee0e11
 \begin{DoxyParamCaption}
 \item[{}]{self, }
 \item[{}]{sess, }
-\item[{}]{n\-\_\-threads = {\ttfamily 1}}
+\item[{}]{coord, }
+\item[{}]{n\-\_\-threads}
 \end{DoxyParamCaption}
 )}}\label{classCustomQueueRunner_1_1CustomQueueRunner_ad43f2e2230cba3ee0e1162eafc763ccd}
 \begin{DoxyVerb}Start background threads to feed queue \end{DoxyVerb}
@@ -87,7 +91,8 @@ def \hyperlink{classCustomQueueRunner_1_1CustomQueueRunner_ad43f2e2230cba3ee0e11
 \subsubsection[{thread\-\_\-main}]{\setlength{\rightskip}{0pt plus 5cm}def Custom\-Queue\-Runner.\-Custom\-Queue\-Runner.\-thread\-\_\-main (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
-\item[{}]{sess}
+\item[{}]{sess, }
+\item[{}]{coord}
 \end{DoxyParamCaption}
 )}}\label{classCustomQueueRunner_1_1CustomQueueRunner_a9146cfaf42a1bcd9b5511fb99a2c7115}
 \begin{DoxyVerb}Function run on alternate thread. Basically, keep adding data to the queue.
