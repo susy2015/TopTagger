@@ -86,6 +86,10 @@ def StandardVariables(variables):
       vNames = ["cand_pt", "cand_m", "dRPtTop", "j23_m_lab", "dRPtW", "j12_m_lab", "j13_m_lab", "sd_n2"]
       jNames = ["m_lab", "CSV_lab", "qgAxis1_lab", "qgMult_lab", "qgPtD_lab"]
 
+   elif variables == "deepFlavor":
+      vNames = ["cand_m", "cand_p", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"]
+      jNames = ["m", "p", "p_top", "qgAxis1", "qgAxis2", "qgMult", "qgPtD", "ChargedHadronMultiplicity", "ElectronEnergyFraction", "ElectronMultiplicity", "MuonMultiplicity", "NeutralHadronMultiplicity", "PhotonEnergyFraction", "PhotonMultiplicity", "recoJetsHFEMEnergyFraction", "recoJetsHFHadronEnergyFraction", "recoJetschargedEmEnergyFraction", "recoJetschargedHadronEnergyFraction", "recoJetsmuonEnergyFraction", "recoJetsneutralEmEnergyFraction", "recoJetsneutralEnergyFraction", "DeepFlavorb", "DeepFlavorbb", "DeepFlavorlepb", "DeepFlavorc", "DeepFlavoruds", "DeepFlavorg"]
+
    elif variables == "TeamAlpha1DConv":
       vNames = ["cand_m", "cand_pt", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"] 
       jNames = ["CSVFlightDistance2dSig",
@@ -225,7 +229,7 @@ class runOptions:
                       l2Reg             = 0.002,
                       dataPath          = "data",
                       trainingNames     = [],
-                      validationNames   = ["trainingTuple_TTbarSingleLepT_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_TTbarSingleLepTbar_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
+                      validationNames   = ["trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
                       keepProb          = 0.4,
                       nTrainingFiles    = 200):
