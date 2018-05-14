@@ -91,23 +91,74 @@ def mainTF(options):
   from DataManager import DataManager
   from DataSet import DataSet
 
-  print "PROCESSING TRAINING DATA"
+  print "PROCESSING VALIDATION DATA"
 
   dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True)
   dgBg = DataGetter.DefinedVariables(options.netOp.vNames, background = True)
 
+  validDataSig = [("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ),
+                  ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", )]
+
+  validDataBg = [("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT100to200_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT200to300_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT300to500_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT500to700_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT700to1000_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1000to1500_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1500to2000_validation_0.h5", ),
+                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT2000toInf_validation_0.h5", )]
+  
+
   print "Input Variables: ",len(dgSig.getList())
 
   # Import data
-  print options.runOp.validationSamples
-  validData = dgSig.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
-  validDataBG = dgBg.importData(samplesToRun = tuple(options.runOp.validationSamples), ptReweight=options.runOp.ptReweight)
+  #print options.runOp.validationSamples
+  
+  validDataArraySig = []
+  validDataArrayBg = []
 
-  for key in validData:
-    validData[key] = numpy.vstack([validData[key], validDataBG[key][:validData[key].shape[0]]])
+  minValidDataSizeSig = 999999999
+  minValidDataSizeBg = 999999999
+  for dsn in validDataSig:
+    print dsn
+    validDataArraySig.append(dgSig.importData(samplesToRun = tuple(dsn), ptReweight=options.runOp.ptReweight))
+    minValidDataSizeSig = min(minValidDataSizeSig, len(validDataArraySig[-1]["data"]))
+  for dsn in validDataBg:
+    print dsn
+    validDataArrayBg.append(dgBg.importData(samplesToRun = tuple(dsn), ptReweight=options.runOp.ptReweight))
+    minValidDataSizeBg = min(minValidDataSizeBg, len(validDataArrayBg[-1]["data"]))
+
+  validDataSig = {}
+  for data in validDataArraySig:
+    for key in data:
+      if key in validDataSig:
+        validDataSig[key] = numpy.vstack([validDataSig[key], data[key][:minValidDataSizeSig]])
+      else:
+        validDataSig[key] = data[key][:minValidDataSizeSig]
+
+  validDataBg = {}
+  for data in validDataArrayBg:
+    for key in data:
+      if key in validDataBg:
+        validDataBg[key] = numpy.vstack([validDataBg[key], data[key][:minValidDataSizeBg]])
+      else:
+        validDataBg[key] = data[key][:minValidDataSizeBg]
+
+  permSig = numpy.random.permutation(validDataSig["data"].shape[0])
+  permBg = numpy.random.permutation(validDataBg["data"].shape[0])
+
+  minNumalidData = min(len(validDataSig["data"]), len(validDataBg["data"]))
+
+  validData = {}
+  for key in validDataSig:
+    validDataSig[key] = validDataSig[key][permSig]
+    validDataBg[key] = validDataBg[key][permBg]
+    validData[key] = numpy.vstack([validDataBg[key][:minNumalidData], validDataSig[key][:minNumalidData]])
 
   #get input/output sizes
-  print validData["data"].shape
+  #print validData["data"].shape
   nFeatures = validData["data"].shape[1]
   nLabels = validData["labels"].shape[1]
   nWeigts = validData["weights"].shape[1]
@@ -131,18 +182,20 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0, 5),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0, 5),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0, 2),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0, 2),]
+
   backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 1.0, 1.0, 1),
                         DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 1.0, 1.0, 1), 
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1.0, 1.0, 2),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 1.0, 1.0, 1), 
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 1.0, 1.0, 1),
+                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 1.0, 1.0, 1),
                         ]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nWeigts, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
@@ -157,7 +210,7 @@ def mainTF(options):
   #summary writer
   summary_writer = tf.summary.FileWriter(options.runOp.directory + "log_graph", graph=tf.get_default_graph())
 
-  print "TRAINING MLP"
+  print "TRAINING NETWORK"
 
   with tf.Session(config=tf.ConfigProto(intra_op_parallelism_threads=8) ) as sess:
     sess.run(tf.global_variables_initializer())
@@ -165,32 +218,43 @@ def mainTF(options):
     #start queue runners
     dm.launchQueueThreads(sess)
 
-    print "Reporting validation loss every %i batchces with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, nEpoch)
+    print "Reporting validation loss every %i batches with %i events per batch for %i epochs"%(ReportInterval, MiniBatchSize, nEpoch)
 
     #preload the first data into staging area
     sess.run([mlp.stagingOp], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb})
 
     i = 0
+    N_TRAIN_SUMMARY = 10
+
+    #flush queue until the sample fraction is approximately equal 
+    while dm.continueTrainingLoop():
+      signalFraction =  sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))[1][:,0].sum()/MiniBatchSize
+      #the first this fraction drops below 0.5 means we are close enough to equal signal/bg fraction 
+      if signalFraction < 0.5:
+        break
+
     try:
       while dm.continueTrainingLoop():
-        #print sess.run(dm.inputDataQueue.dequeue_many(1000))[1]
         #run training operations 
-        _, _, summary, _ = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op, mlp.batch_norm_ops], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
-        summary_writer.add_summary(summary, i)
-        i += 1
-
-        if i == 1 or not i % ReportInterval:
+        if i == 0 or not i % ReportInterval:
           #run validation operations 
           validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
-          summary_writer.add_summary(summary_vl, i)
+          summary_writer.add_summary(summary_vl, i/N_TRAIN_SUMMARY)
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
+
+        if i % N_TRAIN_SUMMARY == 0:
+          _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
+          summary_writer.add_summary(summary, i/N_TRAIN_SUMMARY)
+        else:
+          sess.run([mlp.stagingOp, mlp.train_step], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
+        i += 1
 
     except Exception, e:
       # Report exceptions to the coordinator.
       dm.requestStop(e)
     finally:
       # Terminate as usual. It is safe to call `coord.request_stop()` twice.
-      dm.requestStop(e)
+      dm.requestStop()
       dm.join()
 
     mlp.saveCheckpoint(sess, options.runOp.directory)
