@@ -9,7 +9,7 @@ class CreateModel:
     
     def bias_variable(self, shape, name):
         """bias_variable generates a bias variable of a given shape."""
-        initial = tf.constant(0.01, shape=shape, name=name)
+        initial = tf.constant(0.00, shape=shape, name=name)
         return tf.Variable(initial)
     
     def createRecurentLayers(self, inputs, nodes=0, layers=0, keep_prob=1.0, share=None):
@@ -17,12 +17,13 @@ class CreateModel:
         with tf.variable_scope("rnn") as scope:
             #condition input shape 
             slicedInputs = []
-            for iW in xrange(inputs.shape[1]):
+#            for iW in reversed(range(inputs.shape[1])):
+            for iW in range(inputs.shape[1]):
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
             #create the rnn cell
             cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share, state_is_tuple=True) for _ in xrange(layers)], state_is_tuple=True)
             #add dropout
-            tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=keep_prob)
+            cell = tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=keep_prob)
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
@@ -83,15 +84,18 @@ class CreateModel:
             for layer in xrange(1, NLayer - 1):
                 #use relu for hidden layers as this seems to give best result
                 addResult = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix))
+                #add batch normalization 
+                batchNormalizedLayer = tf.layers.batch_normalization(addResult, training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
                 if self.options.netOp.denseActivationFunc == "relu":
-                    layerOutput = tf.nn.relu(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.relu(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "sigmoid":
-                    layerOutput = tf.nn.sigmoid(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.sigmoid(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "tanh":
-                    layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.tanh(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "none":
-                    layerOutput = addResult
-                h_fc[layer] = tf.layers.batch_normalization(tf.nn.dropout(layerOutput, keep_prob), training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
+                    layerOutput = batchNormalizedLayer
+                #add dropout 
+                h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 
                 # Map the features to next layer
                 if not layer in w_fc:
@@ -162,7 +166,7 @@ class CreateModel:
 
 
             #Create colvolution layers 
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
+            denseInputLayer    = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX,    convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
             denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="_ph")
 
         else:
@@ -176,7 +180,7 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training)
+        self.yt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training)
         self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training, prefix="_ph")
     
         #final answer with softmax applied for the end user
@@ -203,13 +207,17 @@ class CreateModel:
         self.loss = self.cross_entropy + self.l2_norm*self.reg
         self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
 
-        self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
-
         #these operations are necessary to run batch normalization 
         extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         # forgive the hack which removes the operations associated with the placeholder copy of the network
         #if another copy of the network were added /2 would need to be /3
         self.batch_norm_ops = extra_update_ops[:len(extra_update_ops)/2]
+
+        #attach the batch norm updadte ops to the training step 
+        with tf.control_dependencies(self.batch_norm_ops):
+            # Ensures that we execute the update_ops before performing the train_step
+            self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+
 
 
     def createSummaries(self):
