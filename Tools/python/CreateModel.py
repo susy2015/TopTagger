@@ -236,8 +236,18 @@ class CreateModel:
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy_train)
         summary_vaccuracy = tf.summary.scalar("valid accuracy", self.accuracy)
+
+        #special validations
+        summary_vce_QCDMC = tf.summary.scalar("valid_cross_entropy_QCDMC", self.cross_entropy_ph)
+        summary_vaccuracy_QCDMC = tf.summary.scalar("valid accuracy_QCDMC", self.accuracy)
+
+        summary_vce_QCDData = tf.summary.scalar("valid_cross_entropy_QCDData", self.cross_entropy_ph)
+        summary_vaccuracy_QCDData = tf.summary.scalar("valid accuracy_QCDData", self.accuracy)
+
         # create image of colvolutional filters 
         valid_summaries = [summary_vaccuracy, summary_vloss, summary_vce]
+        valid_summaries_QCDMC = [summary_vce_QCDMC, summary_vaccuracy_QCDMC]
+        valid_summaries_QCDData = [summary_vce_QCDData, summary_vaccuracy_QCDData]
         try:
             for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
@@ -249,6 +259,8 @@ class CreateModel:
         # Merge all summaries into a single op
         self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize, summary_accuracy])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
+        self.merged_valid_QCDMC_summary_op = tf.summary.merge(valid_summaries_QCDMC)
+        self.merged_valid_QCDData_summary_op = tf.summary.merge(valid_summaries_QCDData)
 
 
     def __init__(self, options, nnStruct, convLayers, rnnNodes, rnnLayers, inputDataQueue, nBatch, offset_initial, scale_initial):

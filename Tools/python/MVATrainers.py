@@ -84,6 +84,48 @@ def mainXGB(options):
   #output = gbm.predict(xgData)
 
 
+def getValidData(dg, validDataFiles, options):
+  validDataArray = []
+
+  #nSamples = 0
+  #for dsn in validDataFiles:
+  #  nSamples += dsn[1]
+
+  minValidDataSize = 999999999
+  for dsn in validDataFiles:
+    print dsn
+    validDataArray.append(dg.importData(samplesToRun = tuple(dsn[0]), ptReweight=options.runOp.ptReweight))
+
+    arrayLen = len(validDataArray[-1]["data"])
+    dataMultiplier = dsn[1]
+    validDataSize = arrayLen/dataMultiplier
+    if validDataSize < minValidDataSize:
+      minValidDataSize = validDataSize
+  
+  validData = {}
+  for data in validDataArray:
+    for key in data:
+      if key in validData:
+        validData[key] = numpy.vstack([validData[key], data[key][:minValidDataSize*dataMultiplier]])
+      else:
+        validData[key] = data[key][:minValidDataSize*dataMultiplier]
+  
+  perm = numpy.random.permutation(validData["data"].shape[0])
+
+  for key in validData:
+    validData[key] = validData[key][perm]
+
+  return validData
+
+def combineValidationData(validDataSig, validDataBg):
+  minNumalidData = min(len(validDataSig["data"]), len(validDataBg["data"]))
+  
+  validData = {}
+  for key in validDataSig:
+    validData[key] = numpy.vstack([validDataBg[key][:minNumalidData], validDataSig[key][:minNumalidData]])
+
+  return validData
+
 def mainTF(options):
 
   import tensorflow as tf
@@ -96,19 +138,22 @@ def mainTF(options):
   dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True)
   dgBg = DataGetter.DefinedVariables(options.netOp.vNames, background = True)
 
-  validDataSig = [("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ),
-                  ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", )]
+  validDataSig = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ), 1),
+                  (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ), 1)]
 
-  validDataBg = [("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT100to200_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT200to300_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT300to500_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT500to700_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT700to1000_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1000to1500_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1500to2000_validation_0.h5", ),
-                 ("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT2000toInf_validation_0.h5", )]
+  validDataBgTTbar = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ), 1),]
+  
+  validDataBgQCDMC = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT100to200_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT200to300_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT300to500_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT500to700_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT700to1000_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1000to1500_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1500to2000_validation_0.h5", ), 1),
+                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT2000toInf_validation_0.h5", ), 1)]
+  
+  validDataBgQCDData = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_Data_JetHT_2016_validation_0.h5", ), 1)]
   
 
   print "Input Variables: ",len(dgSig.getList())
@@ -116,59 +161,27 @@ def mainTF(options):
   # Import data
   #print options.runOp.validationSamples
   
-  validDataArraySig = []
-  validDataArrayBg = []
+  validDataSig =       getValidData(dgSig, validDataSig,       options)
+  validDataBgTTbar =   getValidData(dgBg,  validDataBgTTbar,   options)
+  validDataBgQCDMC =   getValidData(dgBg,  validDataBgQCDMC,   options)
+  validDataBgQCDData = getValidData(dgBg,  validDataBgQCDData, options)
 
-  minValidDataSizeSig = 999999999
-  minValidDataSizeBg = 999999999
-  for dsn in validDataSig:
-    print dsn
-    validDataArraySig.append(dgSig.importData(samplesToRun = tuple(dsn), ptReweight=options.runOp.ptReweight))
-    minValidDataSizeSig = min(minValidDataSizeSig, len(validDataArraySig[-1]["data"]))
-  for dsn in validDataBg:
-    print dsn
-    validDataArrayBg.append(dgBg.importData(samplesToRun = tuple(dsn), ptReweight=options.runOp.ptReweight))
-    minValidDataSizeBg = min(minValidDataSizeBg, len(validDataArrayBg[-1]["data"]))
-
-  validDataSig = {}
-  for data in validDataArraySig:
-    for key in data:
-      if key in validDataSig:
-        validDataSig[key] = numpy.vstack([validDataSig[key], data[key][:minValidDataSizeSig]])
-      else:
-        validDataSig[key] = data[key][:minValidDataSizeSig]
-
-  validDataBg = {}
-  for data in validDataArrayBg:
-    for key in data:
-      if key in validDataBg:
-        validDataBg[key] = numpy.vstack([validDataBg[key], data[key][:minValidDataSizeBg]])
-      else:
-        validDataBg[key] = data[key][:minValidDataSizeBg]
-
-  permSig = numpy.random.permutation(validDataSig["data"].shape[0])
-  permBg = numpy.random.permutation(validDataBg["data"].shape[0])
-
-  minNumalidData = min(len(validDataSig["data"]), len(validDataBg["data"]))
-
-  validData = {}
-  for key in validDataSig:
-    validDataSig[key] = validDataSig[key][permSig]
-    validDataBg[key] = validDataBg[key][permBg]
-    validData[key] = numpy.vstack([validDataBg[key][:minNumalidData], validDataSig[key][:minNumalidData]])
+  validDataTTbar = combineValidationData(validDataSig, validDataBgTTbar)
+  validDataQCDMC = combineValidationData(validDataSig, validDataBgQCDMC)
+  validDataQCDData = combineValidationData(validDataSig, validDataBgQCDData)
 
   #get input/output sizes
   #print validData["data"].shape
-  nFeatures = validData["data"].shape[1]
-  nLabels = validData["labels"].shape[1]
-  nWeigts = validData["weights"].shape[1]
+  nFeatures = validDataTTbar["data"].shape[1]
+  nLabels = validDataTTbar["labels"].shape[1]
+  nWeigts = validDataTTbar["weights"].shape[1]
 
   #Training parameters
   l2Reg = options.runOp.l2Reg
   MiniBatchSize = options.runOp.minibatchSize
   nEpoch = options.runOp.nepoch
   ReportInterval = options.runOp.reportInterval
-  validationCount = min(options.runOp.nValidationEvents, validData["data"].shape[0])
+  validationCount = min(options.runOp.nValidationEvents, validDataTTbar["data"].shape[0])
 
   #scale data inputs to mean 0, stddev 1
   categories = numpy.array(options.netOp.vCategories)
@@ -176,8 +189,8 @@ def mainTF(options):
   ptps = numpy.zeros(categories.shape, dtype=numpy.float32)
   for i in xrange(categories.max()):
     selectedCategory = categories == i
-    mins[selectedCategory] = validData["data"][:,selectedCategory].mean()
-    ptps[selectedCategory] = validData["data"][:,selectedCategory].std()
+    mins[selectedCategory] = validDataTTbar["data"][:,selectedCategory].mean()
+    ptps[selectedCategory] = validDataTTbar["data"][:,selectedCategory].std()
   ptps[ptps < 1e-10] = 1.0
 
   ##Create data manager, this class controls how data is fed to the network for training
@@ -238,9 +251,16 @@ def mainTF(options):
         #run training operations 
         if i == 0 or not i % ReportInterval:
           #run validation operations 
-          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validData["data"][:validationCount], mlp.y_ph_: validData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validData["weights"][:validationCount]})
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl, i/N_TRAIN_SUMMARY)
+
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
+
+          validation_loss, accuracy, summary_vl_QCDMC = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDMC_summary_op], feed_dict={mlp.x_ph: validDataQCDMC["data"][:validationCount], mlp.y_ph_: validDataQCDMC["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataQCDMC["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl_QCDMC, i/N_TRAIN_SUMMARY)
+
+          validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
 
         if i % N_TRAIN_SUMMARY == 0:
           _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
