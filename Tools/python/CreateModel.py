@@ -62,7 +62,11 @@ class CreateModel:
 
         return denseInputLayer
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, training = False, prefix=""):
+    def gradientReversal(self, input, parameter):
+        gradientOp = -parameter*tf.identity(input, name="Identity")
+        return gradientOp + tf.stop_gradient(tf.identity(input) - gradientOp)
+
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight, training = False, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
@@ -104,10 +108,19 @@ class CreateModel:
                     b_fc[layer] = self.bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
             
             #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the loss function will do this)
+            # for primary class classification
             yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt"+prefix)
-            
-            return yt
 
+            #create pt for domain classification
+            layer = NLayer - 1
+            if not layer in w_fc:
+                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], nnStruct[layer]], name="w_fc%i"%(layer))
+            if not layer in b_fc:
+                b_fc[layer] = self.bias_variable([nnStruct[layer]], name="b_fc%i"%(layer))
+
+            pt = tf.add(tf.matmul(gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
+            
+            return yt, pt
 
     ### createMLP
     # This fucntion is designed to create a MLP for classification purposes (using softmax_cross_entropy_with_logits)
@@ -124,6 +137,7 @@ class CreateModel:
         
         self.keep_prob = tf.placeholder_with_default(1.0, [], name="keep_prob")
         self.training = tf.placeholder_with_default(False, [], name="training")
+        self.gradientReversalWeight = tf.placeholder_with_default(1.0, [], name="gradientReversalWeight")
 
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
@@ -133,7 +147,7 @@ class CreateModel:
         #define a StagingArea here
         self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes)
         self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
-        self.x, self.y_, self.wgt = self.stagingArea.get()
+        self.x, self.y_, self.p_, self.wgt = self.stagingArea.get()
 
         #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
@@ -180,8 +194,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training)
-        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training, prefix="_ph")
+        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training)
+        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, prefix="_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
@@ -198,14 +212,17 @@ class CreateModel:
         #self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
         #self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
         #self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
-        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
-        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
+        self.cross_entropy    = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.y_,    logits=self.yt)
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.y_ph_, logits=self.yt_ph)
+
+        self.cross_entropy_d    = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.p_,    logits=self.pt)
+        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.p_ph_, logits=self.pt_ph)
 
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
-        self.loss = self.cross_entropy + self.l2_norm*self.reg
-        self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
+        self.loss = self.cross_entropy_d + self.cross_entropy + self.l2_norm*self.reg
+        self.loss_ph = self.cross_entropy_d_ph + self.cross_entropy_ph + self.l2_norm*self.reg
 
         #these operations are necessary to run batch normalization 
         extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -213,7 +230,7 @@ class CreateModel:
         #if another copy of the network were added /2 would need to be /3
         self.batch_norm_ops = extra_update_ops[:len(extra_update_ops)/2]
 
-        #attach the batch norm updadte ops to the training step 
+        #attach the batch norm update ops to the training step 
         with tf.control_dependencies(self.batch_norm_ops):
             # Ensures that we execute the update_ops before performing the train_step
             self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
