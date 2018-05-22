@@ -9,11 +9,11 @@ from DataSample import DataSample
 
 class DataManager:
   
-    def __init__(self, variables, nEpoch, nFeatures, nLabels, nWeigts, ptReweight, signalDataSets, backgroundDataSets):
+    def __init__(self, variables, nEpoch, nFeatures, nLabels, nDomains, nWeigts, ptReweight, signalDataSets, backgroundDataSets):
         self.nEpoch = nEpoch
 
         #Define input data queue
-        self.inputDataQueue = tf.RandomShuffleQueue(capacity=65536*2, min_after_dequeue=65536*2 - 65536/2, shapes=[[nFeatures], [nLabels], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32])
+        self.inputDataQueue = tf.RandomShuffleQueue(capacity=65536*2, min_after_dequeue=65536*2 - 65536/2, shapes=[[nFeatures], [nLabels], [nDomains], [nWeigts]], dtypes=[tf.float32, tf.float32, tf.float32, tf.float32])
 
         #Add DataSample objects for each data set used 
         self.sigScaleSum = 0
@@ -23,7 +23,7 @@ class DataManager:
         batchSize = 65536 / 4
         self.sigDataSamples = []
         for dataSet in signalDataSets:
-            self.sigDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, self.sigScaleSum, signal=True, background=False, ptReweight=ptReweight))
+            self.sigDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, self.sigScaleSum, signal=True, background=False, domain=dataSet.domain, ptReweight=ptReweight))
 
         self.bgScaleSum = 0
         for dataSet in signalDataSets:
@@ -31,7 +31,7 @@ class DataManager:
 
         self.bgDataSamples = []
         for dataSet in backgroundDataSets:
-            self.bgDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, self.bgScaleSum, signal=False, background=True, ptReweight=ptReweight))
+            self.bgDataSamples.append(DataSample(dataSet, nEpoch, batchSize, variables, self.inputDataQueue, self.bgScaleSum, signal=False, background=True, domain=dataSet.domain, ptReweight=ptReweight))
 
     def startFileQueues(self, coord):
         threads = []

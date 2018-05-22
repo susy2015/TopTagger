@@ -66,7 +66,7 @@ class CreateModel:
         gradientOp = -parameter*tf.identity(input, name="Identity")
         return gradientOp + tf.stop_gradient(tf.identity(input) - gradientOp)
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight, training = False, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
@@ -118,7 +118,7 @@ class CreateModel:
             if not layer in b_fc:
                 b_fc[layer] = self.bias_variable([nnStruct[layer]], name="b_fc%i"%(layer))
 
-            pt = tf.add(tf.matmul(gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
+            pt = tf.add(tf.matmul(self.gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
             
             return yt, pt
 
@@ -142,6 +142,7 @@ class CreateModel:
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
+        self.p_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="p_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
 
         #define a StagingArea here
@@ -212,11 +213,11 @@ class CreateModel:
         #self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
         #self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
         #self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
-        self.cross_entropy    = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.y_,    logits=self.yt)
-        self.cross_entropy_ph = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.y_ph_, logits=self.yt_ph)
+        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
 
-        self.cross_entropy_d    = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.p_,    logits=self.pt)
-        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy_v2(onehot_labels=self.p_ph_, logits=self.pt_ph)
+        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1))
+        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1))
 
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
@@ -243,8 +244,11 @@ class CreateModel:
         correct_prediction_train = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy_train = tf.reduce_mean(tf.cast(correct_prediction_train, tf.float32))
 
+        summary_grw = tf.summary.scalar("gradient reversal weight",  self.gradientReversalWeight)
+
         # Create a summary to monitor cost tensor
         summary_ce = tf.summary.scalar("cross_entropy", self.cross_entropy)
+        summary_ce_d = tf.summary.scalar("cross_entropy_domain", self.cross_entropy_d)
         summary_l2n = tf.summary.scalar("l2_norm", self.l2_norm)
         summary_loss = tf.summary.scalar("loss", self.loss)
         summary_queueSize = tf.summary.scalar("queue_size", self.inputDataQueue.size())
@@ -274,7 +278,7 @@ class CreateModel:
         except AttributeError:
             pass
         # Merge all summaries into a single op
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize, summary_accuracy])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_grw])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
         self.merged_valid_QCDMC_summary_op = tf.summary.merge(valid_summaries_QCDMC)
         self.merged_valid_QCDData_summary_op = tf.summary.merge(valid_summaries_QCDData)

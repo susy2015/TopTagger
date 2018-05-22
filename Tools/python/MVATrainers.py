@@ -1,7 +1,7 @@
 import numpy
 import pandas as pd
 from DataGetter import DataGetter
-from math import sqrt
+from math import sqrt, exp
 from time import sleep
 from glob import glob
 
@@ -174,7 +174,7 @@ def mainTF(options):
   #print validData["data"].shape
   nFeatures = validDataTTbar["data"].shape[1]
   nLabels = validDataTTbar["labels"].shape[1]
-  nWeigts = validDataTTbar["weights"].shape[1]
+  nWeights = validDataTTbar["weights"].shape[1]
 
   #Training parameters
   l2Reg = options.runOp.l2Reg
@@ -195,23 +195,23 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  1.0, 1.0, 2),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  1.0, 1.0, 2),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
 
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1.0, 1.0, 2),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 1.0, 1.0, 1), 
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 1.0, 1.0, 1),
-                        #DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 1.0, 1.0, 1),
+  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1), 
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1),
                         ]
 
-  dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nWeigts, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
+  dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, 2, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
   # Build the graph
   denseNetwork = [nFeatures]+options.netOp.denseLayers+[nLabels]
@@ -241,7 +241,9 @@ def mainTF(options):
 
     #flush queue until the sample fraction is approximately equal 
     while dm.continueTrainingLoop():
-      signalFraction =  sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))[1][:,0].sum()/MiniBatchSize
+      result = sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
+      signalFraction =  result[1][:,0].sum()/MiniBatchSize
+      print signalFraction, result[2][:,0].sum()/MiniBatchSize
       #the first this fraction drops below 0.5 means we are close enough to equal signal/bg fraction 
       if signalFraction < 0.5:
         break
@@ -249,21 +251,24 @@ def mainTF(options):
     try:
       while dm.continueTrainingLoop():
         #run training operations 
+
+        grw = 2/(1+exp(-i/10000.0)) - 1
+
         if i == 0 or not i % ReportInterval:
           #run validation operations 
-          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.p_ph_: validDataTTbar["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl, i/N_TRAIN_SUMMARY)
 
           print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
 
-          validation_loss, accuracy, summary_vl_QCDMC = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDMC_summary_op], feed_dict={mlp.x_ph: validDataQCDMC["data"][:validationCount], mlp.y_ph_: validDataQCDMC["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataQCDMC["weights"][:validationCount]})
+          validation_loss, accuracy, summary_vl_QCDMC = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDMC_summary_op], feed_dict={mlp.x_ph: validDataQCDMC["data"][:validationCount], mlp.y_ph_: validDataQCDMC["labels"][:validationCount], mlp.p_ph_: validDataQCDMC["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDMC["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl_QCDMC, i/N_TRAIN_SUMMARY)
 
-          validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.reg: l2Reg, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
+          validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.p_ph_: validDataQCDData["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
 
         if i % N_TRAIN_SUMMARY == 0:
-          _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
+          _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True, mlp.gradientReversalWeight:grw})
           summary_writer.add_summary(summary, i/N_TRAIN_SUMMARY)
         else:
           sess.run([mlp.stagingOp, mlp.train_step], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
