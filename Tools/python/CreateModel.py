@@ -245,6 +245,8 @@ class CreateModel:
         self.accuracy_train = tf.reduce_mean(tf.cast(correct_prediction_train, tf.float32))
 
         summary_grw = tf.summary.scalar("gradient reversal weight",  self.gradientReversalWeight)
+        summary_signalFrac = tf.summary.scalar("signalBatchFrac",  tf.reduce_mean(self.y_, axis=0)[0])
+        summary_domainFrac = tf.summary.scalar("domainBatchFrac",  tf.reduce_mean(self.p_, axis=0)[0])
 
         # Create a summary to monitor cost tensor
         summary_ce = tf.summary.scalar("cross_entropy", self.cross_entropy)
@@ -278,7 +280,7 @@ class CreateModel:
         except AttributeError:
             pass
         # Merge all summaries into a single op
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_grw])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_grw, summary_signalFrac, summary_domainFrac])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
         self.merged_valid_QCDMC_summary_op = tf.summary.merge(valid_summaries_QCDMC)
         self.merged_valid_QCDData_summary_op = tf.summary.merge(valid_summaries_QCDData)

@@ -36,6 +36,7 @@ class FileNameQueue:
                     except Queue.Full:
                         continue
                     breakLoop = True
+        #coord.request_stop()
 
     def startQueueProcess(self, coord):
         p = threading.Thread(target=self.queueProcess, args=(coord,))
