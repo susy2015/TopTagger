@@ -93,7 +93,6 @@ def getValidData(dg, validDataFiles, options):
 
   minValidDataSize = 999999999
   for dsn in validDataFiles:
-    print dsn
     validDataArray.append(dg.importData(samplesToRun = tuple(dsn[0]), ptReweight=options.runOp.ptReweight))
 
     arrayLen = len(validDataArray[-1]["data"])
@@ -195,8 +194,8 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
 
   backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4),
                         DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4),
@@ -243,17 +242,16 @@ def mainTF(options):
     while dm.continueTrainingLoop():
       result = sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
       signalFraction =  result[1][:,0].sum()/MiniBatchSize
-      print signalFraction, result[2][:,0].sum()/MiniBatchSize
       #the first this fraction drops below 0.5 means we are close enough to equal signal/bg fraction 
       if signalFraction < 0.5:
         break
 
     try:
       while dm.continueTrainingLoop():
-        #run training operations 
 
         grw = 2/(1+exp(-i/10000.0)) - 1
 
+        #run validation operations 
         if i == 0 or not i % ReportInterval:
           #run validation operations 
           validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.p_ph_: validDataTTbar["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
@@ -267,6 +265,7 @@ def mainTF(options):
           validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.p_ph_: validDataQCDData["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
 
+        #run training operations 
         if i % N_TRAIN_SUMMARY == 0:
           _, _, summary = sess.run([mlp.stagingOp, mlp.train_step, mlp.merged_train_summary_op], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True, mlp.gradientReversalWeight:grw})
           summary_writer.add_summary(summary, i/N_TRAIN_SUMMARY)
