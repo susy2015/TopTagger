@@ -178,24 +178,27 @@ else:
 
     ##TODONE: Switchen to frozen model file 
     ##Get training output
-    #saver = tf.train.import_meta_graph('models/model.ckpt.meta')
+    #saver = tf.train.import_meta_graph(outputDirectory + 'models/model.ckpt.meta')
     #sess = tf.Session()
     ## To initialize values with saved data
-    #saver.restore(sess, './models/model.ckpt')
+    #saver.restore(sess, outputDirectory + './models/model.ckpt')
     ## Restrieve useful variables
     #trainInfo = tf.get_collection('TrainInfo')
-    #x = trainInfo[0]
-    #y_train = trainInfo[1]
+    #graph = tf.get_default_graph()
+    #x = graph.get_tensor_by_name('x:0')
+    #y_train = graph.get_tensor_by_name('y_ph:0')
+    ##x = trainInfo[0]
+    ##y_train = trainInfo[1]
 
     # We use our "load_graph" function
     if len(options.mvaFile):
         graph = load_graph(options.mvaFile)
     else:
         graph = load_graph(outputDirectory + "./tfModel_frozen.pb")
-
+    
     # create the tf session
     sess = tf.Session(graph=graph)
-
+    
     # We access the input and output nodes 
     x = graph.get_tensor_by_name('x:0')
     y_train = graph.get_tensor_by_name('y_ph:0')
@@ -271,13 +274,19 @@ def getData(dataName):
     
     return dataAll, dataGen
 
-def getDataTTbar(tSample, tbarSample):
+def getDataTTbar(ttsig, ttbg):
     dataTTbarAllSamples = []
     dataTTbarGenSamples = []
-    for f in tSample + tbarSample:
+    for f in ttsig:
         dataTTbarTAll, dataTTbarTGen = getData(f)
+        #print dataTTbarTAll[0:100]
+        #print dataTTbarTGen[0:100]
         dataTTbarAllSamples.append(dataTTbarTAll)
         dataTTbarGenSamples.append(dataTTbarTGen)
+    for f in ttbg:
+        dataTTbarTAll, dataTTbarTGen = getData(f)
+        dataTTbarAllSamples.append(dataTTbarTAll)
+#        dataTTbarGenSamples.append(dataTTbarTGen)
 
     dataTTbarAll = pd.concat(dataTTbarAllSamples)
     dataTTbarGen = pd.concat(dataTTbarGenSamples)
@@ -307,7 +316,7 @@ def getDataZnunu(sampleInfo):
 
     return dataAll#, dataGen
 
-dataTTbarAll, dataTTbarGen = getDataTTbar(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6*/trainingTuple_0_division_2_TTbarSingleLepT_test_*.h5"), glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6*/trainingTuple_0_division_2_TTbarSingleLepTbar_test_*.h5"))
+dataTTbarAll, dataTTbarGen = getDataTTbar(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_2_TTbarSingleLepT*_test_*.h5"), glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_2_TTbarSingleLepT*_test_*.h5"))
 
 #Apply baseline cuts
 dataTTbarAll = dataTTbarAll[dataTTbarAll.Njet >= 4]
@@ -315,7 +324,7 @@ dataTTbar = dataTTbarAll[dataTTbarAll.ncand > 0]
 
 dataTTbarGen = dataTTbarGen[dataTTbarGen.Njet >= 4]
 
-dataTTbarAllTrain, dataTTbarGenTrain = getDataTTbar(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6*/trainingTuple_0_division_0_TTbarSingleLepT_training_*.h5"), glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6*/trainingTuple_0_division_0_TTbarSingleLepTbar_training_*.h5"))
+dataTTbarAllTrain, dataTTbarGenTrain = getDataTTbar(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT*_training_*.h5"), glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_TTbarSingleLepT*_training_*.h5"))
 
 #Apply baseline cuts
 dataTTbarAllTrain = dataTTbarAllTrain[dataTTbarAllTrain.Njet >= 4]
@@ -390,9 +399,16 @@ plt.close()
 
 
 makeDiscPlots(dataTTbar, dataTTbarTrain, dataTTbarAns, dataTTbarAnsTrain, genMatches, genMatchesTrain)
+
 #plot efficiency
 
 effPtBins = numpy.hstack([[0], numpy.linspace(50, 200, 7), numpy.linspace(250, 500, 6), [600, 700, 800, 1000]])
+
+numArray = dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["genConstMatchGenPtVec"]
+denArray = dataTTbarGen["genTopPt"]
+
+print numArray, denArray
+
 ptNum, _ = numpy.histogram(dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["genConstMatchGenPtVec"], bins=effPtBins, weights=dataTTbar[genMatches == 1][dataTTbarAns[genMatches == 1] > discCutTTbar[genMatches == 1]]["sampleWgt"])
 ptDen, _ = numpy.histogram(dataTTbarGen["genTopPt"], bins=effPtBins, weights=dataTTbarGen["sampleWgt"])
 

@@ -9,7 +9,7 @@ class CustomQueueRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, variables, fileQueue, inputDataQueue, signal, background, ptReweight=False):
+    def __init__(self, batchSize, variables, fileQueue, inputDataQueue, signal, background, domain, ptReweight=False):
 
         self.fileQueue = fileQueue
         # The actual queue of data. 
@@ -17,11 +17,13 @@ class CustomQueueRunner(object):
 
         self.signal = signal
         self.background = background
+        self.domain = domain
 
         # place holders to enqueue data with 
         self.dataX = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[0][0]])
         self.dataY = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[1][0]])
-        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[2][0]])
+        self.dataD = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[2][0]])
+        self.dataW = tf.placeholder(dtype=tf.float32, shape=[None, self.queueX.shapes[3][0]])
 
         #feature names to select
         self.variables = variables
@@ -30,7 +32,7 @@ class CustomQueueRunner(object):
         self.batch_size = batchSize
 
         # The symbolic operation to add data to the queue
-        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataW])
+        self.enqueue_opX = self.queueX.enqueue_many([self.dataX, self.dataY, self.dataD, self.dataW])
 
         # additional options 
         self.ptReweight = ptReweight
@@ -50,7 +52,7 @@ class CustomQueueRunner(object):
       fIter = self.fileName_iterator()
 
       #private data getter object 
-      dg = DataGetter(self.variables, signal=self.signal, background=self.background, bufferData = False)
+      dg = DataGetter(self.variables, signal=self.signal, background=self.background, domain=self.domain, bufferData = False)
             
       #loop until there are no more files to get from the queue
       for fileName in fIter:
@@ -59,12 +61,12 @@ class CustomQueueRunner(object):
         batch_idx = 0
         nSamples = data["data"].shape[0]
         while batch_idx + self.batch_size <= nSamples:
-            yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
+            yield data["data"][batch_idx:batch_idx+self.batch_size], data["labels"][batch_idx:batch_idx+self.batch_size], data["domain"][batch_idx:batch_idx+self.batch_size], data["weights"][batch_idx:batch_idx+self.batch_size]
             batch_idx += self.batch_size
 
         #yield the last bit of data from the file 
         if batch_idx < nSamples:
-            yield data["data"][batch_idx:], data["labels"][batch_idx:], data["weights"][batch_idx:]
+            yield data["data"][batch_idx:], data["labels"][batch_idx:], data["domain"][batch_idx:], data["weights"][batch_idx:]
 
       return
 
@@ -72,10 +74,10 @@ class CustomQueueRunner(object):
       """
       Function run on alternate thread. Basically, keep adding data to the queue.
       """
-      for dataX, dataY, dataW in self.data_iterator():
+      for dataX, dataY, dataD, dataW in self.data_iterator():
         if coord.should_stop():
           break
-        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataW:dataW})
+        sess.run([self.enqueue_opX], feed_dict={self.dataX:dataX, self.dataY:dataY, self.dataD:dataD, self.dataW:dataW})
 
       sess.run(self.queueX.close())
       coord.request_stop()

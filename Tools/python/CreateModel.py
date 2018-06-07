@@ -9,7 +9,7 @@ class CreateModel:
     
     def bias_variable(self, shape, name):
         """bias_variable generates a bias variable of a given shape."""
-        initial = tf.constant(0.01, shape=shape, name=name)
+        initial = tf.constant(0.00, shape=shape, name=name)
         return tf.Variable(initial)
     
     def createRecurentLayers(self, inputs, nodes=0, layers=0, keep_prob=1.0, share=None):
@@ -17,12 +17,13 @@ class CreateModel:
         with tf.variable_scope("rnn") as scope:
             #condition input shape 
             slicedInputs = []
-            for iW in xrange(inputs.shape[1]):
+#            for iW in reversed(range(inputs.shape[1])):
+            for iW in range(inputs.shape[1]):
                 slicedInputs.append(tf.reshape(tf.slice(inputs, [0,iW,0], [-1, 1, -1]), [-1, int(inputs.shape[2])]))
             #create the rnn cell
             cell = tf.nn.rnn_cell.MultiRNNCell([tf.nn.rnn_cell.BasicLSTMCell(nodes, reuse=share, state_is_tuple=True) for _ in xrange(layers)], state_is_tuple=True)
             #add dropout
-            tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=keep_prob)
+            cell = tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=1.0, output_keep_prob=keep_prob)
             #create the rnn layer 
             output, _ = tf.nn.static_rnn(cell, slicedInputs, dtype=tf.float32, scope=scope)
             #reshape output to match the cnn output
@@ -61,7 +62,11 @@ class CreateModel:
 
         return denseInputLayer
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, training = False, prefix=""):
+    def gradientReversal(self, input, parameter):
+        gradientOp = -parameter*tf.identity(input, name="Identity")
+        return gradientOp + tf.stop_gradient(tf.identity(input) - gradientOp)
+
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
@@ -83,15 +88,18 @@ class CreateModel:
             for layer in xrange(1, NLayer - 1):
                 #use relu for hidden layers as this seems to give best result
                 addResult = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer - 1], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer - 1], name="a_fc%i%s"%(layer,prefix))
+                #add batch normalization 
+                batchNormalizedLayer = tf.layers.batch_normalization(addResult, training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
                 if self.options.netOp.denseActivationFunc == "relu":
-                    layerOutput = tf.nn.relu(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.relu(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "sigmoid":
-                    layerOutput = tf.nn.sigmoid(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.sigmoid(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "tanh":
-                    layerOutput = tf.nn.tanh(addResult, name="h_fc%i%s"%(layer,prefix))
+                    layerOutput = tf.nn.tanh(batchNormalizedLayer, name="h_fc%i%s"%(layer,prefix))
                 elif self.options.netOp.denseActivationFunc == "none":
-                    layerOutput = addResult
-                h_fc[layer] = tf.layers.batch_normalization(tf.nn.dropout(layerOutput, keep_prob), training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
+                    layerOutput = batchNormalizedLayer
+                #add dropout 
+                h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 
                 # Map the features to next layer
                 if not layer in w_fc:
@@ -100,10 +108,19 @@ class CreateModel:
                     b_fc[layer] = self.bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
             
             #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the loss function will do this)
+            # for primary class classification
             yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt"+prefix)
-            
-            return yt
 
+            #create pt for domain classification
+            layer = NLayer - 1
+            if not layer in w_fc:
+                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], nnStruct[layer]], name="w_fc%i"%(layer))
+            if not layer in b_fc:
+                b_fc[layer] = self.bias_variable([nnStruct[layer]], name="b_fc%i"%(layer))
+
+            pt = tf.add(tf.matmul(self.gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
+            
+            return yt, pt
 
     ### createMLP
     # This fucntion is designed to create a MLP for classification purposes (using softmax_cross_entropy_with_logits)
@@ -120,16 +137,18 @@ class CreateModel:
         
         self.keep_prob = tf.placeholder_with_default(1.0, [], name="keep_prob")
         self.training = tf.placeholder_with_default(False, [], name="training")
+        self.gradientReversalWeight = tf.placeholder_with_default(1.0, [], name="gradientReversalWeight")
 
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
+        self.p_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="p_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
 
         #define a StagingArea here
         self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes)
         self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
-        self.x, self.y_, self.wgt = self.stagingArea.get()
+        self.x, self.y_, self.p_, self.wgt = self.stagingArea.get()
 
         #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
@@ -162,7 +181,7 @@ class CreateModel:
 
 
             #Create colvolution layers 
-            denseInputLayer = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
+            denseInputLayer    = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX,    convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="")
             denseInputLayer_ph = self.createCNNRNNLayers(NDENSEONLYVAR, NCONSTITUENTS, nChannel, transformedX_ph, convWeights=self.convWeights, convBiases=self.convBiases, rnnNodes=self.rnnNodes, rnnLayers=self.rnnLayers, keep_prob=self.keep_prob, postfix="_ph")
 
         else:
@@ -176,8 +195,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt = self.createDenseNetwork(denseInputLayer, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training)
-        self.yt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, training=self.training, prefix="_ph")
+        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training)
+        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, prefix="_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
@@ -197,19 +216,26 @@ class CreateModel:
         self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
         self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
 
+        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1))
+        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1))
+
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
           self.l2_norm += tf.nn.l2_loss(w)
-        self.loss = self.cross_entropy + self.l2_norm*self.reg
-        self.loss_ph = self.cross_entropy_ph + self.l2_norm*self.reg
-
-        self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+        self.loss = self.cross_entropy_d + self.cross_entropy + self.l2_norm*self.reg
+        self.loss_ph = self.cross_entropy_d_ph + self.cross_entropy_ph + self.l2_norm*self.reg
 
         #these operations are necessary to run batch normalization 
         extra_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         # forgive the hack which removes the operations associated with the placeholder copy of the network
         #if another copy of the network were added /2 would need to be /3
         self.batch_norm_ops = extra_update_ops[:len(extra_update_ops)/2]
+
+        #attach the batch norm update ops to the training step 
+        with tf.control_dependencies(self.batch_norm_ops):
+            # Ensures that we execute the update_ops before performing the train_step
+            self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+
 
 
     def createSummaries(self):
@@ -218,8 +244,13 @@ class CreateModel:
         correct_prediction_train = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy_train = tf.reduce_mean(tf.cast(correct_prediction_train, tf.float32))
 
+        summary_grw = tf.summary.scalar("gradient reversal weight",  self.gradientReversalWeight)
+        summary_signalFrac = tf.summary.scalar("signalBatchFrac",  tf.reduce_mean(self.y_, axis=0)[0])
+        summary_domainFrac = tf.summary.scalar("domainBatchFrac",  tf.reduce_mean(self.p_, axis=0)[0])
+
         # Create a summary to monitor cost tensor
         summary_ce = tf.summary.scalar("cross_entropy", self.cross_entropy)
+        summary_ce_d = tf.summary.scalar("cross_entropy_domain", self.cross_entropy_d)
         summary_l2n = tf.summary.scalar("l2_norm", self.l2_norm)
         summary_loss = tf.summary.scalar("loss", self.loss)
         summary_queueSize = tf.summary.scalar("queue_size", self.inputDataQueue.size())
@@ -228,8 +259,18 @@ class CreateModel:
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy_train)
         summary_vaccuracy = tf.summary.scalar("valid accuracy", self.accuracy)
+
+        #special validations
+        summary_vce_QCDMC = tf.summary.scalar("valid_cross_entropy_QCDMC", self.cross_entropy_ph)
+        summary_vaccuracy_QCDMC = tf.summary.scalar("valid accuracy_QCDMC", self.accuracy)
+
+        summary_vce_QCDData = tf.summary.scalar("valid_cross_entropy_QCDData", self.cross_entropy_ph)
+        summary_vaccuracy_QCDData = tf.summary.scalar("valid accuracy_QCDData", self.accuracy)
+
         # create image of colvolutional filters 
         valid_summaries = [summary_vaccuracy, summary_vloss, summary_vce]
+        valid_summaries_QCDMC = [summary_vce_QCDMC, summary_vaccuracy_QCDMC]
+        valid_summaries_QCDData = [summary_vce_QCDData, summary_vaccuracy_QCDData]
         try:
             for i in xrange(len(self.convWeights)):
                 shapes = self.convWeights[i].shape
@@ -239,8 +280,10 @@ class CreateModel:
         except AttributeError:
             pass
         # Merge all summaries into a single op
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_l2n, summary_loss, summary_queueSize, summary_accuracy])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_grw, summary_signalFrac, summary_domainFrac])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
+        self.merged_valid_QCDMC_summary_op = tf.summary.merge(valid_summaries_QCDMC)
+        self.merged_valid_QCDData_summary_op = tf.summary.merge(valid_summaries_QCDData)
 
 
     def __init__(self, options, nnStruct, convLayers, rnnNodes, rnnLayers, inputDataQueue, nBatch, offset_initial, scale_initial):

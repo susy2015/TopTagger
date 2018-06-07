@@ -7,7 +7,7 @@ from CustomQueueRunner import CustomQueueRunner
 from FileNameQueue import FileNameQueue
 
 class DataSample:
-    def __init__(self, dataSet, nEpoch, batchSize, variables, inputDataQueue, sumScaleFactor, signal = True, background = True, ptReweight=False):
+    def __init__(self, dataSet, nEpoch, batchSize, variables, inputDataQueue, sumScaleFactor, signal = True, background = True, domain = 0, ptReweight=False):
 
         self.dataSet = dataSet
 
@@ -25,7 +25,7 @@ class DataSample:
         self.fileQueue = FileNameQueue(self.fileList, nEpoch)
 
         #create CustomRunner for this dataset 
-        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, self.queue, signal, background, ptReweight)
+        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, self.queue, signal, background, domain, ptReweight)
 
 
     def start_threads(self, sess, coord, n_threads=1):

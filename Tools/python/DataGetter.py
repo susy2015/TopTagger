@@ -5,9 +5,10 @@ import dask.array as da
 class DataGetter:
 
     #The constructor simply takes in a list and saves it to self.list
-    def __init__(self, variables, signal = True, background = True, bufferData = False):
+    def __init__(self, variables, signal = True, background = True, domain = None, bufferData = False):
         self.list = variables
         self.signal = signal
+        self.domain = domain
         self.background = background
         self.bufferData = bufferData
         self.dataMap = {}
@@ -111,5 +112,9 @@ class DataGetter:
         npyInputSampleWgts = x[:,wgtColumns][filterArray].compute()
         npyInputWgts = npyInputSampleWgts
 
-        return {"data":npyInputData, "labels":npyInputAnswers, "weights":npyInputWgts, "":npyInputSampleWgts}
+        d = np.zeros((npyInputData.shape[0], 2))
+        if self.domain != None and self.domain > 0:
+            d[:,self.domain - 1] = 1
+
+        return {"data":npyInputData, "labels":npyInputAnswers, "domain":d, "weights":npyInputWgts, "":npyInputSampleWgts}
 
