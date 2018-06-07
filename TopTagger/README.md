@@ -1,10 +1,13 @@
+My Main Page                         {#mainpage}
+============
+
 ## Installing the tagger in CMS software release
 
 ### Standalone (edm free) install instructions within CMSSW
 
 If you would rather not go through the hassle of installing ROOT/python/tensorflow the CMSSW environment can be used to provide the necessary libraries and python modules 
 
-```sh
+~~~~~~~~~~~~~{.sh}
 cmsrel CMSSW_9_3_3
 cd CMSSW_9_3_3/src
 cmsenv
@@ -12,7 +15,7 @@ git clone git@github.com:susy2015/TopTagger.git
 cd TopTagger/TopTagger/test
 ./configure
 make -j8 
-```
+~~~~~~~~~~~~~
 
 The test code can then be run identically to the completely standalone instructions.
 
@@ -20,7 +23,7 @@ The test code can then be run identically to the completely standalone instructi
 
 The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases.  In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix, 
 
-```sh
+~~~~~~~~~~~~~{.sh}
 #get CMSSW release
 cmsrel CMSSW_8_0_28_patch1
 cd CMSSW_8_0_28_patch1/src/
@@ -52,7 +55,7 @@ wget https://raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QG
 #run example code
 voms-proxy-init
 cmsRun run_topTagger.py
-```
+~~~~~~~~~~~~~
 
 The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).  
 
@@ -60,11 +63,11 @@ The default configuration of the example cfg file "run_topTagger.py" will run ov
 
 Before the top tagger can be used the top tagger configuration file must be checked out.  Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases.  These should not be accessed directly, but instead you can use the script "getTaggerCfg.sh" to download the working points desired.  An example of a basic checkout of the standard working point for use with the example code (different working points are found here https://github.com/susy2015/TopTaggerCfg/releases) is as follows
 
-```sh
+~~~~~~~~~~~~~sh
 #run the following once to set up the top tagger and add the "getTaggerCfg.sh" to the path
 source TopTagger/TopTagger/test/taggerSetup.sh
 getTaggerCfg.sh -t MVAAK8_Tight_noQGL_binaryCSV_v1.0.2
-```
+~~~~~~~~~~~~~
 
 This will download the configuration file along with the MVA training file if appropriate into a directory.  It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code.  If you want the directory containing the configuration file and MVA file to be located elsewhere this can be specified with the "-d" option (Multiple run directories can point to the same directory, this can be helpful to save space as the random forest training files are quite large).  If you have multiple configuration files you can specify a different name for the configuration file with the "-f" option.  Finally, if you want to download the file without creating the softlinks use the "-n" option.
 

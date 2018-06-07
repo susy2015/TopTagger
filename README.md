@@ -25,7 +25,7 @@ Follow the instructions to install tensorflow for python.  GPU support is not ne
 
 After all the necessary packages are installed, checkout the TopTagger repository and compile with the following command (with a terminal configured to use root/tensorflow)
 
-```sh
+~~~~~~~~~~~~~sh
 #After downloading the code from github or untaring the standalone tarball 
 cd TopTagger/TopTagger/test
 ./configure
@@ -33,7 +33,7 @@ make -j4
 #the command below is optional for system wide install (will require sudo rights)
 #To install in a non-standard directory add PREFIX=/install/path to the configure command
 make install
-```
+~~~~~~~~~~~~~
 
 This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code.  This will also compile a standalone example called ``topTaggerTest''.  
 
@@ -45,20 +45,20 @@ A basic standalone example using the top tagging code is provided in "TopTagger/
 
 The example executable is compiled along with the standalone library as described above.  If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded"
 
-```sh
+~~~~~~~~~~~~~{sh}
 #do once per terminal if opencv or the top tagger are not installed system wide
 source taggerSetup.sh
 #do once in any directory where you will run the top tagger example
 getTaggerCfg.sh -t Intermediate_Example_v1.0.0
 #run the example code
 ./topTaggerTest
-``` 
+~~~~~~~~~~~~~ 
 
 ### Tagger input variables
 
 The top tagging algorithm takes both a collection of all AK4 jets and all AK8 jets (passing basic pt and |eta| acceptance requirments) along with supporting variables.  The input variables used for the example program are listed below
 
-``` c++
+~~~~~~~~~~~~~ c++
 //Variables to hold inputs
 //AK4 jet variables
 //Each entry in these vectors refers to information for 1 AK4 jet
@@ -80,7 +80,7 @@ std::vector<double>** AK8SubjetPtD   = new std::vector<double>*();
 std::vector<double>** AK8SubjetAxis1 = new std::vector<double>*();
 std::vector<double>** AK8SubjetAxis2 = new std::vector<double>*();
 
-```
+~~~~~~~~~~~~~
 
 #### AK4JetLV
 
@@ -116,7 +116,7 @@ Jet shape variables  matching each entry of AK8SubjetLV .
 
 ### Output of example code
 
-```
+~~~~~~~~~~~~~
 Event #: 1
       N tops: 1
       Top properties: N constituents:   1,   Pt:  710.0,   Eta:  -0.854,   Phi:  -2.378
@@ -420,5 +420,5 @@ Event #: 49
           Constituent properties: Constituent type:   1,   Pt:   35.0,   Eta:   1.452,   Phi:   2.705
       Rsys properties: N constituents:   1,   Pt:  144.2,   Eta:  -1.108,   Phi:  -1.851
 
-```
+~~~~~~~~~~~~~
 
