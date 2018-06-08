@@ -39,7 +39,7 @@ private:
     std::map<std::string, std::vector<float>> data_;
 
 public:
-    HDF5Writer(const std::map<std::string, std::vector<std::string>>& variables, int eventsPerFile, std::string ofname) : variables_(variables), nEvtsPerFile_(eventsPerFile), nEvts_(0), nFile_(0), ofname_(ofname)
+    HDF5Writer(const std::map<std::string, std::vector<std::string>>& variables, int eventsPerFile, const std::string& ofname) : variables_(variables), nEvtsPerFile_(eventsPerFile), nEvts_(0), nFile_(0), ofname_(ofname)
     {
         for(const auto& varVec : variables_)
         {
@@ -133,6 +133,7 @@ public:
     void fill()
     {
         ++nEvts_;
+        size_t maxSize = 0;
         for(const auto& dataset : variables_)
         {
             auto& ptrPair = pointers_[dataset.first];
@@ -158,9 +159,10 @@ public:
                     else         dataVec.push_back(*static_cast<const double * const>(pp.second));
                 }
             }
+            maxSize = std::max(maxSize, dataVec.size()/varVec.size());
         }
 
-        if(nEvts_ >= nEvtsPerFile_)
+        if(maxSize >= nEvtsPerFile_)
         {
             //if we reached the max event per file lets write the file
             saveHDF5File();
@@ -219,7 +221,7 @@ private:
     std::shared_ptr<ttUtility::MVAInputCalculator> mvaCalc_;
     std::vector<float> values_;
 
-    void prepVariables(NTupleReader& tr)
+    bool prepVariables(NTupleReader& tr)
     {
         const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
         const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
@@ -303,6 +305,12 @@ private:
         myConstAK4Inputs.addSupplamentalVector("DeepCSVl"                            , tr.getVec<double>("DeepCSVl"));
         myConstAK4Inputs.addSupplamentalVector("DeepCSVbb"                           , tr.getVec<double>("DeepCSVbb"));
         myConstAK4Inputs.addSupplamentalVector("DeepCSVcc"                           , tr.getVec<double>("DeepCSVcc"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorb"                         , tr.getVec<double>("DeepFlavorb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorbb"                        , tr.getVec<double>("DeepFlavorbb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorlepb"                      , tr.getVec<double>("DeepFlavorlepb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorc"                         , tr.getVec<double>("DeepFlavorc"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavoruds"                       , tr.getVec<double>("DeepFlavoruds"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorg"                         , tr.getVec<double>("DeepFlavorg"));
         myConstAK4Inputs.addSupplamentalVector("CvsL"                                , tr.getVec<double>("CvsL"));
         myConstAK4Inputs.addSupplamentalVector("CvsB"                                , tr.getVec<double>("CvsB"));
         myConstAK4Inputs.addSupplamentalVector("CombinedSvtx"                        , tr.getVec<double>("CombinedSvtx"));
@@ -319,6 +327,9 @@ private:
         const TopTaggerResults& ttr = topTagger_->getResults();
         const std::vector<TopObject>& topCands = ttr.getTopCandidates();
 
+        //if there are no top candidates, discard this event and move to the next
+        if(topCands.size() == 0) return false;
+
         //Get gen matching results
 
         std::vector<double> *genMatchdR = new std::vector<double>();
@@ -329,7 +340,17 @@ private:
         VariableHolder<double> vh(tr);
 
         //prepare a vector of gen top pt
-        for(auto& genTop : hadGenTops) vh.add("genTopPt", genTop.Pt());
+        int icandGen = 0;
+        for(auto& genTop : hadGenTops) 
+        {
+            vh.add("candNumGen", icandGen++);
+            vh.add("genTopPt", genTop.Pt());
+        }
+        if(hadGenTops.size() == 0) 
+        {
+            tr.registerDerivedVec("genTopPt", new std::vector<double>());
+            tr.registerDerivedVec("candNumGen", new std::vector<double>());
+        }
 
         std::vector<double>* candNum = new std::vector<double>();
         int iTop = 0;
@@ -351,7 +372,8 @@ private:
             }
 
 
-            if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
+            //if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
+            if(!(hasBestMatch && NConstMatches == 3))
             {
                 const auto& varNames = variables_.find("reco_candidates")->second;
                 candNum->push_back(static_cast<double>(iTop++));
@@ -398,6 +420,7 @@ private:
         tr.registerDerivedVar("passdPhis", static_cast<double>(passdPhis));
         tr.registerDerivedVar("passBJets", static_cast<double>(passBJets));
 	
+        return true;
     }
 
 public:
@@ -413,9 +436,9 @@ public:
         mvaCalc_->mapVars(variables_.find("reco_candidates")->second);
     }
 
-    void operator()(NTupleReader& tr)
+    bool operator()(NTupleReader& tr)
     {
-        prepVariables(tr);
+        return prepVariables(tr);
     }
 };
 
@@ -477,13 +500,13 @@ int main(int argc, char* argv[])
     if(runOnCondor)
     {
         char thistFile[128];
-        sprintf(thistFile, "trainingTuple_%s_%d", dataSets.c_str(), startFile);
+        sprintf(thistFile, "trainingTuple_%d", startFile);
         outFile = thistFile;
         sampleloc = "condor";
     }
 
-    AnaSamples::SampleSet        ss(sampleloc);
-    AnaSamples::SampleCollection sc(ss);
+    AnaSamples::SampleSet        ss("sampleSets.txt", runOnCondor);
+    AnaSamples::SampleCollection sc("sampleCollections.txt", ss);
 
     map<string, vector<AnaSamples::FileSummary>> fileMap;
 
@@ -515,7 +538,7 @@ int main(int argc, char* argv[])
 
     const std::map<std::string, std::vector<std::string>> variables =
     {
-        {"gen_tops", {"eventNum", "candNum", "genTopPt", "sampleWgt","Njet"} },
+        {"gen_tops", {"eventNum", "candNumGen", "genTopPt", "sampleWgt","Njet"} },
         {"reco_candidates", {"eventNum",
                              "candNum",
                              "ncand",
@@ -553,6 +576,12 @@ int main(int argc, char* argv[])
                              "j1_DeepCSVc",
                              "j1_DeepCSVcc",
                              "j1_DeepCSVl",
+                             "j1_DeepFlavorb",
+                             "j1_DeepFlavorbb",
+                             "j1_DeepFlavorlepb",
+                             "j1_DeepFlavorc",
+                             "j1_DeepFlavoruds",
+                             "j1_DeepFlavorg",
                              "j1_ElectronEnergyFraction",
                              "j1_ElectronMultiplicity",
 //                             "j1_JetBprob",
@@ -599,6 +628,12 @@ int main(int argc, char* argv[])
                              "j2_DeepCSVc",
                              "j2_DeepCSVcc",
                              "j2_DeepCSVl",
+                             "j2_DeepFlavorb",
+                             "j2_DeepFlavorbb",
+                             "j2_DeepFlavorlepb",
+                             "j2_DeepFlavorc",
+                             "j2_DeepFlavoruds",
+                             "j2_DeepFlavorg",
                              "j2_ElectronEnergyFraction",
                              "j2_ElectronMultiplicity",
 //                             "j2_JetBprob",
@@ -643,6 +678,12 @@ int main(int argc, char* argv[])
                              "j3_DeepCSVc",
                              "j3_DeepCSVcc",
                              "j3_DeepCSVl",
+                             "j3_DeepFlavorb",
+                             "j3_DeepFlavorbb",
+                             "j3_DeepFlavorlepb",
+                             "j3_DeepFlavorc",
+                             "j3_DeepFlavoruds",
+                             "j3_DeepFlavorg",
                              "j3_ElectronEnergyFraction",
                              "j3_ElectronMultiplicity",
 //                             "j3_JetBprob",
@@ -711,7 +752,7 @@ int main(int argc, char* argv[])
         else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
         else if(iter == 2) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
         else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
-        mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 250000, ofname)), splitNum);
+        mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 500000, ofname)), splitNum);
     }
 
     for(auto& fileVec : fileMap)
@@ -759,6 +800,8 @@ int main(int argc, char* argv[])
 
                     int splitCounter = 0, mtmIndex = 0;
 
+                    bool branchesInitialized = false;
+
                     while(tr.getNextEvent())
                     {
                         //Get sample lumi weight and correct for the actual number of events 
@@ -766,19 +809,28 @@ int main(int argc, char* argv[])
                         double weight = file.getWeight();
                         tr.registerDerivedVar("sampleWgt", weight);
 
-                        //Things to run only on first event
-                        if(tr.isFirstEvent())
-                        {
-                            //Initialize the mini tuple branches, needs to be done after first call of tr.getNextEvent()
-                            for(auto& mtm : mtmVec)
-                            {
-                                mtm.first->initBranches(tr);
-                            }
-                        }
-
                         //If nEvts is set, stop after so many events
                         if(nEvts > 0 && NEvtsTotal > nEvts) break;
                         if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
+
+                        //Things to run only on first event
+                        if(!branchesInitialized)
+                        {
+                            try
+                            {
+                                //Initialize the mini tuple branches, needs to be done after first call of tr.getNextEvent()
+                                for(auto& mtm : mtmVec)
+                                {
+                                    mtm.first->initBranches(tr);
+                                }
+                                branchesInitialized = true;
+                            }
+                            catch(const SATException& e)
+                            {
+                                //do nothing here - this is sort of hacky
+                                continue;
+                            }
+                        }
 
                         //Get cut variable 
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
@@ -800,6 +852,8 @@ int main(int argc, char* argv[])
                         }
 
                     }
+
+                    f->Close();
                 }
                 catch(const SATException& e)
                 {

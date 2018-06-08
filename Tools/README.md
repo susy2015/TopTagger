@@ -8,16 +8,18 @@ Slimmed tuples containing only the information needed for training and validatio
 
 Run the following commands (at the LPC)
 
-```
+~~~~~~~~~~~~~
 make 
 ./makeTrainingTuples -D TTbarSingleLep -E 550000 -R 10:1
 ./makeTrainingTuples -D ZJetsToNuNu -E 200000 -R 1:1
-```
+~~~~~~~~~~~~~
 
-You can change the input sample name with -D, #events with -E and ratio (training sample to validation sample) with -R.  Additional sample splits can be added with -R (i.e. -R 2:2:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd).  To produce the training files for an entire dataset a condor submit script is provided in condor/condorSubmit.py.  This code requires the repository "susy2015/SusyAnaTools" to be checked out in the same directory as the TopTagger repository to compile.run.  
+You can change the input sample name with -D, #events with -E and ratio (training sample to validation sample) with -R.  Additional sample splits can be added with -R (i.e. -R 2:2:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd).  To produce the training files for an entire dataset a condor submit script is provided in condor/condorSubmit.py.  This code requires the repository "susy2015/SusyAnaTools" to be checked out in the same directory as the TopTagger repository to compile and run.  
 
 
 ## Running ANN training code 
+
+The following packages must be installed on your system if you wish to train a model with tensorflow
 
 ### Required packages 
 
@@ -82,62 +84,35 @@ https://root.cern.ch/downloading-root
 
 ### Training
 
-The script "Training_tf.py" is used to train produce and train the MVA algorithm.  The script is primarily intended to train neural networks with tensorflow, but it also is able to train random forests with scikit learn and boosted decision trees with the extreme gradient boost package.
+The script "Training.py" is used to train produce and train the MVA algorithm.  The script is primarily intended to train neural networks with tensorflow, but it also is able to train random forests with scikit learn and boosted decision trees with the extreme gradient boost package.  To run a basic training using the kodiak gpu machines (gpu001 or gpu002) with the default varialbes the following commands can be run.
 
-```
+~~~~~~~~~~~~~
+cd TopTagger/Tools/python
+source source ~hatake/tensorflow/setup.sh
 python Training.py -d DIRECTORY
-```
+~~~~~~~~~~~~~
+
+This will train a tensorflow model with the default settings.  Note that in the case of a neural network training this can take many hours.  To do a "quick" (~15 to 30 min) test use the "-e 2" option to limit yourself to only two training epochs.  The results will appear in "DIRECTORY".  The immediate validation can be viewed during or after training by launching tensorboard as follows
+
+~~~~~~~~~~~~~
+tensorboard --logdir DIRECTORY
+~~~~~~~~~~~~~
+
+This can then be viewed by tuneling your browser to the machine where tensorboard is running and navigating to "localhost:6006".  You can also copy the directory "DIRECTORY" to your local machine and run the same tensorboard command to view this information on your local machine.  
+
+Training parameters defaulta can be seen and modified by looking in the file "TopTagger/Tools/python/taggerOptions.py".  
 
 ### Validation 
 
-The script "Validation_tf.py" produces a series of validation plots including plots of all MVA input variables, the output discriminator, purity, fake rate, efficiency, and ROC curves.  It also produces a vrsion of the ROC curve in a pkl file for reploting.  The validation code will look for the trained network file in the directory specified with the -d option, so this should be the same directory name given to the training script.  Additionally, the output files will b ewritten to this directoty.  
+The script "Validation.py" produces a series of validation plots including plots of all MVA input variables, the output discriminator, purity, fake rate, efficiency, and ROC curves.  It also produces a version of the ROC curve in a pkl file for reploting.  The validation code will look for the trained network file in the directory specified with the -d option, so this should be the same directory name given to the training script.  Additionally, the output files will b ewritten to this directoty.  
 
-```
+~~~~~~~~~~~~~
 python Validation.py -d DIRECTORY
-```
+~~~~~~~~~~~~~
+
+No other options are necessary as all settings needed are read from the configuration file written in DIRECTORY by the training script.  
 
 ### Combined ROC curve plots
 
 The script "rocPlots.py" is provided to help many compairson ROC plots to draw multiple ROC curves on the same axis.  
 
-# Legacy Instructions
-
-These instructions are only necessary to use the old openCV based random forest trainings.  
-
-## OpenCV Instructions 
-
-OpenCV provides a C++ interface to a random forest algorithm which can be integrated into our normal c++ workflow
-
-### Installing openCV
-
-In order to use sample weights we need the latest release of openCV 3.1.0 and a bug fix I have added to stop RTree training form crashing.  You may download the repository from github via my fork in susy2015.
-
-To install from github do the following in your "CMSSW_X_Y_Z/src"
-
-```
-git clone git@github.com:susy2015/opencv.git
-cd opencv
-git checkout 3.1.1_BugFix
-```
-
-To compile openCV run the following commands in the "opencv" folder
-
-```
-cmake .
-make -j6
-```
-
-### Running openCV test code
-
-The openCV test code can be found in "TopTagger/Tools".  This code uses the same input tuples as the sklearn implementation.  The code can be compiled by running "make" in the "TopTagger/Tools" folder and this produes the executable "openCVTest".  To run the code the necessary library locations for opencv must be added to the LD_LIBRARY_PATH variable.  This will be done automatically by running the following
-
-```
-source opencvSetup.sh
-```
-
-The code may then be run with the command 
-
-```
-python Training.py --opencv
-python Validation.py --opencv
-```
