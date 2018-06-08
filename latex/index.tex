@@ -1,0 +1,99 @@
+\subsection*{Installing the tagger in C\-M\-S software release}
+
+\subsubsection*{Standalone (edm free) install instructions within C\-M\-S\-S\-W}
+
+If you would rather not go through the hassle of installing R\-O\-O\-T/python/tensorflow the C\-M\-S\-S\-W environment can be used to provide the necessary libraries and python modules
+
+
+\begin{DoxyCode}
+cmsrel CMSSW\_9\_3\_3
+cd CMSSW\_9\_3\_3/src
+cmsenv
+git clone git@github.com:susy2015/\hyperlink{classTopTagger}{TopTagger}.git
+cd \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/test
+./configure
+make -j8 
+\end{DoxyCode}
+
+
+The test code can then be run identically to the completely standalone instructions.
+
+\subsubsection*{Install tagger integrated in the edm framework}
+
+The instructions are currently for C\-M\-S\-S\-W8, but these will be updated when M\-C is avaliable for 9\-X series releases. In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deep\-Flavor tagger (for the tagger itself along with the tensorflow configuration for 8\-X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,
+
+
+\begin{DoxyCode}
+\textcolor{preprocessor}{#get CMSSW release}
+\textcolor{preprocessor}{}cmsrel CMSSW\_8\_0\_28\_patch1
+cd CMSSW\_8\_0\_28\_patch1/src/
+cmsenv
+git cms-init
+\textcolor{preprocessor}{#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet}
+\textcolor{preprocessor}{}git cms-merge-topic -u mverzett:Experimental\_DeepFlavour\_80X
+cd RecoBTag/DeepFlavour/scripts/
+wget -nv http:\textcolor{comment}{//www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz}
+tar -zxf tensorflow-cmssw8-0-26.tar.gz
+mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python
+rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/
+cd \textcolor{stringliteral}{"$CMSSW\_BASE/src"}
+scram setup \textcolor{stringliteral}{"RecoBTag/Tensorflow/py2-numpy-c-api.xml"}
+cmsenv
+\textcolor{preprocessor}{#patch to gq producer to add axis1}
+\textcolor{preprocessor}{}git cms-merge-topic -u pastika:AddJetAxis1
+\textcolor{preprocessor}{#patched version of jet toolbox}
+\textcolor{preprocessor}{}git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix\_NoLep\_jetToolbox\_80X\_V3
+\textcolor{preprocessor}{#download top tagger code }
+\textcolor{preprocessor}{}git clone -b IntermediateRecipeV0 git@github.com:susy2015/\hyperlink{classTopTagger}{TopTagger}.git
+\textcolor{preprocessor}{#compile everything }
+\textcolor{preprocessor}{}scram b -j12
+cd \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/test
+\textcolor{preprocessor}{#get qgl database file}
+\textcolor{preprocessor}{}wget https:\textcolor{comment}{//raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL\_cmssw8020\_v2.db}
+\textcolor{preprocessor}{#get top tager cfg file and MVA model files }
+\textcolor{preprocessor}{}../../Tools/getTaggerCfg.sh -t Intermediate\_Example\_v1.0.0
+\textcolor{preprocessor}{#run example code}
+\textcolor{preprocessor}{}voms-proxy-init
+cmsRun run\_topTagger.py
+\end{DoxyCode}
+
+
+The default configuration of the example cfg file \char`\"{}run\-\_\-top\-Tagger.\-py\char`\"{} will run over a single-\/lepton ttbar sample and produce an edm formatted output file (\char`\"{}test.\-root\char`\"{}) containing the vector of reconstructed top T\-Lorentz\-Vectors along with a second vector indicating the type of top (monojet, dijet, trijet).
+
+\subsection*{More about getting a configuration file}
+
+Before the top tagger can be used the top tagger configuration file must be checked out. Configuration files for top tagger working points are stored in the Susy2015/\-Top\-Tagger\-Cfg repository and are published through releases. These should not be accessed directly, but instead you can use the script \char`\"{}get\-Tagger\-Cfg.\-sh\char`\"{} to download the working points desired. An example of a basic checkout of the standard working point for use with the example code (different working points are found here \href{https://github.com/susy2015/TopTaggerCfg/releases}{\tt https\-://github.\-com/susy2015/\-Top\-Tagger\-Cfg/releases}) is as follows
+
+
+\begin{DoxyCode}
+\textcolor{preprocessor}{#run the following once to set up the top tagger and add the "getTaggerCfg.sh" to the path}
+\textcolor{preprocessor}{}source \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/test/taggerSetup.sh
+getTaggerCfg.sh -t MVAAK8\_Tight\_noQGL\_binaryCSV\_v1.0.2
+\end{DoxyCode}
+
+
+This will download the configuration file along with the M\-V\-A training file if appropriate into a directory. It will then softlink the files into your current directory so this script is intended to be run from the same directory as you will run your code. If you want the directory containing the configuration file and M\-V\-A file to be located elsewhere this can be specified with the \char`\"{}-\/d\char`\"{} option (Multiple run directories can point to the same directory, this can be helpful to save space as the random forest training files are quite large). If you have multiple configuration files you can specify a different name for the configuration file with the \char`\"{}-\/f\char`\"{} option. Finally, if you want to download the file without creating the softlinks use the \char`\"{}-\/n\char`\"{} option.
+
+\subsection*{Top tagger structure}
+
+The top tagger code is written to take modules which act on a central object to produce the final collection of top objects. The tagger framework consists of the following classes (found in Top\-Tagger/\-Top\-Tagger/)
+
+\subsubsection*{Top Tagger Modules and the Configuration File.}
+
+The configuration file is central to the functioning of the top tagger code. This file is a basic text file implemented to follow the structure of the H\-C\-A\-L configuration parser and the code can be found here \char`\"{}\-Top\-Tagger/\-Cfg\-Parser.\char`\"{} This code upon which this is based can be found here (\href{https://svnweb.cern.ch/cern/wsvn/cmshcos/trunk/hcalBase/include/hcal/cfg/?#aafaf15fcace155f9a3d702b52eb6d719}{\tt https\-://svnweb.\-cern.\-ch/cern/wsvn/cmshcos/trunk/hcal\-Base/include/hcal/cfg/?\#aafaf15fcace155f9a3d702b52eb6d719}). The configuration script is used to tell the top tagger what modules to run and in which order, in addition to allowing any parameters necessary for the tagger and each module to be defined cleanly in one place. An example configuration script can be found in Top\-Tagger/\-Top\-Tagger/test/\-Example\-\_\-\-Top\-Tagger.\-cfg
+
+Modules are where all the real work of the top tagger is done. Each module performs a particular task and stores its results in a \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which will eventually be presented to the user as a summary of final results. All modules inherit from \hyperlink{classTTModule}{T\-T\-Module} and, as described in \hyperlink{classTTModule}{T\-T\-Module}\char`\"{} implement the 2 functions \char`\"{}get\-Parameter\char`\"{}s and \char`\"{}run." Each module is called automatically from the \hyperlink{classTopTagger}{Top\-Tagger} class. They are also instantiated automatically based upon the configuration file.
+
+For further documentation of the code and each module see the following webpage \href{http://susy2015.github.io/TopTagger/html/index.html}{\tt http\-://susy2015.\-github.\-io/\-Top\-Tagger/html/index.\-html}.
+
+\subsubsection*{\hyperlink{classTopTagger}{Top\-Tagger}}
+
+The \hyperlink{classTopTagger}{Top\-Tagger} module is the primary (and only mandatory) section in every top tagger configuration. This section defines all the other top tagger modules which will be run and in which order. This module has 2 variables (both arrays) Which are used to define the module run order and if necessary the module context name.
+
+\paragraph*{module\mbox{[}\mbox{]} (string)\-:}
+
+This variable is an array and is used to define which other modules will be run and in which order. This can be any module listed here in this section.
+
+\paragraph*{context\mbox{[}\mbox{]} (string)\-:}
+
+This variable must be specified for any module being run more than once to specify what context name to read its configuration from. 

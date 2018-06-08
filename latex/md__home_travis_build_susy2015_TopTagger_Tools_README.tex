@@ -1,0 +1,121 @@
+We use Tensorflow package for M\-V\-A based tagger studies. The training/validation is python based. The model is integrated into the c++ side of the framework via the Tensorflow c-\/api or through a call to python if the Tensorflow c-\/api is inavaliable.
+
+\subsection*{Samples for training and validation}
+
+Slimmed tuples containing only the information needed for training and validation can be made with \char`\"{}cpp/make\-Training\-Tuples.\-C\char`\"{}. The training and validation currently require input from several samples including semileptonic ttbar, Q\-C\-D, and znunu. The instructions for creating these files are found below.
+
+Run the following commands (at the L\-P\-C)
+
+
+\begin{DoxyCode}
+make 
+./makeTrainingTuples -D TTbarSingleLep -E 550000 -R 10:1
+./makeTrainingTuples -D ZJetsToNuNu -E 200000 -R 1:1
+\end{DoxyCode}
+
+
+You can change the input sample name with -\/\-D, \#events with -\/\-E and ratio (training sample to validation sample) with -\/\-R. Additional sample splits can be added with -\/\-R (i.\-e. -\/\-R 2\-:2\-:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd). To produce the training files for an entire dataset a condor submit script is provided in condor/condor\-Submit.\-py. This code requires the repository \char`\"{}susy2015/\-Susy\-Ana\-Tools\char`\"{} to be checked out in the same directory as the \hyperlink{classTopTagger}{Top\-Tagger} repository to compile and run.
+
+\subsection*{Running A\-N\-N training code}
+
+The following packages must be installed on your system if you wish to train a model with tensorflow
+
+\subsubsection*{Required packages}
+
+The following packages much be installed to run the A\-N\-N training and validation code
+
+\paragraph*{python 2.\-7}
+
+\href{https://www.python.org/}{\tt https\-://www.\-python.\-org/}
+
+\paragraph*{virtualenv}
+
+This package is not manditory, but is highly recomended to isolate all the packages you will install from your main python installation
+
+\href{https://virtualenv.pypa.io/en/stable/}{\tt https\-://virtualenv.\-pypa.\-io/en/stable/}
+
+To install other packages in the virtual environment first source the activate script for the virtual environment of interest and then install the following packages via pip.
+
+\paragraph*{scipy \& numpy}
+
+scipy and numpy are used for efficient manipulation of large datasets in python and are prerequisutes for most other packages required
+
+\href{https://www.scipy.org/install.html}{\tt https\-://www.\-scipy.\-org/install.\-html}
+
+\href{https://www.scipy.org/install.html}{\tt https\-://www.\-scipy.\-org/install.\-html}
+
+\paragraph*{pandas}
+
+Pandas is a package which is designed to make manipulation of datasets in python more convinenent
+
+\href{http://pandas.pydata.org/pandas-docs/stable/}{\tt http\-://pandas.\-pydata.\-org/pandas-\/docs/stable/}
+
+\paragraph*{scikit-\/learn}
+
+Scikit learn is a python package which implements a wide array of easy to use M\-V\-A techniques
+
+\href{http://scikit-learn.org/stable/install.html}{\tt http\-://scikit-\/learn.\-org/stable/install.\-html}
+
+\paragraph*{tensorflow}
+
+Tensorflow is the machine learning package developed by Google for implementing and training a wide range of advanced neural networks.
+
+\href{https://www.tensorflow.org/install/}{\tt https\-://www.\-tensorflow.\-org/install/}
+
+\paragraph*{H\-D\-F5}
+
+H\-D\-F5 is a dataformat which we use to hold the training and validation format. This package is a pain to install. Unless you have a redhat based linux intall it must be installed from source
+
+\href{https://support.hdfgroup.org/HDF5/release/obtainsrc518.html}{\tt https\-://support.\-hdfgroup.\-org/\-H\-D\-F5/release/obtainsrc518.\-html}
+
+Then the python interface must be installed seperately
+
+\href{http://docs.h5py.org/en/latest/build.html}{\tt http\-://docs.\-h5py.\-org/en/latest/build.\-html}
+
+When I installed the main H\-D5 package from source I found it named the libraries in a way that the python library couldn't find. I was able to workaround this by creating the following softlinks
+
+libhdf5.\-so -\/$>$ libhdf5-\/shared.\-so libhdf5\-\_\-hl.\-so -\/$>$ libhdf5\-\_\-hl-\/shared.\-so
+
+\paragraph*{R\-O\-O\-T and Py\-R\-O\-O\-T}
+
+\href{https://root.cern.ch/downloading-root}{\tt https\-://root.\-cern.\-ch/downloading-\/root}
+
+\subsubsection*{Training}
+
+The script \char`\"{}\-Training.\-py\char`\"{} is used to train produce and train the M\-V\-A algorithm. The script is primarily intended to train neural networks with tensorflow, but it also is able to train random forests with scikit learn and boosted decision trees with the extreme gradient boost package. To run a basic training using the kodiak gpu machines (gpu001 or gpu002) with the default varialbes the following commands can be run.
+
+
+\begin{DoxyCode}
+cd \hyperlink{classTopTagger}{TopTagger}/Tools/python
+source source ~hatake/tensorflow/setup.sh
+python Training.py -d DIRECTORY
+\end{DoxyCode}
+
+
+This will train a tensorflow model with the default settings. Note that in the case of a neural network training this can take many hours. To do a \char`\"{}quick\char`\"{} ($\sim$15 to 30 min) test use the \char`\"{}-\/e 2\char`\"{} option to limit yourself to only two training epochs. The results will appear in \char`\"{}\-D\-I\-R\-E\-C\-T\-O\-R\-Y\char`\"{}. The immediate validation can be viewed during or after training by launching tensorboard as follows
+
+
+\begin{DoxyCode}
+tensorboard --logdir DIRECTORY
+\end{DoxyCode}
+
+
+This can then be viewed by tuneling your browser to the machine where tensorboard is running and navigating to \char`\"{}localhost\-:6006\char`\"{}. You can also copy the directory \char`\"{}\-D\-I\-R\-E\-C\-T\-O\-R\-Y\char`\"{} to your local machine and run the same tensorboard command to view this information on your local machine.
+
+Training parameters defaulta can be seen and modified by looking in the file \char`\"{}\-Top\-Tagger/\-Tools/python/tagger\-Options.\-py\char`\"{}.
+
+\subsubsection*{Validation}
+
+The script \char`\"{}\-Validation.\-py\char`\"{} produces a series of validation plots including plots of all M\-V\-A input variables, the output discriminator, purity, fake rate, efficiency, and R\-O\-C curves. It also produces a version of the R\-O\-C curve in a pkl file for reploting. The validation code will look for the trained network file in the directory specified with the -\/d option, so this should be the same directory name given to the training script. Additionally, the output files will b ewritten to this directoty.
+
+
+\begin{DoxyCode}
+python Validation.py -d DIRECTORY
+\end{DoxyCode}
+
+
+No other options are necessary as all settings needed are read from the configuration file written in D\-I\-R\-E\-C\-T\-O\-R\-Y by the training script.
+
+\subsubsection*{Combined R\-O\-C curve plots}
+
+The script \char`\"{}roc\-Plots.\-py\char`\"{} is provided to help many compairson R\-O\-C plots to draw multiple R\-O\-C curves on the same axis. 
