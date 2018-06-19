@@ -30,12 +30,12 @@ namespace ttUtility
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<double>* btagFactors_;
-        const std::vector<double>* qgLikelihood_;
+        const std::vector<float>* btagFactors_;
+        const std::vector<float>* qgLikelihood_;
 
     public:
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
     };
 
@@ -43,22 +43,22 @@ namespace ttUtility
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<double>* tau1_;
-        const std::vector<double>* tau2_;
-        const std::vector<double>* tau3_;
-        const std::vector<double>* softDropMass_;
+        const std::vector<float>* tau1_;
+        const std::vector<float>* tau2_;
+        const std::vector<float>* tau3_;
+        const std::vector<float>* softDropMass_;
         const std::vector<TLorentzVector>* subjetsLVec_;
         TF1* puppisd_corrGEN_;
         TF1* puppisd_corrRECO_cen_;
         TF1* puppisd_corrRECO_for_;
         
-        double getPUPPIweight(double puppipt, double puppieta ) const;
+        float getPUPPIweight(float puppipt, float puppieta ) const;
 
     public:
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& tau1, const std::vector<float>& tau2, const std::vector<float>& tau3, const std::vector<float>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& tau1, const std::vector<float>& tau2, const std::vector<float>& tau3, const std::vector<float>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
         void packageConstituents(std::vector<Constituent>& constituents);
-        std::vector<TLorentzVector> denominator(const double ptCut) const;
+        std::vector<TLorentzVector> denominator(const float ptCut) const;
         void setWMassCorrHistos(const std::string& fname);
         void setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
 
@@ -92,13 +92,13 @@ namespace ttUtility
     }
 
     //backwards compatability overload
-    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood);
     
     //Tool to calcualte MT2 from tagger results
-    double calculateMT2(const TopTaggerResults& ttr);
+    float calculateMT2(const TopTaggerResults& ttr);
 
     //MVA helper functions
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
+    std::map<std::string, float> createMVAInputs(const TopObject& topCand, const float csvThresh);
 
     std::vector<std::string> getMVAVars();
 

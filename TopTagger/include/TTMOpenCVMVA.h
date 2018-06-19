@@ -12,10 +12,10 @@
 class TTMOpenCVMVA : public TTModule
 {
 private:
-    double discriminator_;
+    float discriminator_;
     std::string modelFile_;
-    double csvThreshold_;
-    double bEtaCut_;
+    float csvThreshold_;
+    float bEtaCut_;
     int maxNbInTop_;
 
     //cv::Ptr is the opencv implementation of a smart pointer

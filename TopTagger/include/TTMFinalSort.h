@@ -11,7 +11,7 @@ class TopTaggerResults;
 class TTMFinalSort : public TTModule
 {
 private:
-    double mt_;
+    float mt_;
     std::string sortMethod_;
 
 public:

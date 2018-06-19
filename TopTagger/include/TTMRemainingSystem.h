@@ -7,7 +7,7 @@
 class TTMRemainingSystem : public TTModule, public TTMConstituentReqs
 {
 private:
-    double CSVThresh_, lowRsysMass_, highRsysMass_, dRMax_;
+    float CSVThresh_, lowRsysMass_, highRsysMass_, dRMax_;
     bool useSecondJet_, allowW_;
 
 public:

@@ -6,7 +6,7 @@
 
 #include "Math/VectorUtil.h"
 
-bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& constituents, const std::set<const Constituent*>& usedConsts, const double dRMax) const
+bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& constituents, const std::set<const Constituent*>& usedConsts, const float dRMax) const
 {
     for(const auto& constituent : constituents)
     {
@@ -36,7 +36,7 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
     return false;
 }
 
-void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>& constituents, const std::vector<Constituent>& allConstituents, std::set<const Constituent*>& usedConstituents, const double dRMax) const
+void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>& constituents, const std::vector<Constituent>& allConstituents, std::set<const Constituent*>& usedConstituents, const float dRMax) const
 {
     for(const auto& constituent : constituents)
     {

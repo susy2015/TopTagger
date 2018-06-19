@@ -14,11 +14,11 @@ private:
     bool doMonojet_;
 
     //dijet variables
-    double dRMaxDiJet_;
+    float dRMaxDiJet_;
     bool doDijet_;
 
     //trijet variables
-    double minTopCandMass_, maxTopCandMass_, dRMaxTrijet_;
+    float minTopCandMass_, maxTopCandMass_, dRMaxTrijet_;
     bool doTrijet_;
 
 public:

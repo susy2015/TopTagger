@@ -17,18 +17,18 @@ namespace ttUtility
 
     ConstGenInputs::ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : hadGenTops_(&hadGenTops), hadGenTopDaughters_(&hadGenTopDaughters) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
 
-    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
+    ConstAK4Inputs::ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood) {}
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& tau1, const std::vector<float>& tau2, const std::vector<float>& tau3, const std::vector<float>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
         puppisd_corrRECO_for_ = nullptr;
     }
 
-    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
+    ConstAK8Inputs::ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& tau1, const std::vector<float>& tau2, const std::vector<float>& tau3, const std::vector<float>& softDropMass, const std::vector<TLorentzVector>& subJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsLVec_(&subJetsLVec) 
     {
         puppisd_corrGEN_ = nullptr;
         puppisd_corrRECO_cen_ = nullptr;
@@ -58,7 +58,7 @@ namespace ttUtility
                 {
                     for(const auto& genDaughter : (*hadGenTopDaughters_)[iGenTop])
                     {
-                        double dR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], *genDaughter);
+                        float dR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], *genDaughter);
                         if(dR < 0.4)
                         {
                             constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
@@ -88,7 +88,7 @@ namespace ttUtility
             std::vector<TLorentzVector> subjets;
             for(const TLorentzVector& puppiSubJet : *subjetsLVec_)
             {
-                double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
+                float myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], puppiSubJet);
                 if (myDR < 0.8)
                 {
                     subjets.push_back(puppiSubJet);
@@ -97,14 +97,14 @@ namespace ttUtility
             // If more than 2 matches, find the best combination of two subjets
             if (subjets.size() > 2) 
             {
-                double min_diff = 999999.;
+                float min_diff = 999999.;
                 int min_j=0, min_k=1;
                 for (unsigned int j=0 ; j<subjets.size(); ++j)
                 {
                     for (unsigned int k=j+1; k<subjets.size(); ++k)
                     {
                         TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j] - subjets[k];
-                        double diff = abs(diff_LV.M());
+                        float diff = abs(diff_LV.M());
                         if(diff < min_diff)
                         {
                             min_diff = diff;
@@ -128,7 +128,7 @@ namespace ttUtility
                     {
                         for(const auto& subjet : subjets)
                         {
-                            double dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
+                            float dR = ROOT::Math::VectorUtil::DeltaR(subjet, *genDaughter);
                             if(dR < 0.4)
                             {
                                 constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
@@ -140,7 +140,7 @@ namespace ttUtility
         }
     }
 
-    std::vector<TLorentzVector> ConstAK8Inputs::denominator(const double ptCut) const 
+    std::vector<TLorentzVector> ConstAK8Inputs::denominator(const float ptCut) const 
     {
         std::vector<TLorentzVector> returnVector;
         for(auto& jet : *jetsLVec_)
@@ -150,10 +150,10 @@ namespace ttUtility
         return returnVector;
     }
 
-    double ConstAK8Inputs::getPUPPIweight(double puppipt, double puppieta ) const
+    float ConstAK8Inputs::getPUPPIweight(float puppipt, float puppieta ) const
     {
-        double genCorr  = 1.;
-        double recoCorr = 1.;
+        float genCorr  = 1.;
+        float recoCorr = 1.;
 
         //The correction is derived for jet > 200GeV. 
         //It would return negative weight for low PT jet
@@ -209,20 +209,20 @@ namespace ttUtility
         }
     }
 
-    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood)
+    std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<float>& btagFactors, const std::vector<float>& qgLikelihood)
     {
         return packageConstituents(ConstAK4Inputs(jetsLVec, btagFactors, qgLikelihood));
     }
 
-    double calculateMT2(const TopTaggerResults& ttr)
+    float calculateMT2(const TopTaggerResults& ttr)
     {
         return 0.0;
     }
 
 
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh)
+    std::map<std::string, float> createMVAInputs(const TopObject& topCand, const float csvThresh)
     {
-        std::map<std::string, double> varMap;
+        std::map<std::string, float> varMap;
 
         //Get top candidate variables
         varMap["cand_pt"]    = topCand.p().Pt();

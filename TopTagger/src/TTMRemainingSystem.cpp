@@ -78,15 +78,15 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
         //The closest jet to the seed is chosen provided the seed + second jet mass
         //is in the specified range.  If the seed is a b jet, a W is always prefered 
         //over an AK4 jet.
-        double mindR = 999.9;
+        float mindR = 999.9;
         bool ak8wFound = false;
         for(auto& jet : consituents)
         {
             //check if jet is used in a top or is the seed
             if(usedJets.count(&jet) || &jet == seed) continue;
 
-            double dR = seed->p().DeltaR(jet.p());
-            double mdijet = (seed->p() + jet.p()).M();
+            float dR = seed->p().DeltaR(jet.p());
+            float mdijet = (seed->p() + jet.p()).M();
 
             //select second jet based upon dR and dijet mass
             if((dRMax_  < 0 || dR < dRMax_)  //disable dR entirely if dRMax is less than 0

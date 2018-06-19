@@ -16,16 +16,16 @@ class TTMConstituentReqs : public TTMFilterBase
 {
 protected:
     //matching variable 
-    double dRMatch_;
+    float dRMatch_;
 
     //mono-jet variables
-    double minAK8TopMass_, maxAK8TopMass_, maxTopTau32_, minAK8TopPt_;
+    float minAK8TopMass_, maxAK8TopMass_, maxTopTau32_, minAK8TopPt_;
 
     //dijet variables
-    double minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_, minAK4WPt_;
+    float minAK8WMass_, maxAK8WMass_, maxWTau21_, minAK8WPt_, minAK4WPt_;
 
     //trijet variables
-    double dRMaxTrijet_, minAK4ResolvedPt_;
+    float dRMaxTrijet_, minAK4ResolvedPt_;
 
     //Implement the requirements to be tagged as an AK8 W
     bool passAK8WReqs(const Constituent& constituent) const;

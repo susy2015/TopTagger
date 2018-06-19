@@ -11,7 +11,7 @@ class TopTaggerResults;
 class TTMOverlapResolution : public TTModule, public TTMFilterBase
 {
 private:
-    double mt_, maxTopEta_, dRMatch_, cvsThreshold_;
+    float mt_, maxTopEta_, dRMatch_, cvsThreshold_;
     int NConstituents_;
     std::string sortMethod_;
 

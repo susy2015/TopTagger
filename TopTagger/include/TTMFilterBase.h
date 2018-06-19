@@ -10,8 +10,8 @@ class TTMFilterBase
 {
 protected:
 
-    bool constituentsAreUsed(const std::vector<const Constituent *>&, const std::set<const Constituent*>&, const double) const ;
-    void markConstituentsUsed(const std::vector<const Constituent *>&, const std::vector<Constituent>&, std::set<const Constituent*>&, const double) const ;
+    bool constituentsAreUsed(const std::vector<const Constituent *>&, const std::set<const Constituent*>&, const float) const ;
+    void markConstituentsUsed(const std::vector<const Constituent *>&, const std::vector<Constituent>&, std::set<const Constituent*>&, const float) const ;
 };
 
 

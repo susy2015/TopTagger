@@ -20,7 +20,7 @@ void TopObject::updateVariables()
     dRmax_ = 0.0;
     for(const auto& jet : constituents_) 
     {
-        double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, jet->p());
+        float deltaR = ROOT::Math::VectorUtil::DeltaR(p_, jet->p());
         dRmax_ = std::max(dRmax_, deltaR);
 
         //If there is gen information in the constituent
@@ -38,7 +38,7 @@ void TopObject::addConstituent(Constituent const * constituent)
     updateVariables();
 }
 
-int TopObject::getNBConstituents(double cvsCut, double etaCut) const
+int TopObject::getNBConstituents(float cvsCut, float etaCut) const
 {
     int nb = 0;
     for(const auto* constituent : constituents_)
@@ -51,15 +51,15 @@ int TopObject::getNBConstituents(double cvsCut, double etaCut) const
     return nb;
 }
 
-const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax) const
+const TLorentzVector* TopObject::getBestGenTopMatch(const float dRMax) const
 {
     //int genDaughterMatches = 0;
     const TLorentzVector* bestMatch = nullptr;
-    double bestMatchDR = 999.9;
+    float bestMatchDR = 999.9;
     for(const auto& genTop : genMatchPossibilities_)
     {
         if(genTop.second.size() < 2) continue;
-        double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, *genTop.first);
+        float deltaR = ROOT::Math::VectorUtil::DeltaR(p_, *genTop.first);
         if(deltaR < bestMatchDR)
         {
             bestMatchDR = deltaR;

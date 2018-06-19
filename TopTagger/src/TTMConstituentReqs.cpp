@@ -38,7 +38,7 @@ bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
     //check that tau1 and 2 are valid
     if(constituent.getTau1() <= 0 || constituent.getTau2() <= 0) return false;
 
-    double tau21 = constituent.getTau2()/constituent.getTau1();
+    float tau21 = constituent.getTau2()/constituent.getTau1();
 
     return constituent.p().Pt() > minAK8WPt_ &&
            constituent.getSoftDropMass() * constituent.getWMassCorr() > minAK8WMass_  && 
@@ -67,7 +67,7 @@ bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const
     //check that tau2 and 3 are valid
     if(constituent.getTau2() <= 0 || constituent.getTau3() <= 0) return false;
 
-    double tau32 = constituent.getTau3()/constituent.getTau2();
+    float tau32 = constituent.getTau3()/constituent.getTau2();
 
     return constituent.p().Pt() > minAK8TopPt_ &&
            constituent.getSoftDropMass() > minAK8TopMass_  && 

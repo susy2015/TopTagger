@@ -76,7 +76,7 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
         {
             //Prepare data from top candidate (this code is shared with training tuple producer)
             //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
+            std::map<std::string, float> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
 
             //Construct opencv data matrix for prediction
             cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type
@@ -88,7 +88,7 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
             }
 
             //predict value
-            double discriminator = treePtr_->predict(inputData);
+            float discriminator = treePtr_->predict(inputData);
             topCand.setDiscriminator(discriminator);
 
             //Check number of b-tagged jets in the top

@@ -43,7 +43,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     {
         auto sortFunc = [this](TopObject* t1, TopObject* t2)
         {
-            double m1 = -999.9, m2 = -999.9;
+            float m1 = -999.9, m2 = -999.9;
             const auto& constVec1 = t1->getConstituents();
             switch(t1->getNConstituents())
             {

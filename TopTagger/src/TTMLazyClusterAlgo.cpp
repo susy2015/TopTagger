@@ -80,7 +80,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
                     TopObject topCand({&constituents[k], &constituents[j], &constituents[i]});
 
                     //mass window on the top candidate mass
-                    double m123 = topCand.p().M();
+                    float m123 = topCand.p().M();
                     bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
 
                     if(topCand.getDRmax() < dRMax_ && passMassWindow)
