@@ -17,13 +17,13 @@ cd TopTagger/TopTagger/test
 make -j8 
 ~~~~~~~~~~~~~
 
-The test code can then be run identically to the completely standalone instructions found [here](../README.md)
+The test code can then be run identically to the completely standalone instructions found [here](../README.md#running-the-example)
 
 ### Install tagger integrated in the edm framework
 
 For the time being it is suggested to produce flat NTuples containing the input variables which are necessary to run the resolved tagger offline.  This is because running tensorflow alongside CMSSW 8_X_Y requires some rather convoluted hacks (instructions are given below, but these are very involved).  It is much easier to produce flat tuples where all the necessary jet information is kept and use the stansalong instructions above to process the flat NTuples.  
 
-#### Instructions for producing jet variables for tagger with CMSSW 8_0_28_patch1
+#### Instructions for producing jet variables for resolved top tagger with CMSSW 8_0_28_patch1
 
 Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.
 
