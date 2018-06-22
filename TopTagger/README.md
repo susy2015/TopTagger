@@ -42,7 +42,7 @@ scram b -j8
 
 The following code should be added to your CMSSW config file to prepare the jet collection with all necessary variables.  
 
-~~~~~~~~~~~~~{.py}
+~~~~~~~~~~~~~{.python}
 jetTag = cms.InputTag("slimmedJets")
 
 process.load('RecoJets.JetProducers.QGTagger_cfi')
@@ -73,12 +73,12 @@ This will produce a jet collection called 'selectedUpdatedPatJetsDeepCSV' which 
 
 The necessary variables can then be accessed in a edm producer as follows 
 
-~~~~~~~~~~~~{c++}
+~~~~~~~~~~~~{.c++}
 //in constructor
 JetTok_ = consumes<std::vector<pat::Jet> >(edm::InputTag("selectedUpdatedPatJetsDeepCSV"));
 ~~~~~~~~~~~~
 
-~~~~~~~~~~~~{c++}
+~~~~~~~~~~~~{.c++}
 //in produce(...)
 edm::Handle<std::vector<pat::Jet> > jets;
 iEvent.getByToken(JetTok_, jets);
