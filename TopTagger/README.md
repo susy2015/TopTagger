@@ -73,12 +73,12 @@ This will produce a jet collection called 'selectedUpdatedPatJetsDeepCSV' which 
 
 The necessary variables can then be accessed in a edm producer as follows 
 
-~~~~~~~~~~~~{.cpp}
+~~~~~~~~~~~~{c++}
 //in constructor
 JetTok_ = consumes<std::vector<pat::Jet> >(edm::InputTag("selectedUpdatedPatJetsDeepCSV"));
 ~~~~~~~~~~~~
 
-~~~~~~~~~~~~{.cpp}
+~~~~~~~~~~~~{c++}
 //in produce(...)
 edm::Handle<std::vector<pat::Jet> > jets;
 iEvent.getByToken(JetTok_, jets);
