@@ -4,6 +4,14 @@
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/SATException.h"
 
+#include "Framework/Framework/include/MakeMVAVariables.h"
+#include "Framework/Framework/include/Jet.h"
+#include "Framework/Framework/include/Muon.h"
+#include "Framework/Framework/include/Electron.h"
+#include "Framework/Framework/include/BJet.h"
+#include "Framework/Framework/include/CommonVariables.h"
+#include "Framework/Framework/include/Baseline.h"
+
 #include "TopTagger/TopTagger/include/TopTagger.h"
 #include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 #include "TopTagger/TopTagger/include/TopTaggerResults.h"
@@ -505,8 +513,8 @@ int main(int argc, char* argv[])
         sampleloc = "condor";
     }
 
-    AnaSamples::SampleSet        ss("sampleSets.txt", runOnCondor);
-    AnaSamples::SampleCollection sc("sampleCollections.txt", ss);
+    AnaSamples::SampleSet        ss("sampleSets.cfg", runOnCondor);
+    AnaSamples::SampleCollection sc("sampleCollections.cfg", ss);
 
     map<string, vector<AnaSamples::FileSummary>> fileMap;
 
@@ -538,206 +546,21 @@ int main(int argc, char* argv[])
 
     const std::map<std::string, std::vector<std::string>> variables =
     {
-        {"gen_tops", {"eventNum", "candNumGen", "genTopPt", "sampleWgt","Njet"} },
-        {"reco_candidates", {"eventNum",
-                             "candNum",
-                             "ncand",
-                             "cand_dThetaMin",
-                             "cand_dThetaMax",
-                             "cand_dRMax",
-                             "cand_eta",
-                             "cand_m",
-                             "cand_phi",
-                             "cand_pt",
-                             "cand_p",
-                             "dR12_lab",
-                             "dR13_lab",
-                             "dR1_23_lab",
-                             "dR23_lab",
-                             "dR2_13_lab",
-                             "dR3_12_lab",
-                             "dRPtTop",
-                             "dRPtW",
-                             "dTheta12",
-                             "dTheta13",
-                             "dTheta23",
-                             "j12_m",
-                             "j12_m_lab",
-                             "j13_m",
-                             "j13_m_lab",
-                             "j1_CSV",
-                             "j1_CSV_lab",
-                             "j1_ChargedHadronMultiplicity",
-                             "j1_CombinedSvtx",
-                             "j1_CvsB",
-                             "j1_CvsL",
-                             "j1_DeepCSVb",
-                             "j1_DeepCSVbb",
-                             "j1_DeepCSVc",
-                             "j1_DeepCSVcc",
-                             "j1_DeepCSVl",
-                             "j1_DeepFlavorb",
-                             "j1_DeepFlavorbb",
-                             "j1_DeepFlavorlepb",
-                             "j1_DeepFlavorc",
-                             "j1_DeepFlavoruds",
-                             "j1_DeepFlavorg",
-                             "j1_ElectronEnergyFraction",
-                             "j1_ElectronMultiplicity",
-//                             "j1_JetBprob",
-                             "j1_JetProba",
-                             "j1_MuonMultiplicity",
-                             "j1_NeutralHadronMultiplicity",
-                             "j1_PhotonEnergyFraction",
-                             "j1_PhotonMultiplicity",
-                             "j1_QGL",
-                             "j1_QGL_lab",
-                             "j1_eta_lab",
-                             "j1_m",
-                             "j1_m_lab",
-                             "j1_p",
-                             "j1_phi_lab",
-                             "j1_pt_lab",
-                             "j1_qgAxis1",
-                             "j1_qgAxis1_lab",
-                             "j1_qgAxis2",
-                             "j1_qgAxis2_lab",
-                             "j1_qgMult",
-                             "j1_qgMult_lab",
-                             "j1_qgPtD",
-                             "j1_qgPtD_lab",
-//                             "j1_recoJetsCharge",
-                             "j1_recoJetsHFEMEnergyFraction",
-                             "j1_recoJetsHFHadronEnergyFraction",
-                             "j1_recoJetsJecScaleRawToFull",
-                             "j1_recoJetschargedEmEnergyFraction",
-                             "j1_recoJetschargedHadronEnergyFraction",
-                             "j1_recoJetsmuonEnergyFraction",
-                             "j1_recoJetsneutralEmEnergyFraction",
-                             "j1_recoJetsneutralEnergyFraction",
-                             "j23_m",
-                             "j23_m_lab",
-                             "j2_CSV",
-                             "j2_CSV_lab",
-                             "j2_ChargedHadronMultiplicity",
-                             "j2_CombinedSvtx",
-                             "j2_CvsB",
-                             "j2_CvsL",
-                             "j2_DeepCSVb",
-                             "j2_DeepCSVbb",
-                             "j2_DeepCSVc",
-                             "j2_DeepCSVcc",
-                             "j2_DeepCSVl",
-                             "j2_DeepFlavorb",
-                             "j2_DeepFlavorbb",
-                             "j2_DeepFlavorlepb",
-                             "j2_DeepFlavorc",
-                             "j2_DeepFlavoruds",
-                             "j2_DeepFlavorg",
-                             "j2_ElectronEnergyFraction",
-                             "j2_ElectronMultiplicity",
-//                             "j2_JetBprob",
-                             "j2_JetProba",
-                             "j2_MuonMultiplicity",
-                             "j2_NeutralHadronMultiplicity",
-                             "j2_PhotonEnergyFraction",
-                             "j2_PhotonMultiplicity",
-                             "j2_QGL",
-                             "j2_QGL_lab",
-                             "j2_eta_lab",
-                             "j2_m",
-                             "j2_m_lab",
-                             "j2_p",
-                             "j2_phi_lab",
-                             "j2_pt_lab",
-                             "j2_qgAxis1",
-                             "j2_qgAxis1_lab",
-                             "j2_qgAxis2",
-                             "j2_qgAxis2_lab",
-                             "j2_qgMult",
-                             "j2_qgMult_lab",
-                             "j2_qgPtD",
-                             "j2_qgPtD_lab",
-//                             "j2_recoJetsCharge",
-                             "j2_recoJetsHFEMEnergyFraction",
-                             "j2_recoJetsHFHadronEnergyFraction",
-                             "j2_recoJetsJecScaleRawToFull",
-                             "j2_recoJetschargedEmEnergyFraction",
-                             "j2_recoJetschargedHadronEnergyFraction",
-                             "j2_recoJetsmuonEnergyFraction",
-                             "j2_recoJetsneutralEmEnergyFraction",
-                             "j2_recoJetsneutralEnergyFraction",
-                             "j3_CSV",
-                             "j3_CSV_lab",
-                             "j3_ChargedHadronMultiplicity",
-                             "j3_CombinedSvtx",
-                             "j3_CvsB",
-                             "j3_CvsL",
-                             "j3_DeepCSVb",
-                             "j3_DeepCSVbb",
-                             "j3_DeepCSVc",
-                             "j3_DeepCSVcc",
-                             "j3_DeepCSVl",
-                             "j3_DeepFlavorb",
-                             "j3_DeepFlavorbb",
-                             "j3_DeepFlavorlepb",
-                             "j3_DeepFlavorc",
-                             "j3_DeepFlavoruds",
-                             "j3_DeepFlavorg",
-                             "j3_ElectronEnergyFraction",
-                             "j3_ElectronMultiplicity",
-//                             "j3_JetBprob",
-                             "j3_JetProba",
-                             "j3_MuonMultiplicity",
-                             "j3_NeutralHadronMultiplicity",
-                             "j3_PhotonEnergyFraction",
-                             "j3_PhotonMultiplicity",
-                             "j3_QGL",
-                             "j3_QGL_lab",
-                             "j3_eta_lab",
-                             "j3_m",
-                             "j3_m_lab",
-                             "j3_p",
-                             "j3_phi_lab",
-                             "j3_pt_lab",
-                             "j3_qgAxis1",
-                             "j3_qgAxis1_lab",
-                             "j3_qgAxis2",
-                             "j3_qgAxis2_lab",
-                             "j3_qgMult",
-                             "j3_qgMult_lab",
-                             "j3_qgPtD",
-                             "j3_qgPtD_lab",
-//                             "j3_recoJetsCharge",
-                             "j3_recoJetsHFEMEnergyFraction",
-                             "j3_recoJetsHFHadronEnergyFraction",
-                             "j3_recoJetsJecScaleRawToFull",
-                             "j3_recoJetschargedEmEnergyFraction",
-                             "j3_recoJetschargedHadronEnergyFraction",
-                             "j3_recoJetsmuonEnergyFraction",
-                             "j3_recoJetsneutralEmEnergyFraction",
-                             "j3_recoJetsneutralEnergyFraction",
-//                             "sd_n2",
-                             "genTopMatchesVec",
-                             "genConstiuentMatchesVec",
-                             "genConstMatchGenPtVec",
-                             "Njet",
-                             "Bjet",
-                             "passnJets",
-                             "passMET",
-                             "passdPhis",
-                             "passBJets",
-                             "MET",
-                             "sampleWgt",
-                             "j1_p_top",
-                             "j1_theta_top",
-                             "j1_phi_top",
-                             "j2_p_top",
-                             "j2_theta_top",
-                             "j2_phi_top",
-                             "j3_p_top",
-                             "j3_theta_top",
-                             "j3_phi_top"} }
+        {"isSignal", {"EvtNum", "sampleWgt", "Weight", "NGoodJets"} },
+        {"isData", {"EvtNum", 
+                    "fwm2_top6", 
+                    "fwm3_top6", 
+                    "fwm4_top6", 
+                    "fwm5_top6", 
+                    "fwm6_top6", 
+                    "fwm7_top6", 
+                    "fwm8_top6", 
+                    "fwm9_top6", 
+                    "fwm10_top6", 
+                    "jmt_ev0_top6", 
+                    "jmt_ev1_top6", 
+                    "jmt_ev2_top6",
+                    "NGoodJets"} }
     };
 
     //parse sample splitting and set up minituples
@@ -795,11 +618,25 @@ int main(int argc, char* argv[])
                     NTupleReader tr(t);
 
                     //register variable prep class with NTupleReader
-                    PrepVariables prepVars(variables);
-                    tr.registerFunction(prepVars);
+                    //PrepVariables prepVars(variables);
+                    //tr.registerFunction(prepVars);
+                    
+                    Muon muon;
+                    Electron electron;
+                    MakeMVAVariables makeMVAVariables(false);
+                    Jet jet;
+                    BJet bjet;
+                    CommonVariables commonVariables;
+                    Baseline baseline;
+                    tr.registerFunction( std::move(muon) );
+                    tr.registerFunction( std::move(electron) );
+                    tr.registerFunction( std::move(makeMVAVariables) );
+                    tr.registerFunction( std::move(jet) );
+                    tr.registerFunction( std::move(bjet) );
+                    tr.registerFunction( std::move(commonVariables) );
+                    tr.registerFunction( std::move(baseline) );
 
                     int splitCounter = 0, mtmIndex = 0;
-
                     bool branchesInitialized = false;
 
                     while(tr.getNextEvent())
@@ -807,8 +644,19 @@ int main(int argc, char* argv[])
                         //Get sample lumi weight and correct for the actual number of events 
                         //This needs to happen before we ad sampleWgt to the mini tuple variables to save
                         double weight = file.getWeight();
+                        bool isData = false; bool isSignal = false;
+                        if(file.tag.find("Data") != std::string::npos)
+                        {
+                            isData = true;
+                        }
+                        else 
+                        {
+                            isSignal = true;
+                        }
                         tr.registerDerivedVar("sampleWgt", weight);
-
+                        tr.registerDerivedVar("isData", isData);
+                        tr.registerDerivedVar("isSignal", isSignal);
+                        
                         //If nEvts is set, stop after so many events
                         if(nEvts > 0 && NEvtsTotal > nEvts) break;
                         if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
@@ -833,12 +681,14 @@ int main(int argc, char* argv[])
                         }
 
                         //Get cut variable 
-                        const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
-			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
-
+                        //const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
+			//const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
+                        const auto& passBaseline0l_Good = tr.getVar<bool>("passBaseline0l_Good");
+                        const auto& passBaseline1l_Good = tr.getVar<bool>("passBaseline1l_Good");
+                        const auto& Mbl = tr.getVar<double>("Mbl");
+                        
 			//fill mini tuple
-			bool passbaseline = passMVABaseline;
-			// if(passMVABaseline)
+			bool passbaseline = passBaseline1l_Good && Mbl>30 && Mbl<180;
 			if(passbaseline)
                         {
                             mtmVec[mtmIndex].first->fill();
