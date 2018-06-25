@@ -9,9 +9,10 @@ Slimmed tuples containing only the information needed for training and validatio
 Run the following commands (at the LPC)
 
 ~~~~~~~~~~~~~
-make 
-./makeTrainingTuples -D TTbarSingleLep -E 550000 -R 10:1
-./makeTrainingTuples -D ZJetsToNuNu -E 200000 -R 1:1
+autoconf
+./configure OPENCVDIR=/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/ HDF5DIR=/cvmfs/cms.cern.ch/slc6_amd64_gcc630/external/hdf5/1.8.17-oenich/
+make
+./makeTrainingTuples -D TT -E 101 -R 10:1
 ~~~~~~~~~~~~~
 
 You can change the input sample name with -D, #events with -E and ratio (training sample to validation sample) with -R.  Additional sample splits can be added with -R (i.e. -R 2:2:1 will create 3 sample files where the first 2 have twice the number of events as the 3rd).  To produce the training files for an entire dataset a condor submit script is provided in condor/condorSubmit.py.  This code requires the repository "susy2015/SusyAnaTools" to be checked out in the same directory as the TopTagger repository to compile and run.  

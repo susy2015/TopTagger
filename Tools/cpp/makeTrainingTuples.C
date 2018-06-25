@@ -467,8 +467,8 @@ int main(int argc, char* argv[])
     };
     bool forFakeRate = false;
     bool runOnCondor = false;
-    string dataSets = "", sampleloc = AnaSamples::fileDir, outFile = "trainingTuple", sampleRatios = "1:1";
-    int nFiles = -1, startFile = 0, nEvts = -1, printInterval = 10000;
+    string dataSets = "", /*sampleloc = AnaSamples::fileDir,*/ outFile = "trainingTuple", sampleRatios = "1:1";
+    int nFiles = -1, startFile = 0, nEvts = -1, printInterval = 1000;
 
     while((opt = getopt_long(argc, argv, "fcD:N:M:E:R:", long_options, &option_index)) != -1)
     {
@@ -510,7 +510,7 @@ int main(int argc, char* argv[])
         char thistFile[128];
         sprintf(thistFile, "trainingTuple_%d", startFile);
         outFile = thistFile;
-        sampleloc = "condor";
+        //sampleloc = "condor";
     }
 
     AnaSamples::SampleSet        ss("sampleSets.cfg", runOnCondor);
@@ -521,12 +521,13 @@ int main(int argc, char* argv[])
     //Select approperiate datasets here
     if(dataSets.compare("TEST") == 0)
     {
-        fileMap["DYJetsToLL"]  = {ss["DYJetsToLL_HT_600toInf"]};
-        fileMap["ZJetsToNuNu"] = {ss["ZJetsToNuNu_HT_2500toInf"]};
-        fileMap["DYJetsToLL_HT_600toInf"] = {ss["DYJetsToLL_HT_600toInf"]};
-        fileMap["ZJetsToNuNu_HT_2500toInf"] = {ss["ZJetsToNuNu_HT_2500toInf"]};
-        fileMap["TTbarDiLep"] = {ss["TTbarDiLep"]};
-        fileMap["TTbarNoHad"] = {ss["TTbarDiLep"]};
+        return 0;
+        //fileMap["DYJetsToLL"]  = {ss["DYJetsToLL_HT_600toInf"]};
+        //fileMap["ZJetsToNuNu"] = {ss["ZJetsToNuNu_HT_2500toInf"]};
+        //fileMap["DYJetsToLL_HT_600toInf"] = {ss["DYJetsToLL_HT_600toInf"]};
+        //fileMap["ZJetsToNuNu_HT_2500toInf"] = {ss["ZJetsToNuNu_HT_2500toInf"]};
+        //fileMap["TTbarDiLep"] = {ss["TTbarDiLep"]};
+        //fileMap["TTbarNoHad"] = {ss["TTbarDiLep"]};
     }
     else
     {
@@ -546,21 +547,22 @@ int main(int argc, char* argv[])
 
     const std::map<std::string, std::vector<std::string>> variables =
     {
-        {"isSignal", {"EvtNum", "sampleWgt", "Weight", "NGoodJets"} },
-        {"isData", {"EvtNum", 
-                    "fwm2_top6", 
-                    "fwm3_top6", 
-                    "fwm4_top6", 
-                    "fwm5_top6", 
-                    "fwm6_top6", 
-                    "fwm7_top6", 
-                    "fwm8_top6", 
-                    "fwm9_top6", 
-                    "fwm10_top6", 
-                    "jmt_ev0_top6", 
-                    "jmt_ev1_top6", 
-                    "jmt_ev2_top6",
-                    "NGoodJets"} }
+        {"EventShapeVar", {"EvtNum",
+                           "sampleWgt",
+                           "Weight",
+                           "fwm2_top6", 
+                           "fwm3_top6", 
+                           "fwm4_top6", 
+                           "fwm5_top6", 
+                           "fwm6_top6", 
+                           "fwm7_top6", 
+                           "fwm8_top6", 
+                           "fwm9_top6", 
+                           "fwm10_top6", 
+                           "jmt_ev0_top6", 
+                           "jmt_ev1_top6", 
+                           "jmt_ev2_top6",
+                           "NGoodJets"} }
     };
 
     //parse sample splitting and set up minituples
@@ -620,6 +622,11 @@ int main(int argc, char* argv[])
                     //register variable prep class with NTupleReader
                     //PrepVariables prepVars(variables);
                     //tr.registerFunction(prepVars);
+                    std::string runtype = (file.tag.find("Data") != std::string::npos) ? "Data" : "MC";
+                    tr.registerDerivedVar<std::string>("runtype",runtype);
+                    tr.registerDerivedVar<std::string>("filetag",file.tag);
+                    tr.registerDerivedVar<double>("etaCut",2.4);
+                    tr.registerDerivedVar<bool>("blind",true);                        
                     
                     Muon muon;
                     Electron electron;
@@ -656,7 +663,7 @@ int main(int argc, char* argv[])
                         tr.registerDerivedVar("sampleWgt", weight);
                         tr.registerDerivedVar("isData", isData);
                         tr.registerDerivedVar("isSignal", isSignal);
-                        
+
                         //If nEvts is set, stop after so many events
                         if(nEvts > 0 && NEvtsTotal > nEvts) break;
                         if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
@@ -691,6 +698,7 @@ int main(int argc, char* argv[])
 			bool passbaseline = passBaseline1l_Good && Mbl>30 && Mbl<180;
 			if(passbaseline)
                         {
+                            //std::cout<<"Got one"<<std::endl;
                             mtmVec[mtmIndex].first->fill();
                             ++splitCounter;
                             if(splitCounter == mtmVec[mtmIndex].second)
