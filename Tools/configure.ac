@@ -63,7 +63,8 @@ if test -z ${HDF5DIR+x}; then
 fi
 
 HDF5INCDIR=src
-AC_CHECK_FILE($HDF5DIR/$HDF5INCDIR/hdf5.h, [], [AC_ERROR([HDF5 includes are required. Specify location with ./configure HDF5DIR=/Path])])
+AC_CHECK_FILE($HDF5DIR/$HDF5INCDIR/hdf5.h, [], [HDF5INCDIR=include; AC_CHECK_FILE($HDF5DIR/$HDF5INCDIR/hdf5.h, [], [AC_ERROR([HDF5 includes are required. Specify location with ./configure HDF5DIR=/Path])])])
+
 
 AC_CHECK_FILE($HDF5DIR/lib/libhdf5.${LIBSUFFIX}, [], [AC_ERROR([HDF5 libraries are required. Specify location with ./configure HDF5DIR=/Path])])
 

@@ -29,11 +29,15 @@ TTIDIR     = $(TAGGERDIR)/TopTagger/include
 TPIDIR     = $(TAGGERDIR)/CfgParser/include
 
 #openCV include dirs
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
-INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
+ifdef OPENCV_DIRECTORY
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/include/ -I$(OPENCV_DIRECTORY)/modules/core/include 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/video/include -I$(OPENCV_DIRECTORY)/modules/objdetect/include 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/ml/include/ -I$(OPENCV_DIRECTORY)/modules/photo/include/ 
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)/modules/imgproc/include/
+	INCLUDESDIRS  += -I$(OPENCV_DIRECTORY)
+	# openCV libraries
+	LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
+endif
 
 #hdf5 include dir
 INCLUDESDIRS  += -I$(HDF5_DIRECTORY)/$(HDF5_INC_DIRECTORY)
@@ -51,8 +55,6 @@ CXXDEPFLAGS = -MMD -MP
 # ROOT libraries
 LIBS       = $(shell root-config --glibs)
 
-# openCV libraries
-LIBS      += -L$(OPENCV_DIRECTORY)/lib -lopencv_ml -lopencv_core
 
 # hdf5 libs
 LIBS += -L$(HDF5_DIRECTORY)/lib -lhdf5
