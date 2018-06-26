@@ -71,7 +71,7 @@ public:
             {
                 std::string type;
                 tr.getType(var, type);
-                if(type.find("vector") != std::string::npos)
+                if(type.find("vector") != std::string::npos) 
                 {
                     ptrPair.push_back(std::make_pair(true, tr.getVecPtr(var)));
                 }
@@ -147,7 +147,7 @@ public:
             auto& ptrPair = pointers_[dataset.first];
             auto& varVec = variables_[dataset.first];
             auto& dataVec = data_[dataset.first];
-            int nCand = 0;
+            int nCand = 1;
             //get ncand
             for(const auto& pp : ptrPair)
             {
@@ -160,11 +160,13 @@ public:
             }
             for(int i = 0; i < nCand; ++i)
             {
+                int index = 0;
                 for(const auto& pp : ptrPair)
                 {
                     //Check if this is a vector or a pointer 
                     if(pp.first) dataVec.push_back(nCand?((**static_cast<const std::vector<double> * const * const>(pp.second))[i]):0.0);
                     else         dataVec.push_back(*static_cast<const double * const>(pp.second));
+                    index++;
                 }
             }
             maxSize = std::max(maxSize, dataVec.size()/varVec.size());
@@ -187,267 +189,6 @@ public:
         saveHDF5File();
     }
     
-};
-
-class PrepVariables
-{
-private:
-    template<typename T>
-    class VariableHolder
-    {
-    private:
-        NTupleReader* tr_;
-    public:
-        std::map<std::string, std::vector<T>*> variables_;
-
-        void add(const std::string& key, const T& var)
-        {
-            if(variables_.find(key) == variables_.end() || variables_[key] == nullptr)
-            {
-                variables_[key] = new std::vector<T>();
-            }
-
-            variables_[key]->push_back(var);
-        }
-
-        void registerFunctions()
-        {
-            for(auto& entry : variables_)
-            {
-                if(entry.second == nullptr) entry.second = new std::vector<T>();
-                tr_->registerDerivedVec(entry.first, entry.second);
-            }
-        }
-
-        VariableHolder(NTupleReader& tr) : tr_(&tr) {}
-    };
-  
-    TopTagger* topTagger_;
-    TopCat topMatcher_;
-    int eventNum_, bgPrescale_;
-    const std::map<std::string, std::vector<std::string>>& variables_;
-    std::shared_ptr<ttUtility::MVAInputCalculator> mvaCalc_;
-    std::vector<float> values_;
-
-    bool prepVariables(NTupleReader& tr)
-    {
-        const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
-        const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
-        const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
-
-        const std::vector<int>& qgMult  = tr.getVec<int>("qgMult");
-        const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
-        const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis1");
-        const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
-
-        const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
-        const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
-        const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
-        const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("genDecayMomIdxVec");
-
-	//std::vector<TLorentzVector> jetsLVec_forTagger;
-        //std::vector<double> recoJetsBtag_forTagger;
-        //std::vector<double> qgLikelihood_forTagger;
-        //std::vector<double> recoJetsCharge_forTagger;
-        //AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, AnaConsts::pt20Arr);
-
-	const double met=tr.getVar<double>("met");
-	const double metphi=tr.getVar<double>("metphi");
-	TLorentzVector metLVec; metLVec.SetPtEtaPhiM(met, 0, metphi, 0);
-        int cntNJetsPt50Eta24 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt50Eta24Arr);
-        int cntNJetsPt30Eta24 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Eta24Arr);
-        int cntNJetsPt30      = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Arr);
-	int cntCSVS = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVS, AnaConsts::bTagArr);
-        int cntCSVL = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVL, AnaConsts::bTagArr);
-	std::vector<double> * dPhiVec = new std::vector<double>();
-        (*dPhiVec) = AnaFunctions::calcDPhi(jetsLVec, metLVec.Phi(), 3, AnaConsts::dphiArr);
-	bool passnJets = true;
-        if( cntNJetsPt50Eta24 < AnaConsts::nJetsSelPt50Eta24 ) passnJets = false;
-        if( cntNJetsPt30Eta24 < AnaConsts::nJetsSelPt30Eta24 ) passnJets = false;
-        bool passdPhis = (dPhiVec->at(0) >= AnaConsts::dPhi0_CUT && dPhiVec->at(1) >= AnaConsts::dPhi1_CUT && dPhiVec->at(2) >= AnaConsts::dPhi2_CUT);
-	bool passBJets = true;
-        if( !( (AnaConsts::low_nJetsSelBtagged == -1 || cntCSVS >= AnaConsts::low_nJetsSelBtagged) && (AnaConsts::high_nJetsSelBtagged == -1 || cntCSVS < AnaConsts::high_nJetsSelBtagged ) ) )passBJets = false;
-	bool passMET = (metLVec.Pt() >= AnaConsts::defaultMETcut);
-
-        //New Tagger starts here
-        //prep input object (constituent) vector
-        std::vector<TLorentzVector> hadGenTops = ttUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-        std::vector<std::vector<const TLorentzVector*>> hadGenTopDaughters;
-        for(const auto& top : hadGenTops)
-        {
-            hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
-        }
-        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
-
-        auto convertToDoubleandRegister = [](NTupleReader& tr, std::string name)
-        {
-            const std::vector<int>& intVec = tr.getVec<int>(name);
-            std::vector<double>* doubleVec = new std::vector<double>(intVec.begin(), intVec.end());
-            tr.registerDerivedVec(name+"ConvertedToDouble", doubleVec);
-            return doubleVec;
-        };
-
-        myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
-        myConstAK4Inputs.addSupplamentalVector("qgMult"                              , *convertToDoubleandRegister(tr, "qgMult"));
-        myConstAK4Inputs.addSupplamentalVector("qgPtD"                               , tr.getVec<double>("qgPtD"));
-        myConstAK4Inputs.addSupplamentalVector("qgAxis1"                             , tr.getVec<double>("qgAxis1"));
-        myConstAK4Inputs.addSupplamentalVector("qgAxis2"                             , tr.getVec<double>("qgAxis2"));
-//        myConstAK4Inputs.addSupplamentalVector("recoJetsFlavor"                      , tr.getVec<double>("recoJetsFlavor"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsJecScaleRawToFull"           , tr.getVec<double>("recoJetsJecScaleRawToFull"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction" , tr.getVec<double>("recoJetschargedHadronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction"     , tr.getVec<double>("recoJetschargedEmEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction"     , tr.getVec<double>("recoJetsneutralEmEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction"          , tr.getVec<double>("recoJetsmuonEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction"      , tr.getVec<double>("recoJetsHFHadronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction"          , tr.getVec<double>("recoJetsHFEMEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction"       , tr.getVec<double>("recoJetsneutralEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction"                , tr.getVec<double>("PhotonEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction"              , tr.getVec<double>("ElectronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity"           , tr.getVec<double>("ChargedHadronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity"           , tr.getVec<double>("NeutralHadronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity"                  , tr.getVec<double>("PhotonMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity"                , tr.getVec<double>("ElectronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity"                    , tr.getVec<double>("MuonMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVb"                            , tr.getVec<double>("DeepCSVb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVc"                            , tr.getVec<double>("DeepCSVc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVl"                            , tr.getVec<double>("DeepCSVl"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVbb"                           , tr.getVec<double>("DeepCSVbb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVcc"                           , tr.getVec<double>("DeepCSVcc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorb"                         , tr.getVec<double>("DeepFlavorb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorbb"                        , tr.getVec<double>("DeepFlavorbb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorlepb"                      , tr.getVec<double>("DeepFlavorlepb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorc"                         , tr.getVec<double>("DeepFlavorc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavoruds"                       , tr.getVec<double>("DeepFlavoruds"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorg"                         , tr.getVec<double>("DeepFlavorg"));
-        myConstAK4Inputs.addSupplamentalVector("CvsL"                                , tr.getVec<double>("CvsL"));
-        myConstAK4Inputs.addSupplamentalVector("CvsB"                                , tr.getVec<double>("CvsB"));
-        myConstAK4Inputs.addSupplamentalVector("CombinedSvtx"                        , tr.getVec<double>("CombinedSvtx"));
-        myConstAK4Inputs.addSupplamentalVector("JetProba"                            , tr.getVec<double>("JetProba_0"));
-        myConstAK4Inputs.addSupplamentalVector("JetBprob"                            , tr.getVec<double>("JetBprob"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsCharge"                      , tr.getVec<double>("recoJetsCharge_0"));
-
-        std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
-
-        //run tagger
-        topTagger_->runTagger(constituents);
-
-        //retrieve results
-        const TopTaggerResults& ttr = topTagger_->getResults();
-        const std::vector<TopObject>& topCands = ttr.getTopCandidates();
-
-        //if there are no top candidates, discard this event and move to the next
-        if(topCands.size() == 0) return false;
-
-        //Get gen matching results
-
-        std::vector<double> *genMatchdR = new std::vector<double>();
-        std::vector<double> *genMatchConst = new std::vector<double>();
-        std::vector<double> *genMatchVec = new std::vector<double>();
-
-        //Class which holds and registers vectors of variables
-        VariableHolder<double> vh(tr);
-
-        //prepare a vector of gen top pt
-        int icandGen = 0;
-        for(auto& genTop : hadGenTops) 
-        {
-            vh.add("candNumGen", icandGen++);
-            vh.add("genTopPt", genTop.Pt());
-        }
-        if(hadGenTops.size() == 0) 
-        {
-            tr.registerDerivedVec("genTopPt", new std::vector<double>());
-            tr.registerDerivedVec("candNumGen", new std::vector<double>());
-        }
-
-        std::vector<double>* candNum = new std::vector<double>();
-        int iTop = 0;
-        //prepare reco top quantities
-        for(const TopObject& topCand : topCands)
-        {
-            const auto* bestMatch = topCand.getBestGenTopMatch();
-            bool hasBestMatch = bestMatch !=  nullptr;
-            double bestMatchPt = bestMatch?(bestMatch->Pt()):(-999.9);
-
-            int NConstMatches = 0;
-            for(const auto* constituent : topCand.getConstituents())
-            {
-                auto iter = constituent->getGenMatches().find(bestMatch);
-                if(iter != constituent->getGenMatches().end())
-                {
-                    ++NConstMatches;
-                }
-            }
-
-
-            //if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
-            if(!(hasBestMatch && NConstMatches == 3))
-            {
-                const auto& varNames = variables_.find("reco_candidates")->second;
-                candNum->push_back(static_cast<double>(iTop++));
-                genMatchConst->push_back(NConstMatches);
-                genMatchdR->push_back(hasBestMatch);
-                genMatchVec->push_back(bestMatchPt);
-
-                mvaCalc_->setPtr(values_.data());
-                if(mvaCalc_->calculateVars(topCand, 0))
-                {
-                    for(int i = 0; i < varNames.size(); ++i)
-                    {
-                        if(values_[i] < std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max()) vh.add(varNames[i], values_[i]);
-                    }
-                }
-            }
-            if(bgPrescale_ >= 1) bgPrescale_ = 0;
-        }
-
-
-        vh.registerFunctions();
-
-        //register matching vectors
-        tr.registerDerivedVec("genTopMatchesVec",        genMatchdR);
-        tr.registerDerivedVec("genConstiuentMatchesVec", genMatchConst);
-        tr.registerDerivedVec("genConstMatchGenPtVec",   genMatchVec);
-
-        tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
-
-        tr.registerDerivedVar("eventNum", static_cast<double>(eventNum_++));
-        tr.registerDerivedVec("candNum", candNum);
-        tr.registerDerivedVar("ncand", static_cast<double>(candNum->size()));
-
-        //Generate basic MVA selection 
-        bool passMVABaseline = true;//met > 100 && cntNJetsPt30 >= 5 && cntCSVS >= 1 && cntCSVL >= 2;//true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
-        tr.registerDerivedVar("passMVABaseline", passMVABaseline);
-	const bool passValidationBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
-	tr.registerDerivedVar("passValidationBaseline",passValidationBaseline);
-	tr.registerDerivedVar("MET", met);
-	tr.registerDerivedVar("Njet",      static_cast<double>(cntNJetsPt30));
-        tr.registerDerivedVar("Bjet",      static_cast<double>(cntCSVS));
-        tr.registerDerivedVar("passnJets", static_cast<double>(passnJets));
-        tr.registerDerivedVar("passMET",   static_cast<double>(passMET));
-        tr.registerDerivedVar("passdPhis", static_cast<double>(passdPhis));
-        tr.registerDerivedVar("passBJets", static_cast<double>(passBJets));
-	
-        return true;
-    }
-
-public:
-    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max())
-    {
-        eventNum_ = 0;
-        bgPrescale_ = 0;
-
-        topTagger_ = new TopTagger();
-        topTagger_->setCfgFile("TopTaggerClusterOnly.cfg");
-
-        mvaCalc_.reset(new ttUtility::TrijetInputCalculator());
-        mvaCalc_->mapVars(variables_.find("reco_candidates")->second);
-    }
-
-    bool operator()(NTupleReader& tr)
-    {
-        return prepVariables(tr);
-    }
 };
 
 int main(int argc, char* argv[])
@@ -547,7 +288,7 @@ int main(int argc, char* argv[])
 
     const std::map<std::string, std::vector<std::string>> variables =
     {
-        {"EventShapeVar", {"EvtNum",
+        {"EventShapeVar", {"EvtNum_double",
                            "sampleWgt",
                            "Weight",
                            "fwm2_top6", 
@@ -562,7 +303,7 @@ int main(int argc, char* argv[])
                            "jmt_ev0_top6", 
                            "jmt_ev1_top6", 
                            "jmt_ev2_top6",
-                           "NGoodJets"} }
+                           "NGoodJets_double"} }
     };
 
     //parse sample splitting and set up minituples
@@ -648,6 +389,10 @@ int main(int argc, char* argv[])
 
                     while(tr.getNextEvent())
                     {
+                        //If nEvts is set, stop after so many events
+                        if(nEvts > 0 && NEvtsTotal > nEvts) break;
+                        if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
+
                         //Get sample lumi weight and correct for the actual number of events 
                         //This needs to happen before we ad sampleWgt to the mini tuple variables to save
                         double weight = file.getWeight();
@@ -663,11 +408,9 @@ int main(int argc, char* argv[])
                         tr.registerDerivedVar("sampleWgt", weight);
                         tr.registerDerivedVar("isData", isData);
                         tr.registerDerivedVar("isSignal", isSignal);
-
-                        //If nEvts is set, stop after so many events
-                        if(nEvts > 0 && NEvtsTotal > nEvts) break;
-                        if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
-
+                        tr.registerDerivedVar("EvtNum_double", static_cast<double>(tr.getVar<int>("EvtNum"))); 
+                        tr.registerDerivedVar("NGoodJets_double", static_cast<double>(tr.getVar<int>("NGoodJets"))); 
+                        
                         //Things to run only on first event
                         if(!branchesInitialized)
                         {
@@ -679,10 +422,12 @@ int main(int argc, char* argv[])
                                     mtm.first->initBranches(tr);
                                 }
                                 branchesInitialized = true;
+                                std::cout<<"I might not work"<<std::endl;
                             }
                             catch(const SATException& e)
                             {
                                 //do nothing here - this is sort of hacky
+                                std::cout<<"I did not work"<<std::endl;
                                 continue;
                             }
                         }
