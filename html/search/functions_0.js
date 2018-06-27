@@ -1,6 +1,6 @@
 var searchData=
 [
   ['addgenmatch',['addGenMatch',['../classConstituent.html#a2aea6bdc5229bb87227bcc8caa9c51c6',1,'Constituent']]],
-  ['addqglvectors',['addQGLVectors',['../classttUtility_1_1ConstAK4Inputs.html#a1f0268275cbc047d7a689ceb9ab5ff78',1,'ttUtility::ConstAK4Inputs']]],
-  ['addsupplamentalvector',['addSupplamentalVector',['../classttUtility_1_1ConstAK4Inputs.html#a528690054575d44f293e984b70cb2856',1,'ttUtility::ConstAK4Inputs']]]
+  ['addqglvectors',['addQGLVectors',['../classttUtility_1_1ConstAK4Inputs.html#a4ed506e88c7e854713f52bf5f7f1652d',1,'ttUtility::ConstAK4Inputs']]],
+  ['addsupplamentalvector',['addSupplamentalVector',['../classttUtility_1_1ConstAK4Inputs.html#aa7fc3fed9a160ab26cd77fd7c8b09565',1,'ttUtility::ConstAK4Inputs']]]
 ];

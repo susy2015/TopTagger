@@ -88,8 +88,90 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
 <div class="line">./configure</div>
 <div class="line">make -j8 </div>
-</div><!-- fragment --><p>The test code can then be run identically to the completely standalone instructions.</p>
+</div><!-- fragment --><p>The test code can then be run identically to the completely standalone instructions found <a href="../README.md#running-the-example">here</a></p>
 <h3>Install tagger integrated in the edm framework</h3>
+<p>For the time being it is suggested to produce flat NTuples containing the input variables which are necessary to run the resolved tagger offline. This is because running tensorflow alongside CMSSW 8_X_Y requires some rather convoluted hacks (instructions are given below, but these are very involved). It is much easier to produce flat tuples where all the necessary jet information is kept and use the stansalong instructions above to process the flat NTuples.</p>
+<h4>Instructions for producing jet variables for resolved top tagger with CMSSW 8_0_28_patch1</h4>
+<p>Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
+<div class="line"><span class="preprocessor"></span>cmsrel CMSSW_8_0_28_patch1</div>
+<div class="line">cd CMSSW_8_0_28_patch1/src/</div>
+<div class="line"><span class="preprocessor">#initialize cms and cms git commands </span></div>
+<div class="line"><span class="preprocessor"></span>cmsenv</div>
+<div class="line">git cms-init</div>
+<div class="line"><span class="preprocessor">#patch to qg producer to add axis1</span></div>
+<div class="line"><span class="preprocessor"></span>git cms-merge-topic -u pastika:AddJetAxis1</div>
+<div class="line"><span class="preprocessor">#compile</span></div>
+<div class="line"><span class="preprocessor">scram b -j8</span></div>
+</div><!-- fragment --><p>The following code should be added to your CMSSW config file to prepare the jet collection with all necessary variables.</p>
+<div class="fragment"><div class="line">jetTag = cms.InputTag(<span class="stringliteral">&quot;slimmedJets&quot;</span>)</div>
+<div class="line"></div>
+<div class="line">process.load(<span class="stringliteral">&#39;RecoJets.JetProducers.QGTagger_cfi&#39;</span>)</div>
+<div class="line">process.QGTagger.srcJets   = cms.InputTag(<span class="stringliteral">&quot;slimmedJets&quot;</span>)</div>
+<div class="line"></div>
+<div class="line">from PhysicsTools.PatAlgos.tools.jetTools <span class="keyword">import</span> updateJetCollection</div>
+<div class="line"></div>
+<div class="line">updateJetCollection(</div>
+<div class="line">   process,</div>
+<div class="line">   labelName = <span class="stringliteral">&quot;DeepCSV&quot;</span>,</div>
+<div class="line">   jetSource = cms.InputTag(<span class="stringliteral">&quot;slimmedJets&quot;</span>),</div>
+<div class="line">   jetCorrections = (<span class="stringliteral">&#39;AK4PFchs&#39;</span>, cms.vstring([<span class="stringliteral">&#39;L1FastJet&#39;</span>, <span class="stringliteral">&#39;L2Relative&#39;</span>, <span class="stringliteral">&#39;L3Absolute&#39;</span>]), <span class="stringliteral">&#39;None&#39;</span>),</div>
+<div class="line">   btagDiscriminators = [</div>
+<div class="line">      <span class="stringliteral">&#39;pfDeepCSVJetTags:probudsg&#39;</span>,</div>
+<div class="line">      <span class="stringliteral">&#39;pfDeepCSVJetTags:probb&#39;</span>,</div>
+<div class="line">      <span class="stringliteral">&#39;pfDeepCSVJetTags:probc&#39;</span>,</div>
+<div class="line">      <span class="stringliteral">&#39;pfDeepCSVJetTags:probbb&#39;</span>,</div>
+<div class="line">      <span class="stringliteral">&#39;pfDeepCSVJetTags:probcc&#39;</span>,</div>
+<div class="line">      ] ## to add discriminators                                                                                                                                                                                                              </div>
+<div class="line">)</div>
+<div class="line"></div>
+<div class="line">process.updatedPatJetsDeepCSV.userData.userFloats.src += [<span class="stringliteral">&#39;QGTagger:qgLikelihood&#39;</span>, <span class="stringliteral">&#39;QGTagger:ptD&#39;</span>, <span class="stringliteral">&#39;QGTagger:axis1&#39;</span>, <span class="stringliteral">&#39;QGTagger:axis2&#39;</span>,]</div>
+<div class="line">process.updatedPatJetsDeepCSV.userData.userInts.src += [<span class="stringliteral">&#39;QGTagger:mult&#39;</span>,]</div>
+</div><!-- fragment --><p>This will produce a jet collection called 'selectedUpdatedPatJetsDeepCSV' which contains all necessary variables for the resolved top tagger.</p>
+<p>The necessary variables can then be accessed in a edm producer as follows</p>
+<div class="fragment"><div class="line">{c++}</div>
+<div class="line"><span class="comment">//in constructor</span></div>
+<div class="line">JetTok_ = consumes&lt;std::vector&lt;pat::Jet&gt; &gt;(edm::InputTag(<span class="stringliteral">&quot;selectedUpdatedPatJetsDeepCSV&quot;</span>));</div>
+</div><!-- fragment --><div class="fragment"><div class="line">{c++}</div>
+<div class="line"><span class="comment">//in produce(...)</span></div>
+<div class="line">edm::Handle&lt;std::vector&lt;pat::Jet&gt; &gt; jets;</div>
+<div class="line">iEvent.getByToken(JetTok_, jets);</div>
+<div class="line"></div>
+<div class="line"><span class="keywordflow">for</span>(<span class="keyword">const</span> pat::Jet&amp; jet : *jets)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">//No need to keep jets below 20 GeV</span></div>
+<div class="line">    <span class="keywordflow">if</span>(jet.pt() &lt; 20) <span class="keywordflow">continue</span>;</div>
+<div class="line"></div>
+<div class="line">    TLorentzVector perJetLVec;</div>
+<div class="line">    perJetLVec.SetPtEtaPhiE( jet.pt(), jet.eta(), jet.phi(), jet.energy() );</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordtype">double</span> qgPtD = jet.userFloat(<span class="stringliteral">&quot;QGTagger:ptD&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> qgAxis1 = jet.userFloat(<span class="stringliteral">&quot;QGTagger:axis1&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> qgAxis2 = jet.userFloat(<span class="stringliteral">&quot;QGTagger:axis2&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> qgMult = <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(jet.userInt(<span class="stringliteral">&quot;QGTagger:mult&quot;</span>));</div>
+<div class="line">    <span class="keywordtype">double</span> deepCSVb = jet.bDiscriminator(<span class="stringliteral">&quot;pfDeepCSVJetTags:probb&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> deepCSVc = jet.bDiscriminator(<span class="stringliteral">&quot;pfDeepCSVJetTags:probc&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> deepCSVl = jet.bDiscriminator(<span class="stringliteral">&quot;pfDeepCSVJetTags:probudsg&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> deepCSVbb = jet.bDiscriminator(<span class="stringliteral">&quot;pfDeepCSVJetTags:probbb&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> deepCSVcc = jet.bDiscriminator(<span class="stringliteral">&quot;pfDeepCSVJetTags:probcc&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> btag = jet.bDiscriminator(<span class="stringliteral">&quot;pfCombinedSecondaryVertexV2BJetTags&quot;</span>);</div>
+<div class="line">    <span class="keywordtype">double</span> chargedHadronEnergyFraction = jet.chargedHadronEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> neutralHadronEnergyFraction = jet.neutralHadronEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> chargedEmEnergyFraction = jet.chargedEmEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> neutralEmEnergyFraction = jet.neutralEmEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> muonEnergyFraction = jet.muonEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> photonEnergyFraction = jet.photonEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> electronEnergyFraction = jet.electronEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> recoJetsHFHadronEnergyFraction = jet.HFHadronEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> recoJetsHFEMEnergyFraction = jet.HFEMEnergyFraction();</div>
+<div class="line">    <span class="keywordtype">double</span> chargedHadronMultiplicity = jet.chargedHadronMultiplicity();</div>
+<div class="line">    <span class="keywordtype">double</span> neutralHadronMultiplicity = jet.neutralHadronMultiplicity();</div>
+<div class="line">    <span class="keywordtype">double</span> photonMultiplicity = jet.photonMultiplicity();</div>
+<div class="line">    <span class="keywordtype">double</span> electronMultiplicity = jet.electronMultiplicity();</div>
+<div class="line">    <span class="keywordtype">double</span> muonMultiplicity = jet.muonMultiplicity();</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>For convinenent use with the top tagger the 4-vector and each jet variable can be saved in a flat tuple in its own std::vector per event.</p>
+<h4>Instructions for running tagger online with CMSSW 8_0_28_patch1</h4>
 <p>The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases. In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
 <div class="line"><span class="preprocessor"></span>cmsrel CMSSW_8_0_28_patch1</div>
@@ -123,6 +205,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor"></span>voms-proxy-init</div>
 <div class="line">cmsRun run_topTagger.py</div>
 </div><!-- fragment --><p>The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).</p>
+<h4>Running tagger online in CMSSW 9_4_X/10_0_X</h4>
+<p>Instructions coming soon</p>
 <h2>More about getting a configuration file</h2>
 <p>Before the top tagger can be used the top tagger configuration file must be checked out. Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases. These should not be accessed directly, but instead you can use the script "getTaggerCfg.sh" to download the working points desired. An example of a basic checkout of the standard working point for use with the example code (different working points are found here <a href="https://github.com/susy2015/TopTaggerCfg/releases">https://github.com/susy2015/TopTaggerCfg/releases</a>) is as follows</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#run the following once to set up the top tagger and add the &quot;getTaggerCfg.sh&quot; to the path</span></div>
@@ -144,7 +228,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 8 2018 00:22:55 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 27 2018 19:49:58 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

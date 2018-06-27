@@ -16,9 +16,122 @@ make -j8
 \end{DoxyCode}
 
 
-The test code can then be run identically to the completely standalone instructions.
+The test code can then be run identically to the completely standalone instructions found \href{../README.md#running-the-example}{\tt here}
 
 \subsubsection*{Install tagger integrated in the edm framework}
+
+For the time being it is suggested to produce flat N\-Tuples containing the input variables which are necessary to run the resolved tagger offline. This is because running tensorflow alongside C\-M\-S\-S\-W 8\-\_\-\-X\-\_\-\-Y requires some rather convoluted hacks (instructions are given below, but these are very involved). It is much easier to produce flat tuples where all the necessary jet information is kept and use the stansalong instructions above to process the flat N\-Tuples.
+
+\paragraph*{Instructions for producing jet variables for resolved top tagger with C\-M\-S\-S\-W 8\-\_\-0\-\_\-28\-\_\-patch1}
+
+Setting up a new C\-M\-S\-S\-W 8\-\_\-0\-\_\-28\-\_\-patch1 release to produce the resolved top tagger variables.
+
+
+\begin{DoxyCode}
+\textcolor{preprocessor}{#get CMSSW release}
+\textcolor{preprocessor}{}cmsrel CMSSW\_8\_0\_28\_patch1
+cd CMSSW\_8\_0\_28\_patch1/src/
+\textcolor{preprocessor}{#initialize cms and cms git commands }
+\textcolor{preprocessor}{}cmsenv
+git cms-init
+\textcolor{preprocessor}{#patch to qg producer to add axis1}
+\textcolor{preprocessor}{}git cms-merge-topic -u pastika:AddJetAxis1
+\textcolor{preprocessor}{#compile}
+\textcolor{preprocessor}{scram b -j8}
+\end{DoxyCode}
+
+
+The following code should be added to your C\-M\-S\-S\-W config file to prepare the jet collection with all necessary variables.
+
+
+\begin{DoxyCode}
+jetTag = cms.InputTag(\textcolor{stringliteral}{"slimmedJets"})
+
+process.load(\textcolor{stringliteral}{'RecoJets.JetProducers.QGTagger\_cfi'})
+process.QGTagger.srcJets   = cms.InputTag(\textcolor{stringliteral}{"slimmedJets"})
+
+from PhysicsTools.PatAlgos.tools.jetTools \textcolor{keyword}{import} updateJetCollection
+
+updateJetCollection(
+   process,
+   labelName = \textcolor{stringliteral}{"DeepCSV"},
+   jetSource = cms.InputTag(\textcolor{stringliteral}{"slimmedJets"}),
+   jetCorrections = (\textcolor{stringliteral}{'AK4PFchs'}, cms.vstring([\textcolor{stringliteral}{'L1FastJet'}, \textcolor{stringliteral}{'L2Relative'}, \textcolor{stringliteral}{'L3Absolute'}]), \textcolor{stringliteral}{'None'}),
+   btagDiscriminators = [
+      \textcolor{stringliteral}{'pfDeepCSVJetTags:probudsg'},
+      \textcolor{stringliteral}{'pfDeepCSVJetTags:probb'},
+      \textcolor{stringliteral}{'pfDeepCSVJetTags:probc'},
+      \textcolor{stringliteral}{'pfDeepCSVJetTags:probbb'},
+      \textcolor{stringliteral}{'pfDeepCSVJetTags:probcc'},
+      ] ## to add discriminators                                                                           
+                                                                                                                  
+                             
+)
+
+process.updatedPatJetsDeepCSV.userData.userFloats.src += [\textcolor{stringliteral}{'QGTagger:qgLikelihood'}, \textcolor{stringliteral}{'QGTagger:ptD'}, \textcolor{stringliteral}{'
+      QGTagger:axis1'}, \textcolor{stringliteral}{'QGTagger:axis2'},]
+process.updatedPatJetsDeepCSV.userData.userInts.src += [\textcolor{stringliteral}{'QGTagger:mult'},]
+\end{DoxyCode}
+
+
+This will produce a jet collection called 'selected\-Updated\-Pat\-Jets\-Deep\-C\-S\-V' which contains all necessary variables for the resolved top tagger.
+
+The necessary variables can then be accessed in a edm producer as follows
+
+
+\begin{DoxyCode}
+\{c++\}
+\textcolor{comment}{//in constructor}
+JetTok\_ = consumes<std::vector<pat::Jet> >(edm::InputTag(\textcolor{stringliteral}{"selectedUpdatedPatJetsDeepCSV"}));
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}
+\{c++\}
+\textcolor{comment}{//in produce(...)}
+edm::Handle<std::vector<pat::Jet> > jets;
+iEvent.getByToken(JetTok\_, jets);
+
+\textcolor{keywordflow}{for}(\textcolor{keyword}{const} pat::Jet& jet : *jets)
+\{
+    \textcolor{comment}{//No need to keep jets below 20 GeV}
+    \textcolor{keywordflow}{if}(jet.pt() < 20) \textcolor{keywordflow}{continue};
+
+    TLorentzVector perJetLVec;
+    perJetLVec.SetPtEtaPhiE( jet.pt(), jet.eta(), jet.phi(), jet.energy() );
+
+    \textcolor{keywordtype}{double} qgPtD = jet.userFloat(\textcolor{stringliteral}{"QGTagger:ptD"});
+    \textcolor{keywordtype}{double} qgAxis1 = jet.userFloat(\textcolor{stringliteral}{"QGTagger:axis1"});
+    \textcolor{keywordtype}{double} qgAxis2 = jet.userFloat(\textcolor{stringliteral}{"QGTagger:axis2"});
+    \textcolor{keywordtype}{double} qgMult = \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(jet.userInt(\textcolor{stringliteral}{"QGTagger:mult"}));
+    \textcolor{keywordtype}{double} deepCSVb = jet.bDiscriminator(\textcolor{stringliteral}{"pfDeepCSVJetTags:probb"});
+    \textcolor{keywordtype}{double} deepCSVc = jet.bDiscriminator(\textcolor{stringliteral}{"pfDeepCSVJetTags:probc"});
+    \textcolor{keywordtype}{double} deepCSVl = jet.bDiscriminator(\textcolor{stringliteral}{"pfDeepCSVJetTags:probudsg"});
+    \textcolor{keywordtype}{double} deepCSVbb = jet.bDiscriminator(\textcolor{stringliteral}{"pfDeepCSVJetTags:probbb"});
+    \textcolor{keywordtype}{double} deepCSVcc = jet.bDiscriminator(\textcolor{stringliteral}{"pfDeepCSVJetTags:probcc"});
+    \textcolor{keywordtype}{double} btag = jet.bDiscriminator(\textcolor{stringliteral}{"pfCombinedSecondaryVertexV2BJetTags"});
+    \textcolor{keywordtype}{double} chargedHadronEnergyFraction = jet.chargedHadronEnergyFraction();
+    \textcolor{keywordtype}{double} neutralHadronEnergyFraction = jet.neutralHadronEnergyFraction();
+    \textcolor{keywordtype}{double} chargedEmEnergyFraction = jet.chargedEmEnergyFraction();
+    \textcolor{keywordtype}{double} neutralEmEnergyFraction = jet.neutralEmEnergyFraction();
+    \textcolor{keywordtype}{double} muonEnergyFraction = jet.muonEnergyFraction();
+    \textcolor{keywordtype}{double} photonEnergyFraction = jet.photonEnergyFraction();
+    \textcolor{keywordtype}{double} electronEnergyFraction = jet.electronEnergyFraction();
+    \textcolor{keywordtype}{double} recoJetsHFHadronEnergyFraction = jet.HFHadronEnergyFraction();
+    \textcolor{keywordtype}{double} recoJetsHFEMEnergyFraction = jet.HFEMEnergyFraction();
+    \textcolor{keywordtype}{double} chargedHadronMultiplicity = jet.chargedHadronMultiplicity();
+    \textcolor{keywordtype}{double} neutralHadronMultiplicity = jet.neutralHadronMultiplicity();
+    \textcolor{keywordtype}{double} photonMultiplicity = jet.photonMultiplicity();
+    \textcolor{keywordtype}{double} electronMultiplicity = jet.electronMultiplicity();
+    \textcolor{keywordtype}{double} muonMultiplicity = jet.muonMultiplicity();
+\}
+\end{DoxyCode}
+
+
+For convinenent use with the top tagger the 4-\/vector and each jet variable can be saved in a flat tuple in its own std\-::vector per event.
+
+\paragraph*{Instructions for running tagger online with C\-M\-S\-S\-W 8\-\_\-0\-\_\-28\-\_\-patch1}
 
 The instructions are currently for C\-M\-S\-S\-W8, but these will be updated when M\-C is avaliable for 9\-X series releases. In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deep\-Flavor tagger (for the tagger itself along with the tensorflow configuration for 8\-X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,
 
@@ -59,6 +172,10 @@ cmsRun run\_topTagger.py
 
 
 The default configuration of the example cfg file \char`\"{}run\-\_\-top\-Tagger.\-py\char`\"{} will run over a single-\/lepton ttbar sample and produce an edm formatted output file (\char`\"{}test.\-root\char`\"{}) containing the vector of reconstructed top T\-Lorentz\-Vectors along with a second vector indicating the type of top (monojet, dijet, trijet).
+
+\paragraph*{Running tagger online in C\-M\-S\-S\-W 9\-\_\-4\-\_\-\-X/10\-\_\-0\-\_\-\-X}
+
+Instructions coming soon
 
 \subsection*{More about getting a configuration file}
 
