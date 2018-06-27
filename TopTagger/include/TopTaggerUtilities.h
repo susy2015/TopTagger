@@ -9,9 +9,14 @@
 class Constituent;
 class TopObject;
 class TopTaggerResults;
-class TF1;
 
+#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/CfgParser/include/TTException.h"
+
+#include "TF1.h"
+#include "TFile.h"
 #include "TLorentzVector.h"
+#include "Math/VectorUtil.h"
 
 //This file is for utility functions which do not fit in other classes 
 //DO NOT DEFINE FUNCTIONS IN LINE!!!!!!
@@ -40,18 +45,19 @@ namespace ttUtility
     /**
      *Class to gather the information necessary to construct the AK4 jet constituents
      */
+    template<typename FLOATTYPE>
     class ConstAK4Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<double>* btagFactors_;
-        const std::vector<double>* qgLikelihood_;
+        const std::vector<FLOATTYPE>* btagFactors_;
+        const std::vector<FLOATTYPE>* qgLikelihood_;
         const std::vector<int>* qgMult_;
-        const std::vector<double>* qgPtD_;
-        const std::vector<double>* qgAxis1_;
-        const std::vector<double>* qgAxis2_;
+        const std::vector<FLOATTYPE>* qgPtD_;
+        const std::vector<FLOATTYPE>* qgAxis1_;
+        const std::vector<FLOATTYPE>* qgAxis2_;
 
-        std::map<std::string, const std::vector<double>*> extraInputVariables_;
+        std::map<std::string, const std::vector<FLOATTYPE>*> extraInputVariables_;
 
     public:
         /**
@@ -60,13 +66,13 @@ namespace ttUtility
          *@param btagFactors B-tag discriminators for each jet
          *@param qgLikelihood Quark-gluon likelihoods for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
         /**
          *Basic constructor
          *@param jetsLVec Jet TLorentzVectors for each jet
          *@param btagFactors B-tag discriminators for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
         /**
          *Constructor with gen informaion 
          *@param jetsLVec Jet TLorentzVectors for each jet
@@ -75,70 +81,306 @@ namespace ttUtility
          *@param hadGenTops Vector of hadronicly decaying gen top TLorentzVectors
          *@param hadGenTopDaughters Vector of direct decay daughters of the top quarks
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
         /**
          *Adds jet shape inputs from the quark-gluon likelihood calculator
          */
-        void addQGLVectors(const std::vector<int>& qgMult, const std::vector<double>& qgPtD, const std::vector<double>& qgAxis1, const std::vector<double>& qgAxis2);
+        void addQGLVectors(const std::vector<int>& qgMult, const std::vector<FLOATTYPE>& qgPtD, const std::vector<FLOATTYPE>& qgAxis1, const std::vector<FLOATTYPE>& qgAxis2)
+        {
+            qgMult_ = &qgMult;
+            qgPtD_ = &qgPtD;
+            qgAxis1_ = &qgAxis1;
+            qgAxis2_ = &qgAxis2;
+        }
+
         /**
          *Adds a vector holding additional variables which will be inserted into the "extraVars" map of the Constituent
          *@param name The name to use to store the extra variables
          *@param vector the values for the extra variable for each jet
          */
-        void addSupplamentalVector(const std::string& name, const std::vector<double>& vector);
+        void addSupplamentalVector(const std::string& name, const std::vector<FLOATTYPE>& vector)
+        {
+            extraInputVariables_[name] = &vector;
+        }
+
         /**
          *Called to fill the constituents using the information collected in the class. 
          *Not intended to be called directly.
          *@param constituents vector to insert AK4 constituents into
          */
-        void packageConstituents(std::vector<Constituent>& constituents);
+        void packageConstituents(std::vector<Constituent>& constituents)
+        {
+            //vector holding constituents to be created
+            //std::vector<Constituent> constituents;
+
+            //Safety check that jet and b-tag vectors are the same length
+            //Special exception for qgLikelihood if it is empty (for slimplified tagger)
+            if(jetsLVec_->size() != btagFactors_->size() || (qgLikelihood_ != nullptr && jetsLVec_->size() != qgLikelihood_->size()))
+            {
+                THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(btagFactors_->size()));
+            }
+
+            if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+            {
+                if(jetsLVec_->size() != qgMult_->size() || jetsLVec_->size() != qgPtD_->size() || jetsLVec_->size() != qgAxis1_->size() || jetsLVec_->size() != qgAxis2_->size())
+                {
+                    THROW_TTEXCEPTION("Unequal vector size (QGL)!!!!!!!\n");
+                }
+            }
+
+            //Construct constituents in place in the vector
+            for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
+            {
+                constituents.emplace_back((*jetsLVec_)[iJet], static_cast<double>((*btagFactors_)[iJet]), static_cast<double>((qgLikelihood_ != nullptr)?((*qgLikelihood_)[iJet]):(0.0)));
+
+                //Add additional QGL info if it is provided 
+                if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
+                {
+                    constituents.back().setQGLVars(static_cast<double>((*qgMult_)[iJet]), static_cast<double>((*qgPtD_)[iJet]), static_cast<double>((*qgAxis1_)[iJet]), static_cast<double>((*qgAxis2_)[iJet]));
+                }
+
+                //Add any extra variables that have been added 
+                for(const auto& extraVar : extraInputVariables_)
+                {
+                    if(extraVar.second && iJet < extraVar.second->size()) constituents.back().setExtraVar(extraVar.first, static_cast<double>((*extraVar.second)[iJet]));
+                    else THROW_TTEXCEPTION("Extra variable " + extraVar.first + "[" + std::to_string(iJet) + "] is not found!!!!!!!");
+                }
+            
+                //Get gen matches if the required info is provided
+                if(hadGenTops_ && hadGenTopDaughters_)
+                {
+                    for(unsigned int iGenTop = 0; iGenTop < hadGenTops_->size(); ++iGenTop)
+                    {
+                        for(const auto& genDaughter : (*hadGenTopDaughters_)[iGenTop])
+                        {
+                            double dR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], *genDaughter);
+                            if(dR < 0.4)
+                            {
+                                constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     };
 
     /**
      *Class to gather the information necessary to construct the AK8 jet constituents
      */
+    template<typename FLOATTYPE>
     class ConstAK8Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<double>* tau1_;
-        const std::vector<double>* tau2_;
-        const std::vector<double>* tau3_;
-        const std::vector<double>* softDropMass_;
-        const std::vector<double>* subjetsBtag_;
-        const std::vector<double>* subjetsMult_;
-        const std::vector<double>* subjetsPtD_;
-        const std::vector<double>* subjetsAxis1_;
-        const std::vector<double>* subjetsAxis2_;
+        const std::vector<FLOATTYPE>* tau1_;
+        const std::vector<FLOATTYPE>* tau2_;
+        const std::vector<FLOATTYPE>* tau3_;
+        const std::vector<FLOATTYPE>* softDropMass_;
+        const std::vector<FLOATTYPE>* subjetsBtag_;
+        const std::vector<FLOATTYPE>* subjetsMult_;
+        const std::vector<FLOATTYPE>* subjetsPtD_;
+        const std::vector<FLOATTYPE>* subjetsAxis1_;
+        const std::vector<FLOATTYPE>* subjetsAxis2_;
         const std::vector<TLorentzVector>* subjetsLVec_;
         const std::vector<std::vector<TLorentzVector>>* vecSubjetsLVec_;
-        const std::vector<std::vector<double>>* vecSubjetsBtag_;
-        const std::vector<std::vector<double>>* vecSubjetsMult_;
-        const std::vector<std::vector<double>>* vecSubjetsPtD_;
-        const std::vector<std::vector<double>>* vecSubjetsAxis1_;
-        const std::vector<std::vector<double>>* vecSubjetsAxis2_;
+        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsBtag_;
+        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsMult_;
+        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsPtD_;
+        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsAxis1_;
+        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsAxis2_;
         TF1* puppisd_corrGEN_;
         TF1* puppisd_corrRECO_cen_;
         TF1* puppisd_corrRECO_for_;
         
-        double getPUPPIweight(double puppipt, double puppieta ) const;
+        double getPUPPIweight(double puppipt, double puppieta ) const
+        {
+            double genCorr  = 1.;
+            double recoCorr = 1.;
+
+            //The correction is derived for jet > 200GeV.
+            //It would return negative weight for low PT jet
+            if (puppipt < 200) return 1.;
+            if(puppisd_corrGEN_ && puppisd_corrRECO_cen_ && puppisd_corrRECO_for_)
+            {
+                genCorr =  puppisd_corrGEN_->Eval( puppipt );
+                if( fabs(puppieta) <= 1.3 )
+                {
+                    recoCorr = puppisd_corrRECO_cen_->Eval( puppipt );
+                }
+                else
+                {
+                    recoCorr = puppisd_corrRECO_for_->Eval( puppipt );
+                }
+            }
+
+            return genCorr * recoCorr;
+        }
 
     public:
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<double>& subjetsBtag, const std::vector<double>& subjetsMult, const std::vector<double>& subjetsPtD, const std::vector<double>& subjetsAxis1, const std::vector<double>& subjetsAxis2);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<double>& subjetsBtag, const std::vector<double>& subjetsMult, const std::vector<double>& subjetsPtD, const std::vector<double>& subjetsAxis1, const std::vector<double>& subjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
-	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<double> >& vecSubjetsBtag, const std::vector<std::vector<double> >& vecSubjetsMult, const std::vector<std::vector<double> >& vecSubjetsPtD, const std::vector<std::vector<double> >& vecSubjetsAxis1, const std::vector<std::vector<double> >& vecSubjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*> >& hadGenTopDaughters);
-	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& tau1, const std::vector<double>& tau2, const std::vector<double>& tau3, const std::vector<double>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<double> >& vecSubjetsBtag, const std::vector<std::vector<double> >& vecSubjetsMult, const std::vector<std::vector<double> >& vecSubjetsPtD, const std::vector<std::vector<double> >& vecSubjetsAxis1, const std::vector<std::vector<double> >& vecSubjetsAxis2);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        void packageConstituents(std::vector<Constituent>& constituents);
-        std::vector<TLorentzVector> denominator(const double ptCut) const;
-        void setWMassCorrHistos(const std::string& fname);
-        void setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<FLOATTYPE>& subjetsBtag, const std::vector<FLOATTYPE>& subjetsMult, const std::vector<FLOATTYPE>& subjetsPtD, const std::vector<FLOATTYPE>& subjetsAxis1, const std::vector<FLOATTYPE>& subjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        static void prepHistosForWCorrectionFactors(const std::string& fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for);
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<FLOATTYPE>& subjetsBtag, const std::vector<FLOATTYPE>& subjetsMult, const std::vector<FLOATTYPE>& subjetsPtD, const std::vector<FLOATTYPE>& subjetsAxis1, const std::vector<FLOATTYPE>& subjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsBtag, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsMult, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsPtD, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis1, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*> >& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsBtag, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsMult, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsPtD, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis1, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+
+        void packageConstituents(std::vector<Constituent>& constituents)
+        {
+            //vector holding constituents to be created
+            //std::vector<Constituent> constituents;
+
+            //Safety check that jet and b-tag vectors are the same length
+            if(jetsLVec_->size() != tau1_->size() || jetsLVec_->size() != tau2_->size() || jetsLVec_->size() != tau3_->size() || jetsLVec_->size() != softDropMass_->size())
+            {
+                THROW_TTEXCEPTION("Unequal AK8 vector size!!!!!!!\n");
+            }
+
+            //Safety check that jet and b-tag vectors are the same length
+            if((subjetsBtag_ &&  subjetsLVec_->size() != subjetsBtag_->size()) || 
+               (subjetsMult_ &&  subjetsLVec_->size() != subjetsMult_->size()) || 
+               (subjetsPtD_ &&   subjetsLVec_->size() != subjetsPtD_->size()) || 
+               (subjetsAxis1_ && subjetsLVec_->size() != subjetsAxis1_->size()) || 
+               (subjetsAxis2_ && subjetsLVec_->size() != subjetsAxis2_->size()))
+            {
+                std::cout << subjetsLVec_->size() << "\t" << subjetsBtag_->size() << "\t" << subjetsMult_->size() << "\t" << subjetsPtD_->size() << "\t" << subjetsAxis1_->size() << "\t" << subjetsAxis2_->size() << std::endl;
+                THROW_TTEXCEPTION("Unequal subjet vector size!!!!!!!\n");
+            }
+
+            //Construct constituents in place in the vector
+            for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
+            {
+                // For each tagged top/W, find the corresponding subjets
+                std::vector<Constituent> subjets;
+                if(vecSubjetsLVec_ != nullptr)
+                {	        
+                    for(unsigned int iSJ = 0; iSJ < (*vecSubjetsLVec_)[iJet].size(); ++iSJ)
+                    {
+                        subjets.emplace_back((*vecSubjetsLVec_)[iJet][iSJ], AK8SUBJET);
+                        if(vecSubjetsBtag_)  subjets.back().setBTag((*vecSubjetsBtag_)[iJet][iSJ]);
+                        if(vecSubjetsMult_)  subjets.back().setExtraVar("mult",  (*vecSubjetsMult_) [iJet][iSJ]);
+                        if(vecSubjetsPtD_)   subjets.back().setExtraVar("ptD",   (*vecSubjetsPtD_)  [iJet][iSJ]);
+                        if(vecSubjetsAxis1_) subjets.back().setExtraVar("axis1", (*vecSubjetsAxis1_)[iJet][iSJ]);
+                        if(vecSubjetsAxis2_) subjets.back().setExtraVar("axis2", (*vecSubjetsAxis2_)[iJet][iSJ]);
+                    }
+                } 
+                else if (subjetsLVec_ != nullptr) 
+                {
+                    // Calculate matching subjets if a single list was given 
+                    for(unsigned int iSJ = 0; iSJ < subjetsLVec_->size(); ++iSJ)
+                    {
+                        double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], (*subjetsLVec_)[iSJ]);
+                        if (myDR < 0.8)
+                        {
+                            subjets.emplace_back((*subjetsLVec_)[iSJ], AK8SUBJET);
+                            if(subjetsBtag_)  subjets.back().setBTag((*subjetsBtag_)[iSJ]);
+                            if(subjetsMult_)  subjets.back().setExtraVar("mult", (*subjetsMult_)[iSJ]);
+                            if(subjetsPtD_)   subjets.back().setExtraVar("ptD", (*subjetsPtD_)[iSJ]);
+                            if(subjetsAxis1_) subjets.back().setExtraVar("axis1", (*subjetsAxis1_)[iSJ]);
+                            if(subjetsAxis2_) subjets.back().setExtraVar("axis2", (*subjetsAxis2_)[iSJ]);
+                        }
+                    }
+
+                    // If more than 2 matches, find the best combination of two subjets
+                    if (subjets.size() > 2) 
+                    {
+                        double min_diff = 999999.;
+                        int min_j=0, min_k=1;
+                        for (unsigned int j=0 ; j<subjets.size(); ++j)
+                        {
+                            for (unsigned int k=j+1; k<subjets.size(); ++k)
+                            {
+                                TLorentzVector diff_LV = (*jetsLVec_)[iJet] - subjets[j].p() - subjets[k].p();
+                                double diff = fabs(diff_LV.M());
+                                if(diff < min_diff)
+                                {
+                                    min_diff = diff;
+                                    min_j = j;
+                                    min_k = k;
+                                }
+                            }
+                        }
+                        subjets = {subjets[min_j], subjets[min_k]};
+                    }
+                }
+                //Emplace new constituent into vector
+                constituents.emplace_back((*jetsLVec_)[iJet], static_cast<double>((*tau1_)[iJet]), static_cast<double>((*tau2_)[iJet]), static_cast<double>((*tau3_)[iJet]), static_cast<double>((*softDropMass_)[iJet]), subjets, getPUPPIweight(static_cast<double>((*jetsLVec_)[iJet].Pt()), static_cast<double>((*jetsLVec_)[iJet].Eta())));
+
+                //Get gen matches if the required info is provided
+                if(hadGenTops_ && hadGenTopDaughters_)
+                {
+                    for(unsigned int iGenTop = 0; iGenTop < hadGenTops_->size(); ++iGenTop)
+                    {
+                        for(const auto& genDaughter : (*hadGenTopDaughters_)[iGenTop])
+                        {
+                            for(const auto& subjet : subjets)
+                            {
+                                double dR = ROOT::Math::VectorUtil::DeltaR(subjet.p(), *genDaughter);
+                                if(dR < 0.4)
+                                {
+                                    constituents.back().addGenMatch((*hadGenTops_)[iGenTop], genDaughter);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        std::vector<TLorentzVector> denominator(const double ptCut) const
+        {
+            std::vector<TLorentzVector> returnVector;
+            for(auto& jet : *jetsLVec_)
+            {
+                if(jet.Pt() > ptCut) returnVector.push_back(jet);
+            }
+            return returnVector;
+        }
+
+        void setWMassCorrHistos(const std::string& fname)
+        {
+            TF1* puppisd_corrGEN = nullptr;
+            TF1* puppisd_corrRECO_cen = nullptr;
+            TF1* puppisd_corrRECO_for = nullptr;
+
+            ConstAK8Inputs::prepHistosForWCorrectionFactors(fname, puppisd_corrGEN, puppisd_corrRECO_cen, puppisd_corrRECO_for);
+            setWMassCorrHistos(puppisd_corrGEN,puppisd_corrRECO_cen, puppisd_corrRECO_for);
+        }
+
+        void setWMassCorrHistos(TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
+        {
+            puppisd_corrGEN_ = puppisd_corrGEN;
+            puppisd_corrRECO_cen_ = puppisd_corrRECO_cen;
+            puppisd_corrRECO_for_ = puppisd_corrRECO_for;
+        }
+
+        static void prepHistosForWCorrectionFactors(const std::string& fname, TF1* puppisd_corrGEN, TF1* puppisd_corrRECO_cen, TF1* puppisd_corrRECO_for)
+        {
+            TFile* file = TFile::Open(fname.c_str(),"READ");
+            if(file)
+            {
+                puppisd_corrGEN      = (TF1*)file->Get("puppiJECcorr_gen");
+                puppisd_corrRECO_cen = (TF1*)file->Get("puppiJECcorr_reco_0eta1v3");
+                puppisd_corrRECO_for = (TF1*)file->Get("puppiJECcorr_reco_1v3eta2v5");
+
+                file->Close();
+                delete file;
+            }
+            else
+            {
+                THROW_TTEXCEPTION("W mass correction file not found w mass!!!!!!!" + fname + "\n");
+            }
+        }
     };
 
     //template metaprogramming magic 
