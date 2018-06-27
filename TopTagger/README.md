@@ -17,9 +17,110 @@ cd TopTagger/TopTagger/test
 make -j8 
 ~~~~~~~~~~~~~
 
-The test code can then be run identically to the completely standalone instructions.
+The test code can then be run identically to the completely standalone instructions found [here](../README.md#running-the-example)
 
 ### Install tagger integrated in the edm framework
+
+For the time being it is suggested to produce flat NTuples containing the input variables which are necessary to run the resolved tagger offline.  This is because running tensorflow alongside CMSSW 8_X_Y requires some rather convoluted hacks (instructions are given below, but these are very involved).  It is much easier to produce flat tuples where all the necessary jet information is kept and use the stansalong instructions above to process the flat NTuples.  
+
+#### Instructions for producing jet variables for resolved top tagger with CMSSW 8_0_28_patch1
+
+Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.
+
+~~~~~~~~~~~~~{.sh}
+#get CMSSW release
+cmsrel CMSSW_8_0_28_patch1
+cd CMSSW_8_0_28_patch1/src/
+#initialize cms and cms git commands 
+cmsenv
+git cms-init
+#patch to qg producer to add axis1
+git cms-merge-topic -u pastika:AddJetAxis1
+#compile
+scram b -j8
+~~~~~~~~~~~~~
+
+The following code should be added to your CMSSW config file to prepare the jet collection with all necessary variables.  
+
+~~~~~~~~~~~~~{.python}
+jetTag = cms.InputTag("slimmedJets")
+
+process.load('RecoJets.JetProducers.QGTagger_cfi')
+process.QGTagger.srcJets   = cms.InputTag("slimmedJets")
+
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+
+updateJetCollection(
+   process,
+   labelName = "DeepCSV",
+   jetSource = cms.InputTag("slimmedJets"),
+   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+   btagDiscriminators = [
+      'pfDeepCSVJetTags:probudsg',
+      'pfDeepCSVJetTags:probb',
+      'pfDeepCSVJetTags:probc',
+      'pfDeepCSVJetTags:probbb',
+      'pfDeepCSVJetTags:probcc',
+      ] ## to add discriminators                                                                                                                                                                                                              
+)
+
+process.updatedPatJetsDeepCSV.userData.userFloats.src += ['QGTagger:qgLikelihood', 'QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2',]
+process.updatedPatJetsDeepCSV.userData.userInts.src += ['QGTagger:mult',]
+
+~~~~~~~~~~~~~
+
+This will produce a jet collection called 'selectedUpdatedPatJetsDeepCSV' which contains all necessary variables for the resolved top tagger.
+
+The necessary variables can then be accessed in a edm producer as follows 
+
+~~~~~~~~~~~~{.c++}
+//in constructor
+JetTok_ = consumes<std::vector<pat::Jet> >(edm::InputTag("selectedUpdatedPatJetsDeepCSV"));
+~~~~~~~~~~~~
+
+~~~~~~~~~~~~{.c++}
+//in produce(...)
+edm::Handle<std::vector<pat::Jet> > jets;
+iEvent.getByToken(JetTok_, jets);
+
+for(const pat::Jet& jet : *jets)
+{
+    //No need to keep jets below 20 GeV
+    if(jet.pt() < 20) continue;
+
+    TLorentzVector perJetLVec;
+    perJetLVec.SetPtEtaPhiE( jet.pt(), jet.eta(), jet.phi(), jet.energy() );
+
+    double qgPtD = jet.userFloat("QGTagger:ptD");
+    double qgAxis1 = jet.userFloat("QGTagger:axis1");
+    double qgAxis2 = jet.userFloat("QGTagger:axis2");
+    double qgMult = static_cast<double>(jet.userInt("QGTagger:mult"));
+    double deepCSVb = jet.bDiscriminator("pfDeepCSVJetTags:probb");
+    double deepCSVc = jet.bDiscriminator("pfDeepCSVJetTags:probc");
+    double deepCSVl = jet.bDiscriminator("pfDeepCSVJetTags:probudsg");
+    double deepCSVbb = jet.bDiscriminator("pfDeepCSVJetTags:probbb");
+    double deepCSVcc = jet.bDiscriminator("pfDeepCSVJetTags:probcc");
+    double btag = jet.bDiscriminator("pfCombinedSecondaryVertexV2BJetTags");
+    double chargedHadronEnergyFraction = jet.chargedHadronEnergyFraction();
+    double neutralHadronEnergyFraction = jet.neutralHadronEnergyFraction();
+    double chargedEmEnergyFraction = jet.chargedEmEnergyFraction();
+    double neutralEmEnergyFraction = jet.neutralEmEnergyFraction();
+    double muonEnergyFraction = jet.muonEnergyFraction();
+    double photonEnergyFraction = jet.photonEnergyFraction();
+    double electronEnergyFraction = jet.electronEnergyFraction();
+    double recoJetsHFHadronEnergyFraction = jet.HFHadronEnergyFraction();
+    double recoJetsHFEMEnergyFraction = jet.HFEMEnergyFraction();
+    double chargedHadronMultiplicity = jet.chargedHadronMultiplicity();
+    double neutralHadronMultiplicity = jet.neutralHadronMultiplicity();
+    double photonMultiplicity = jet.photonMultiplicity();
+    double electronMultiplicity = jet.electronMultiplicity();
+    double muonMultiplicity = jet.muonMultiplicity();
+}
+~~~~~~~~~~~~
+
+For convinenent use with the top tagger the 4-vector and each jet variable can be saved in a flat tuple in its own std::vector per event.  
+
+#### Instructions for running tagger online with CMSSW 8_0_28_patch1
 
 The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases.  In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix, 
 
@@ -58,6 +159,10 @@ cmsRun run_topTagger.py
 ~~~~~~~~~~~~~
 
 The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).  
+
+#### Running tagger online in CMSSW 9_4_X/10_0_X
+
+Instructions coming soon 
 
 ## More about getting a configuration file
 

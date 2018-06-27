@@ -18,7 +18,7 @@ branches:
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get install -qq autofs attr gdb git uuid-dev uuid fuse
-- wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
+- wget --no-check-certificate https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
 - sudo dpkg -i cvmfs-release-latest_all.deb
 - sudo apt-get update
 - sudo apt-get install -qq cvmfs cvmfs-config-default
