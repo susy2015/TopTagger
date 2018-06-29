@@ -262,6 +262,7 @@ int main(int argc, char* argv[])
     //Select approperiate datasets here
     if(dataSets.compare("TEST") == 0)
     {
+        std::cout<<"What are you doing???"<<std::endl;
         return 0;
         //fileMap["DYJetsToLL"]  = {ss["DYJetsToLL_HT_600toInf"]};
         //fileMap["ZJetsToNuNu"] = {ss["ZJetsToNuNu_HT_2500toInf"]};
@@ -459,11 +460,6 @@ int main(int argc, char* argv[])
                     f->Close();
                 }
                 catch(const SATException& e)
-                {
-                    cout << e << endl;
-                    throw;
-                }
-                catch(const TTException& e)
                 {
                     cout << e << endl;
                     throw;

@@ -20,10 +20,12 @@ import subprocess
 filestoTransferGTP = [environ["CMSSW_BASE"] + "/src/TopTagger/Tools/makeTrainingTuples",
                       environ["CMSSW_BASE"] + "/src/TopTagger/TopTagger/test/libTopTagger.so",
                       environ["CMSSW_BASE"] + "/src/TopTagger/Tools/TopTaggerClusterOnly.cfg",
-                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets.txt",
-                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections.txt",
+                      #environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets.txt",
+                      #environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections.txt",
                       "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_core.so.3.1",
                       "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_ml.so.3.1",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets.cfg",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections.cfg",
 #                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so",
 #                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10",
 #                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10.3.0",
@@ -85,7 +87,8 @@ makeExeAndFriendsTarrball(filestoTransferGTP, "gtp")
 nFilesPerJob = options.numfile
 
 fileParts = [submitFile]
-sc = SampleCollection("../sampleSets.txt", "../sampleCollections.txt")
+#sc = SampleCollection("../sampleSets.txt", "../sampleCollections.txt")
+sc = SampleCollection("../sampleSets.cfg", "../sampleCollections.cfg")
 datasets = []
 
 if options.dataCollections or options.dataCollectionslong:
