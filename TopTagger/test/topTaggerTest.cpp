@@ -122,10 +122,10 @@ int main()
 
             //Use helper function to create input list 
             //Create AK4 inputs object
-            ttUtility::ConstAK4Inputs AK4Inputs = ttUtility::ConstAK4Inputs(**AK4JetLV, **AK4JetBtag, **AK4JetQGL);
+            ttUtility::ConstAK4Inputs<double> AK4Inputs(**AK4JetLV, **AK4JetBtag, **AK4JetQGL);
 
             //Create AK8 inputs object
-            ttUtility::ConstAK8Inputs AK8Inputs = ttUtility::ConstAK8Inputs(
+            ttUtility::ConstAK8Inputs<double> AK8Inputs(
                 **AK8JetLV,
                 **AK8JetTau1,
                 **AK8JetTau2,
