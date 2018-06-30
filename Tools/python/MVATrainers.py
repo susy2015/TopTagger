@@ -22,10 +22,10 @@ def mainSKL(options):
   # Import data
   dg = DataGetter(allVars)
   dataFiles = []
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_20_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_40_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_60_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
   print dataFiles
   trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
 
@@ -63,10 +63,10 @@ def mainXGB(options):
   # Import data
   dg = DataGetter(allVars)
   dataFiles = []
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_20_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_40_division_0_TTbarSingleLepT*_training_[01234].h5")
-  dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_60_division_0_TTbarSingleLepT*_training_[01234].h5")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
+  dataFiles += glob(options.dataFilePath + "/")
   trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
   #= dg.importData(samplesToRun = tuple(glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[0].h5")), prescale=True, ptReweight=options.ptReweight)
 
@@ -137,22 +137,22 @@ def mainTF(options):
   dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True)
   dgBg = DataGetter.DefinedVariables(options.netOp.vNames, background = True)
 
-  validDataSig = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ), 1),
-                  (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ), 1)]
+  validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                  (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1)]
 
-  validDataBgTTbar = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5", ), 1),]
+  validDataBgTTbar = [(("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),]
   
-  validDataBgQCDMC = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT100to200_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT200to300_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT300to500_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT500to700_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT700to1000_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1000to1500_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT1500to2000_validation_0.h5", ), 1),
-                      (("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_QCD_HT2000toInf_validation_0.h5", ), 1)]
+  validDataBgQCDMC = [(("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1),
+                      (("/cms/data/cmadrid/EventShapeTrainingData/", ), 1)]
   
-  validDataBgQCDData = [(("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_1_Data_JetHT_2016_validation_0.h5", ), 1)]
+  validDataBgQCDData = [(("/cms/data/cmadrid/EventShapeTrainingData/", ), 1)]
   
 
   print "Input Variables: ",len(dgSig.getList())
@@ -194,20 +194,20 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
+  signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_350_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_350_SHuHd_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
 
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1), 
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1),
+  backgroundDataSets = [DataSet("",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4),
+                        DataSet("", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4),
+                        DataSet("",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8),
+                        DataSet("",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1), 
+                        DataSet("",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1),
+                        DataSet("",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1),
                         ]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, 2, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
