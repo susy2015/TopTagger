@@ -1,6 +1,6 @@
 set OPENCVPATH=@OPENCVDIR@
-set XGBOOSTPATH=@XGBOOSTDIR@
-set TENSORFLOWPATH=@TENSORFLOWDIR@
+set XGBOOSTPATH=@XGBOOSTDIR@/lib
+set TENSORFLOWPATH=@TENSORFLOWDIR@/lib
 set TAGGERDIR=@TAGGERDIR@/TopTagger/test
 set SCRIPTDIR=@TAGGERDIR@/TopTagger/scripts
 
@@ -8,19 +8,19 @@ set OSNAME=`uname -s`
 if ( "$OSNAME" == "Darwin" ) then
     if ! ( $DYLD_LIBRARY_PATH:q =~ *$OPENCVPATH:q* ) then
         if ! ( "${OPENCVPATH}" == "" ) then
-            setenv DYLD_LIBRARY_PATH ${OPENCVPATH}/lib:${DYLD_LIBRARY_PATH}
+            setenv DYLD_LIBRARY_PATH ${OPENCVPATH}:${DYLD_LIBRARY_PATH}
         endif
     endif
     
     if ! ( $DYLD_LIBRARY_PATH:q =~ *$XGBOOSTPATH:q* ) then 
         if ! ( "${XGBOOSTPATH}" == "" ) then
-            setenv DYLD_LIBRARY_PATH ${XGBOOSTPATH}/lib:${DYLD_LIBRARY_PATH}
+            setenv DYLD_LIBRARY_PATH ${XGBOOSTPATH}:${DYLD_LIBRARY_PATH}
         endif
     endif
     
     if ! ( $DYLD_LIBRARY_PATH:q =~ *$TENSORFLOWPATH:q* ) then 
         if ! ( "${TENSORFLOWPATH}" == "" ) then
-            setenv DYLD_LIBRARY_PATH ${TENSORFLOWPATH}/lib:${DYLD_LIBRARY_PATH}
+            setenv DYLD_LIBRARY_PATH ${TENSORFLOWPATH}:${DYLD_LIBRARY_PATH}
         endif
     endif
     
@@ -34,19 +34,19 @@ else
 
     if ! ( $LD_LIBRARY_PATH:q =~ *$OPENCVPATH:q*) then
         if ! ( "${OPENCVPATH}" == "" ) then
-            setenv LD_LIBRARY_PATH ${OPENCVPATH}/lib:${LD_LIBRARY_PATH}
+            setenv LD_LIBRARY_PATH ${OPENCVPATH}:${LD_LIBRARY_PATH}
         endif
     endif
     
     if ! ( $LD_LIBRARY_PATH:q =~ *$XGBOOSTPATH:q* ) then 
         if ! ( "${XGBOOSTPATH}" == "" ) then
-            setenv LD_LIBRARY_PATH ${XGBOOSTPATH}/lib:${LD_LIBRARY_PATH}
+            setenv LD_LIBRARY_PATH ${XGBOOSTPATH}:${LD_LIBRARY_PATH}
         endif
     endif
     
     if ! ( $LD_LIBRARY_PATH:q =~ *$TENSORFLOWPATH:q* ) then 
         if ! ( "${TENSORFLOWPATH}" == "" ) then
-            setenv LD_LIBRARY_PATH ${TENSORFLOWPATH}/lib:${LD_LIBRARY_PATH}
+            setenv LD_LIBRARY_PATH ${TENSORFLOWPATH}:${LD_LIBRARY_PATH}
         endif
     endif
     

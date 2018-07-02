@@ -120,8 +120,12 @@ AC_CHECK_FILE($TENSORFLOWINCLUDE, [], [])
 TENSORFLOWLIB=$TENSORFLOWDIR/lib/libtensorflow.${LIBSUFFIX}
 AC_CHECK_FILE($TENSORFLOWLIB, [], [])
 
+TENSORFLOWFRAMEWORKLIB=$TENSORFLOWDIR/lib/libtensorflow_framework.${LIBSUFFIX}
+AC_CHECK_FILE($TENSORFLOWFRAMEWORKLIB, [], [])
+
 TENSORFLOWINCLUDE=ac_cv_file_$(echo ${TENSORFLOWINCLUDE} | sed -e 's/[\/]/_/g' -e 's/\./_/')
-TENSORFLOWLIB=ac_cv_file_$(echo ${TENSORFLOWLIBXGB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+TENSORFLOWLIB=ac_cv_file_$(echo ${TENSORFLOWLIB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
+TENSORFLOWFRAMEWORKLIB=ac_cv_file_$(echo ${TENSORFLOWFRAMEWORKLIB} | sed -e 's/[\/]/_/g' -e 's/\./_/')
 
 dnl configure Tensorflow if it is found
 if test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWLIB}" = "no"; then
@@ -129,6 +133,11 @@ if test "${!TENSORFLOWINCLUDE}" = "no" || test "${!TENSORFLOWINCLUDE}" = "no" ||
    AC_SUBST(TENSORFLOWDIR, "")
 else
    AC_SUBST(TENSORFLOWDIR, $TENSORFLOWDIR)
+   if test "${!TENSORFLOWFRAMEWORKLIB}" = "yes"; then
+      AC_SUBST(TENSORFLOWLIBS, "-ltensorflow -ltensorflow_framework")
+   else
+      AC_SUBST(TENSORFLOWLIBS, "-ltensorflow")
+   fi
 fi
 
 dnl check for xgboost
