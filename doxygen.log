@@ -201,7 +201,6 @@ Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyCluster
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyClusterAlgo.cpp...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOpenCVMVA.cpp...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagg/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMAK8TopFilter.h:11: warning: Compound TTMAK8TopFilter is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:13: warning: Compound TopObject is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh:11: warning: Compound cfg::Record is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:309: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMLazyClusterAlgo.h:9: warning: Compound TTMLazyClusterAlgo is not documented.
@@ -452,20 +451,6 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:84: warning: Member GetMatchedTop(std::vector< TLorentzVector > TopCand, std::vector< TLorentzVector > &MachedTopCand, std::vector< TLorentzVector >Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:85: warning: Member GetMatchedTopConst(const std::vector< Constituent const * > &topconst, const std::vector< TLorentzVector > &gentopdau) (function) of class TopCat is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:87: warning: Member TopConst(const std::vector< T > &tops, const std::vector< TLorentzVector > &genDecayLVec, const std::vector< int > &genDecayPdgIdVec, const std::vector< int > &genDecayIdxVec, const std::vector< int > &genDecayMomIdxVec) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:26: warning: Member TopObject(std::vector< Constituent const * > constituents) (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:28: warning: Member addConstituent(Constituent const *constituent) (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:29: warning: Member setDiscriminator(const double disc) (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:31: warning: Member p() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:32: warning: Member P() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:33: warning: Member getDRmax() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:34: warning: Member getDThetaMin() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:35: warning: Member getDThetaMax() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:36: warning: Member getDiscriminator() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:38: warning: Member getConstituents() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:39: warning: Member getNConstituents() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:40: warning: Member getNBConstituents(double cvsCut, double etaCut=2.4) const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:42: warning: Member getGenTopMatches() const  (function) of class TopObject is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h:43: warning: Member getBestGenTopMatch(const double dRMax=0.6) const  (function) of class TopObject is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:53: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:54: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:55: warning: Member getTops() (function) of class TopTaggerResults is not documented.
@@ -1015,5 +1000,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1297/65536 hits=7698 misses=1387
+lookup cache used 1287/65536 hits=7670 misses=1377
 finished...

@@ -4,6 +4,7 @@ var searchData=
   ['setcfgfile',['setCfgFile',['../classTopTagger.html#ac18bfe0673dbd05973f45c668ed2b190',1,'TopTagger']]],
   ['setcfgfiledirect',['setCfgFileDirect',['../classTopTagger.html#ae7a38be12023643495adea6f9a696ff3',1,'TopTagger']]],
   ['setconstituents',['setConstituents',['../classTopTaggerResults.html#a2d7cf77c1e4591e6fbdf0b297a3f87bd',1,'TopTaggerResults']]],
+  ['setdiscriminator',['setDiscriminator',['../classTopObject.html#abf5123e8c707e9059c8ec96b35643bef',1,'TopObject']]],
   ['setextravar',['setExtraVar',['../classConstituent.html#a1b2fc086bc359e141e54ed2903c951c9',1,'Constituent']]],
   ['setptr',['setPtr',['../classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53',1,'ttUtility::MVAInputCalculator']]],
   ['setrethrow',['setRethrow',['../classTopTagger.html#ae117c09fc42674a09247fd1ad8dcb3ce',1,'TopTagger']]],
