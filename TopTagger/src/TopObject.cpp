@@ -74,3 +74,13 @@ const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax) const
     if(bestMatchDR < dRMax) return bestMatch;
     else                    return nullptr;
 }
+
+double TopObject::getMCScaleFactor() const
+{
+    return 0.0;
+}
+
+double TopObject::getSystematicUncertainty(const std::string& source) const
+{
+    return 0.0;
+}

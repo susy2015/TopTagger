@@ -17,13 +17,14 @@ class TopObject
 {
 private:
     TLorentzVector p_;
-    double dRmax_, discriminator_, dThetaMin_, dThetaMax_;
+    double dRmax_, discriminator_, dThetaMin_, dThetaMax_, scaleFactor_;
 
     std::vector<Constituent const *> constituents_;
 
     void updateVariables();
 
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatchPossibilities_;
+    std::map<std::string, double> systematicUncertainties_;
 
 public:
     /// Construct default empty TopObject
@@ -60,6 +61,11 @@ public:
     const decltype(genMatchPossibilities_)& getGenTopMatches() const { return genMatchPossibilities_; }
     /// Returns the best matched genrator level top based on the possible matches based on the parameter dRMax which defines the matching cone between the overall generator top and the top candidate.
     const TLorentzVector* getBestGenTopMatch(const double dRMax = 0.6) const;
+
+    /// Return the scale factor used to scale simulation events so that they better match data.
+    double getMCScaleFactor() const; 
+    /// Return systematic uncertainty 
+    double getSystematicUncertainty(const std::string& source) const; 
 };
 
 #endif
