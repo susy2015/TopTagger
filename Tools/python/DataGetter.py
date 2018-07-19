@@ -14,13 +14,13 @@ class DataGetter:
         self.dataMap = {}
 
     #This method accepts a string and will return a DataGetter object with the variable list defined in this method.
-    @classmethod
-    def StandardVariables(cls, variables):
-
-        if variables == "TeamAlpha":
-            vNames = ["EvtNum_double", "sampleWgt", "Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
-
-        return cls(vNames)
+    #@classmethod
+    #def StandardVariables(cls, variables):
+    #
+    #    if variables == "TeamAlpha":
+    #        vNames = ["EvtNum_double", "sampleWgt", "Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
+    #
+    #    return cls(vNames)
 
     #Simply accept a list and pass it to the constructor
     @classmethod
@@ -58,47 +58,39 @@ class DataGetter:
             if not v in columnHeaders:
                 print "Variable not found: %s"%v
 
-        dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
-        
-        labelColumnNames = ["genConstiuentMatchesVec", "genTopMatchesVec", "ncand"]
-        labelColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in labelColumnNames])
-        
-        wgtColumnNames = ["sampleWgt"]
-        wgtColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in wgtColumnNames])
-        
         #load data files 
         dsets = [h5py.File(filename, mode='r')['EventShapeVar'] for filename in samplesToRun]
-        
         arrays = [da.from_array(dset, chunks=(65536, 1024)) for dset in dsets]
-        
         x = da.concatenate(arrays, axis=0)
-        
+         
+        #setup and get data
+        dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
         data = x[:,dataColumns]
+        npyInputData = data.compute()
         
-        #remove partial tops 
-        inputLabels = x[:,labelColumns]
-        inputAnswer = (inputLabels[:,0] > 2.99) & (inputLabels[:,1] > 0.99)
-    
-        inputBackground = (inputLabels[:,0] == 0) & da.logical_not(inputLabels[:,1])
-    
-        filterArray = []
-        if self.signal and self.background:
-            filterArray = ((inputAnswer == 1) | (inputBackground == 1)) & (inputLabels[:,2] > 0)
-        elif self.signal:
-            filterArray = (inputAnswer == 1) & (inputLabels[:,2] > 0)
-        elif self.background:
-            filterArray = (inputBackground == 1) & (inputLabels[:,2] > 0)
-
-        npyInputData = data[filterArray].compute()
-        #npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
-        npyInputAnswer = inputAnswer
-        npyInputAnswers = da.vstack([npyInputAnswer,da.logical_not(npyInputAnswer)]).transpose()[filterArray].compute()
-        npyInputSampleWgts = x[:,wgtColumns][filterArray].compute()
+        #setup and get labels
+        npyInputAnswers = np.zeros((npyInputData.shape[0], 2))
+        if self.signal:
+            npyInputAnswers[:,0] = 1
+        else:
+            npyInputAnswers[:,1] = 1
+        
+        #setup and get domains
+        domainColumnNames = ["NGoodJets_double"]
+        domainColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in domainColumnNames])
+        inputDomains = x[:,domainColumns]
+        maxNJetBin = 10
+        tempInputDomains = inputDomains.astype(int)
+        tempInputDomains = da.reshape(tempInputDomains, [-1])
+        tempInputDomains[tempInputDomains > maxNJetBin] = maxNJetBin 
+        tempInputDomains = tempInputDomains - tempInputDomains.min()
+        d =  np.zeros((npyInputData.shape[0], tempInputDomains.max().compute() + 1))
+        d[np.arange(d.shape[0]), tempInputDomains] = 1
+        
+        #setup and get weights
+        wgtColumnNames = ["sampleWgt"]
+        wgtColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in wgtColumnNames])
+        npyInputSampleWgts = x[:,wgtColumns].compute()
         npyInputWgts = npyInputSampleWgts
-
-        d = np.zeros((npyInputData.shape[0], 2))
-        if self.domain != None and self.domain > 0:
-            d[:,self.domain - 1] = 1
-
+                
         return {"data":npyInputData, "labels":npyInputAnswers, "domain":d, "weights":npyInputWgts, "":npyInputSampleWgts}
-
