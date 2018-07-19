@@ -26,7 +26,7 @@ def splitVarAndCatagory(inVars):
    return variables, categories
 
 def StandardVariables(variables):
-   if variables == "TeamAlpha":
+   if variables == "Stealth":
       vNames = ["EvtNum_double", "sampleWgt", "Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
       jNames = []
 
@@ -237,8 +237,8 @@ class networkOptions:
                       denseLayers         = [300, 100],
                       denseActivationFunc = "relu",
                       convLayers          = [],
-                      rnnNodes            = 30,
-                      rnnLayers           = 1,
+                      rnnNodes            = 0,
+                      rnnLayers           = 0,
                       convNConstituents   = 3,
                       convFilterWidth     = 1,
                       useCNN              = True,

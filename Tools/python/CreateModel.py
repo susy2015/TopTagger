@@ -66,7 +66,7 @@ class CreateModel:
         gradientOp = -parameter*tf.identity(input, name="Identity")
         return gradientOp + tf.stop_gradient(tf.identity(input) - gradientOp)
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, prefix="", nDomainNode=2):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
@@ -114,9 +114,9 @@ class CreateModel:
             #create pt for domain classification
             layer = NLayer - 1
             if not layer in w_fc:
-                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], nnStruct[layer]], name="w_fc%i"%(layer))
+                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], int(nDomainNode)], name="w_fc%i"%(layer))
             if not layer in b_fc:
-                b_fc[layer] = self.bias_variable([nnStruct[layer]], name="b_fc%i"%(layer))
+                b_fc[layer] = self.bias_variable([int(nDomainNode)], name="b_fc%i"%(layer))
 
             pt = tf.add(tf.matmul(self.gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
             
@@ -139,16 +139,16 @@ class CreateModel:
         self.training = tf.placeholder_with_default(False, [], name="training")
         self.gradientReversalWeight = tf.placeholder_with_default(1.0, [], name="gradientReversalWeight")
 
+        #define a StagingArea here
+        #self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes, shapes=self.inputDataQueue.shapes)
+        #self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
+        self.x, self.y_, self.p_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)#self.stagingArea.get()
+
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
         self.y_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="y_ph_")
-        self.p_ph_ = tf.placeholder(tf.float32, [None, self.nnStruct[NLayer - 1]], name="p_ph_")
+        self.p_ph_ = tf.placeholder(tf.float32, [None, self.p_.shape[1]], name="p_ph_")
         self.wgt_ph = tf.placeholder(tf.float32, [None, 1], name="wgt_ph")
-
-        #define a StagingArea here
-        self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes)
-        self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
-        self.x, self.y_, self.p_, self.wgt = self.stagingArea.get()
 
         #self.x, self.y_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)
 
@@ -195,8 +195,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training)
-        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, prefix="_ph")
+        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, nDomainNode=self.p_.shape[1])
+        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, prefix="_ph", nDomainNode=self.p_.shape[1])
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
