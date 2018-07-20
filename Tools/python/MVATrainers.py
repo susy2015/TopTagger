@@ -139,30 +139,26 @@ def mainTF(options):
 
   validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_rpv_stop_350_training_0.h5", ), 1),]
 
+  validDataSig2 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_stealth_stop_350_SHuHd_training_0.h5", ), 1),]
+
+  validDataSig3 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_rpv_stop_850_training_0.h5", ), 1),]
+
   validDataBgTTbar = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
                       (("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
   
-  validDataBgQCDMC = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
-                      (("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
-  
-  validDataBgQCDData = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
-                      (("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
-
-  
-
   print "Input Variables: ",len(dgSig.getList())
 
   # Import data
   #print options.runOp.validationSamples
   
   validDataSig =       getValidData(dgSig, validDataSig,       options)
+  validDataSig2 =      getValidData(dgSig, validDataSig2,     options)
+  validDataSig3 =      getValidData(dgSig, validDataSig3,     options)
   validDataBgTTbar =   getValidData(dgBg,  validDataBgTTbar,   options)
-  validDataBgQCDMC =   getValidData(dgBg,  validDataBgQCDMC,   options)
-  validDataBgQCDData = getValidData(dgBg,  validDataBgQCDData, options)
 
   validDataTTbar = combineValidationData(validDataSig, validDataBgTTbar)
-  validDataQCDMC = combineValidationData(validDataSig, validDataBgQCDMC)
-  validDataQCDData = combineValidationData(validDataSig, validDataBgQCDData)
+  validDataQCDMC = combineValidationData(validDataSig2, validDataBgTTbar)
+  validDataQCDData = combineValidationData(validDataSig3, validDataBgTTbar)
 
   #get input/output sizes
   #print validData["data"].shape
@@ -190,8 +186,8 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_350_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),]
+  signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),]
 
   #signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_350_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
   #                  DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_350_SHuHd_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
@@ -236,21 +232,21 @@ def mainTF(options):
 
     try:
       while dm.continueTrainingLoop():
-        grw = 2/(1+exp(-i/10000.0)) - 1
+        grw = 0.0 #2/(1+exp(-i/10000.0)) - 1
 
         #run validation operations 
-        #if i == 0 or not i % ReportInterval:
-        #  #run validation operations 
-        #  validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.p_ph_: validDataTTbar["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
-        #  summary_writer.add_summary(summary_vl, i/N_TRAIN_SUMMARY)
-        #
-        #  print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
-        #
-        #  validation_loss, accuracy, summary_vl_QCDMC = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDMC_summary_op], feed_dict={mlp.x_ph: validDataQCDMC["data"][:validationCount], mlp.y_ph_: validDataQCDMC["labels"][:validationCount], mlp.p_ph_: validDataQCDMC["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDMC["weights"][:validationCount]})
-        #  summary_writer.add_summary(summary_vl_QCDMC, i/N_TRAIN_SUMMARY)
-        #
-        #  validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.p_ph_: validDataQCDData["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
-        #  summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
+        if i == 0 or not i % ReportInterval:
+          #run validation operations 
+          validation_loss, accuracy, summary_vl = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_summary_op], feed_dict={mlp.x_ph: validDataTTbar["data"][:validationCount], mlp.y_ph_: validDataTTbar["labels"][:validationCount], mlp.p_ph_: validDataTTbar["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataTTbar["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl, i/N_TRAIN_SUMMARY)
+        
+          print('Interval %d, validation accuracy %0.6f, validation loss %0.6f' % (i/ReportInterval, accuracy, validation_loss))
+        
+          validation_loss, accuracy, summary_vl_QCDMC = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDMC_summary_op], feed_dict={mlp.x_ph: validDataQCDMC["data"][:validationCount], mlp.y_ph_: validDataQCDMC["labels"][:validationCount], mlp.p_ph_: validDataQCDMC["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDMC["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl_QCDMC, i/N_TRAIN_SUMMARY)
+        
+          validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.p_ph_: validDataQCDData["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
+          summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
 
         #run training operations 
         if i % N_TRAIN_SUMMARY == 0:

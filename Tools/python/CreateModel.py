@@ -140,9 +140,10 @@ class CreateModel:
         self.gradientReversalWeight = tf.placeholder_with_default(1.0, [], name="gradientReversalWeight")
 
         #define a StagingArea here
-        #self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes, shapes=self.inputDataQueue.shapes)
-        #self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
-        self.x, self.y_, self.p_, self.wgt = self.inputDataQueue.dequeue_many(n=self.nBatch)#self.stagingArea.get()
+        stagingAreaShape = [[self.nBatch, int(a.dims[0])] for a in self.inputDataQueue.shapes]
+        self.stagingArea = tf.contrib.staging.StagingArea(self.inputDataQueue.dtypes, shapes=stagingAreaShape)
+        self.stagingOp = self.stagingArea.put(self.inputDataQueue.dequeue_many(n=self.nBatch))
+        self.x, self.y_, self.p_, self.wgt = self.stagingArea.get()
 
         #Define inputs and training inputs
         self.x_ph = tf.placeholder(tf.float32, [None, self.nnStruct[0]], name="x")
@@ -261,11 +262,11 @@ class CreateModel:
         summary_vaccuracy = tf.summary.scalar("valid accuracy", self.accuracy)
 
         #special validations
-        summary_vce_QCDMC = tf.summary.scalar("valid_cross_entropy_QCDMC", self.cross_entropy_ph)
-        summary_vaccuracy_QCDMC = tf.summary.scalar("valid accuracy_QCDMC", self.accuracy)
+        summary_vce_QCDMC = tf.summary.scalar("valid_cross_entropy_sig2", self.cross_entropy_ph)
+        summary_vaccuracy_QCDMC = tf.summary.scalar("valid accuracy_sig2", self.accuracy)
 
-        summary_vce_QCDData = tf.summary.scalar("valid_cross_entropy_QCDData", self.cross_entropy_ph)
-        summary_vaccuracy_QCDData = tf.summary.scalar("valid accuracy_QCDData", self.accuracy)
+        summary_vce_QCDData = tf.summary.scalar("valid_cross_entropy_sig3", self.cross_entropy_ph)
+        summary_vaccuracy_QCDData = tf.summary.scalar("valid accuracy_sig3", self.accuracy)
 
         # create image of colvolutional filters 
         valid_summaries = [summary_vaccuracy, summary_vloss, summary_vce]

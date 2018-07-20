@@ -27,7 +27,8 @@ def splitVarAndCatagory(inVars):
 
 def StandardVariables(variables):
    if variables == "Stealth":
-      vNames = ["EvtNum_double", "sampleWgt", "Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
+#      vNames = ["EvtNum_double", "sampleWgt", "Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
+      vNames = ["fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "fwm7_top6", "fwm8_top6", "fwm9_top6", "fwm10_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6"]
       jNames = []
 
    return vNames, jNames
@@ -234,7 +235,7 @@ class networkOptions:
    def __init__(self, networkName         = "Network test Configuration (name not set)",
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
-                      denseLayers         = [300, 100],
+                      denseLayers         = [100, 50],
                       denseActivationFunc = "relu",
                       convLayers          = [],
                       rnnNodes            = 0,
