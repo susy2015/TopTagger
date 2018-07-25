@@ -508,6 +508,7 @@ namespace ttUtility
         int j_qgPtD_lab_[NCONST];
         int j_qgAxis1_lab_[NCONST];
         int j_qgAxis2_lab_[NCONST];
+        int j_CvsL_lab_[NCONST];
         int dR12_lab_[NCONST];
         int dR12_3_lab_[NCONST];
         int j12_m_lab_[NCONST];

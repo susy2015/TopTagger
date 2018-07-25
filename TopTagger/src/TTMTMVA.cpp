@@ -27,6 +27,27 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
         keepLooping = false;
 
         //Get variable name
+        std::string varName = cfgDoc->get("mvaVarMappedName", iVar, localCxt, "");
+
+        //if it is a non empty string save in vector
+        if(varName.size() > 0)
+        {
+            keepLooping = true;
+
+            varsTMVA_.push_back(varName);
+        }
+        ++iVar;
+    }
+    while(keepLooping);
+
+    bool varsTMVASet = varsTMVA_.size() > 0;
+
+    iVar = 0;
+    do
+    {
+        keepLooping = false;
+
+        //Get variable name
         std::string varName = cfgDoc->get("mvaVar", iVar, localCxt, "");
 
         //if it is a non empty string save in vector
@@ -35,6 +56,7 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
             keepLooping = true;
 
             vars_.push_back(varName);
+            if(!varsTMVASet) varsTMVA_.push_back(varName);
         }
         ++iVar;
     }
@@ -58,13 +80,17 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     {
         varCalculator_.reset(new ttUtility::BDTDijetInputCalculator());
     }
+    else if(NConstituents_ == 3)
+    {
+        varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    }
     varCalculator_->mapVars(vars_);
     varCalculator_->setPtr(varMap_.data());
 
     //load variables into reader
     for(unsigned int i = 0; i < vars_.size(); ++i)
     {
-        reader_->AddVariable(vars_[i].c_str(), &varMap_[i]);
+        reader_->AddVariable(varsTMVA_[i].c_str(), &varMap_[i]);
     }
 
     //load model file into reader

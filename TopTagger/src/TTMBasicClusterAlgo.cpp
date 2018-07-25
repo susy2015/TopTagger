@@ -115,9 +115,21 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
                                         }
                                     }
                                     if(reject) continue;
+                                    std::vector<const Constituent *> constituentsVec = {&constituents[k], &constituents[j], &constituents[i]};
+                                    std::sort(constituentsVec.begin(), constituentsVec.end(), [](const Constituent* c1, const Constituent* c2) { return c1->getBTagDisc() > c2->getBTagDisc(); });
+                                    if(constituentsVec[1]->p().Pt() > constituentsVec[2]->p().Pt())
+                                    {
+                                        fillTriplet(constituentsVec[0], constituentsVec[1], constituentsVec[2], topCandidates);
+                                    }
+                                    else
+                                    {
+                                        fillTriplet(constituentsVec[0], constituentsVec[2], constituentsVec[1], topCandidates);
+                                    }
                                 }
-
-                                fillTriplet(&constituents[k], &constituents[j], &constituents[i], topCandidates);
+                                else
+                                {
+                                    fillTriplet(&constituents[k], &constituents[j], &constituents[i], topCandidates);
+                                }
                             }
                         }
                     }
