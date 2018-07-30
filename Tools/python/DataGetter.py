@@ -1,16 +1,17 @@
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import dask.array as da
 
 class DataGetter:
 
     #The constructor simply takes in a list and saves it to self.list
-    def __init__(self, variables, signal = True, background = True, domain = None, bufferData = False):
+    def __init__(self, variables, signal = True, background = True, domain = None, bufferData = False, weightHist=None):
         self.list = variables
         self.signal = signal
         self.domain = domain
         self.background = background
         self.bufferData = bufferData
+        self.weightHist = weightHist
         self.dataMap = {}
 
     #This method accepts a string and will return a DataGetter object with the variable list defined in this method.
@@ -75,6 +76,9 @@ class DataGetter:
                 print "Variable not found: %s"%v
 
         dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
+
+        ptColumnsName = ["cand_pt"]
+        ptColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in ptColumnsName])
         
         labelColumnNames = ["genConstiuentMatchesVec", "genTopMatchesVec", "ncand"]
         labelColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in labelColumnNames])
@@ -110,7 +114,13 @@ class DataGetter:
         npyInputAnswer = inputAnswer
         npyInputAnswers = da.vstack([npyInputAnswer,da.logical_not(npyInputAnswer)]).transpose()[filterArray].compute()
         npyInputSampleWgts = x[:,wgtColumns][filterArray].compute()
-        npyInputWgts = npyInputSampleWgts
+        dataPt = x[:,ptColumns][filterArray].compute()
+        npyInputWgts = np.ones(len(npyInputSampleWgts)).reshape([-1,1])
+
+        if self.weightHist != None:
+            ptBins = self.weightHist[1]
+            ptWeightHist = self.weightHist[0]
+            npyInputWgts *= ptWeightHist[np.digitize(dataPt, ptBins) - 1].reshape([-1,1])
 
         d = np.zeros((npyInputData.shape[0], 2))
         if self.domain != None and self.domain > 0:

@@ -213,11 +213,18 @@ class CreateModel:
         #self.cross_entropy_ph = tf.losses.compute_weighted_loss(losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.y_ph_, logits=self.yt_ph), weights=tf.reshape(self.wgt_ph, [-1]), reduction=tf.losses.Reduction.MEAN)
         #self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
         #self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
-        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
-        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
 
-        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1))
-        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1))
+        #self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt)
+        #self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph)
+        #
+        #self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1))
+        #self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1))
+
+        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
+        
+        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1)*tf.reshape(self.wgt, [-1]))
+        self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1)*tf.reshape(self.wgt_ph, [-1]))
 
         self.l2_norm = tf.constant(0.0)
         for w in self.w_fc.values():
