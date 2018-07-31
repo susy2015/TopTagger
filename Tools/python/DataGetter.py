@@ -67,6 +67,7 @@ class DataGetter:
         dataColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in variables])
         data = x[:,dataColumns]
         npyInputData = data.compute()
+        #print data.shape
         
         #setup and get labels
         npyInputAnswers = np.zeros((npyInputData.shape[0], 2))
@@ -79,7 +80,7 @@ class DataGetter:
         domainColumnNames = ["NGoodJets_double"]
         domainColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in domainColumnNames])
         inputDomains = x[:,domainColumns]
-        maxNJetBin = 10
+        maxNJetBin = 11
         tempInputDomains = inputDomains.astype(int)
         tempInputDomains = da.reshape(tempInputDomains, [-1])
         tempInputDomains[tempInputDomains > maxNJetBin] = maxNJetBin 
@@ -92,5 +93,5 @@ class DataGetter:
         wgtColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in wgtColumnNames])
         npyInputSampleWgts = x[:,wgtColumns].compute()
         npyInputWgts = npyInputSampleWgts
-                
+
         return {"data":npyInputData, "labels":npyInputAnswers, "domain":d, "weights":npyInputWgts, "":npyInputSampleWgts}

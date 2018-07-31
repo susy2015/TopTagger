@@ -8,7 +8,7 @@ from glob import glob
 def mainSKL(options):
 
   from sklearn.ensemble import RandomForestClassifier
-  import xgboost as xgb
+  #import xgboost as xgb
   import pickle
 
   print "PROCESSING TRAINING DATA"
@@ -19,28 +19,47 @@ def mainSKL(options):
   globalVars, jetVars = StandardVariables(options.variables)
   allVars = globalVars + getJetVarNames(jetVars)
 
+  print allVars
+
   # Import data
-  dg = DataGetter(allVars)
+  #dg = DataGetter(allVars)
+  dgSig = DataGetter.DefinedVariables(allVars, signal = True,  background = False)
+  dgBg = DataGetter.DefinedVariables(allVars,  signal = False, background = True)
   dataFiles = []
-  dataFiles += glob(options.dataFilePath + "/")
-  dataFiles += glob(options.dataFilePath + "/")
-  dataFiles += glob(options.dataFilePath + "/")
-  dataFiles += glob(options.dataFilePath + "/")
-  print dataFiles
-  trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
+  dataFiles += glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5")
+  dataFiles2 =glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5")
+
+  dataSig = dgSig.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=False)
+  dataBg = dgBg.importData(samplesToRun = tuple(dataFiles2), prescale=True, ptReweight=False)
+  
+  minLen = min(len(dataSig["data"]),len(dataBg["data"]))
+
+  trainDataArray = [dataSig,dataBg]
+  trainData = {}
+  for data in trainDataArray:
+    for key in data:
+      if key in trainData:
+        trainData[key] = numpy.vstack([trainData[key], data[key][:minLen]])
+      else:
+        trainData[key] = data[key][:minLen]
+
+
+  perms = numpy.random.permutation(trainData["data"].shape[0])
+  for key in trainData:
+    trainData[key] = trainData[key][perms]
 
   # Create random forest
-  clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
-                          gamma=0, learning_rate=0.001, max_delta_step=0, max_depth=6,
-                          min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
-                          objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
-                          scale_pos_weight=1, seed=0, silent=False, subsample=1 )
-  #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
+  #clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
+  #                        gamma=0, learning_rate=0.001, max_delta_step=0, max_depth=6,
+  #                        min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
+  #                        objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
+  #                        scale_pos_weight=1, seed=0, silent=False, subsample=1 )
+  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
 
   print "TRAINING RF"
   
   # Train random forest 
-  clf = clf.fit(trainData["data"], trainData["labels"][:,0], sample_weight=trainData["weights"][:,0])
+  clf = clf.fit(trainData["data"], trainData["labels"][:,0])#, sample_weight=trainData["weights"][:,0])
   
   #Dump output from training
   fileObject = open(options.directory + "/" + "TrainingOutput.pkl",'wb')
@@ -134,14 +153,14 @@ def mainTF(options):
 
   print "PROCESSING VALIDATION DATA"
 
-  dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True)
-  dgBg = DataGetter.DefinedVariables(options.netOp.vNames, background = True)
+  dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True, background = False)
+  dgBg = DataGetter.DefinedVariables(options.netOp.vNames,  signal = True, background = True)
 
-  validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_rpv_stop_350_training_0.h5", ), 1),]
+  validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_rpv_stop_850_validation_0.h5", ), 2),]
 
-  validDataSig2 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_stealth_stop_350_SHuHd_training_0.h5", ), 1),]
+  validDataSig2 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_stealth_stop_350_SHuHd_validation_0.h5", ), 2),]
 
-  validDataSig3 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_0_rpv_stop_850_training_0.h5", ), 1),]
+  validDataSig3 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_rpv_stop_350_validation_0.h5", ), 2),]
 
   validDataBgTTbar = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
                       (("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
@@ -151,10 +170,10 @@ def mainTF(options):
   # Import data
   #print options.runOp.validationSamples
   
-  validDataSig =       getValidData(dgSig, validDataSig,       options)
+  validDataSig =       getValidData(dgSig, validDataSig,      options)
   validDataSig2 =      getValidData(dgSig, validDataSig2,     options)
   validDataSig3 =      getValidData(dgSig, validDataSig3,     options)
-  validDataBgTTbar =   getValidData(dgBg,  validDataBgTTbar,   options)
+  validDataBgTTbar =   getValidData(dgBg,  validDataBgTTbar,  options)
 
   validDataTTbar = combineValidationData(validDataSig, validDataBgTTbar)
   validDataQCDMC = combineValidationData(validDataSig2, validDataBgTTbar)
@@ -186,13 +205,18 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),]
+  signalDataSets = [#DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SYY_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+  ]
 
-  #signalDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_350_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
-  #                  DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_stealth_stop_350_SHuHd_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
-
-  backgroundDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 2),]
+  backgroundDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 3),]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nDomain, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
@@ -232,7 +256,7 @@ def mainTF(options):
 
     try:
       while dm.continueTrainingLoop():
-        grw = 0.0 #2/(1+exp(-i/10000.0)) - 1
+        grw = 0.0 #2/(1+exp(-i/3000.0)) - 1 #2/(1+exp(-i/10000.0)) - 1
 
         #run validation operations 
         if i == 0 or not i % ReportInterval:

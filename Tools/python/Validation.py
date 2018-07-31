@@ -230,14 +230,10 @@ if options.modelJSON != None:
     trainingOptions.netOp.vNames = cfgs[options.variables] #the json file is a dictionary, cloptions.variables specifies the key to use
 
 elif options.variables != None:
-  inputVariables, jetVariables = StandardVariables(options.variables)
-  trainingOptions.netOp.inputVariables   = inputVariables
-  trainingOptions.netOp.jetVariables     = jetVariables
-
-  trainingOptions.netOp.jetVariablesList = [jet+var for var in jetVariables for jet in ["j1_","j2_","j3_"]]
+  inputVariables, __ = StandardVariables(options.variables)
 
   trainingOptions.netOp.numPassThru      = len(inputVariables)
-  trainingOptions.netOp.vNames           = trainingOptions.netOp.inputVariables+trainingOptions.netOp.jetVariablesList
+  trainingOptions.netOp.vNames           = inputVariables
 
 dg = DataGetter.DefinedVariables(trainingOptions.netOp.vNames)
 varsname = dg.getList()

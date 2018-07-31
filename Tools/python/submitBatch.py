@@ -71,7 +71,7 @@ class SubmitJobs:
        f.write("source /home/hatake/tensorflow/setup.sh > log.log\n")
        f.write("python "+os.path.join(pythonDir,"Training.py")+" -c "+jobName+".json >> log.log\n")
        f.write("export CUDA_VISIBLE_DEVICES=\n")
-       f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+" >> log.log\n")
+       #f.write("python "+os.path.join(pythonDir,"Validation.py")+" -j "+options.saveName+" >> log.log\n")
     
        f.close()
 

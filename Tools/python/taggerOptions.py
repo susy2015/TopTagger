@@ -55,7 +55,7 @@ class runOptions:
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.4,
+                      keepProb          = 0.4, 
                       nTrainingFiles    = 200):
 
       self.runName           = runName
@@ -235,8 +235,8 @@ class networkOptions:
    def __init__(self, networkName         = "Network test Configuration (name not set)",
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
-                      denseLayers         = [100, 50],
-                      denseActivationFunc = "relu",
+                      denseLayers         = [20],
+                      denseActivationFunc = "relu", #"sigmoid",
                       convLayers          = [],
                       rnnNodes            = 0,
                       rnnLayers           = 0,

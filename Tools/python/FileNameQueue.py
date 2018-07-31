@@ -20,7 +20,7 @@ class FileNameQueue:
         return self.fileQueue.get(False)
 
     def queueProcess(self, coord):
-        for i in xrange(self.nEpoch):
+        for i in xrange(self.nEpoch + 100):
             if coord.should_stop():
                 break
             perms = numpy.random.permutation(self.files.shape[0])
@@ -36,7 +36,8 @@ class FileNameQueue:
                     except Queue.Full:
                         continue
                     breakLoop = True
-        #coord.request_stop()
+            if i == self.nEpoch:
+                coord.request_stop()
 
     def startQueueProcess(self, coord):
         p = threading.Thread(target=self.queueProcess, args=(coord,))
