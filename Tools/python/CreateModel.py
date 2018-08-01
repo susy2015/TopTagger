@@ -235,7 +235,7 @@ class CreateModel:
         #attach the batch norm update ops to the training step 
         with tf.control_dependencies(self.batch_norm_ops):
             # Ensures that we execute the update_ops before performing the train_step
-            self.train_step = tf.train.AdamOptimizer(1.0e-4).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
+            self.train_step = tf.train.AdamOptimizer(1.0e-5).minimize(self.loss)#, var_list=self.w_fc.values() + self.b_fc.values())
 
 
 

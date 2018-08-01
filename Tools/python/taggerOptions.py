@@ -50,12 +50,12 @@ class runOptions:
                       minibatchSize     = 2048,
                       reportInterval    = 500,
                       nValidationEvents = 100000,
-                      l2Reg             = 0.002,
+                      l2Reg             = 0.1, #0.002,
                       dataPath          = "data",
                       trainingNames     = [],
                       validationNames   = ["trainingTuple_0_division_1_TTbarSingleLepT_validation_0.h5", "trainingTuple_0_division_1_TTbarSingleLepTbar_validation_0.h5"],
                       ptReweight        = False,
-                      keepProb          = 0.4, 
+                      keepProb          = 0.6, #0.4,
                       nTrainingFiles    = 200):
 
       self.runName           = runName

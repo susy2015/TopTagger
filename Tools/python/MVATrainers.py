@@ -8,6 +8,7 @@ from glob import glob
 def mainSKL(options):
 
   from sklearn.ensemble import RandomForestClassifier
+  from sklearn.neural_network import MLPClassifier
   #import xgboost as xgb
   import pickle
 
@@ -54,7 +55,8 @@ def mainSKL(options):
   #                        min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
   #                        objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
   #                        scale_pos_weight=1, seed=0, silent=False, subsample=1 )
-  clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
+  #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
+  clf = MLPClassifier(hidden_layer_sizes=(20))
 
   print "TRAINING RF"
   
@@ -154,7 +156,7 @@ def mainTF(options):
   print "PROCESSING VALIDATION DATA"
 
   dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True, background = False)
-  dgBg = DataGetter.DefinedVariables(options.netOp.vNames,  signal = True, background = True)
+  dgBg = DataGetter.DefinedVariables(options.netOp.vNames,  signal = False, background = True)
 
   validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_rpv_stop_850_validation_0.h5", ), 2),]
 
@@ -205,18 +207,34 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [#DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SYY_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+  signalDataSets = [
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_850_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_850_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SYY_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
   ]
 
-  backgroundDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 3),]
+  backgroundDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, len(signalDataSets)),]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nDomain, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
@@ -256,7 +274,7 @@ def mainTF(options):
 
     try:
       while dm.continueTrainingLoop():
-        grw = 0.0 #2/(1+exp(-i/3000.0)) - 1 #2/(1+exp(-i/10000.0)) - 1
+        grw = 2/(1+exp(-i/3000.0)) - 1 #2/(1+exp(-i/10000.0)) - 1
 
         #run validation operations 
         if i == 0 or not i % ReportInterval:
@@ -279,6 +297,10 @@ def mainTF(options):
         else:
           sess.run([mlp.stagingOp, mlp.train_step], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         i += 1
+
+      #Should fix bad end of training state
+      while dm.continueFlushingQueue():
+        sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
 
     except Exception, e:
       # Report exceptions to the coordinator.
