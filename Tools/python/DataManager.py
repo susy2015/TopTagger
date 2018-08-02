@@ -79,9 +79,15 @@ class DataManager:
 
     def continueTrainingLoop(self):
         try:
-            return not self.coordS1.should_stop()
+            return not self.coordS2.should_stop()
         except AttributeError:
             print "Run launchQueueThreads before starting the training loop"
+
+    def continueFlushingQueue(self):
+        try:
+            return not self.coordS1.should_stop()
+        except AttributeError:
+            print "Run launchQueueThreads before starting the training loop"        
 
     def requestStop(self, e = None):
         try:

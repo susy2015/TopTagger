@@ -1,14 +1,55 @@
 import numpy
-import pandas as pd
+#import pandas as pd
 from DataGetter import DataGetter
 from math import sqrt, exp
 from time import sleep
 from glob import glob
 
+def getValidData(dg, validDataFiles, options):
+  validDataArray = []
+
+  #nSamples = 0
+  #for dsn in validDataFiles:
+  #  nSamples += dsn[1]
+
+  minValidDataSize = 999999999
+  for dsn in validDataFiles:
+    validDataArray.append(dg.importData(samplesToRun = tuple(dsn[0]), ptReweight=False))
+
+    arrayLen = len(validDataArray[-1]["data"])
+    dataMultiplier = dsn[1]
+    validDataSize = arrayLen/dataMultiplier
+    if validDataSize < minValidDataSize:
+      minValidDataSize = validDataSize
+  
+  validData = {}
+  for data in validDataArray:
+    for key in data:
+      if key in validData:
+        validData[key] = numpy.vstack([validData[key], data[key][:minValidDataSize*dataMultiplier]])
+      else:
+        validData[key] = data[key][:minValidDataSize*dataMultiplier]
+  
+  perm = numpy.random.permutation(validData["data"].shape[0])
+
+  for key in validData:
+    validData[key] = validData[key][perm]
+
+  return validData
+
+def combineValidationData(validDataSig, validDataBg):
+  minNumalidData = min(len(validDataSig["data"]), len(validDataBg["data"]))
+  
+  validData = {}
+  for key in validDataSig:
+    validData[key] = numpy.vstack([validDataBg[key][:minNumalidData], validDataSig[key][:minNumalidData]])
+
+  return validData
+
 def mainSKL(options):
 
   from sklearn.ensemble import RandomForestClassifier
-  import xgboost as xgb
+#  import xgboost as xgb
   import pickle
 
   print "PROCESSING TRAINING DATA"
@@ -18,8 +59,56 @@ def mainSKL(options):
   #get variables 
   globalVars, jetVars = StandardVariables(options.variables)
   allVars = globalVars + getJetVarNames(jetVars)
+  print allVars
 
   # Import data
+  #dgSig = DataGetter.DefinedVariables(allVars, signal = True)
+  #dgBg = DataGetter.DefinedVariables(allVars, background = True)
+  #
+  #validDataSig = [(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_20_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_20_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_40_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_40_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_60_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_60_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),]
+  #
+  #validDataBgTTbar = [(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_20_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_20_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_40_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_40_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_60_division_0_TTbarSingleLepT_training_[01234].h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_60_division_0_TTbarSingleLepTbar_training_[01234].h5", ), 1),]
+  #
+  #validDataBgQCDMC = [(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT100to200_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT200to300_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT300to500_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT500to700_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT700to1000_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT1000to1500_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT1500to2000_training_0.h5", ), 1),
+  #                    (glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_QCD_HT2000toInf_training_0.h5", ), 1)]
+  #
+  #validDataBgQCDData = [(glob("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_0_division_0_Data_JetHT_2016_training_0.h5", ), 1)]
+  #
+  #
+  #print "Input Variables: ",len(dgSig.getList())
+  #
+  ## Import data
+  ##print options.runOp.validationSamples
+  #
+  #validDataSig =       getValidData(dgSig, validDataSig,       options)
+  #validDataBgTTbar =   getValidData(dgBg,  validDataBgTTbar,   options)
+  #validDataBgQCDMC =   getValidData(dgBg,  validDataBgQCDMC,   options)
+  #validDataBgQCDData = getValidData(dgBg,  validDataBgQCDData, options)
+  #
+  #validDataTTbar = combineValidationData(validDataSig, validDataBgTTbar)
+  #validDataQCDMC = combineValidationData(validDataSig, validDataBgQCDMC)
+  #validDataQCDData = combineValidationData(validDataSig, validDataBgQCDData)
+
   dg = DataGetter(allVars)
   dataFiles = []
   dataFiles += glob(options.dataFilePath + "/trainingTuple_TTbarSingleLepT*_0_division_0_TTbarSingleLepT*_training_[01234].h5")
@@ -30,12 +119,12 @@ def mainSKL(options):
   trainData = dg.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=options.ptReweight)
 
   # Create random forest
-  clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
-                          gamma=0, learning_rate=0.001, max_delta_step=0, max_depth=6,
-                          min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
-                          objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
-                          scale_pos_weight=1, seed=0, silent=False, subsample=1 )
-  #clf = RandomForestClassifier(n_estimators=500, max_depth=10, n_jobs = 28, verbose = True)
+  #clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
+  #                        gamma=0, learning_rate=0.001, max_delta_step=0, max_depth=6,
+  #                        min_child_weight=0.1, missing=None, n_estimators=2000, nthread=28,
+  #                        objective='binary:logistic', reg_alpha=0, reg_lambda=0.01,
+  #                        scale_pos_weight=1, seed=0, silent=False, subsample=1 )
+  clf = RandomForestClassifier(n_estimators=1000, max_depth=10, n_jobs = 28, verbose = True)
 
   print "TRAINING RF"
   
@@ -83,47 +172,6 @@ def mainXGB(options):
 
   #output = gbm.predict(xgData)
 
-
-def getValidData(dg, validDataFiles, options):
-  validDataArray = []
-
-  #nSamples = 0
-  #for dsn in validDataFiles:
-  #  nSamples += dsn[1]
-
-  minValidDataSize = 999999999
-  for dsn in validDataFiles:
-    validDataArray.append(dg.importData(samplesToRun = tuple(dsn[0]), ptReweight=options.runOp.ptReweight))
-
-    arrayLen = len(validDataArray[-1]["data"])
-    dataMultiplier = dsn[1]
-    validDataSize = arrayLen/dataMultiplier
-    if validDataSize < minValidDataSize:
-      minValidDataSize = validDataSize
-  
-  validData = {}
-  for data in validDataArray:
-    for key in data:
-      if key in validData:
-        validData[key] = numpy.vstack([validData[key], data[key][:minValidDataSize*dataMultiplier]])
-      else:
-        validData[key] = data[key][:minValidDataSize*dataMultiplier]
-  
-  perm = numpy.random.permutation(validData["data"].shape[0])
-
-  for key in validData:
-    validData[key] = validData[key][perm]
-
-  return validData
-
-def combineValidationData(validDataSig, validDataBg):
-  minNumalidData = min(len(validDataSig["data"]), len(validDataBg["data"]))
-  
-  validData = {}
-  for key in validDataSig:
-    validData[key] = numpy.vstack([validDataBg[key][:minNumalidData], validDataSig[key][:minNumalidData]])
-
-  return validData
 
 def mainTF(options):
 
@@ -194,20 +242,25 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
                     DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
 
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1), 
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1),
+  #pt reweighting histograms 
+  ttbarRatio = (numpy.array([0.7976347,  1.010679,  1.0329635,  1.0712056,  1.1147588,  1.0072196,  0.79854023, 0.7216115,  0.7717652,  0.851551,   0.8372917 ]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
+  QCDDataRatio = (numpy.array([0.50125164, 0.70985824, 1.007087,   1.6701245,  2.5925348,  3.6850858, 4.924969,   6.2674766,  7.5736594,  8.406105,   7.7529635 ]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
+  QCDMCRatio = (numpy.array([0.75231355, 1.0563549,  1.2571484,  1.3007764,  1.0678109,  0.83444154, 0.641499,   0.49130705, 0.36807108, 0.24333349, 0.06963781]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
+
+  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4,  ),#ttbarRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4,  ),#ttbarRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8,  ),#QCDDataRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio), 
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
                         ]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, 2, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
@@ -239,12 +292,15 @@ def mainTF(options):
     N_TRAIN_SUMMARY = 10
 
     #flush queue until the sample fraction is approximately equal 
+    flushctr = 200
     while dm.continueTrainingLoop():
       result = sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
       signalFraction =  result[1][:,0].sum()/MiniBatchSize
       #the first this fraction drops below 0.5 means we are close enough to equal signal/bg fraction 
       if signalFraction < 0.5:
-        break
+        flushctr -= 1
+        if flushctr <= 0:
+          break
 
     try:
       while dm.continueTrainingLoop():
@@ -272,6 +328,9 @@ def mainTF(options):
         else:
           sess.run([mlp.stagingOp, mlp.train_step], feed_dict={mlp.reg: l2Reg, mlp.keep_prob:options.runOp.keepProb, mlp.training: True})
         i += 1
+
+      while dm.continueFlushingQueue():
+        sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
 
     except Exception, e:
       # Report exceptions to the coordinator.

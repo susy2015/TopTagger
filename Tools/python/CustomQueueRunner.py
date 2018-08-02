@@ -9,7 +9,7 @@ class CustomQueueRunner(object):
     This class manages the background threads needed to fill
         a queue full of data.
     """
-    def __init__(self, batchSize, variables, fileQueue, inputDataQueue, signal, background, domain, ptReweight=False):
+    def __init__(self, batchSize, variables, fileQueue, inputDataQueue, signal, background, domain, ptReweight=False, weightHist=None):
 
         self.fileQueue = fileQueue
         # The actual queue of data. 
@@ -36,6 +36,7 @@ class CustomQueueRunner(object):
 
         # additional options 
         self.ptReweight = ptReweight
+        self.weightHist = weightHist
 
     def fileName_iterator(self):
         #Simple iterator to get new filename from file queue
@@ -52,7 +53,7 @@ class CustomQueueRunner(object):
       fIter = self.fileName_iterator()
 
       #private data getter object 
-      dg = DataGetter(self.variables, signal=self.signal, background=self.background, domain=self.domain, bufferData = False)
+      dg = DataGetter(self.variables, signal=self.signal, background=self.background, domain=self.domain, bufferData = False, weightHist=self.weightHist)
             
       #loop until there are no more files to get from the queue
       for fileName in fIter:
