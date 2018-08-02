@@ -114,28 +114,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">double</span> discriminator_;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    std::string modelFile_, modelName_;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    std::vector&lt;std::string&gt; vars_;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">int</span> NConstituents_;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">bool</span> filter_;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">//TMVA model variables </span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::unique_ptr&lt;TMVA::Reader&gt; reader_;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::vector&lt;float&gt; varMap_;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">//variable calclator</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    std::unique_ptr&lt;ttUtility::MVAInputCalculator&gt; varCalculator_; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMTMVA.html#a00b1eda9a6425e95eb4e0f41688236e0">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMTMVA.html#a640584674f072cb893685845080c5eb9">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;};</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMTMVA.html">TTMTMVA</a>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    std::vector&lt;std::string&gt; varsTMVA_;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">int</span> NConstituents_;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">bool</span> filter_;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">//TMVA model variables </span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::unique_ptr&lt;TMVA::Reader&gt; reader_;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    std::vector&lt;float&gt; varMap_;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">//variable calclator</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    std::unique_ptr&lt;ttUtility::MVAInputCalculator&gt; varCalculator_; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMTMVA.html#a00b1eda9a6425e95eb4e0f41688236e0">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMTMVA.html#a640584674f072cb893685845080c5eb9">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMTMVA.html">TTMTMVA</a>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="TTModule_8h_html"><div class="ttname"><a href="TTModule_8h.html">TTModule.h</a></div></div>
-<div class="ttc" id="classTTMTMVA_html_a640584674f072cb893685845080c5eb9"><div class="ttname"><a href="classTTMTMVA.html#a640584674f072cb893685845080c5eb9">TTMTMVA::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMTMVA.cpp:83</div></div>
+<div class="ttc" id="classTTMTMVA_html_a640584674f072cb893685845080c5eb9"><div class="ttname"><a href="classTTMTMVA.html#a640584674f072cb893685845080c5eb9">TTMTMVA::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMTMVA.cpp:109</div></div>
 <div class="ttc" id="TTModule_8h_html_a5aff241e827824ffd2c2efc4c5bf1fda"><div class="ttname"><a href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a></div><div class="ttdeci">#define REGISTER_TTMODULE(_module)</div><div class="ttdef"><b>Definition:</b> TTModule.h:50</div></div>
 <div class="ttc" id="classcfg_1_1CfgDocument_html"><div class="ttname"><a href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a></div><div class="ttdef"><b>Definition:</b> CfgDocument.hh:15</div></div>
 <div class="ttc" id="classTTMTMVA_html"><div class="ttname"><a href="classTTMTMVA.html">TTMTMVA</a></div><div class="ttdef"><b>Definition:</b> TTMTMVA.h:30</div></div>
@@ -145,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 11 2018 23:13:45 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 2 2018 20:12:43 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

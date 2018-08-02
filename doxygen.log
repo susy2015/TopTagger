@@ -327,7 +327,7 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parameter.hh...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parser.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh...
-Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:577: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
+Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:578: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:43: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/README.md:17: warning: explicit link request to 'events' could not be resolved
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:300: warning: Member get_mT2(const double mVis1, const double pxVis1, const double pyVis1, const double mVis2, const double pxVis2, const double pyVis2, const double pxMiss, const double pyMiss, const double mInvis1, const double mInvis2, const double desiredPrecisionOnMT2=0, const bool useDeciSectionsInitially=true) (function) of class asymm_mt2_lester_bisect is not documented.
@@ -653,10 +653,10 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:65: warning: Member gradientReversal (function) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:69: warning: Member createDenseNetwork (function) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:205: warning: Member createLoss (function) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:241: warning: Member createSummaries (function) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:289: warning: Member __init__ (function) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:308: warning: Member saveCheckpoint (function) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:323: warning: Member saveModel (function) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:248: warning: Member createSummaries (function) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:296: warning: Member __init__ (function) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:315: warning: Member saveCheckpoint (function) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:330: warning: Member saveModel (function) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:138: warning: Member keep_prob (variable) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:139: warning: Member training (variable) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:140: warning: Member gradientReversalWeight (variable) of class CreateModel::CreateModel is not documented.
@@ -678,33 +678,33 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:202: warning: Member y (variable) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:203: warning: Member y_ph (variable) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:207: warning: Member reg (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:216: warning: Member cross_entropy (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:217: warning: Member cross_entropy_ph (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:219: warning: Member cross_entropy_d (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:220: warning: Member cross_entropy_d_ph (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:222: warning: Member l2_norm (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:225: warning: Member loss (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:226: warning: Member loss_ph (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:232: warning: Member batch_norm_ops (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:237: warning: Member train_step (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:243: warning: Member accuracy (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:245: warning: Member accuracy_train (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:283: warning: Member merged_train_summary_op (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:284: warning: Member merged_valid_summary_op (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:285: warning: Member merged_valid_QCDMC_summary_op (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:286: warning: Member merged_valid_QCDData_summary_op (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:290: warning: Member options (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:292: warning: Member nnStruct (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:293: warning: Member convLayers (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:294: warning: Member rnnNodes (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:295: warning: Member rnnLayers (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:296: warning: Member inputDataQueue (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:297: warning: Member nBatch (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:298: warning: Member offset_initial (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:299: warning: Member scale_initial (variable) of class CreateModel::CreateModel is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:306: warning: Member saver (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:223: warning: Member cross_entropy (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:224: warning: Member cross_entropy_ph (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:226: warning: Member cross_entropy_d (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:227: warning: Member cross_entropy_d_ph (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:229: warning: Member l2_norm (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:232: warning: Member loss (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:233: warning: Member loss_ph (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:239: warning: Member batch_norm_ops (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:244: warning: Member train_step (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:250: warning: Member accuracy (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:252: warning: Member accuracy_train (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:290: warning: Member merged_train_summary_op (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:291: warning: Member merged_valid_summary_op (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:292: warning: Member merged_valid_QCDMC_summary_op (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:293: warning: Member merged_valid_QCDData_summary_op (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:297: warning: Member options (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:299: warning: Member nnStruct (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:300: warning: Member convLayers (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:301: warning: Member rnnNodes (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:302: warning: Member rnnLayers (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:303: warning: Member inputDataQueue (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:304: warning: Member nBatch (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:305: warning: Member offset_initial (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:306: warning: Member scale_initial (variable) of class CreateModel::CreateModel is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CreateModel.py:313: warning: Member saver (variable) of class CreateModel::CreateModel is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:12: warning: Member __init__ (function) of class CustomQueueRunner::CustomQueueRunner is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:40: warning: Member fileName_iterator (function) of class CustomQueueRunner::CustomQueueRunner is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:41: warning: Member fileName_iterator (function) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:14: warning: Member fileQueue (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:16: warning: Member queueX (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:18: warning: Member signal (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
@@ -718,25 +718,28 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:32: warning: Member batch_size (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:35: warning: Member enqueue_opX (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:38: warning: Member ptReweight (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/CustomQueueRunner.py:39: warning: Member weightHist (variable) of class CustomQueueRunner::CustomQueueRunner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:8: warning: Member __init__ (function) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:18: warning: Member StandardVariables (function) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:43: warning: Member DefinedVariables (function) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:46: warning: Member getList (function) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:49: warning: Member prescaleBackground (function) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:52: warning: Member importData (function) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:19: warning: Member StandardVariables (function) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:44: warning: Member DefinedVariables (function) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:47: warning: Member getList (function) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:50: warning: Member prescaleBackground (function) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:53: warning: Member importData (function) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:9: warning: Member list (variable) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:10: warning: Member signal (variable) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:11: warning: Member domain (variable) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:12: warning: Member background (variable) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:13: warning: Member bufferData (variable) of class DataGetter::DataGetter is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:14: warning: Member dataMap (variable) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:14: warning: Member weightHist (variable) of class DataGetter::DataGetter is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataGetter.py:15: warning: Member dataMap (variable) of class DataGetter::DataGetter is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:12: warning: Member __init__ (function) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:36: warning: Member startFileQueues (function) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:46: warning: Member startDataQueues (function) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:59: warning: Member launchQueueThreads (function) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:80: warning: Member continueTrainingLoop (function) of class DataManager::DataManager is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:86: warning: Member requestStop (function) of class DataManager::DataManager is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:97: warning: Member join (function) of class DataManager::DataManager is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:86: warning: Member continueFlushingQueue (function) of class DataManager::DataManager is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:92: warning: Member requestStop (function) of class DataManager::DataManager is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:103: warning: Member join (function) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:13: warning: Member nEpoch (variable) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:16: warning: Member inputDataQueue (variable) of class DataManager::DataManager is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataManager.py:19: warning: Member sigScaleSum (variable) of class DataManager::DataManager is not documented.
@@ -769,11 +772,12 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/Tools/python/DataSet.py:10: warning: Member prescale (variable) of class DataSet::DataSet is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataSet.py:11: warning: Member rescale (variable) of class DataSet::DataSet is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataSet.py:12: warning: Member nEnqueueThreads (variable) of class DataSet::DataSet is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/DataSet.py:13: warning: Member weightHist (variable) of class DataSet::DataSet is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:9: warning: Member __init__ (function) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:16: warning: Member getQueue (function) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:19: warning: Member get (function) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:22: warning: Member queueProcess (function) of class FileNameQueue::FileNameQueue is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:41: warning: Member startQueueProcess (function) of class FileNameQueue::FileNameQueue is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:42: warning: Member startQueueProcess (function) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:10: warning: Member files (variable) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:11: warning: Member nEpoch (variable) of class FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:14: warning: Member fileQueue (variable) of class FileNameQueue::FileNameQueue is not documented.
@@ -917,9 +921,9 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:481: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 436 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:432: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:433: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:573: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 446 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:574: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 451 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:572: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 436 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:574: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 446 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:575: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 451 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:573: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 436 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 ...
 Generating docs for compound TTMFactory...
 Generating docs for compound TTMFilterBase...
@@ -1000,5 +1004,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1287/65536 hits=7670 misses=1377
+lookup cache used 1288/65536 hits=7675 misses=1378
 finished...
