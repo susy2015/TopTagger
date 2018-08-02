@@ -462,6 +462,7 @@ namespace ttUtility
             j_qgPtD_lab_[i] = -1;
             j_qgAxis1_lab_[i] = -1;
             j_qgAxis2_lab_[i] = -1;
+            j_CvsL_lab_[i] = -1;
             dR12_lab_[i] = -1;
             dR12_3_lab_[i] = -1;
             j12_m_lab_[i] = -1;
@@ -549,6 +550,7 @@ namespace ttUtility
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_qgPtD_lab") == 0)                              j_qgPtD_lab_[i] = j;
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_qgAxis1_lab") == 0)                            j_qgAxis1_lab_[i] = j;
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_qgAxis2_lab") == 0)                            j_qgAxis2_lab_[i] = j;
+                if(vars[j].compare("j" + std::to_string(i + 1) + "_CvsL_lab") == 0)                               j_CvsL_lab_[i] = j;
                 if(vars[j].compare("dR" + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_lab") == 0)     dR12_lab_[i] = j;
                 if(vars[j].compare("dR" + std::to_string(iNNext + 1) + "_" + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_lab") == 0) dR12_3_lab_[i] = j;
                 if(vars[j].compare("j"  + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m_lab") == 0)   j12_m_lab_[i] = j;
@@ -627,19 +629,19 @@ namespace ttUtility
             std::vector<Constituent const *> top_constituents = topCand.getConstituents();
 
             //resort by CSV
-            std::sort(top_constituents.begin(), top_constituents.end(), [](const Constituent * const c1, const Constituent * const c2){ return c1->getBTagDisc() > c2->getBTagDisc(); });
+            //std::sort(top_constituents.begin(), top_constituents.end(), [](const Constituent * const c1, const Constituent * const c2){ return c1->getBTagDisc() > c2->getBTagDisc(); });
 
             //Get constituent variables before deboost
             for(unsigned int i = 0; i < top_constituents.size(); ++i)
             {
                 if(j_m_lab_[i] >= 0)       *(basePtr_ + j_m_lab_[i] + len_*iCand)       = top_constituents[i]->p().M();
                 if(j_CSV_lab_[i] >= 0)     *(basePtr_ + j_CSV_lab_[i] + len_*iCand)     = top_constituents[i]->getBTagDisc();
-                //Here we fake the QGL if it is a b jet
-                if(j_QGL_lab_[i] >= 0)     *(basePtr_ + j_QGL_lab_[i] + len_*iCand)     = top_constituents[i]->getQGLikelihood();
-                if(j_qgMult_lab_[i] >= 0)  *(basePtr_ + j_qgMult_lab_[i] + len_*iCand)  = top_constituents[i]->getQGMult();
-                if(j_qgPtD_lab_[i] >= 0)   *(basePtr_ + j_qgPtD_lab_[i] + len_*iCand)   = top_constituents[i]->getQGPtD();
-                if(j_qgAxis1_lab_[i] >= 0) *(basePtr_ + j_qgAxis1_lab_[i] + len_*iCand) = top_constituents[i]->getQGAxis1();
-                if(j_qgAxis2_lab_[i] >= 0) *(basePtr_ + j_qgAxis2_lab_[i] + len_*iCand) = top_constituents[i]->getQGAxis2();
+                if(j_QGL_[i] >= 0)          *(basePtr_ + j_QGL_lab_[i] + len_*iCand)      = relu(top_constituents[i]->getExtraVar("qgLikelihood"));
+                if(j_qgPtD_lab_[i] >= 0)    *(basePtr_ + j_qgPtD_lab_[i] + len_*iCand)    = relu(top_constituents[i]->getExtraVar("qgPtD"));
+                if(j_qgAxis1_lab_[i] >= 0)  *(basePtr_ + j_qgAxis1_lab_[i] + len_*iCand)  = relu(top_constituents[i]->getExtraVar("qgAxis1"));
+                if(j_qgAxis2_lab_[i] >= 0)  *(basePtr_ + j_qgAxis2_lab_[i] + len_*iCand)  = relu(top_constituents[i]->getExtraVar("qgAxis2"));
+                if(j_qgMult_lab_[i] >= 0)   *(basePtr_ + j_qgMult_lab_[i] + len_*iCand)   = relu(top_constituents[i]->getExtraVar("qgMult"));            
+                if(j_CvsL_lab_[i] >= 0)     *(basePtr_ + j_CvsL_lab_[i] + len_*iCand)     = relu(top_constituents[i]->getExtraVar("CvsL"));
 
                 //index of next jet (assumes < 4 jets)
                 unsigned int iNext = (i + 1) % top_constituents.size();
@@ -658,8 +660,12 @@ namespace ttUtility
 
             if(dRPtTop_ >= 0) *(basePtr_ + dRPtTop_ + len_*iCand) = ROOT::Math::VectorUtil::DeltaR(top_constituents[0]->p(), top_constituents[1]->p() + top_constituents[2]->p()) * topCand.p().Pt();
             if(dRPtW_ >= 0) *(basePtr_ + dRPtW_ + len_*iCand) = ROOT::Math::VectorUtil::DeltaR(top_constituents[1]->p(), top_constituents[2]->p()) * (top_constituents[1]->p() + top_constituents[2]->p()).Pt();
-            //double var_sd_0 = top_constituents[2]->p().Pt()/(top_constituents[1]->p().Pt()+top_constituents[2]->p().Pt());
-            //if(sd_n2_ >= 0) *(basePtr_ + sd_n2_ + len_*iCand) = var_sd_0/std::pow(varMap["dR23_lab"], -2);
+            if(sd_n2_ >= 0) 
+            {
+                double var_sd_0 = top_constituents[2]->p().Pt()/(top_constituents[1]->p().Pt()+top_constituents[2]->p().Pt());
+                double var_WdR = ROOT::Math::VectorUtil::DeltaR(top_constituents[1]->p(), top_constituents[2]->p());
+                *(basePtr_ + sd_n2_ + len_*iCand) = var_sd_0 / pow(var_WdR, -2);
+            }
 
             std::vector<Constituent> RF_constituents;
 

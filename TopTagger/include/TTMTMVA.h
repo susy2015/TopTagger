@@ -34,6 +34,7 @@ private:
     double discriminator_;
     std::string modelFile_, modelName_;
     std::vector<std::string> vars_;
+    std::vector<std::string> varsTMVA_;
     int NConstituents_;
     bool filter_;
 

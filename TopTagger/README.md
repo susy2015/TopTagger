@@ -100,7 +100,7 @@ for(const pat::Jet& jet : *jets)
     double deepCSVl = jet.bDiscriminator("pfDeepCSVJetTags:probudsg");
     double deepCSVbb = jet.bDiscriminator("pfDeepCSVJetTags:probbb");
     double deepCSVcc = jet.bDiscriminator("pfDeepCSVJetTags:probcc");
-    double btag = jet.bDiscriminator("pfCombinedSecondaryVertexV2BJetTags");
+    double btag = jet.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags");
     double chargedHadronEnergyFraction = jet.chargedHadronEnergyFraction();
     double neutralHadronEnergyFraction = jet.neutralHadronEnergyFraction();
     double chargedEmEnergyFraction = jet.chargedEmEnergyFraction();
