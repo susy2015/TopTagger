@@ -106,19 +106,30 @@ class CreateModel:
                     w_fc[layer] = self.weight_variable([nnStruct[layer], nnStruct[layer + 1]], name="w_fc%i"%(layer))
                 if not layer in b_fc:
                     b_fc[layer] = self.bias_variable([nnStruct[layer + 1]], name="b_fc%i"%(layer))
-            
+                    
             #create yt for input to the softmax cross entropy for classification (this should not have softmax applied as the loss function will do this)
             # for primary class classification
             yt = tf.add(tf.matmul(h_fc[NLayer - 2], w_fc[NLayer - 2]),  b_fc[NLayer - 2], name="yt"+prefix)
 
-            #create pt for domain classification
+
+            #Adding one hidden layer to domain classification
             layer = NLayer - 1
             if not layer in w_fc:
-                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], int(nDomainNode)], name="w_fc%i"%(layer))
+                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], 20], name="w_fc%i"%(layer))
             if not layer in b_fc:
-                b_fc[layer] = self.bias_variable([int(nDomainNode)], name="b_fc%i"%(layer))
+                b_fc[layer] = self.bias_variable([20], name="b_fc%i"%(layer))
+            addResult = tf.add(tf.matmul(self.gradientReversal(h_fc[layer - 1], gradientReversalWeight), w_fc[layer], name="z_fc%i%s"%(layer,prefix)),  b_fc[layer], name="a_fc%i%s"%(layer,prefix))
+            batchNormalizedLayer = tf.layers.batch_normalization(addResult, training=training, reuse=share, trainable=not share, name="layer%i_bn"%layer)
+            layerOutput = tf.nn.relu(batchNormalizedLayer, name="h_fc%i%s"%(layer, prefix))
+            h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
 
-            pt = tf.add(tf.matmul(self.gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
+            #create pt for domain classification            
+            if not layer + 1 in w_fc:
+                w_fc[layer + 1] = self.weight_variable([20, int(nDomainNode)], name="w_fc%i"%(layer + 1))
+            if not layer + 1 in b_fc:
+                b_fc[layer + 1] = self.bias_variable([int(nDomainNode)], name="b_fc%i"%(layer + 1))
+                        
+            pt = tf.add(tf.matmul(h_fc[layer], w_fc[layer + 1]),  b_fc[layer + 1], name="pt"+prefix)
             
             return yt, pt
 
