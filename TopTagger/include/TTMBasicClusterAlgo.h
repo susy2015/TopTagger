@@ -22,6 +22,7 @@ class Constituent;
  *@param doDijet (bool) Enable the AK8W + AK4 jet category clustering.
  *@param dRMaxDijet (float) The maximum allowed seperation if dR between the AK4 and AK8 jet and the dijet centroid for the dijet catagory.  
  *@param doMonojet (bool) Enable the fully merged top category clustering.
+ *@param useDeepAK8 (bool) Use deepAK8 discriminator to identify boosted objects from AK8 jets instead of NSubjettiness.
  *
  *See TTMConstituentReqs for more parameters
  */
@@ -30,6 +31,7 @@ class TTMBasicClusterAlgo : public TTModule, public TTMConstituentReqs
 private:
     //mino-jet variables
     bool doMonojet_;
+    bool useDeepAK8_;
 
     //dijet variables
     double dRMaxDiJet_;

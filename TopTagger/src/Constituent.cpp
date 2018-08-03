@@ -72,6 +72,16 @@ void Constituent::setWMassCorr(const double& wMassCorr)
     wMassCorr_ = wMassCorr;
 }
 
+void Constituent::setTopDisc(const double& topDisc)
+{
+    topDisc_ = topDisc;
+}
+
+void Constituent::setWDisc(const double& WDisc)
+{
+    WDisc_ = WDisc;
+}
+
 void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter)
 {
     genMatches_[&genTop].insert(genDaughter);
