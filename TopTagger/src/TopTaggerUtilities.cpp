@@ -5,6 +5,7 @@
 #include "TopTagger/TopTagger/include/lester_mt2_bisect.h"
 
 #include <map>
+#include <utility>
 
 namespace ttUtility
 {
@@ -629,7 +630,12 @@ namespace ttUtility
             std::vector<Constituent const *> top_constituents = topCand.getConstituents();
 
             //resort by CSV
-            //std::sort(top_constituents.begin(), top_constituents.end(), [](const Constituent * const c1, const Constituent * const c2){ return c1->getBTagDisc() > c2->getBTagDisc(); });
+            std::sort(top_constituents.begin(), top_constituents.end(), [](const Constituent * const c1, const Constituent * const c2){ return c1->getBTagDisc() > c2->getBTagDisc(); });
+            //switch candidates 2 and 3 if they are not in Pt ordering 
+            if(top_constituents[2]->p().Pt() > top_constituents[1]->p().Pt())
+            {
+                std::swap(top_constituents[1], top_constituents[2]);
+            }
 
             //Get constituent variables before deboost
             for(unsigned int i = 0; i < top_constituents.size(); ++i)
