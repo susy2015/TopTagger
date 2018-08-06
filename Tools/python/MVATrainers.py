@@ -242,25 +242,25 @@ def mainTF(options):
 
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
-  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_0_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 12),
-                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 12),]
+  signalDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 8),
+                    DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6p1/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 8),]
 
   #pt reweighting histograms 
   ttbarRatio = (numpy.array([0.7976347,  1.010679,  1.0329635,  1.0712056,  1.1147588,  1.0072196,  0.79854023, 0.7216115,  0.7717652,  0.851551,   0.8372917 ]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
   QCDDataRatio = (numpy.array([0.50125164, 0.70985824, 1.007087,   1.6701245,  2.5925348,  3.6850858, 4.924969,   6.2674766,  7.5736594,  8.406105,   7.7529635 ]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
   QCDMCRatio = (numpy.array([0.75231355, 1.0563549,  1.2571484,  1.3007764,  1.0678109,  0.83444154, 0.641499,   0.49130705, 0.36807108, 0.24333349, 0.06963781]), numpy.array([  0.,  50., 100., 150., 200., 250., 300., 350., 400., 450., 500., 1e10]))
 
-  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 4,  ),#ttbarRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 4,  ),#ttbarRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8,  ),#QCDDataRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio), 
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
-                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1, ),#QCDMCRatio),
+  backgroundDataSets = [DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepT_training_*.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, 8,  ttbarRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_TTbarSingleLepTbar_training_*.h5", 365.4,  61901450, 1.0, False, 0, 1.0, 1.0, 8,  ttbarRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_Data_JetHT_2016_training_*.h5",      1.0,         1, 1.0, False, 1, 1.0, 1.0, 8,  include = False),#QCDDataRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT100to200_training_*.h5",   27990000,  80684349, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio), 
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT200to300_training_*.h5",   1712000 ,  57580393, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT300to500_training_*.h5",   347700  ,  54537903, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT500to700_training_*.h5",   32100   ,  62271343, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT700to1000_training_*.h5",  6831    ,  45232316, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1000to1500_training_*.h5", 1207    ,  15127293, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT1500to2000_training_*.h5", 119.9   ,  11826702, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
+                        DataSet("/cms/data/pastika/trainData_pt20_30_40_dRPi_tightMass_deepFlavor_v6/trainingTuple_*_division_0_QCD_HT2000toInf_training_*.h5",  25.24   ,   6039005, 0.0, False, 2, 1.0, 1.0, 1, include = False),#QCDMCRatio),
                         ]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, 2, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
@@ -295,7 +295,9 @@ def mainTF(options):
     flushctr = 200
     while dm.continueTrainingLoop():
       result = sess.run(dm.inputDataQueue.dequeue_many(MiniBatchSize))
-      signalFraction =  result[1][:,0].sum()/MiniBatchSize
+      signalCount = result[1][:,0].sum()
+      bgCount = result[1][:,1].sum()
+      signalFraction =  signalCount/(signalCount+bgCount)
       #the first this fraction drops below 0.5 means we are close enough to equal signal/bg fraction 
       if signalFraction < 0.5:
         flushctr -= 1

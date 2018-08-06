@@ -25,7 +25,7 @@ class DataSample:
         self.fileQueue = FileNameQueue(self.fileList, nEpoch)
 
         #create CustomRunner for this dataset 
-        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, self.queue, signal, background, domain, ptReweight, self.dataSet.weightHist)
+        self.customRunner = CustomQueueRunner(self.batchSize, variables, self.fileQueue, self.queue, signal, background, domain, ptReweight, self.dataSet.weightHist, self.dataSet.include)
 
 
     def start_threads(self, sess, coord, n_threads=1):

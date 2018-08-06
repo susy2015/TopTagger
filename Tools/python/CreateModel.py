@@ -66,7 +66,7 @@ class CreateModel:
         gradientOp = -parameter*tf.identity(input, name="Identity")
         return gradientOp + tf.stop_gradient(tf.identity(input) - gradientOp)
 
-    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, prefix=""):
+    def createDenseNetwork(self, denseInputLayer, nnStruct, w_fc = {}, b_fc = {}, keep_prob=1.0, gradientReversalWeight=1.0, training = False, domainAdaptionConnectionLayer = 9999, NDomains = 2, prefix=""):
         with tf.variable_scope("dense") as scope:
             #constants 
             NLayer = len(nnStruct)
@@ -113,12 +113,13 @@ class CreateModel:
 
             #create pt for domain classification
             layer = NLayer - 1
+            connectionLayer = min(domainAdaptionConnectionLayer, NLayer - 2)
             if not layer in w_fc:
-                w_fc[layer] = self.weight_variable([nnStruct[layer - 1], nnStruct[layer]], name="w_fc%i"%(layer))
+                w_fc[layer] = self.weight_variable([nnStruct[connectionLayer], NDomains], name="w_fc%i"%(layer))
             if not layer in b_fc:
                 b_fc[layer] = self.bias_variable([nnStruct[layer]], name="b_fc%i"%(layer))
 
-            pt = tf.add(tf.matmul(self.gradientReversal(h_fc[NLayer - 2], gradientReversalWeight), w_fc[NLayer - 1]),  b_fc[NLayer - 1], name="pt"+prefix)
+            pt = tf.add(tf.matmul(self.gradientReversal(h_fc[connectionLayer], gradientReversalWeight), w_fc[layer]),  b_fc[layer], name="pt"+prefix)
             
             return yt, pt
 
@@ -195,8 +196,8 @@ class CreateModel:
         self.b_fc = {}
 
         #create dense network
-        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training)
-        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, prefix="_ph")
+        self.yt,    self.pt    = self.createDenseNetwork(denseInputLayer,    self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, domainAdaptionConnectionLayer = self.daLayer, NDomains = int(self.p_ph_.shape[1]))
+        self.yt_ph, self.pt_ph = self.createDenseNetwork(denseInputLayer_ph, self.nnStruct, self.w_fc, self.b_fc, keep_prob=self.keep_prob, gradientReversalWeight=self.gradientReversalWeight, training=self.training, domainAdaptionConnectionLayer = self.daLayer, NDomains = int(self.p_ph_.shape[1]), prefix="_ph")
     
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
@@ -220,10 +221,10 @@ class CreateModel:
         #self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1))
         #self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1))
 
-        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reshape(self.wgt, [-1]))
-        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reshape(self.wgt_ph, [-1]))
+        self.cross_entropy    = tf.losses.softmax_cross_entropy(onehot_labels=self.y_,    logits=self.yt,    weights=tf.reduce_sum(self.y_,    axis=1)*tf.reshape(self.wgt,    [-1]))
+        self.cross_entropy_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.y_ph_, logits=self.yt_ph, weights=tf.reduce_sum(self.y_ph_, axis=1)*tf.reshape(self.wgt_ph, [-1]))
         
-        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_, axis=1)*tf.reshape(self.wgt, [-1]))
+        self.cross_entropy_d    = tf.losses.softmax_cross_entropy(onehot_labels=self.p_,    logits=self.pt,    weights=tf.reduce_sum(self.p_,    axis=1)*tf.reshape(self.wgt,    [-1]))
         self.cross_entropy_d_ph = tf.losses.softmax_cross_entropy(onehot_labels=self.p_ph_, logits=self.pt_ph, weights=tf.reduce_sum(self.p_ph_, axis=1)*tf.reshape(self.wgt_ph, [-1]))
 
         self.l2_norm = tf.constant(0.0)
@@ -304,6 +305,7 @@ class CreateModel:
         self.nBatch = nBatch
         self.offset_initial = offset_initial
         self.scale_initial = scale_initial
+        self.daLayer = options.netOp.daLayer
 
         self.createMLP()
         self.createLoss()
