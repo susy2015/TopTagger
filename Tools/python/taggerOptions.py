@@ -411,19 +411,20 @@ class networkOptions:
    def __init__(self, networkName         = "Network test Configuration (name not set)",
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
-                      denseLayers         = [300, 100],
+                      denseLayers         = [300],
                       denseActivationFunc = "relu",
                       convLayers          = [],
                       rnnNodes            = 30,
-                      rnnLayers           = 1,
+                      rnnLayers           = 0,
                       convNConstituents   = 3,
                       convFilterWidth     = 1,
                       useCNN              = True,
-                      useRNN              = True):
+                      useRNN              = True,):
 
       self.networkName      = networkName
       self.inputVariables   = inputVariables
       self.jetVariables     = jetVariables
+      self.daLayer          = 2
 
       self.denseLayers = denseLayers
       self.denseActivationFunc = denseActivationFunc

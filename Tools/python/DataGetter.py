@@ -5,7 +5,7 @@ import dask.array as da
 class DataGetter:
 
     #The constructor simply takes in a list and saves it to self.list
-    def __init__(self, variables, signal = True, background = True, domain = None, bufferData = False, weightHist=None):
+    def __init__(self, variables, signal = True, background = True, domain = None, bufferData = False, weightHist=None, include=True):
         self.list = variables
         self.signal = signal
         self.domain = domain
@@ -13,6 +13,7 @@ class DataGetter:
         self.bufferData = bufferData
         self.weightHist = weightHist
         self.dataMap = {}
+        self.include = include 
 
     #This method accepts a string and will return a DataGetter object with the variable list defined in this method.
     @classmethod
@@ -112,7 +113,10 @@ class DataGetter:
         npyInputData = data[filterArray].compute()
         #npyInputLabels = inputData.as_matrix(["genConstiuentMatchesVec", "genTopMatchesVec"])
         npyInputAnswer = inputAnswer
-        npyInputAnswers = da.vstack([npyInputAnswer,da.logical_not(npyInputAnswer)]).transpose()[filterArray].compute()
+        if self.include:
+            npyInputAnswers = da.vstack([npyInputAnswer,da.logical_not(npyInputAnswer)]).transpose()[filterArray].compute()
+        else:
+            npyInputAnswers = np.zeros((npyInputData.shape[0], 2))
         npyInputSampleWgts = x[:,wgtColumns][filterArray].compute()
         dataPt = x[:,ptColumns][filterArray].compute()
         npyInputWgts = np.ones(len(npyInputSampleWgts)).reshape([-1,1])
