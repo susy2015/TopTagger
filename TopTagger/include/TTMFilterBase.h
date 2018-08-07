@@ -20,7 +20,7 @@ protected:
      *@param usedConsts Set of all constituents already used in final reconstructed tops 
      *@param dRMatch The dR requirement used to select whether an AK4 jet matches a AK8 subjet
      */
-    bool constituentsAreUsed(const std::vector<const Constituent *>&, const std::set<const Constituent*>&, const double) const ;
+    bool constituentsAreUsed(const std::vector<const Constituent *>&, const std::set<const Constituent*>&, const double, const double) const ;
     /**
      *Marks constituents as being used in a final reconstructed top 
      *
@@ -29,7 +29,7 @@ protected:
      *@param usedConstituents Set of all constituents already used in final reconstructed tops 
      *@param dRMatch The dR requirement used to select whether an AK4 jet matches a AK8 subjet
      */
-    void markConstituentsUsed(const std::vector<const Constituent *>&, const std::vector<Constituent>&, std::set<const Constituent*>&, const double) const ;
+    void markConstituentsUsed(const std::vector<const Constituent *>&, const std::vector<Constituent>&, std::set<const Constituent*>&, const double, const double) const ;
 };
 
 

@@ -12,6 +12,7 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
 
     //common parameter
     dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
+    dRMatchAK8_   = cfgDoc->get("dRMatchAK8",   commonCxt, -999.9);
     
     //monojet parameters
     minAK8TopMass_    = cfgDoc->get("minAK8TopMass",    localCxt, -999.9);
@@ -57,7 +58,7 @@ bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent, const Cons
     //check that the AK4 jet does not overlap with the selected AK8 subjets
     //to keep the algorithm from needing to do unnecessary calculations on all matches
     //we have to have the AK8 jet in the first position, not the second arguement
-    bool overlapCheck = constituentsAreUsed({&constituentAK8}, {&constituent}, dRMatch_);
+    bool overlapCheck = constituentsAreUsed({&constituentAK8}, {&constituent}, dRMatch_, dRMatchAK8_);
 
     return basicReqs && !overlapCheck;
 }

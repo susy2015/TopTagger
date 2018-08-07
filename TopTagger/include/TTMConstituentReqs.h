@@ -33,7 +33,7 @@ class TTMConstituentReqs : public TTMFilterBase
 {
 protected:
     //matching variable 
-    double dRMatch_;
+    double dRMatch_, dRMatchAK8_;
 
     //mono-jet variables
     double minAK8TopMass_, maxAK8TopMass_, maxTopTau32_, minAK8TopPt_, deepAK8WDisc_, deepAK8TopDisc_;
