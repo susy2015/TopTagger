@@ -31,44 +31,37 @@ int main()
     //AK4 jet variables
     //Each entry in these vectors refers to information for 1 AK4 jet
     std::vector<TLorentzVector>** AK4JetLV = new std::vector<TLorentzVector>*();
-    std::vector<double>** AK4JetBtag = new std::vector<double>*();
-    std::vector<double>** AK4qgMult = new std::vector<double>*();
-    std::vector<double>** AK4qgPtD = new std::vector<double>*();
-    std::vector<double>** AK4qgAxis1 = new std::vector<double>*();
-    std::vector<double>** AK4qgAxis2 = new std::vector<double>*();
-    std::vector<double>** AK4recoJetschargedHadronEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetschargedEmEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetsneutralEmEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4ElectronEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4PhotonEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetsneutralEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetsHFHadronEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetsmuonEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4recoJetsHFEMEnergyFraction = new std::vector<double>*();
-    std::vector<double>** AK4NeutralHadronMultiplicity = new std::vector<double>*();
-    std::vector<double>** AK4ChargedHadronMultiplicity = new std::vector<double>*();
-    std::vector<double>** AK4ElectronMultiplicity = new std::vector<double>*();
-    std::vector<double>** AK4MuonMultiplicity = new std::vector<double>*();
-    std::vector<double>** AK4PhotonMultiplicity = new std::vector<double>*();
-    std::vector<double>** AK4DeepCSVbb = new std::vector<double>*();
-    std::vector<double>** AK4DeepCSVb = new std::vector<double>*();
-    std::vector<double>** AK4DeepCSVc = new std::vector<double>*();
-    std::vector<double>** AK4DeepCSVcc = new std::vector<double>*();
-    std::vector<double>** AK4DeepCSVl = new std::vector<double>*();
+    std::vector<float>** AK4JetBtag = new std::vector<float>*();
+    std::vector<float>** AK4qgMult = new std::vector<float>*();
+    std::vector<float>** AK4qgPtD = new std::vector<float>*();
+    std::vector<float>** AK4qgAxis1 = new std::vector<float>*();
+    std::vector<float>** AK4qgAxis2 = new std::vector<float>*();
+    std::vector<float>** AK4recoJetschargedHadronEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetschargedEmEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetsneutralEmEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4ElectronEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4PhotonEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetsneutralEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetsHFHadronEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetsmuonEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4recoJetsHFEMEnergyFraction = new std::vector<float>*();
+    std::vector<float>** AK4NeutralHadronMultiplicity = new std::vector<float>*();
+    std::vector<float>** AK4ChargedHadronMultiplicity = new std::vector<float>*();
+    std::vector<float>** AK4ElectronMultiplicity = new std::vector<float>*();
+    std::vector<float>** AK4MuonMultiplicity = new std::vector<float>*();
+    std::vector<float>** AK4PhotonMultiplicity = new std::vector<float>*();
+    std::vector<float>** AK4DeepCSVbb = new std::vector<float>*();
+    std::vector<float>** AK4DeepCSVb = new std::vector<float>*();
+    std::vector<float>** AK4DeepCSVc = new std::vector<float>*();
+    std::vector<float>** AK4DeepCSVcc = new std::vector<float>*();
+    std::vector<float>** AK4DeepCSVl = new std::vector<float>*();
 
     //AK8 jet varaibles
     //The elements of each vector refer to one AK8 jet
     std::vector<TLorentzVector>** AK8JetLV = new std::vector<TLorentzVector>*();
-    std::vector<double>** AK8JetTau1 = new std::vector<double>*();
-    std::vector<double>** AK8JetTau2 = new std::vector<double>*();
-    std::vector<double>** AK8JetTau3 = new std::vector<double>*();
-    std::vector<double>** AK8JetSoftdropMass = new std::vector<double>*();
+    std::vector<float>** AK8JetSoftdropMass = new std::vector<float>*();
+    std::vector<float>** AK8JetDeepAK8Top = new std::vector<float>*();
     std::vector<std::vector<TLorentzVector>>** AK8SubjetLV = new std::vector<std::vector<TLorentzVector>>*();
-    std::vector<std::vector<double>>** AK8SubjetBtag  = new std::vector<std::vector<double>>*();
-    std::vector<std::vector<double>>** AK8SubjetMult  = new std::vector<std::vector<double>>*();
-    std::vector<std::vector<double>>** AK8SubjetPtD   = new std::vector<std::vector<double>>*();
-    std::vector<std::vector<double>>** AK8SubjetAxis1 = new std::vector<std::vector<double>>*();
-    std::vector<std::vector<double>>** AK8SubjetAxis2 = new std::vector<std::vector<double>>*();
 
     //Activate branches of interest
     //AK4 jet lorentz vectors
@@ -180,32 +173,9 @@ int main()
     tree->SetBranchStatus( "ak8SubJetsLVec", 1);
     tree->SetBranchAddress("ak8SubJetsLVec", AK8SubjetLV);
 
-    tree->SetBranchStatus( "ak8SubjetBDisc", 1);
-    tree->SetBranchAddress("ak8SubjetBDisc", AK8SubjetBtag);
-
-    tree->SetBranchStatus( "ak8SubJetsMult", 1);
-    tree->SetBranchAddress("ak8SubJetsMult", AK8SubjetMult);
-
-    tree->SetBranchStatus( "ak8SubJetsPtD", 1);
-    tree->SetBranchAddress("ak8SubJetsPtD", AK8SubjetPtD);
-
-    tree->SetBranchStatus( "ak8SubJetsAxis1", 1);
-    tree->SetBranchAddress("ak8SubJetsAxis1", AK8SubjetAxis1);
-
-    tree->SetBranchStatus( "ak8SubJetsAxis2", 1);
-    tree->SetBranchAddress("ak8SubJetsAxis2", AK8SubjetAxis2);
-
-    //AK8 jet tau1 variable
-    tree->SetBranchStatus( "ak8tau1", 1);
-    tree->SetBranchAddress("ak8tau1", AK8JetTau1);
-    
-    //AK8 jet tau2 variable
-    tree->SetBranchStatus( "ak8tau2", 1);
-    tree->SetBranchAddress("ak8tau2", AK8JetTau2);
-    
-    //AK8 jet tau3 variable
-    tree->SetBranchStatus( "ak8tau3", 1);
-    tree->SetBranchAddress("ak8tau3", AK8JetTau3);
+    //AK8 jet deepAK8 top discriminator variable
+    tree->SetBranchStatus( "ak8DeepAK8Top", 1);
+    tree->SetBranchAddress("ak8DeepAK8Top", AK8JetDeepAK8Top);
     
     //AK8 jet softdrop mass
     tree->SetBranchStatus( "ak8softDropMass", 1);
@@ -232,7 +202,7 @@ int main()
 
             //Use helper function to create input list 
             //Create AK4 inputs object
-            ttUtility::ConstAK4Inputs<double> AK4Inputs(**AK4JetLV, **AK4JetBtag);
+            ttUtility::ConstAK4Inputs<float> AK4Inputs(**AK4JetLV, **AK4JetBtag);
             AK4Inputs.addSupplamentalVector("qgPtD",                                **AK4qgPtD);
             AK4Inputs.addSupplamentalVector("qgAxis1",                              **AK4qgAxis1);
             AK4Inputs.addSupplamentalVector("qgAxis2",                              **AK4qgAxis2);
@@ -257,22 +227,15 @@ int main()
             AK4Inputs.addSupplamentalVector("DeepCSVbb",                            **AK4DeepCSVbb);
             AK4Inputs.addSupplamentalVector("DeepCSVcc",                            **AK4DeepCSVcc);
 
-
+            
             //Create AK8 inputs object
-            ttUtility::ConstAK8Inputs<double> AK8Inputs(
+            ttUtility::ConstAK8Inputs<float> AK8Inputs(
                 **AK8JetLV,
-                **AK8JetTau1,
-                **AK8JetTau2,
-                **AK8JetTau3,
+                **AK8JetDeepAK8Top,
                 **AK8JetSoftdropMass,
-                **AK8SubjetLV,
-                **AK8SubjetBtag,
-                **AK8SubjetMult,
-                **AK8SubjetPtD,
-                **AK8SubjetAxis1,
-                **AK8SubjetAxis2
+                **AK8SubjetLV
                 );
-
+            
             //Create jets constituents list combining AK4 and AK8 jets, these are used to construct top candiates
             //The vector of input constituents can also be constructed "by hand"
             std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
@@ -356,9 +319,7 @@ int main()
 
     delete AK8JetLV;
     delete AK8SubjetLV;
-    delete AK8JetTau1;
-    delete AK8JetTau2;
-    delete AK8JetTau3;
+    delete AK8JetDeepAK8Top;
     delete AK8JetSoftdropMass;
 
     exit(0);
