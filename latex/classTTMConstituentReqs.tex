@@ -26,6 +26,12 @@ Inheritance diagram for T\-T\-M\-Constituent\-Reqs\-:\begin{figure}[H]
 \hypertarget{classTTMConstituentReqs_a146535ca0b3c55a3178dff46d8312371}{bool \hyperlink{classTTMConstituentReqs_a146535ca0b3c55a3178dff46d8312371}{pass\-A\-K4\-Resolved\-Reqs} (const \hyperlink{classConstituent}{Constituent} \&constituent, const double min\-Pt) const }\label{classTTMConstituentReqs_a146535ca0b3c55a3178dff46d8312371}
 
 \begin{DoxyCompactList}\small\item\em Implement the requirements for the A\-K4 resolved constituents. \end{DoxyCompactList}\item 
+\hypertarget{classTTMConstituentReqs_ad315aa8b3bbcaa2194e515876f6ae85f}{bool \hyperlink{classTTMConstituentReqs_ad315aa8b3bbcaa2194e515876f6ae85f}{pass\-Deep\-A\-K8\-W\-Reqs} (const \hyperlink{classConstituent}{Constituent} \&constituent) const }\label{classTTMConstituentReqs_ad315aa8b3bbcaa2194e515876f6ae85f}
+
+\begin{DoxyCompactList}\small\item\em Implement requirements on A\-K8 W tagged with deep\-A\-K8. \end{DoxyCompactList}\item 
+\hypertarget{classTTMConstituentReqs_a3fa336ca887104b5ec315db546bb5b36}{bool \hyperlink{classTTMConstituentReqs_a3fa336ca887104b5ec315db546bb5b36}{pass\-Deep\-A\-K8\-Top\-Reqs} (const \hyperlink{classConstituent}{Constituent} \&constituent) const }\label{classTTMConstituentReqs_a3fa336ca887104b5ec315db546bb5b36}
+
+\begin{DoxyCompactList}\small\item\em Implement requirements on A\-K8 tops tagged with deep\-A\-K8. \end{DoxyCompactList}\item 
 \hypertarget{classTTMConstituentReqs_a6b72bd3d3605f24c240053a9ac0f36df}{void \hyperlink{classTTMConstituentReqs_a6b72bd3d3605f24c240053a9ac0f36df}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)}\label{classTTMConstituentReqs_a6b72bd3d3605f24c240053a9ac0f36df}
 
 \begin{DoxyCompactList}\small\item\em Get the parameters needed for the constituent selection functions. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -33,6 +39,9 @@ Inheritance diagram for T\-T\-M\-Constituent\-Reqs\-:\begin{figure}[H]
 \begin{DoxyCompactItemize}
 \item 
 \hypertarget{classTTMConstituentReqs_ac98f4b266d20f9975e338620d5c72425}{double {\bfseries d\-R\-Match\-\_\-}}\label{classTTMConstituentReqs_ac98f4b266d20f9975e338620d5c72425}
+
+\item 
+\hypertarget{classTTMConstituentReqs_ae1b896324fc5546fa998f7b343da4a73}{double {\bfseries d\-R\-Match\-A\-K8\-\_\-}}\label{classTTMConstituentReqs_ae1b896324fc5546fa998f7b343da4a73}
 
 \item 
 \hypertarget{classTTMConstituentReqs_a6a778c0d25d85ccc4d87a7a630d38e53}{double {\bfseries min\-A\-K8\-Top\-Mass\-\_\-}}\label{classTTMConstituentReqs_a6a778c0d25d85ccc4d87a7a630d38e53}
@@ -45,6 +54,12 @@ Inheritance diagram for T\-T\-M\-Constituent\-Reqs\-:\begin{figure}[H]
 
 \item 
 \hypertarget{classTTMConstituentReqs_a1278553c3950ec8057c4860997024a69}{double {\bfseries min\-A\-K8\-Top\-Pt\-\_\-}}\label{classTTMConstituentReqs_a1278553c3950ec8057c4860997024a69}
+
+\item 
+\hypertarget{classTTMConstituentReqs_aca47798ffce469f8a43b825798693c72}{double {\bfseries deep\-A\-K8\-W\-Disc\-\_\-}}\label{classTTMConstituentReqs_aca47798ffce469f8a43b825798693c72}
+
+\item 
+\hypertarget{classTTMConstituentReqs_ac182ac9699ded5d0aefff19ecefe7570}{double {\bfseries deep\-A\-K8\-Top\-Disc\-\_\-}}\label{classTTMConstituentReqs_ac182ac9699ded5d0aefff19ecefe7570}
 
 \item 
 \hypertarget{classTTMConstituentReqs_aef537173e73a40069b42d0ef5e14daa8}{double {\bfseries min\-A\-K8\-W\-Mass\-\_\-}}\label{classTTMConstituentReqs_aef537173e73a40069b42d0ef5e14daa8}
@@ -77,6 +92,8 @@ This class implemens common selection requirements for constituents for use in o
 \hline
 {\em max\-Top\-Tau32} & (float) Maximum of the Nsubjettiness ratio tau3/tau2 to be considered an A\-K8 top candidate. \\
 \hline
+{\em deep\-A\-K8\-Top\-Disc} & (float) Minimum deep\-A\-K8 discriminator threshold to be considered an A\-K8 top candidate. \\
+\hline
 {\em min\-A\-K8\-Top\-Pt} & (float) Minimum top pt to be considered as an A\-K8 top candidate. \\
 \hline
 {\em min\-A\-K8\-W\-Mass} & (float) Minimum A\-K8 mass to be considered an A\-K8 W candidate. \\
@@ -84,6 +101,8 @@ This class implemens common selection requirements for constituents for use in o
 {\em max\-A\-K8\-W\-Mass} & (float) Maximum A\-K8 mass to be considered an A\-K8 W candidate. \\
 \hline
 {\em max\-W\-Tau21} & (float) Maximum of the Nsubjettiness ratio tau2/tau1 to be considered an A\-K8 W candidate. \\
+\hline
+{\em deep\-A\-K8\-W\-Disc} & (float) Minimum deep\-A\-K8 discriminator threshold to be considered an A\-K8 W candidate. \\
 \hline
 {\em min\-A\-K8\-W\-Pt} & (float) Minimum top A\-K8 jet pt to be considered as an A\-K8 + A\-K4 top candidate. \\
 \hline

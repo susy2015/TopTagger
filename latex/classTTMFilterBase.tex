@@ -14,9 +14,9 @@ Inheritance diagram for T\-T\-M\-Filter\-Base\-:\begin{figure}[H]
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-bool \hyperlink{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}{constituents\-Are\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double) const 
+bool \hyperlink{classTTMFilterBase_a98fd6161e5b20134fb1b963c182ba630}{constituents\-Are\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double, const double) const 
 \item 
-void \hyperlink{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}{mark\-Constituents\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&, std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double) const 
+void \hyperlink{classTTMFilterBase_aaddc805db839d120d018855e4ba12c67}{mark\-Constituents\-Used} (const std\-::vector$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&, std\-::set$<$ const \hyperlink{classConstituent}{Constituent} $\ast$ $>$ \&, const double, const double) const 
 \end{DoxyCompactItemize}
 
 
@@ -24,15 +24,16 @@ void \hyperlink{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}{mark\-Cons
 This class provides several common functions which can be used by \hyperlink{classTTModule}{T\-T\-Module} objects (it is not one itself) to assist in overlap resolution when top candidates sharing the same constituents are selected. 
 
 \subsection{Member Function Documentation}
-\hypertarget{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!constituents\-Are\-Used@{constituents\-Are\-Used}}
+\hypertarget{classTTMFilterBase_a98fd6161e5b20134fb1b963c182ba630}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!constituents\-Are\-Used@{constituents\-Are\-Used}}
 \index{constituents\-Are\-Used@{constituents\-Are\-Used}!TTMFilterBase@{T\-T\-M\-Filter\-Base}}
 \subsubsection[{constituents\-Are\-Used}]{\setlength{\rightskip}{0pt plus 5cm}bool T\-T\-M\-Filter\-Base\-::constituents\-Are\-Used (
 \begin{DoxyParamCaption}
 \item[{const std\-::vector$<$ const {\bf Constituent} $\ast$ $>$ \&}]{constituents, }
 \item[{const std\-::set$<$ const {\bf Constituent} $\ast$ $>$ \&}]{used\-Consts, }
-\item[{const double}]{d\-R\-Max}
+\item[{const double}]{d\-R\-Max, }
+\item[{const double}]{d\-R\-Max\-A\-K8}
 \end{DoxyParamCaption}
-) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_abfee8da5aa9015b18a408ba0883471f5}
+) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_a98fd6161e5b20134fb1b963c182ba630}
 Checks if the constituents are used
 
 
@@ -44,16 +45,17 @@ Checks if the constituents are used
 {\em d\-R\-Match} & The d\-R requirement used to select whether an A\-K4 jet matches a A\-K8 subjet \\
 \hline
 \end{DoxyParams}
-\hypertarget{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!mark\-Constituents\-Used@{mark\-Constituents\-Used}}
+\hypertarget{classTTMFilterBase_aaddc805db839d120d018855e4ba12c67}{\index{T\-T\-M\-Filter\-Base@{T\-T\-M\-Filter\-Base}!mark\-Constituents\-Used@{mark\-Constituents\-Used}}
 \index{mark\-Constituents\-Used@{mark\-Constituents\-Used}!TTMFilterBase@{T\-T\-M\-Filter\-Base}}
 \subsubsection[{mark\-Constituents\-Used}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Filter\-Base\-::mark\-Constituents\-Used (
 \begin{DoxyParamCaption}
 \item[{const std\-::vector$<$ const {\bf Constituent} $\ast$ $>$ \&}]{constituents, }
 \item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{all\-Constituents, }
 \item[{std\-::set$<$ const {\bf Constituent} $\ast$ $>$ \&}]{used\-Constituents, }
-\item[{const double}]{d\-R\-Max}
+\item[{const double}]{d\-R\-Max, }
+\item[{const double}]{d\-R\-Max\-A\-K8}
 \end{DoxyParamCaption}
-) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_a1dc5745da5777fc3bea18fe6fadcf365}
+) const\hspace{0.3cm}{\ttfamily [protected]}}}\label{classTTMFilterBase_aaddc805db839d120d018855e4ba12c67}
 Marks constituents as being used in a final reconstructed top
 
 

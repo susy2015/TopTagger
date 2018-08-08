@@ -106,15 +106,15 @@ Inheritance diagram for TTMFilterBase:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:abfee8da5aa9015b18a408ba0883471f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMFilterBase.html#abfee8da5aa9015b18a408ba0883471f5">constituentsAreUsed</a> (const std::vector&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const std::set&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const double) const </td></tr>
-<tr class="separator:abfee8da5aa9015b18a408ba0883471f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dc5745da5777fc3bea18fe6fadcf365"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMFilterBase.html#a1dc5745da5777fc3bea18fe6fadcf365">markConstituentsUsed</a> (const std::vector&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt; &amp;, std::set&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const double) const </td></tr>
-<tr class="separator:a1dc5745da5777fc3bea18fe6fadcf365"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98fd6161e5b20134fb1b963c182ba630"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMFilterBase.html#a98fd6161e5b20134fb1b963c182ba630">constituentsAreUsed</a> (const std::vector&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const std::set&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const double, const double) const </td></tr>
+<tr class="separator:a98fd6161e5b20134fb1b963c182ba630"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaddc805db839d120d018855e4ba12c67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMFilterBase.html#aaddc805db839d120d018855e4ba12c67">markConstituentsUsed</a> (const std::vector&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt; &amp;, std::set&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const double, const double) const </td></tr>
+<tr class="separator:aaddc805db839d120d018855e4ba12c67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class provides several common functions which can be used by <a class="el" href="classTTModule.html">TTModule</a> objects (it is not one itself) to assist in overlap resolution when top candidates sharing the same constituents are selected. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="abfee8da5aa9015b18a408ba0883471f5"></a>
+<a class="anchor" id="a98fd6161e5b20134fb1b963c182ba630"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -137,7 +137,13 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>dRMax</em>&#160;</td>
+          <td class="paramname"><em>dRMax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>dRMaxAK8</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -163,7 +169,7 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a1dc5745da5777fc3bea18fe6fadcf365"></a>
+<a class="anchor" id="aaddc805db839d120d018855e4ba12c67"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -192,7 +198,13 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>dRMax</em>&#160;</td>
+          <td class="paramname"><em>dRMax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>dRMaxAK8</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -226,7 +238,7 @@ Protected Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 6 2018 16:22:05 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 8 2018 20:35:38 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

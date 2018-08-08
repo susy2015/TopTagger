@@ -98,45 +98,46 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">class </span><a class="code" href="classTopObject.html">TopObject</a>;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">class </span><a class="code" href="classConstituent.html">Constituent</a>;</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classTTMBasicClusterAlgo.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a> : <span class="keyword">public</span> <a class="code" href="classTTModule.html">TTModule</a>, <span class="keyword">public</span> <a class="code" href="classTTMConstituentReqs.html">TTMConstituentReqs</a></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="comment">//mino-jet variables</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">bool</span> doMonojet_;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="comment">//dijet variables</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">double</span> dRMaxDiJet_;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">bool</span> doDijet_;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">//trijet variables</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">double</span> minTopCandMass_, maxTopCandMass_, dRMaxTrijet_, minTrijetAK4JetPt_, midTrijetAK4JetPt_, maxTrijetAK4JetPt_;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">bool</span> doTrijet_;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">int</span> nbSeed_;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> fillTriplet(<span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, <span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, <span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, std::vector&lt;TopObject&gt;&amp;);</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classTTMBasicClusterAlgo.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a> : <span class="keyword">public</span> <a class="code" href="classTTModule.html">TTModule</a>, <span class="keyword">public</span> <a class="code" href="classTTMConstituentReqs.html">TTMConstituentReqs</a></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">//mino-jet variables</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">bool</span> doMonojet_;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">bool</span> useDeepAK8_;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="comment">//dijet variables</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">double</span> dRMaxDiJet_;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">bool</span> doDijet_;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">//trijet variables</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">double</span> minTopCandMass_, maxTopCandMass_, dRMaxTrijet_, minTrijetAK4JetPt_, midTrijetAK4JetPt_, maxTrijetAK4JetPt_;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">bool</span> doTrijet_;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">int</span> nbSeed_;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMBasicClusterAlgo.html#afdbe472d26a753268dac63d897169299">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMBasicClusterAlgo.html#ae1d464bf1db5762318766d109c843932">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;};</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a>);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> fillTriplet(<span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, <span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, <span class="keyword">const</span> <a class="code" href="classConstituent.html">Constituent</a>* <span class="keyword">const</span>, std::vector&lt;TopObject&gt;&amp;);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMBasicClusterAlgo.html#afdbe472d26a753268dac63d897169299">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMBasicClusterAlgo.html#ae1d464bf1db5762318766d109c843932">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="TTModule_8h_html"><div class="ttname"><a href="TTModule_8h.html">TTModule.h</a></div></div>
 <div class="ttc" id="classConstituent_html"><div class="ttname"><a href="classConstituent.html">Constituent</a></div><div class="ttdef"><b>Definition:</b> Constituent.h:20</div></div>
-<div class="ttc" id="classTTMBasicClusterAlgo_html_ae1d464bf1db5762318766d109c843932"><div class="ttname"><a href="classTTMBasicClusterAlgo.html#ae1d464bf1db5762318766d109c843932">TTMBasicClusterAlgo::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMBasicClusterAlgo.cpp:36</div></div>
+<div class="ttc" id="classTTMBasicClusterAlgo_html_ae1d464bf1db5762318766d109c843932"><div class="ttname"><a href="classTTMBasicClusterAlgo.html#ae1d464bf1db5762318766d109c843932">TTMBasicClusterAlgo::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMBasicClusterAlgo.cpp:37</div></div>
 <div class="ttc" id="TTModule_8h_html_a5aff241e827824ffd2c2efc4c5bf1fda"><div class="ttname"><a href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a></div><div class="ttdeci">#define REGISTER_TTMODULE(_module)</div><div class="ttdef"><b>Definition:</b> TTModule.h:50</div></div>
 <div class="ttc" id="classTopObject_html"><div class="ttname"><a href="classTopObject.html">TopObject</a></div><div class="ttdef"><b>Definition:</b> TopObject.h:16</div></div>
 <div class="ttc" id="classcfg_1_1CfgDocument_html"><div class="ttname"><a href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a></div><div class="ttdef"><b>Definition:</b> CfgDocument.hh:15</div></div>
 <div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:14</div></div>
-<div class="ttc" id="classTTMConstituentReqs_html"><div class="ttname"><a href="classTTMConstituentReqs.html">TTMConstituentReqs</a></div><div class="ttdef"><b>Definition:</b> TTMConstituentReqs.h:30</div></div>
+<div class="ttc" id="classTTMConstituentReqs_html"><div class="ttname"><a href="classTTMConstituentReqs.html">TTMConstituentReqs</a></div><div class="ttdef"><b>Definition:</b> TTMConstituentReqs.h:32</div></div>
 <div class="ttc" id="classTTModule_html"><div class="ttname"><a href="classTTModule.html">TTModule</a></div><div class="ttdef"><b>Definition:</b> TTModule.h:21</div></div>
 <div class="ttc" id="classTTMBasicClusterAlgo_html_afdbe472d26a753268dac63d897169299"><div class="ttname"><a href="classTTMBasicClusterAlgo.html#afdbe472d26a753268dac63d897169299">TTMBasicClusterAlgo::getParameters</a></div><div class="ttdeci">void getParameters(const cfg::CfgDocument *, const std::string &amp;)</div><div class="ttdef"><b>Definition:</b> TTMBasicClusterAlgo.cpp:9</div></div>
-<div class="ttc" id="classTTMBasicClusterAlgo_html"><div class="ttname"><a href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a></div><div class="ttdef"><b>Definition:</b> TTMBasicClusterAlgo.h:28</div></div>
+<div class="ttc" id="classTTMBasicClusterAlgo_html"><div class="ttname"><a href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a></div><div class="ttdef"><b>Definition:</b> TTMBasicClusterAlgo.h:29</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 6 2018 16:22:04 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 8 2018 20:35:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
