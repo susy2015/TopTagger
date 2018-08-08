@@ -25,7 +25,7 @@ echo "========================================================================="
 make -j
 echo "========================================================================="
 source taggerSetup.sh
-getTaggerCfg.sh -t DeepCombined_Example_v1.0.1
+getTaggerCfg.sh -t DeepCombined_Example_v1.0.2
 ./topTaggerTest
 echo "========================================================================="
 cd ../..

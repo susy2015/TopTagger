@@ -23,7 +23,7 @@ class TopTaggerResults;
 class TTMOverlapResolution : public TTModule, public TTMFilterBase
 {
 private:
-    double mt_, maxTopEta_, dRMatch_, cvsThreshold_;
+    double mt_, maxTopEta_, dRMatch_, dRMatchAK8_, cvsThreshold_;
     int NConstituents_;
     std::string sortMethod_;
     std::function<bool (const TopObject* t1, const TopObject* t2)> sortFunc_;

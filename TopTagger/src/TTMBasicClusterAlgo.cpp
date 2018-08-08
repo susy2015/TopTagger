@@ -14,6 +14,7 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     
     //monojet parameters
     doMonojet_        = cfgDoc->get("doMonojet",        localCxt,  false);
+    useDeepAK8_       = cfgDoc->get("useDeepAK8",       localCxt,  false);
 
     //dijet parameters
     doDijet_          = cfgDoc->get("doDijet",          localCxt,  false);
@@ -54,7 +55,14 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
         if(doMonojet_)
         {
             //Only use AK8 tops here 
-            if(passAK8TopReqs(constituents[i]))
+            if(useDeepAK8_ && passDeepAK8TopReqs(constituents[i])) 
+            {
+                TopObject topCand({&constituents[i]});
+                topCand.setDiscriminator(constituents[i].getTopDisc());
+
+                topCandidates.push_back(topCand);
+            }
+            else if (!useDeepAK8_ && passAK8TopReqs(constituents[i]))
             {
                 TopObject topCand({&constituents[i]});
 

@@ -12,12 +12,17 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
 
     //common parameter
     dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
+    dRMatchAK8_   = cfgDoc->get("dRMatchAK8",   commonCxt, -999.9);
     
     //monojet parameters
     minAK8TopMass_    = cfgDoc->get("minAK8TopMass",    localCxt, -999.9);
     maxAK8TopMass_    = cfgDoc->get("maxAK8TopMass",    localCxt, -999.9);
     maxTopTau32_      = cfgDoc->get("maxTopTau32",      localCxt, -999.9);
     minAK8TopPt_      = cfgDoc->get("minAK8TopPt",      localCxt, -999.9);
+    deepAK8TopDisc_   = cfgDoc->get("deepAK8TopDisc",   localCxt, -999.9);
+
+    //mono-W parameters
+    deepAK8WDisc_     = cfgDoc->get("deepAK8WDisc",     localCxt, -999.9);
 
     //dijet parameters
     minAK8WMass_      = cfgDoc->get("minAK8WMass",      localCxt, -999.9);
@@ -53,7 +58,7 @@ bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent, const Cons
     //check that the AK4 jet does not overlap with the selected AK8 subjets
     //to keep the algorithm from needing to do unnecessary calculations on all matches
     //we have to have the AK8 jet in the first position, not the second arguement
-    bool overlapCheck = constituentsAreUsed({&constituentAK8}, {&constituent}, dRMatch_);
+    bool overlapCheck = constituentsAreUsed({&constituentAK8}, {&constituent}, dRMatch_, dRMatchAK8_);
 
     return basicReqs && !overlapCheck;
 }
@@ -72,6 +77,28 @@ bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const
            constituent.getSoftDropMass() > minAK8TopMass_  && 
            constituent.getSoftDropMass() < maxAK8TopMass_ &&
            tau32 < maxTopTau32_;
+}
+
+bool TTMConstituentReqs::passDeepAK8WReqs(const Constituent& constituent) const
+{
+    //check that it is an AK8 jet
+    if(constituent.getType() != AK8JET) return false;
+
+    return constituent.p().Pt() > minAK8TopPt_ &&
+           constituent.getSoftDropMass() > minAK8TopMass_  && 
+           constituent.getSoftDropMass() < maxAK8TopMass_ &&
+           constituent.getTopDisc() > deepAK8WDisc_;
+}
+
+bool TTMConstituentReqs::passDeepAK8TopReqs(const Constituent& constituent) const
+{
+    //check that it is an AK8 jet
+    if(constituent.getType() != AK8JET) return false;
+
+    return constituent.p().Pt() > minAK8TopPt_ &&
+           constituent.getSoftDropMass() > minAK8TopMass_  && 
+           constituent.getSoftDropMass() < maxAK8TopMass_ &&
+           constituent.getTopDisc() > deepAK8TopDisc_;
 }
 
 bool TTMConstituentReqs::passAK4ResolvedReqs(const Constituent& constituent, const double minPt) const

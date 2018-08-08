@@ -28,7 +28,7 @@ private:
     double qgMult_, qgPtD_, qgAxis1_, qgAxis2_;
 
     //AK8 specific variables 
-    double tau1_, tau2_, tau3_, softDropMass_;
+    double tau1_, tau2_, tau3_, softDropMass_, topDisc_, WDisc_;
     std::vector<Constituent> subjets_;
     double wMassCorr_;
 
@@ -60,6 +60,8 @@ public:
     void setSubJets(const std::vector<Constituent>& subjets);
     void setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2);
     void setWMassCorr(const double& wMassCorr);
+    void setTopDisc(const double& topDisc);
+    void setWDisc(const double& WDisc);
 
     /** 
      *Adds an extra variable which is not included in the primary members of the Constituent class.  These will be added and retrieved by name. 
@@ -95,6 +97,8 @@ public:
     const double getQGPtD() const                         { return qgPtD_; }
     const double getQGAxis1() const                       { return qgAxis1_; }
     const double getQGAxis2() const                       { return qgAxis2_; }
+    const double getTopDisc() const                       { return topDisc_; }
+    const double getWDisc() const                         { return WDisc_; }
     /** 
      *Retrieve an extra variable based upon its name 
      *@param [in] var Name of the variable to retrieve

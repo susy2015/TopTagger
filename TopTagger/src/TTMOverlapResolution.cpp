@@ -21,6 +21,7 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     mt_           = cfgDoc->get("mt",           commonCxt, -999.9);
     maxTopEta_    = cfgDoc->get("maxTopEta",    commonCxt, -999.9);
     dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
+    dRMatchAK8_   = cfgDoc->get("dRMatchAK8",   commonCxt, 0.8);
 
     cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
     NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
@@ -148,7 +149,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             bool passTopEta = (fabs((*iTop)->p().Eta()) < maxTopEta_);
 
             //Check if the candidates have been used in another top
-            bool overlaps = constituentsAreUsed(jets, usedJets, dRMatch_);
+            bool overlaps = constituentsAreUsed(jets, usedJets, dRMatch_, dRMatchAK8_);
 
             //Prune top from final top collection if it fails the following requirements
             if(overlaps || !passTopEta)
@@ -161,7 +162,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             //If the candidate survived, it must be a good top!!!
 
             //Add the good tops constituents to the set tracking which constituents have been used
-            markConstituentsUsed(jets, constituents, usedJets, dRMatch_);
+            markConstituentsUsed(jets, constituents, usedJets, dRMatch_, dRMatchAK8_);
         }
 
         ++iTop;
