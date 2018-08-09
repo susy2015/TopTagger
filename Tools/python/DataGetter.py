@@ -80,14 +80,16 @@ class DataGetter:
         domainColumnNames = ["NGoodJets_double"]
         domainColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in domainColumnNames])
         inputDomains = x[:,domainColumns]
-        maxNJetBin = 11
+        maxNJetBin = 15
         tempInputDomains = inputDomains.astype(int)
         tempInputDomains = da.reshape(tempInputDomains, [-1])
         tempInputDomains[tempInputDomains > maxNJetBin] = maxNJetBin 
+        numDomains = maxNJetBin + 1 - tempInputDomains.min().compute()
         tempInputDomains = tempInputDomains - tempInputDomains.min()
-        d =  np.zeros((npyInputData.shape[0], tempInputDomains.max().compute() + 1))
+        d =  np.zeros((npyInputData.shape[0], numDomains))
+        #d =  np.zeros((npyInputData.shape[0], tempInputDomains.max().compute() + 1))
         d[np.arange(d.shape[0]), tempInputDomains] = 1
-        
+
         #setup and get weights
         wgtColumnNames = ["sampleWgt"]
         wgtColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in wgtColumnNames])
