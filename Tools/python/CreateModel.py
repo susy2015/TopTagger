@@ -113,14 +113,13 @@ class CreateModel:
 
             #Adding the hidden layers to domain classification
             layer = NLayer - 1
-            HArch = []
+            HArch = [20]
             GRHArch = [nnStruct[layer - 1]] + HArch 
-
+            
             #apply gradient reversal 
             h_fc[layer - 1] = self.gradientReversal(h_fc[layer - 1], gradientReversalWeight)
             
             for i in xrange(1, len(GRHArch)):
-                print GRHArch[i]
                 if not layer in w_fc:
                     w_fc[layer] = self.weight_variable([GRHArch[i - 1], GRHArch[i]], name="w_fc%i"%(layer))
                 if not layer in b_fc:
@@ -130,7 +129,7 @@ class CreateModel:
                 layerOutput = tf.nn.relu(batchNormalizedLayer, name="h_fc%i%s"%(layer, prefix))
                 h_fc[layer] = tf.nn.dropout(layerOutput, keep_prob)
                 layer += 1
-
+            
             #create pt for domain classification            
             if not layer in w_fc:
                 w_fc[layer] = self.weight_variable([GRHArch[-1], int(nDomainNode)], name="w_fc%i"%(layer))
@@ -139,13 +138,6 @@ class CreateModel:
                         
             pt = tf.add(tf.matmul(h_fc[layer - 1], w_fc[layer]),  b_fc[layer], name="pt"+prefix)
 
-            #if not layer + 1 in w_fc:
-            #    w_fc[layer + 1] = self.weight_variable([GRHArch[-1], int(nDomainNode)], name="w_fc%i"%(layer + 1))
-            #if not layer + 1 in b_fc:
-            #    b_fc[layer + 1] = self.bias_variable([int(nDomainNode)], name="b_fc%i"%(layer + 1))
-            #            
-            #pt = tf.add(tf.matmul(h_fc[layer], w_fc[layer + 1]),  b_fc[layer + 1], name="pt"+prefix)
-            
             return yt, pt
 
     ### createMLP
@@ -228,6 +220,7 @@ class CreateModel:
         #final answer with softmax applied for the end user
         self.y = tf.nn.softmax(self.yt, name="y")
         self.y_ph = tf.nn.softmax(self.yt_ph, name="y_ph")
+        self.p = tf.nn.softmax(self.pt, name="p")
     
     def createLoss(self):
         # other placeholders 
@@ -270,6 +263,8 @@ class CreateModel:
         self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
         correct_prediction_train = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy_train = tf.reduce_mean(tf.cast(correct_prediction_train, tf.float32))
+        correct_prediction_domain = tf.equal(tf.argmax(self.p, 1), tf.argmax(self.p_, 1))
+        self.accuracy_domain = tf.reduce_mean(tf.cast(correct_prediction_domain, tf.float32))
 
         summary_grw = tf.summary.scalar("gradient reversal weight",  self.gradientReversalWeight)
         summary_signalFrac = tf.summary.scalar("signalBatchFrac",  tf.reduce_mean(self.y_, axis=0)[0])
@@ -285,6 +280,7 @@ class CreateModel:
         summary_vloss = tf.summary.scalar("valid_loss", self.loss_ph)
         # Create a summary to monitor accuracy tensor
         summary_accuracy = tf.summary.scalar("accuracy", self.accuracy_train)
+        summary_daccuracy = tf.summary.scalar("domain accuracy", self.accuracy_domain)
         summary_vaccuracy = tf.summary.scalar("valid accuracy", self.accuracy)
 
         #special validations
@@ -307,7 +303,7 @@ class CreateModel:
         except AttributeError:
             pass
         # Merge all summaries into a single op
-        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_grw, summary_signalFrac, summary_domainFrac])
+        self.merged_train_summary_op = tf.summary.merge([summary_ce, summary_ce_d, summary_l2n, summary_loss, summary_queueSize, summary_accuracy, summary_daccuracy, summary_grw, summary_signalFrac, summary_domainFrac])
         self.merged_valid_summary_op = tf.summary.merge(valid_summaries)
         self.merged_valid_QCDMC_summary_op = tf.summary.merge(valid_summaries_QCDMC)
         self.merged_valid_QCDData_summary_op = tf.summary.merge(valid_summaries_QCDData)
