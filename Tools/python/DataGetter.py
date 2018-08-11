@@ -80,7 +80,7 @@ class DataGetter:
         domainColumnNames = ["NGoodJets_double"]
         domainColumns = np.array([np.flatnonzero(columnHeaders == v)[0] for v in domainColumnNames])
         inputDomains = x[:,domainColumns]
-        maxNJetBin = 15
+        maxNJetBin = 14
         tempInputDomains = inputDomains.astype(int)
         tempInputDomains = da.reshape(tempInputDomains, [-1])
         tempInputDomains[tempInputDomains > maxNJetBin] = maxNJetBin 

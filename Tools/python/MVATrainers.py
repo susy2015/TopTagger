@@ -208,22 +208,22 @@ def mainTF(options):
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
   signalDataSets = [
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
 
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_850_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
 
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
                     DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
@@ -274,7 +274,7 @@ def mainTF(options):
 
     try:
       while dm.continueTrainingLoop():
-        grw = 2/(1+exp(-i/3000.0)) - 1 #2/(1+exp(-i/10000.0)) - 1
+        grw = 1000000000000.0*(2/(1+exp(-i/500000.0)) - 1) #2/(1+exp(-i/10000.0)) - 1
 
         #run validation operations 
         if i == 0 or not i % ReportInterval:
@@ -289,6 +289,8 @@ def mainTF(options):
         
           validation_loss, accuracy, summary_vl_QCDData = sess.run([mlp.loss_ph, mlp.accuracy, mlp.merged_valid_QCDData_summary_op], feed_dict={mlp.x_ph: validDataQCDData["data"][:validationCount], mlp.y_ph_: validDataQCDData["labels"][:validationCount], mlp.p_ph_: validDataQCDData["domain"][:validationCount], mlp.reg: l2Reg, mlp.gradientReversalWeight:grw, mlp.wgt_ph: validDataQCDData["weights"][:validationCount]})
           summary_writer.add_summary(summary_vl_QCDData, i/N_TRAIN_SUMMARY)
+
+          #print(sess.run(mlp.x))
 
         #run training operations 
         if i % N_TRAIN_SUMMARY == 0:
