@@ -4,6 +4,7 @@
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/SATException.h"
 
+#include "Framework/Framework/include/RunTopTagger.h"
 #include "Framework/Framework/include/MakeMVAVariables.h"
 #include "Framework/Framework/include/Jet.h"
 #include "Framework/Framework/include/Muon.h"
@@ -304,7 +305,32 @@ int main(int argc, char* argv[])
                            "jmt_ev0_top6", 
                            "jmt_ev1_top6", 
                            "jmt_ev2_top6",
-                           "NGoodJets_double"} }
+                           "NGoodJets_double",
+                           "Jet_pt_1",
+                           "Jet_pt_2",
+                           "Jet_pt_3",
+                           "Jet_pt_4",
+                           "Jet_pt_5",
+                           "Jet_pt_6",
+                           "Jet_eta_1",
+                           "Jet_eta_2",
+                           "Jet_eta_3",
+                           "Jet_eta_4",
+                           "Jet_eta_5",
+                           "Jet_eta_6",
+                           "Jet_phi_1",
+                           "Jet_phi_2",
+                           "Jet_phi_3",
+                           "Jet_phi_4",
+                           "Jet_phi_5",
+                           "Jet_phi_6",
+                           "Jet_m_1",
+                           "Jet_m_2",
+                           "Jet_m_3",
+                           "Jet_m_4",
+                           "Jet_m_5",
+                           "Jet_m_6",
+                           "BestComboAvgMass"}}
     };
 
     //parse sample splitting and set up minituples
@@ -369,20 +395,24 @@ int main(int argc, char* argv[])
                     tr.registerDerivedVar<std::string>("filetag",file.tag);
                     tr.registerDerivedVar<double>("etaCut",2.4);
                     tr.registerDerivedVar<bool>("blind",true);                        
-                    
+                    std::vector<std::vector<const TLorentzVector*>>* hadtopdaughters = new std::vector<std::vector<const TLorentzVector*>>;
+                    tr.registerDerivedVec("hadtopdaughters", hadtopdaughters);
+
+                    //RunTopTagger rtt;
                     Muon muon;
                     Electron electron;
-                    MakeMVAVariables makeMVAVariables(false);
                     Jet jet;
                     BJet bjet;
                     CommonVariables commonVariables;
+                    MakeMVAVariables makeMVAVariables(false);
                     Baseline baseline;
+                    //tr.registerFunction( std::move(rtt) );
                     tr.registerFunction( std::move(muon) );
                     tr.registerFunction( std::move(electron) );
-                    tr.registerFunction( std::move(makeMVAVariables) );
                     tr.registerFunction( std::move(jet) );
                     tr.registerFunction( std::move(bjet) );
                     tr.registerFunction( std::move(commonVariables) );
+                    tr.registerFunction( std::move(makeMVAVariables) );
                     tr.registerFunction( std::move(baseline) );
 
                     int splitCounter = 0, mtmIndex = 0;
@@ -394,22 +424,29 @@ int main(int argc, char* argv[])
                         if(nEvts > 0 && NEvtsTotal > nEvts) break;
                         if(tr.getEvtNum() % printInterval == 0) std::cout << "Event #: " << tr.getEvtNum() << std::endl;
 
+                        //Make top 6 cm jets 4 vector
+                        const auto& Jets_cm_top6 = tr.getVec<TLorentzVector>("Jets_cm_top6");
+                        for(unsigned int i = 0; i < Jets_cm_top6.size(); i++)
+                        {
+                            tr.registerDerivedVar("Jet_pt_"+std::to_string(i+1),  static_cast<double>(Jets_cm_top6[i].Pt()));
+                            tr.registerDerivedVar("Jet_eta_"+std::to_string(i+1), static_cast<double>(Jets_cm_top6[i].Eta()));
+                            tr.registerDerivedVar("Jet_phi_"+std::to_string(i+1), static_cast<double>(Jets_cm_top6[i].Phi()));
+                            tr.registerDerivedVar("Jet_m_"+std::to_string(i+1),   static_cast<double>(Jets_cm_top6[i].M()));
+                        }
+
+                        //Get/make the mass variables
+                        const auto& BestCombo            = tr.getVar<std::pair<TLorentzVector, TLorentzVector>>("BestCombo");
+                        double bestComboAvgMass = ( BestCombo.first.M() + BestCombo.second.M() )/2;
+                        tr.registerDerivedVar("BestComboAvgMass", bestComboAvgMass);
+                        //double bestComboMassDiff = BestCombo.first.M() - BestCombo.second.M();
+                        //double bestComboAvgPt = ( BestCombo.first.Pt() + BestCombo.second.Pt() )/2;
+                        //double bestComboRelDiff = bestComboMassDiff / bestComboAvgMass;
+
                         //Get sample lumi weight and correct for the actual number of events 
                         //This needs to happen before we ad sampleWgt to the mini tuple variables to save
                         double weight = file.getWeight();
-                        bool isData = false; bool isSignal = false;
-                        if(file.tag.find("Data") != std::string::npos)
-                        {
-                            isData = true;
-                        }
-                        else 
-                        {
-                            isSignal = true;
-                        }
                         tr.registerDerivedVar("sampleWgt", weight);
-                        tr.registerDerivedVar("isData", isData);
-                        tr.registerDerivedVar("isSignal", isSignal);
-                        tr.registerDerivedVar("EvtNum_double", static_cast<double>(tr.getVar<int>("EvtNum"))); 
+                        tr.registerDerivedVar("EvtNum_double", static_cast<double>(tr.getVar<long int>("EvtNum"))); 
                         tr.registerDerivedVar("NGoodJets_double", static_cast<double>(tr.getVar<int>("NGoodJets"))); 
                         
                         //Things to run only on first event
