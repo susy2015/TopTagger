@@ -13,6 +13,8 @@ import pickle
 from taggerOptions import *
 from glob import glob
 
+dataPath = "/cms/data/cmadrid/EventShapeTrainingData_V2"
+
 def load_graph(frozen_graph_filename):
     # We load the protobuf file from the disk and parse it to retrieve the 
     # unserialized graph_def
@@ -283,11 +285,11 @@ def getDataTTbar(ttsig):
 
     return dataTTbarAll
 
-dataTTbarAll = getDataTTbar(glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_2_TT_test_0.h5"))
-dataTTbarAllTrain = getDataTTbar(glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5"))
+dataTTbarAll = getDataTTbar(glob(dataPath + "/trainingTuple_*_division_2_TT_test_0.h5"))
+dataTTbarAllTrain = getDataTTbar(glob(dataPath + "/trainingTuple_*_division_0_TT_training_0.h5"))
 
-dataSigAll = getDataTTbar(glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_2_rpv_stop_*_test_0.h5"))
-dataSigAllTrain = getDataTTbar(glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_rpv_stop_*_training_0.h5"))
+dataSigAll = getDataTTbar(glob(dataPath + "/trainingTuple_*_division_2_rpv_stop_*_test_0.h5"))
+dataSigAllTrain = getDataTTbar(glob(dataPath + "/trainingTuple_*_division_0_rpv_stop_*_training_0.h5"))
 
 print "CALCULATING TTBAR DISCRIMINATORS"
 

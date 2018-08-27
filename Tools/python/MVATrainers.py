@@ -5,6 +5,8 @@ from math import sqrt, exp
 from time import sleep
 from glob import glob
 
+dataPath = "/cms/data/cmadrid/EventShapeTrainingData_V2"
+
 def mainSKL(options):
 
   from sklearn.ensemble import RandomForestClassifier
@@ -27,8 +29,8 @@ def mainSKL(options):
   dgSig = DataGetter.DefinedVariables(allVars, signal = True,  background = False)
   dgBg = DataGetter.DefinedVariables(allVars,  signal = False, background = True)
   dataFiles = []
-  dataFiles += glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5")
-  dataFiles2 =glob("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5")
+  dataFiles += glob(dataPath + "/trainingTuple_*_division_*_rpv_stop_*_training_0.h5")
+  dataFiles2 =glob(dataPath + "/trainingTuple_*_division_0_TT_training_0.h5")
 
   dataSig = dgSig.importData(samplesToRun = tuple(dataFiles), prescale=True, ptReweight=False)
   dataBg = dgBg.importData(samplesToRun = tuple(dataFiles2), prescale=True, ptReweight=False)
@@ -158,14 +160,14 @@ def mainTF(options):
   dgSig = DataGetter.DefinedVariables(options.netOp.vNames, signal = True, background = False)
   dgBg = DataGetter.DefinedVariables(options.netOp.vNames,  signal = False, background = True)
 
-  validDataSig = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_rpv_stop_850_validation_0.h5", ), 2),]
+  validDataSig = [((dataPath + "/trainingTuple_0_division_1_rpv_stop_850_validation_0.h5", ), 2),]
 
-  validDataSig2 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_stealth_stop_350_SHuHd_validation_0.h5", ), 2),]
+  validDataSig2 = [((dataPath + "/trainingTuple_0_division_1_stealth_stop_350_SHuHd_validation_0.h5", ), 2),]
 
-  validDataSig3 = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_0_division_1_rpv_stop_350_validation_0.h5", ), 2),]
+  validDataSig3 = [((dataPath + "/trainingTuple_0_division_1_rpv_stop_350_validation_0.h5", ), 2),]
 
-  validDataBgTTbar = [(("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
-                      (("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
+  validDataBgTTbar = [((dataPath + "/trainingTuple_20_division_1_TT_validation_0.h5", ), 1),
+                      ((dataPath + "/trainingTuple_2110_division_1_TT_validation_0.h5", ), 1),]
   
   print "Input Variables: ",len(dgSig.getList())
 
@@ -208,33 +210,33 @@ def mainTF(options):
   ##Create data manager, this class controls how data is fed to the network for training
   #                 DataSet(fileGlob, xsec, Nevts, kFactor, sig, prescale, rescale)
   signalDataSets = [
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_350_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_450_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_550_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_650_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_750_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_850_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
 
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_850_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_350_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_450_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_550_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_650_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_750_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_850_SHuHd_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
 
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_350_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_450_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_550_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_650_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_750_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_850_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_350_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_450_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_550_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_650_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_750_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_850_SYY_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
 
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
-                    #DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_*_stealth_stop_*_SYY_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_rpv_stop_*_training_0.h5",      365.4,  61878989, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_*_SHuHd_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
+                    #DataSet(dataPath + "/trainingTuple_*_division_*_stealth_stop_*_SYY_training_0.h5",   365.4,  61901450, 1.0, True,  0, 1.0, 1.0, 1),
   ]
 
-  backgroundDataSets = [DataSet("/cms/data/cmadrid/EventShapeTrainingData/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, len(signalDataSets)),]
+  backgroundDataSets = [DataSet(dataPath + "/trainingTuple_*_division_0_TT_training_0.h5",    365.4,  61878989, 1.0, False, 0, 1.0, 1.0, len(signalDataSets)),]
 
   dm = DataManager(options.netOp.vNames, nEpoch, nFeatures, nLabels, nDomain, nWeights, options.runOp.ptReweight, signalDataSets, backgroundDataSets)
 
@@ -274,7 +276,7 @@ def mainTF(options):
 
     try:
       while dm.continueTrainingLoop():
-        grw = 1000000000000.0*(2/(1+exp(-i/500000.0)) - 1) #2/(1+exp(-i/10000.0)) - 1
+        grw = 1.0#1*(2/(1+exp(-i/10000.0)) - 1) #2/(1+exp(-i/10000.0)) - 1 #1000000000000.0*(2/(1+exp(-i/500000.0)) - 1)
 
         #run validation operations 
         if i == 0 or not i % ReportInterval:

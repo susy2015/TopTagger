@@ -32,8 +32,23 @@ def StandardVariables(variables):
       #vNames = ["fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6"]
       #vNames = ["Weight", "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "fwm6_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
       #vNames = ["fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6"]
-      vNames = ["fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
+      #vNames = ["fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6", "NGoodJets_double"]
       #vNames = ["fwm2_top6", "fwm3_top6", "jmt_ev0_top6", "jmt_ev1_top6"]
+      #vNames = ["Jet_pt_1", "Jet_pt_2", "Jet_pt_3", "Jet_pt_4", "Jet_pt_5", "Jet_pt_6",
+      #          "Jet_eta_1","Jet_eta_2","Jet_eta_3","Jet_eta_4","Jet_eta_5","Jet_eta_6",
+      #          "Jet_phi_1","Jet_phi_2","Jet_phi_3","Jet_phi_4","Jet_phi_5","Jet_phi_6",
+      #          "Jet_m_1",  "Jet_m_2",  "Jet_m_3",  "Jet_m_4",  "Jet_m_5",  "Jet_m_6",
+      #          "BestComboAvgMass",
+      #          "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6"]
+      vNames = ["Jet_pt_1", "Jet_pt_2", "Jet_pt_3", "Jet_pt_4", "Jet_pt_5", "Jet_pt_6",
+                "Jet_eta_1","Jet_eta_2","Jet_eta_3","Jet_eta_4","Jet_eta_5","Jet_eta_6",
+                "Jet_phi_1","Jet_phi_2","Jet_phi_3","Jet_phi_4","Jet_phi_5","Jet_phi_6",
+                "Jet_m_1",  "Jet_m_2",  "Jet_m_3",  "Jet_m_4",  "Jet_m_5",  "Jet_m_6"]
+      #vNames = ["Jet_pt_1", "Jet_pt_2", "Jet_pt_3", "Jet_pt_4", "Jet_pt_5", "Jet_pt_6",
+      #          "Jet_eta_1","Jet_eta_2","Jet_eta_3","Jet_eta_4","Jet_eta_5","Jet_eta_6",
+      #          "Jet_phi_1","Jet_phi_2","Jet_phi_3","Jet_phi_4","Jet_phi_5","Jet_phi_6",
+      #          "Jet_m_1",  "Jet_m_2",  "Jet_m_3",  "Jet_m_4",  "Jet_m_5",  "Jet_m_6",
+      #          "fwm2_top6", "fwm3_top6", "fwm4_top6", "fwm5_top6", "jmt_ev0_top6", "jmt_ev1_top6", "jmt_ev2_top6"]
       jNames = []
 
    return vNames, jNames
@@ -240,7 +255,7 @@ class networkOptions:
    def __init__(self, networkName         = "Network test Configuration (name not set)",
                       inputVariables      = ["cand_m", "j12_m", "j13_m", "j23_m", "dTheta12", "dTheta23", "dTheta13"],
                       jetVariables        = ["p", "CSV", "QGL"],
-                      denseLayers         = [20],
+                      denseLayers         = [60],
                       denseActivationFunc = "relu", #"sigmoid",
                       convLayers          = [],
                       rnnNodes            = 0,
