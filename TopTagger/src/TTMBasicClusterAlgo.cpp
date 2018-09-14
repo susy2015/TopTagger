@@ -57,14 +57,14 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
             //Only use AK8 tops here 
             if(useDeepAK8_ && passDeepAK8TopReqs(constituents[i])) 
             {
-                TopObject topCand({&constituents[i]});
+                TopObject topCand({&constituents[i]}, TopObject::MERGED_TOP);
                 topCand.setDiscriminator(constituents[i].getTopDisc());
 
                 topCandidates.push_back(topCand);
             }
             else if (!useDeepAK8_ && passAK8TopReqs(constituents[i]))
             {
-                TopObject topCand({&constituents[i]});
+                TopObject topCand({&constituents[i]}, TopObject::MERGED_TOP);
 
                 topCandidates.push_back(topCand);
             }
@@ -83,7 +83,7 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
                     //the AK8 jet is passed to ensure the AK4 jet does not overlap with it
                     if(i == j || !passAK4WReqs(constituents[j], constituents[i])) continue;
 
-                    TopObject topCand({&constituents[i], &constituents[j]});
+                    TopObject topCand({&constituents[i], &constituents[j]}, TopObject::SEMIMERGEDWB_TOP);
 
                     //mass window on the top candidate mass
                     double m123 = topCand.p().M();
@@ -136,7 +136,7 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
 
 void TTMBasicClusterAlgo::fillTriplet(const Constituent* const c1, const Constituent* const c2, const Constituent* const c3, std::vector<TopObject>& topCandidates)
 {
-    TopObject topCand({c1, c2, c3});
+    TopObject topCand({c1, c2, c3}, TopObject::RESOLVED_TOP);
 
     //mass window on the top candidate mass
     double m123 = topCand.p().M();

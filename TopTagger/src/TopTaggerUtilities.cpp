@@ -371,6 +371,7 @@ namespace ttUtility
     bool BDTMonojetInputCalculator::checkCand(const TopObject& topCand)
     {
         return topCand.getNConstituents() == 1
+            && topCand.getType() == TopObject::MERGED_TOP
             && topCand.getConstituents()[0]->getType() == AK8JET
             && topCand.getConstituents()[0]->getSubjets().size() == 2;
     }
@@ -437,7 +438,8 @@ namespace ttUtility
 
     bool BDTDijetInputCalculator::checkCand(const TopObject& topCand)
     {
-        return topCand.getNConstituents() == 2;
+        return topCand.getNConstituents() == 2
+            && topCand.getType() == TopObject::SEMIMERGEDWB_TOP;
     }
 
     TrijetInputCalculator::TrijetInputCalculator()
@@ -767,7 +769,8 @@ namespace ttUtility
 
     bool TrijetInputCalculator::checkCand(const TopObject& topCand)
     {
-        return topCand.getNConstituents() == 3;
+        return topCand.getNConstituents() == 3
+            && topCand.getType() == TopObject::RESOLVED_TOP;
     }
 
     std::vector<std::string> getMVAVars()
