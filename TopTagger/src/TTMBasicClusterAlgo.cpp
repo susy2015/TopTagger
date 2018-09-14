@@ -14,6 +14,7 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     
     //monojet parameters
     doMonojet_        = cfgDoc->get("doMonojet",        localCxt,  false);
+    doMonoW_          = cfgDoc->get("doMonoW",          localCxt,  false);
     useDeepAK8_       = cfgDoc->get("useDeepAK8",       localCxt,  false);
 
     //dijet parameters
@@ -68,6 +69,25 @@ void TTMBasicClusterAlgo::run(TopTaggerResults& ttResults)
 
                 topCandidates.push_back(topCand);
             }
+        }
+
+        //single w-boson jet
+        if(doMonoW_)
+        {
+            //Only use AK8 tops here 
+            if(useDeepAK8_ && passDeepAK8WReqs(constituents[i])) 
+            {
+                TopObject topCand({&constituents[i]}, TopObject::MERGED_W);
+                topCand.setDiscriminator(constituents[i].getTopDisc());
+
+                topCandidates.push_back(topCand);
+            }
+            else if (!useDeepAK8_ && passAK8WReqs(constituents[i]))
+            {
+                TopObject topCand({&constituents[i]}, TopObject::MERGED_W);
+
+                topCandidates.push_back(topCand);
+            }            
         }
 
         //singlet w-bosons + jet

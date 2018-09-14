@@ -4,6 +4,8 @@
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 
+#include <iostream>
+
 void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
@@ -84,10 +86,10 @@ bool TTMConstituentReqs::passDeepAK8WReqs(const Constituent& constituent) const
     //check that it is an AK8 jet
     if(constituent.getType() != AK8JET) return false;
 
-    return constituent.p().Pt() > minAK8TopPt_ &&
-           constituent.getSoftDropMass() > minAK8TopMass_  && 
-           constituent.getSoftDropMass() < maxAK8TopMass_ &&
-           constituent.getTopDisc() > deepAK8WDisc_;
+    return constituent.p().Pt() > minAK8WPt_ &&
+           constituent.getSoftDropMass() > minAK8WMass_  && 
+           constituent.getSoftDropMass() < maxAK8WMass_ &&
+           constituent.getWDisc() > deepAK8WDisc_;
 }
 
 bool TTMConstituentReqs::passDeepAK8TopReqs(const Constituent& constituent) const

@@ -3,6 +3,7 @@
 
 #include "TopTagger/TopTagger/include/TTModule.h"
 #include "TopTagger/TopTagger/include/TTMFilterBase.h"
+#include "TopTagger/TopTagger/include/TopObject.h"
 
 class TopTaggerResults;
 class Constituent;
@@ -10,6 +11,8 @@ class Constituent;
 class TTMAK8TopFilter : public TTModule
 {
 private:
+
+    TopObject::Type type_;
 
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);
