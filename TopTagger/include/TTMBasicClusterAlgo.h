@@ -42,6 +42,9 @@ private:
     bool doTrijet_;
     int nbSeed_;
 
+    //W-jet variables
+    bool doMonoW_;
+
     void fillTriplet(const Constituent* const, const Constituent* const, const Constituent* const, std::vector<TopObject>&);
 
 public:

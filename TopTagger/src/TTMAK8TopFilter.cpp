@@ -10,6 +10,9 @@ void TTMAK8TopFilter::getParameters(const cfg::CfgDocument* cfgDoc, const std::s
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
     
+    //Parameters
+    type_        = static_cast<TopObject::Type>(cfgDoc->get("type",        localCxt,  TopObject::MERGED_TOP));
+
 }
 
 void TTMAK8TopFilter::run(TopTaggerResults& ttResults)
@@ -23,7 +26,7 @@ void TTMAK8TopFilter::run(TopTaggerResults& ttResults)
     for(auto& topCand : topCandidates)
     {
         //For now this just adds the merged tops
-        if(topCand.getNConstituents() == 1)
+        if(topCand.getType() == type_)
         {
             tops.push_back(&topCand);
         }

@@ -3,11 +3,11 @@
 
 #include "TopTagger/TopTagger/include/TTModule.h"
 #include "TopTagger/TopTagger/include/TTMFilterBase.h"
+#include "TopTagger/TopTagger/include/TopObject.h"
 
 #include <string>
 #include <functional>
 
-class TopObject;
 class TopTaggerResults;
 
 /**
@@ -24,7 +24,7 @@ class TTMOverlapResolution : public TTModule, public TTMFilterBase
 {
 private:
     double mt_, maxTopEta_, dRMatch_, dRMatchAK8_, cvsThreshold_;
-    int NConstituents_;
+    TopObject::Type type_;
     std::string sortMethod_;
     std::function<bool (const TopObject* t1, const TopObject* t2)> sortFunc_;
     bool doSort_;

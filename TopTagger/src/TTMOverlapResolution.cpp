@@ -10,8 +10,6 @@
 #include <vector>
 #include <cmath>
 
-#include <iostream>
-
 void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
@@ -24,7 +22,7 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     dRMatchAK8_   = cfgDoc->get("dRMatchAK8",   commonCxt, 0.8);
 
     cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
-    NConstituents_ = cfgDoc->get("NConstituents", localCxt,  -1);
+    type_          = static_cast<TopObject::Type>(cfgDoc->get("NConstituents", localCxt,  TopObject::ANY));
     sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "EMPTY");
 
     //select the approperiate sorting function 
@@ -131,7 +129,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
     //Get vector of final tops to prune
     std::vector<TopObject*>& tops = ttResults.getTops();
 
-    //This container will kep trach of which jets have been included in final tops
+    //This container will keep track of which jets have been included in final tops
     std::set<Constituent const *>& usedJets = ttResults.getUsedConstituents();
 
     //Sort the top vector for overlap resolution
@@ -139,8 +137,8 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
     for(auto iTop = tops.begin(); iTop != tops.end();)
     {
-        //Check that this top had the expected number of constituents
-        if(NConstituents_ < 0 || (*iTop)->getNConstituents() == NConstituents_)
+        //Check that this top had the expected type
+        if((type_ == TopObject::ANY) || ((*iTop)->getType() == type_))
         {
             //Get constituent jets for this top
             const std::vector<Constituent const *>& jets = (*iTop)->getConstituents();

@@ -61,6 +61,7 @@ int main()
     std::vector<TLorentzVector>** AK8JetLV = new std::vector<TLorentzVector>*();
     std::vector<float>** AK8JetSoftdropMass = new std::vector<float>*();
     std::vector<float>** AK8JetDeepAK8Top = new std::vector<float>*();
+    std::vector<float>** AK8JetDeepAK8W = new std::vector<float>*();
     std::vector<std::vector<TLorentzVector>>** AK8SubjetLV = new std::vector<std::vector<TLorentzVector>>*();
 
     //Activate branches of interest
@@ -177,6 +178,10 @@ int main()
     tree->SetBranchStatus( "ak8DeepAK8Top", 1);
     tree->SetBranchAddress("ak8DeepAK8Top", AK8JetDeepAK8Top);
     
+    //AK8 jet deepAK8 W discriminator variable
+    tree->SetBranchStatus( "ak8DeepAK8W", 1);
+    tree->SetBranchAddress("ak8DeepAK8W", AK8JetDeepAK8W);
+    
     //AK8 jet softdrop mass
     tree->SetBranchStatus( "ak8softDropMass", 1);
     tree->SetBranchAddress("ak8softDropMass", AK8JetSoftdropMass);
@@ -232,6 +237,7 @@ int main()
             ttUtility::ConstAK8Inputs<float> AK8Inputs(
                 **AK8JetLV,
                 **AK8JetDeepAK8Top,
+                **AK8JetDeepAK8W,
                 **AK8JetSoftdropMass,
                 **AK8SubjetLV
                 );
@@ -260,7 +266,7 @@ int main()
                 //3 for resolved tops 
                 //2 for W+jet tops
                 //1 for fully merged AK8 tops
-                printf("\tTop properties: N constituents: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf\n", top->getNConstituents(), top->p().Pt(), top->p().Eta(), top->p().Phi());
+                printf("\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf\n", static_cast<int>(top->getType()), top->p().Pt(), top->p().Eta(), top->p().Phi(), top->p().M());
 
                 //get vector of top constituents 
                 const std::vector<Constituent const *>& constituents = top->getConstituents();

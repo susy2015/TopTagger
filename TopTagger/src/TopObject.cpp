@@ -2,7 +2,11 @@
 
 #include "Math/VectorUtil.h"
 
-TopObject::TopObject(std::vector<Constituent const *> constituents) : constituents_(constituents)
+TopObject::TopObject() : dRmax_(999.9), discriminator_(-999.9), dThetaMin_(999.9), dThetaMax_(-999.9), scaleFactor_(0.0), type_(TopObject::NONE)
+{
+}
+
+TopObject::TopObject(std::vector<Constituent const *> constituents, const Type& type) : constituents_(constituents), type_(type)
 {
     discriminator_ = -999.9;
     updateVariables();
