@@ -5,13 +5,27 @@
 
 {\ttfamily \#include $<$Top\-Object.\-h$>$}
 
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classTopObject_af82a20e421c29bc667af7cd73fc46ba4}{Type} \{ \\*
+{\bfseries N\-O\-N\-E}, 
+{\bfseries M\-E\-R\-G\-E\-D\-\_\-\-T\-O\-P}, 
+{\bfseries S\-E\-M\-I\-M\-E\-R\-G\-E\-D\-W\-B\-\_\-\-T\-O\-P}, 
+{\bfseries R\-E\-S\-O\-L\-V\-E\-D\-\_\-\-T\-O\-P}, 
+\\*
+{\bfseries M\-E\-R\-G\-E\-D\-\_\-\-W}, 
+{\bfseries S\-E\-M\-I\-M\-E\-R\-G\-E\-D\-Q\-B\-\_\-\-T\-O\-P}, 
+{\bfseries A\-N\-Y}
+ \}
+\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
 \hypertarget{classTopObject_a0eb6419f5a625d5ad777df5363e02f90}{\hyperlink{classTopObject_a0eb6419f5a625d5ad777df5363e02f90}{Top\-Object} ()}\label{classTopObject_a0eb6419f5a625d5ad777df5363e02f90}
 
 \begin{DoxyCompactList}\small\item\em Construct default empty \hyperlink{classTopObject}{Top\-Object}. \end{DoxyCompactList}\item 
-\hypertarget{classTopObject_a03208b96dc5bdb7bc271ad7303574b8e}{\hyperlink{classTopObject_a03208b96dc5bdb7bc271ad7303574b8e}{Top\-Object} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} const $\ast$ $>$ constituents)}\label{classTopObject_a03208b96dc5bdb7bc271ad7303574b8e}
+\hypertarget{classTopObject_a7888dbf304a6fb09af55b4a632cab5ef}{\hyperlink{classTopObject_a7888dbf304a6fb09af55b4a632cab5ef}{Top\-Object} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} const $\ast$ $>$ constituents, const \hyperlink{classTopObject_af82a20e421c29bc667af7cd73fc46ba4}{Type} \&type=N\-O\-N\-E)}\label{classTopObject_a7888dbf304a6fb09af55b4a632cab5ef}
 
 \begin{DoxyCompactList}\small\item\em Construct a \hyperlink{classTopObject}{Top\-Object} from a vector of constituent jets. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_adafc98b5660ac2ca92f9115668de2c10}{void \hyperlink{classTopObject_adafc98b5660ac2ca92f9115668de2c10}{add\-Constituent} (\hyperlink{classConstituent}{Constituent} const $\ast$constituent)}\label{classTopObject_adafc98b5660ac2ca92f9115668de2c10}
@@ -38,10 +52,13 @@
 \hypertarget{classTopObject_a144b61f5139eb1bef7bc00cee17deaf7}{double \hyperlink{classTopObject_a144b61f5139eb1bef7bc00cee17deaf7}{get\-Discriminator} () const }\label{classTopObject_a144b61f5139eb1bef7bc00cee17deaf7}
 
 \begin{DoxyCompactList}\small\item\em Returns the top discriminator for this candidate. \end{DoxyCompactList}\item 
+\hypertarget{classTopObject_a0be777a60c1bfab05e40a4b352193071}{double \hyperlink{classTopObject_a0be777a60c1bfab05e40a4b352193071}{get\-Type} () const }\label{classTopObject_a0be777a60c1bfab05e40a4b352193071}
+
+\begin{DoxyCompactList}\small\item\em Returnes the type of top. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_a3bd54d089da20318d1733c2d4e28493a}{const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} \\*
 const $\ast$ $>$ \& \hyperlink{classTopObject_a3bd54d089da20318d1733c2d4e28493a}{get\-Constituents} () const }\label{classTopObject_a3bd54d089da20318d1733c2d4e28493a}
 
-\begin{DoxyCompactList}\small\item\em Returns the interal vector of constituents which are used to construct the \hyperlink{classTopObject}{Top\-Object}. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Returns the internal vector of constituents which are used to construct the \hyperlink{classTopObject}{Top\-Object}. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_a562bafee171bf66c283d519c8021672d}{int \hyperlink{classTopObject_a562bafee171bf66c283d519c8021672d}{get\-N\-Constituents} () const }\label{classTopObject_a562bafee171bf66c283d519c8021672d}
 
 \begin{DoxyCompactList}\small\item\em The number of constituents in this \hyperlink{classTopObject}{Top\-Object}. \end{DoxyCompactList}\item 
@@ -65,6 +82,12 @@ const \& \hyperlink{classTopObject_a51cc6fbaacb2cf502cad0b57d99ae91f}{get\-Gen\-
 
 \subsection{Detailed Description}
 Container class which represents a top candidate or final selected top object. 
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classTopObject_af82a20e421c29bc667af7cd73fc46ba4}{\index{Top\-Object@{Top\-Object}!Type@{Type}}
+\index{Type@{Type}!TopObject@{Top\-Object}}
+\subsubsection[{Type}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Top\-Object\-::\-Type}}}\label{classTopObject_af82a20e421c29bc667af7cd73fc46ba4}
+Enum to select what flavor of object this \hyperlink{classTopObject}{Top\-Object} is. 
 
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 

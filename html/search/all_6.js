@@ -19,5 +19,6 @@ var searchData=
   ['getsystematicuncertainty',['getSystematicUncertainty',['../classTopObject.html#add523f130ec310825913f90f2ad92cd1',1,'TopObject']]],
   ['gettopcandidates',['getTopCandidates',['../classTopTaggerResults.html#af73f385ccfed5d95edceff6fce6c749b',1,'TopTaggerResults']]],
   ['gettops',['getTops',['../classTopTaggerResults.html#a247c5fe21e474217d21059d9648367c5',1,'TopTaggerResults']]],
+  ['gettype',['getType',['../classTopObject.html#a0be777a60c1bfab05e40a4b352193071',1,'TopObject']]],
   ['getusedconstituents',['getUsedConstituents',['../classTopTaggerResults.html#a515649da0d0d2a39e1f695a384e7f1e9',1,'TopTaggerResults']]]
 ];

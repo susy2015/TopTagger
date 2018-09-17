@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -83,6 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classTopObject-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -92,16 +93,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="TopObject_8h_source.html">TopObject.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:af82a20e421c29bc667af7cd73fc46ba4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">Type</a> { <br/>
+&#160;&#160;<b>NONE</b>, 
+<b>MERGED_TOP</b>, 
+<b>SEMIMERGEDWB_TOP</b>, 
+<b>RESOLVED_TOP</b>, 
+<br/>
+&#160;&#160;<b>MERGED_W</b>, 
+<b>SEMIMERGEDQB_TOP</b>, 
+<b>ANY</b>
+<br/>
+ }</td></tr>
+<tr class="separator:af82a20e421c29bc667af7cd73fc46ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0eb6419f5a625d5ad777df5363e02f90"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0eb6419f5a625d5ad777df5363e02f90"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a0eb6419f5a625d5ad777df5363e02f90">TopObject</a> ()</td></tr>
 <tr class="memdesc:a0eb6419f5a625d5ad777df5363e02f90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct default empty <a class="el" href="classTopObject.html">TopObject</a>. <br/></td></tr>
 <tr class="separator:a0eb6419f5a625d5ad777df5363e02f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03208b96dc5bdb7bc271ad7303574b8e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03208b96dc5bdb7bc271ad7303574b8e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a03208b96dc5bdb7bc271ad7303574b8e">TopObject</a> (std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> const * &gt; constituents)</td></tr>
-<tr class="memdesc:a03208b96dc5bdb7bc271ad7303574b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="classTopObject.html">TopObject</a> from a vector of constituent jets. <br/></td></tr>
-<tr class="separator:a03208b96dc5bdb7bc271ad7303574b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7888dbf304a6fb09af55b4a632cab5ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7888dbf304a6fb09af55b4a632cab5ef"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a7888dbf304a6fb09af55b4a632cab5ef">TopObject</a> (std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> const * &gt; constituents, const <a class="el" href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">Type</a> &amp;type=NONE)</td></tr>
+<tr class="memdesc:a7888dbf304a6fb09af55b4a632cab5ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="classTopObject.html">TopObject</a> from a vector of constituent jets. <br/></td></tr>
+<tr class="separator:a7888dbf304a6fb09af55b4a632cab5ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adafc98b5660ac2ca92f9115668de2c10"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adafc98b5660ac2ca92f9115668de2c10"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#adafc98b5660ac2ca92f9115668de2c10">addConstituent</a> (<a class="el" href="classConstituent.html">Constituent</a> const *constituent)</td></tr>
 <tr class="memdesc:adafc98b5660ac2ca92f9115668de2c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new constituent to the <a class="el" href="classTopObject.html">TopObject</a>. <br/></td></tr>
@@ -134,10 +150,14 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a144b61f5139eb1bef7bc00cee17deaf7">getDiscriminator</a> () const </td></tr>
 <tr class="memdesc:a144b61f5139eb1bef7bc00cee17deaf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the top discriminator for this candidate. <br/></td></tr>
 <tr class="separator:a144b61f5139eb1bef7bc00cee17deaf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0be777a60c1bfab05e40a4b352193071"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0be777a60c1bfab05e40a4b352193071"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a0be777a60c1bfab05e40a4b352193071">getType</a> () const </td></tr>
+<tr class="memdesc:a0be777a60c1bfab05e40a4b352193071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returnes the type of top. <br/></td></tr>
+<tr class="separator:a0be777a60c1bfab05e40a4b352193071"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3bd54d089da20318d1733c2d4e28493a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3bd54d089da20318d1733c2d4e28493a"></a>
 const std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> <br class="typebreak"/>
 const * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a3bd54d089da20318d1733c2d4e28493a">getConstituents</a> () const </td></tr>
-<tr class="memdesc:a3bd54d089da20318d1733c2d4e28493a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the interal vector of constituents which are used to construct the <a class="el" href="classTopObject.html">TopObject</a>. <br/></td></tr>
+<tr class="memdesc:a3bd54d089da20318d1733c2d4e28493a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the internal vector of constituents which are used to construct the <a class="el" href="classTopObject.html">TopObject</a>. <br/></td></tr>
 <tr class="separator:a3bd54d089da20318d1733c2d4e28493a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a562bafee171bf66c283d519c8021672d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a562bafee171bf66c283d519c8021672d"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a562bafee171bf66c283d519c8021672d">getNConstituents</a> () const </td></tr>
@@ -167,14 +187,28 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Container class which represents a top candidate or final selected top object. </p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a class="anchor" id="af82a20e421c29bc667af7cd73fc46ba4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">TopObject::Type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enum to select what flavor of object this <a class="el" href="classTopObject.html">TopObject</a> is. </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/travis/build/susy2015/TopTagger/TopTagger/include/<a class="el" href="TopObject_8h_source.html">TopObject.h</a></li>
 <li>/home/travis/build/susy2015/TopTagger/TopTagger/src/TopObject.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 8 2018 20:35:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2018 22:36:52 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

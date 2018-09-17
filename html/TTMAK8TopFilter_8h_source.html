@@ -69,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -93,34 +93,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="TTModule_8h.html">TopTagger/TopTagger/include/TTModule.h</a>&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;TopTagger/TopTagger/include/TTMFilterBase.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">class </span><a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">class </span><a class="code" href="classConstituent.html">Constituent</a>;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classTTMAK8TopFilter.html">   10</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a> : <span class="keyword">public</span> <a class="code" href="classTTModule.html">TTModule</a></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMAK8TopFilter.html#aed52bd6877ec9b8ac3a2f45769f05856">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMAK8TopFilter.html#a28a8fcd8a829caae32b2a106037d3a6f">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;};</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a>);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;TopTagger/TopTagger/include/TopObject.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">class </span><a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">class </span><a class="code" href="classConstituent.html">Constituent</a>;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classTTMAK8TopFilter.html">   11</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a> : <span class="keyword">public</span> <a class="code" href="classTTModule.html">TTModule</a></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <a class="code" href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">TopObject::Type</a> type_;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMAK8TopFilter.html#aed52bd6877ec9b8ac3a2f45769f05856">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMAK8TopFilter.html#a28a8fcd8a829caae32b2a106037d3a6f">run</a>(<a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp;);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;};</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<a class="code" href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a>(<a class="code" href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a>);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="TTModule_8h_html"><div class="ttname"><a href="TTModule_8h.html">TTModule.h</a></div></div>
-<div class="ttc" id="classTTMAK8TopFilter_html_a28a8fcd8a829caae32b2a106037d3a6f"><div class="ttname"><a href="classTTMAK8TopFilter.html#a28a8fcd8a829caae32b2a106037d3a6f">TTMAK8TopFilter::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMAK8TopFilter.cpp:15</div></div>
+<div class="ttc" id="classTTMAK8TopFilter_html_a28a8fcd8a829caae32b2a106037d3a6f"><div class="ttname"><a href="classTTMAK8TopFilter.html#a28a8fcd8a829caae32b2a106037d3a6f">TTMAK8TopFilter::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMAK8TopFilter.cpp:18</div></div>
 <div class="ttc" id="classConstituent_html"><div class="ttname"><a href="classConstituent.html">Constituent</a></div><div class="ttdef"><b>Definition:</b> Constituent.h:20</div></div>
 <div class="ttc" id="classTTMAK8TopFilter_html_aed52bd6877ec9b8ac3a2f45769f05856"><div class="ttname"><a href="classTTMAK8TopFilter.html#aed52bd6877ec9b8ac3a2f45769f05856">TTMAK8TopFilter::getParameters</a></div><div class="ttdeci">void getParameters(const cfg::CfgDocument *, const std::string &amp;)</div><div class="ttdef"><b>Definition:</b> TTMAK8TopFilter.cpp:7</div></div>
 <div class="ttc" id="TTModule_8h_html_a5aff241e827824ffd2c2efc4c5bf1fda"><div class="ttname"><a href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a></div><div class="ttdeci">#define REGISTER_TTMODULE(_module)</div><div class="ttdef"><b>Definition:</b> TTModule.h:50</div></div>
-<div class="ttc" id="classTTMAK8TopFilter_html"><div class="ttname"><a href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a></div><div class="ttdef"><b>Definition:</b> TTMAK8TopFilter.h:10</div></div>
+<div class="ttc" id="classTTMAK8TopFilter_html"><div class="ttname"><a href="classTTMAK8TopFilter.html">TTMAK8TopFilter</a></div><div class="ttdef"><b>Definition:</b> TTMAK8TopFilter.h:11</div></div>
 <div class="ttc" id="classcfg_1_1CfgDocument_html"><div class="ttname"><a href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a></div><div class="ttdef"><b>Definition:</b> CfgDocument.hh:15</div></div>
 <div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:14</div></div>
 <div class="ttc" id="classTTModule_html"><div class="ttname"><a href="classTTModule.html">TTModule</a></div><div class="ttdef"><b>Definition:</b> TTModule.h:21</div></div>
+<div class="ttc" id="classTopObject_html_af82a20e421c29bc667af7cd73fc46ba4"><div class="ttname"><a href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">TopObject::Type</a></div><div class="ttdeci">Type</div><div class="ttdef"><b>Definition:</b> TopObject.h:22</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 8 2018 20:35:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2018 22:36:51 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
