@@ -24,6 +24,7 @@ void TTMFinalSort::run(TopTaggerResults& ttResults)
 {
     //Get vector of final tops to sort
     std::vector<TopObject*>& tops = ttResults.getTops();
+    std::map<TopObject::Type, std::vector<TopObject*>>& topsByType = ttResults.getTopsByType();
 
     //Sort the top vector for overlap resolution
     if(sortMethod_.compare("topMass") == 0)
@@ -42,4 +43,7 @@ void TTMFinalSort::run(TopTaggerResults& ttResults)
     {
         THROW_TTEXCEPTION("Invalid sorting option");
     }
+
+    //After final sort, create the catagory seperated version of the final top collection 
+    for(TopObject* top : tops) topsByType[top->getType()].push_back(top);
 }

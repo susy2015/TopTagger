@@ -80,6 +80,11 @@ public:
      */
     void runTagger(const std::vector<Constituent>&);
 
+    /**
+     *Runs the top tagger modules specified in the configuration file.  Run once per event.
+     */
+    void runTagger(std::vector<Constituent>&&);
+
     //Getters
 
     /**

@@ -5,6 +5,7 @@
 #include "TopTagger/TopTagger/include/Constituent.h"
 
 #include <vector>
+#include <map>
 #include <set>
 #include <memory>
 
@@ -27,6 +28,9 @@ private:
     ///List of final top objects, will be filled out by the modules
     std::vector<TopObject*> tops_;
 
+    ///Final tops sorted by type
+    std::map<TopObject::Type, std::vector<TopObject*>> topsByType_;
+
     ///The remaining system container
     TopObject rsys_;
 
@@ -39,6 +43,8 @@ public:
      */
     TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(new std::vector<Constituent>(constituents)) {}
 
+    TopTaggerResults(std::vector<Constituent>&& constituents) : constituents_(new std::vector<Constituent>(std::move(constituents))) {}
+
     ~TopTaggerResults() {}
 
     //Setters
@@ -49,11 +55,19 @@ public:
         constituents_.reset(new std::vector<Constituent>(constituents));
     }
 
+    /** Set/reset the internal copy of the constituents vector */
+    void setConstituents(std::vector<Constituent>&& constituents)
+    {
+        //Again a copy is made to ensure this vector remains in scope
+        constituents_.reset(new std::vector<Constituent>(constituents));
+    }
+
     //non-const getters (for modules)
     decltype(topCandidates_)& getTopCandidates() { return topCandidates_; }
     decltype(usedConstituents_)& getUsedConstituents() { return usedConstituents_; }
     decltype(tops_)& getTops() { return tops_; }
     decltype(rsys_)& getRsys() { return rsys_; }
+    decltype(topsByType_)& getTopsByType() { return topsByType_; }
     
     //const getters for public consumption
     /** Get the internal vector of constituents */
@@ -64,6 +78,8 @@ public:
     const decltype(topCandidates_)& getTopCandidates() const { return topCandidates_; }
     /** Get the vector of final reconstructed tops */
     const decltype(tops_)& getTops() const { return tops_; }
+    /** Get a map of final top objects split by type */
+    const decltype(topsByType_)& getTopsByType() const { return topsByType_; }
     /** Get the remaining system used for MT2 calculations in the case when there is only one reconstructed top */
     const decltype(rsys_)& getRsys() const { return rsys_; }
 };

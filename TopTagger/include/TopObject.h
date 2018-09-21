@@ -21,7 +21,7 @@ public:
      */
     enum Type
     {
-        NONE, MERGED_TOP, SEMIMERGEDWB_TOP, RESOLVED_TOP, MERGED_W, SEMIMERGEDQB_TOP, ANY
+        NONE, MERGED_TOP, SEMIMERGEDWB_TOP, RESOLVED_TOP, MERGED_W, SEMIMERGEDQB_TOP, NTYPE, ANY
     };
 
 private:
@@ -61,7 +61,7 @@ public:
     /// Returns the top discriminator for this candidate 
     double getDiscriminator() const { return discriminator_; }
     /// Returnes the type of top
-    double getType() const { return type_; }
+    Type getType() const { return type_; }
 
     /// Returns the internal vector of constituents which are used to construct the TopObject
     const std::vector<Constituent const *>& getConstituents() const { return constituents_; }
