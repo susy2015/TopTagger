@@ -10,7 +10,12 @@
 \item 
 \hyperlink{classTopTaggerResults_a661fa9c839fd16be88ea1205cf274c7e}{Top\-Tagger\-Results} (const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents)
 \item 
+\hypertarget{classTopTaggerResults_a2a91300ec5ed751c36b2d06202349bad}{{\bfseries Top\-Tagger\-Results} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&\&constituents)}\label{classTopTaggerResults_a2a91300ec5ed751c36b2d06202349bad}
+
+\item 
 void \hyperlink{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}{set\-Constituents} (const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&constituents)
+\item 
+void \hyperlink{classTopTaggerResults_a4ab733379f6e450ce98b2afdb4f6e523}{set\-Constituents} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&\&constituents)
 \item 
 \hypertarget{classTopTaggerResults_a36f6d9d5d0de2835f9d2eb904c937ba1}{decltype(top\-Candidates\-\_\-)\& {\bfseries get\-Top\-Candidates} ()}\label{classTopTaggerResults_a36f6d9d5d0de2835f9d2eb904c937ba1}
 
@@ -24,6 +29,9 @@ void \hyperlink{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}{set\-Co
 \hypertarget{classTopTaggerResults_a4fc99173e33deb2efc0f5d79f05d8c8b}{decltype(rsys\-\_\-)\& {\bfseries get\-Rsys} ()}\label{classTopTaggerResults_a4fc99173e33deb2efc0f5d79f05d8c8b}
 
 \item 
+\hypertarget{classTopTaggerResults_aab9cf8928f15dd99d75dee250b0324eb}{decltype(tops\-By\-Type\-\_\-)\& {\bfseries get\-Tops\-By\-Type} ()}\label{classTopTaggerResults_aab9cf8928f15dd99d75dee250b0324eb}
+
+\item 
 const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \& \hyperlink{classTopTaggerResults_ac1cf35b9f88753c844265a33954c5678}{get\-Constituents} () const 
 \item 
 decltype(used\-Constituents\-\_\-) const \& \hyperlink{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}{get\-Used\-Constituents} () const 
@@ -31,6 +39,8 @@ decltype(used\-Constituents\-\_\-) const \& \hyperlink{classTopTaggerResults_a51
 decltype(top\-Candidates\-\_\-) const \& \hyperlink{classTopTaggerResults_af73f385ccfed5d95edceff6fce6c749b}{get\-Top\-Candidates} () const 
 \item 
 decltype(tops\-\_\-) const \& \hyperlink{classTopTaggerResults_a247c5fe21e474217d21059d9648367c5}{get\-Tops} () const 
+\item 
+decltype(tops\-By\-Type\-\_\-) const \& \hyperlink{classTopTaggerResults_ac3e5eb22c271a27aed0aaab94dacb547}{get\-Tops\-By\-Type} () const 
 \item 
 decltype(rsys\-\_\-) const \& \hyperlink{classTopTaggerResults_a9618cf005aa6b206e70462ceeea5f6c4}{get\-Rsys} () const 
 \end{DoxyCompactItemize}
@@ -78,7 +88,14 @@ Get the vector of top candidates \hypertarget{classTopTaggerResults_a247c5fe21e4
 {}
 \end{DoxyParamCaption}
 ) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a247c5fe21e474217d21059d9648367c5}
-Get the vector of final reconstructed tops \hypertarget{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Used\-Constituents@{get\-Used\-Constituents}}
+Get the vector of final reconstructed tops \hypertarget{classTopTaggerResults_ac3e5eb22c271a27aed0aaab94dacb547}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Tops\-By\-Type@{get\-Tops\-By\-Type}}
+\index{get\-Tops\-By\-Type@{get\-Tops\-By\-Type}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{get\-Tops\-By\-Type}]{\setlength{\rightskip}{0pt plus 5cm}decltype(tops\-By\-Type\-\_\-) const\& Top\-Tagger\-Results\-::get\-Tops\-By\-Type (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_ac3e5eb22c271a27aed0aaab94dacb547}
+Get a map of final top objects split by type \hypertarget{classTopTaggerResults_a515649da0d0d2a39e1f695a384e7f1e9}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!get\-Used\-Constituents@{get\-Used\-Constituents}}
 \index{get\-Used\-Constituents@{get\-Used\-Constituents}!TopTaggerResults@{Top\-Tagger\-Results}}
 \subsubsection[{get\-Used\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}decltype(used\-Constituents\-\_\-) const\& Top\-Tagger\-Results\-::get\-Used\-Constituents (
 \begin{DoxyParamCaption}
@@ -92,6 +109,13 @@ Get the set of constituens which have been flagged as used in final reconstructe
 \item[{const std\-::vector$<$ {\bf Constituent} $>$ \&}]{constituents}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a2d7cf77c1e4591e6fbdf0b297a3f87bd}
+Set/reset the internal copy of the constituents vector \hypertarget{classTopTaggerResults_a4ab733379f6e450ce98b2afdb4f6e523}{\index{Top\-Tagger\-Results@{Top\-Tagger\-Results}!set\-Constituents@{set\-Constituents}}
+\index{set\-Constituents@{set\-Constituents}!TopTaggerResults@{Top\-Tagger\-Results}}
+\subsubsection[{set\-Constituents}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-Results\-::set\-Constituents (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ {\bf Constituent} $>$ \&\&}]{constituents}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTaggerResults_a4ab733379f6e450ce98b2afdb4f6e523}
 Set/reset the internal copy of the constituents vector 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}

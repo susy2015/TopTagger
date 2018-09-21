@@ -136,29 +136,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTopTagger.html#accf43da3b1469e524bfe6f568116219a">runTagger</a>(<span class="keyword">const</span> std::vector&lt;Constituent&gt;&amp;);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">//Getters</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">const</span> <a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp; <a class="code" href="classTopTagger.html#ac6f06aeb683b0b761ad09ac018e11d08">getResults</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;};</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTopTagger.html#accf43da3b1469e524bfe6f568116219a">runTagger</a>(std::vector&lt;Constituent&gt;&amp;&amp;);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">//Getters</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">const</span> <a class="code" href="classTopTaggerResults.html">TopTaggerResults</a>&amp; <a class="code" href="classTopTagger.html#ac6f06aeb683b0b761ad09ac018e11d08">getResults</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;};</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classTopTagger_html_a26e4654b1eef1f7e7dcffeb02b9fc41b"><div class="ttname"><a href="classTopTagger.html#a26e4654b1eef1f7e7dcffeb02b9fc41b">TopTagger::TopTagger</a></div><div class="ttdeci">TopTagger()</div><div class="ttdoc">Default constructor to create an empty TopTagger object. </div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:12</div></div>
-<div class="ttc" id="classTopTagger_html_accf43da3b1469e524bfe6f568116219a"><div class="ttname"><a href="classTopTagger.html#accf43da3b1469e524bfe6f568116219a">TopTagger::runTagger</a></div><div class="ttdeci">void runTagger(const std::vector&lt; Constituent &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:137</div></div>
+<div class="ttc" id="classTopTagger_html_accf43da3b1469e524bfe6f568116219a"><div class="ttname"><a href="classTopTagger.html#accf43da3b1469e524bfe6f568116219a">TopTagger::runTagger</a></div><div class="ttdeci">void runTagger(const std::vector&lt; Constituent &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:156</div></div>
 <div class="ttc" id="classTopTagger_html_ae117c09fc42674a09247fd1ad8dcb3ce"><div class="ttname"><a href="classTopTagger.html#ae117c09fc42674a09247fd1ad8dcb3ce">TopTagger::setRethrow</a></div><div class="ttdeci">void setRethrow(const bool reThrow)</div><div class="ttdef"><b>Definition:</b> TopTagger.h:65</div></div>
 <div class="ttc" id="classConstituent_html"><div class="ttname"><a href="classConstituent.html">Constituent</a></div><div class="ttdef"><b>Definition:</b> Constituent.h:20</div></div>
 <div class="ttc" id="classTopTagger_html_ad7e22571559cb7afe0f0cf0e14d1ef41"><div class="ttname"><a href="classTopTagger.html#ad7e22571559cb7afe0f0cf0e14d1ef41">TopTagger::setVerbosity</a></div><div class="ttdeci">void setVerbosity(const int verbosity)</div><div class="ttdef"><b>Definition:</b> TopTagger.h:60</div></div>
 <div class="ttc" id="classTopTagger_html_ae7a38be12023643495adea6f9a696ff3"><div class="ttname"><a href="classTopTagger.html#ae7a38be12023643495adea6f9a696ff3">TopTagger::setCfgFileDirect</a></div><div class="ttdeci">void setCfgFileDirect(const std::string &amp;)</div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:76</div></div>
 <div class="ttc" id="classTTException_html"><div class="ttname"><a href="classTTException.html">TTException</a></div><div class="ttdef"><b>Definition:</b> TTException.h:6</div></div>
-<div class="ttc" id="classTopTagger_html_ac6f06aeb683b0b761ad09ac018e11d08"><div class="ttname"><a href="classTopTagger.html#ac6f06aeb683b0b761ad09ac018e11d08">TopTagger::getResults</a></div><div class="ttdeci">const TopTaggerResults &amp; getResults() const </div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:156</div></div>
+<div class="ttc" id="classTopTagger_html_ac6f06aeb683b0b761ad09ac018e11d08"><div class="ttname"><a href="classTopTagger.html#ac6f06aeb683b0b761ad09ac018e11d08">TopTagger::getResults</a></div><div class="ttdeci">const TopTaggerResults &amp; getResults() const </div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:175</div></div>
 <div class="ttc" id="classTopTagger_html_ac18bfe0673dbd05973f45c668ed2b190"><div class="ttname"><a href="classTopTagger.html#ac18bfe0673dbd05973f45c668ed2b190">TopTagger::setCfgFile</a></div><div class="ttdeci">void setCfgFile(const std::string &amp;)</div><div class="ttdef"><b>Definition:</b> TopTagger.cpp:29</div></div>
-<div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:14</div></div>
+<div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:15</div></div>
 <div class="ttc" id="classTopTagger_html"><div class="ttname"><a href="classTopTagger.html">TopTagger</a></div><div class="ttdef"><b>Definition:</b> TopTagger.h:26</div></div>
 <div class="ttc" id="classTTModule_html"><div class="ttname"><a href="classTTModule.html">TTModule</a></div><div class="ttdef"><b>Definition:</b> TTModule.h:21</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 17 2018 22:36:51 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 21 2018 20:46:26 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

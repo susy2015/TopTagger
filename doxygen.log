@@ -455,10 +455,12 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:84: warning: Member GetMatchedTop(std::vector< TLorentzVector > TopCand, std::vector< TLorentzVector > &MachedTopCand, std::vector< TLorentzVector >Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:85: warning: Member GetMatchedTopConst(const std::vector< Constituent const * > &topconst, const std::vector< TLorentzVector > &gentopdau) (function) of class TopCat is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:87: warning: Member TopConst(const std::vector< T > &tops, const std::vector< TLorentzVector > &genDecayLVec, const std::vector< int > &genDecayPdgIdVec, const std::vector< int > &genDecayIdxVec, const std::vector< int > &genDecayMomIdxVec) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:53: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:54: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:55: warning: Member getTops() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:56: warning: Member getRsys() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:46: warning: Member TopTaggerResults(std::vector< Constituent > &&constituents) (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:66: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:67: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:68: warning: Member getTops() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:69: warning: Member getRsys() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:70: warning: Member getTopsByType() (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:23: warning: Member GetTopLVec(TopObject *Top) (function) of class TopVar is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:24: warning: Member GetTopLVec(TopObject TopCand) (function) of class TopVar is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:25: warning: Member GetTopPt(TopObject *Top) (function) of class TopVar is not documented.
@@ -1027,5 +1029,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1322/65536 hits=8128 misses=1413
+lookup cache used 1329/65536 hits=8190 misses=1420
 finished...
