@@ -43,11 +43,20 @@ public:
      */
     TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(new std::vector<Constituent>(constituents)) {}
 
+    TopTaggerResults(std::vector<Constituent>&& constituents) : constituents_(new std::vector<Constituent>(std::move(constituents))) {}
+
     ~TopTaggerResults() {}
 
     //Setters
     /** Set/reset the internal copy of the constituents vector */
     void setConstituents(const std::vector<Constituent>& constituents)
+    {
+        //Again a copy is made to ensure this vector remains in scope
+        constituents_.reset(new std::vector<Constituent>(constituents));
+    }
+
+    /** Set/reset the internal copy of the constituents vector */
+    void setConstituents(std::vector<Constituent>&& constituents)
     {
         //Again a copy is made to ensure this vector remains in scope
         constituents_.reset(new std::vector<Constituent>(constituents));

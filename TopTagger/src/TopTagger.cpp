@@ -134,6 +134,25 @@ void TopTagger::getParameters()
     while(keepLooping);
 }
 
+void TopTagger::runTagger(std::vector<Constituent>&& constituents)
+{
+    //try-catch the entire function - exceptions rethrown by default
+    try
+    {
+        if(topTaggerResults_) delete topTaggerResults_;
+        topTaggerResults_ = new TopTaggerResults(std::forward<std::vector<Constituent>>(constituents));
+
+        for(std::unique_ptr<TTModule>& module : topTaggerModules_)
+        {
+            module->run(*topTaggerResults_);
+        }
+    }
+    catch(const TTException& e)
+    {
+        handelException(e);
+    }
+}
+
 void TopTagger::runTagger(const std::vector<Constituent>& constituents)
 {
     //try-catch the entire function - exceptions rethrown by default

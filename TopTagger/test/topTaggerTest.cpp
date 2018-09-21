@@ -247,7 +247,7 @@ int main()
             std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
 
             //run the top tagger
-            tt.runTagger(constituents);
+            tt.runTagger(std::move(constituents));
 
             //retrieve the top tagger results object
             const TopTaggerResults& ttr = tt.getResults();
