@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# getTaggerCfg.sh
+
 GITHUB_SUSY2015_URL=https://github.com/susy2015
 REPO_NAME=TopTaggerCfg
 
+STARTING_DIR=$PWD
 CFG_DIRECTORY=$PWD
 TAG=
 NO_SOFTLINK=
@@ -61,12 +64,48 @@ then
     exit 0
 fi
 
-STARTING_DIR=$PWD
+echo " - Running getTaggerCfg.sh"
 
+# get source directory of bash script
+# used for "Easter Egg"...
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+# check if OVERWRITE is set
+# if OVERWRITE is set, ask user for confirmation before continuing
+if [[ -z $OVERWRITE ]]
+then
+    # OVERWRITE is not set
+    # continue
+    echo "INFO: OVERWRITE is not set. Existing files and softlinks will not be replaced."
+    echo "  To replace existing softlinks and files, use the OVERWRITE option -o."
+else
+    # OVERWRITE is set
+    # ask user for confirmation before continuing
+    echo   "INFO: OVERWRITE is set. Existing files and softlinks will be replaced."
+    echo   "  Would you like to continue and replace existing files?"
+    printf "  Enter (Y/y/yes/si/oui/ja/da) to continue, and anything else to quit: "
+    read answer
+    if [[ $answer == "ok" ]]
+    then
+        # "Easter Egg"...
+        cat $SCRIPTDIR/ok.txt
+        exit 0
+    fi
+    if [[ $answer == "Y" || $answer == "y" || $answer == "yes" || $answer == "si" || $answer == "oui" || $answer == "ja" || $answer == "da" ]]
+    then
+        echo " - Continuing..."
+    else
+        echo " - Quitting..."
+        exit 0
+    fi
+fi
+
+
+# Check that CFG_DIRECTORY is a directory
 if [ ! -d $CFG_DIRECTORY ]
 then
     echo $CFG_DIRECTORY " Is not a valid directory!"
-    exit 0
+    exit 1
 fi
 
 cd $CFG_DIRECTORY
@@ -89,6 +128,8 @@ fi
 
 cd $REPO_NAME-$TAG
 DOWNLOAD_DIR=$PWD
+
+echo "INFO: DOWNLOAD_DIR is $DOWNLOAD_DIR"
 
 MVAFILES=
 
@@ -129,13 +170,27 @@ fi
 
 cd $STARTING_DIR
 
+echo "INFO: STARTING_DIR is $STARTING_DIR"
+
+# If OVERWRITE is set, make solftlinks (using ln) with -f
+# If OVERWRITE is not set, make solftlinks (using ln)
+# Pipe output to /dev/null
+
+# Note: "> /dev/null 2>&1" does this:
+# stdin  ==> fd 0      (default fd 0)
+# stdout ==> /dev/null (default fd 1)
+# stderr ==> stdout    (default fd 2)
+
+# [[ -z STRING ]] : True if the length of "STRING" is zero, False if "STRING" has nonzero length
 if [[ -z $NO_SOFTLINK ]]
 then
-    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME
+    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME > /dev/null 2>&1
     if [[ ! -z ${MVAFILES// } ]] 
     then
         for MVAFILE in $MVAFILES; do
-            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE
+            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE > /dev/null 2>&1
         done
     fi
 fi
+
+
