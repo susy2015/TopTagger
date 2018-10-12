@@ -17,19 +17,23 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 TOP_CFG_NAME=TopTagger.cfg
 
 function print_help {
+    echo ""
     echo "Usage:"
-    echo "getTaggerCfg.sh -t RELEASE_TAG [-d checkout_directory] [-f cfg_filename] [-n]"
+    echo "    getTaggerCfg.sh -t RELEASE_TAG [-d checkout_directory] [-f cfg_filename] [-n]"
     echo ""
-    echo "Description: This script automatically downloads the top tagger configuration file and MVA training file (if necessary)"
-    echo "And produces a softlink to this files in your corrent directory.  This script should be run from the directory where"
-    echo "the tagger code will be run from.  Tagger configuration releases can be browsed here"
-    echo "https://github.com/susy2015/TopTaggerCfg/releases."
+    echo "Options:"
+    echo "    -t RELEASE_TAG :         This is the github release tag to check out (required option)"
+    echo "    -d checkout_directory :  This is the directory where the configuration files will be downloaded to (default: .)"
+    echo "    -f cfg_filename :        Specify this option to name the softlink to the cfg file something other than \"TopTagger.cfg\""
+    echo "    -o :                     Overwrite the softlinks if they already exist"
+    echo "    -n :                     Download files without producing softlinks"
     echo ""
-    echo "-t RELEASE_TAG :         This is the github release tag to check out (required option)"
-    echo "-d checkout_directory :  This is the directory where the configuration files will be downloaded to (default: .)"
-    echo "-f cfg_filename :        Specify this option to name the softlink to the cfg file something other than \"TopTagger.cfg\""
-    echo "-o :                     Overwrite the softlinks if they already exist"
-    echo "-n :                     Download files without producing softlinks"
+    echo "Description:"
+    echo "    This script automatically downloads the top tagger configuration file and MVA training file (if necessary)"
+    echo "    and produces a softlink to this file in your corrent directory.  This script should be run from the directory where"
+    echo "    the tagger code will be run from.  Tagger configuration releases can be browsed at"
+    echo "    https://github.com/susy2015/TopTaggerCfg/releases."
+    echo ""
 }
 
 
