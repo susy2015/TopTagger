@@ -100,7 +100,13 @@ else
     if [[ $answer == "ok" ]]
     then
         # "Easter Egg"...
-        cat $SCRIPTDIR/ok.txt
+        echo "  ______    __  ___" 
+        echo " /  __  \\  |  |/  /" 
+        echo "|  |  |  | |  '  / " 
+        echo "|  |  |  | |    <  " 
+        echo "|  \`--'  | |  .  \\ " 
+        echo " \\______/  |__|\\__\\" 
+        echo ""
         exit 0
     fi
     if [[ $answer == "Y" || $answer == "y" || $answer == "yes" || $answer == "si" || $answer == "oui" || $answer == "ja" || $answer == "da" ]]
