@@ -109,6 +109,9 @@ dnl check for tensorflow c-api
 if test -z ${TENSORFLOWDIR+x}; then
    if test ${scramfound} == yes; then
       TENSORFLOWDIR=$(scram tool tag tensorflow-c TENSORFLOW_C_BASE)
+      if test ${TENSORFLOWDIR:0:5} == SCRAM; then
+         TENSORFLOWDIR=$(scram tool tag tensorflow TENSORFLOW_BASE)
+      fi
    else
       TENSORFLOWDIR=/usr/local/
    fi
