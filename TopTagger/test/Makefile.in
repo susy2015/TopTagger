@@ -26,7 +26,7 @@ TTTDIR     = $(TAGGERDIR)/TopTagger/test
 TPSDIR     = $(TAGGERDIR)/CfgParser/src
 
 ## Enable for maximum warning
-#CXXFLAGS += -Wall -Wextra -Weffc++
+CXXFLAGS += -Wall -Wextra -Wpedantic
 
 # Flags for generating auto dependancies 
 CXXDEPFLAGS = -MMD -MP
