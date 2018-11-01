@@ -356,6 +356,7 @@ namespace hcalcfg {
     struct ParserInitCaller {
 	static void CallInit(T *t) {
             // nothing to do
+            (void)t;
 	}
     };
 
@@ -372,6 +373,7 @@ namespace hcalcfg {
     struct ParserDestroyCaller {
 	static void CallDestroy(T *t) {
             // nothing to do
+            (void)t;
 	}
     };
 

@@ -83,28 +83,28 @@ public:
     const TLorentzVector& P() const                       { return p(); }
     //* Alias for p() */
     const TLorentzVector& getP() const                    { return p(); }
-    const double getBTagDisc() const                      { return bTagDisc_; }
-    const double getQGLikelihood() const                  { return qgLikelihood_; }
-    const ConstituentType getType() const                 { return type_; }
-    const double getTau1() const                          { return tau1_; }
-    const double getTau2() const                          { return tau2_; }
-    const double getTau3() const                          { return tau3_; }
-    const double getSoftDropMass() const                  { return softDropMass_; }
+    double getBTagDisc() const                      { return bTagDisc_; }
+    double getQGLikelihood() const                  { return qgLikelihood_; }
+    ConstituentType getType() const                 { return type_; }
+    double getTau1() const                          { return tau1_; }
+    double getTau2() const                          { return tau2_; }
+    double getTau3() const                          { return tau3_; }
+    double getSoftDropMass() const                  { return softDropMass_; }
     const decltype(subjets_)& getSubjets() const          { return subjets_; }
     const decltype(genMatches_)& getGenMatches() const    { return genMatches_; }
-    const double getWMassCorr() const                     { return wMassCorr_; }
-    const double getQGMult() const                        { return qgMult_; }
-    const double getQGPtD() const                         { return qgPtD_; }
-    const double getQGAxis1() const                       { return qgAxis1_; }
-    const double getQGAxis2() const                       { return qgAxis2_; }
-    const double getTopDisc() const                       { return topDisc_; }
-    const double getWDisc() const                         { return WDisc_; }
+    double getWMassCorr() const                     { return wMassCorr_; }
+    double getQGMult() const                        { return qgMult_; }
+    double getQGPtD() const                         { return qgPtD_; }
+    double getQGAxis1() const                       { return qgAxis1_; }
+    double getQGAxis2() const                       { return qgAxis2_; }
+    double getTopDisc() const                       { return topDisc_; }
+    double getWDisc() const                         { return WDisc_; }
     /** 
      *Retrieve an extra variable based upon its name 
      *@param [in] var Name of the variable to retrieve
      *@return Value of the variable
      */
-    const double getExtraVar(const std::string var) const;
+    double getExtraVar(const std::string var) const;
 };
 
 #endif

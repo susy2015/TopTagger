@@ -120,6 +120,9 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     varCalculator_->mapVars(vars_);
 
 #else
+    //Mark variables unused to suppress warnings
+    (void)cfgDoc;
+    (void)localContextName;
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with Tensorflow c-api support!!!");
 #endif
 }
@@ -161,7 +164,7 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     varCalculator_->setPtr(static_cast<float*>(TF_TensorData(input_values_0)));
 
     //Prepare data from top candidate (this code is shared with training tuple producer)
-    int iCand = 0;
+    unsigned int iCand = 0;
     for(auto& topCand : validCands)
     {
         if(varCalculator_->calculateVars(*topCand, iCand)) ++iCand;
@@ -212,6 +215,9 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     for(auto tensor : output_values) TF_DeleteTensor(tensor);
 
     TF_DeleteStatus(status);
+#else
+    //Mark variables unused to suppress warnings
+    (void)ttResults;
 #endif
 }
 
@@ -234,6 +240,9 @@ TTMTensorflow::~TTMTensorflow()
 
 void free_buffer(void* data, size_t length) 
 {
+    //mark length as unused
+    (void)length;
+    //free the memory
     free(data);
 }
 

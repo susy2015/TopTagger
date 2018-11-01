@@ -102,6 +102,9 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     }
 
 #else
+    //Mark variables unused to suppress warnings
+    (void)cfgDoc;
+    (void)localContextName;
     THROW_TTEXCEPTION("Top tagger was not compiled with support for TMVA!!!!"); 
 #endif
 }
@@ -141,5 +144,8 @@ void TTMTMVA::run(TopTaggerResults& ttResults)
             }
         }
     }
+#else
+    //Mark variables unused to suppress warnings
+    (void)ttResults;
 #endif
 }
