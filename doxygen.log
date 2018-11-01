@@ -205,7 +205,7 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTagg/home/travis/build/sus
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:309: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMLazyClusterAlgo.h:9: warning: Compound TTMLazyClusterAlgo is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:295: warning: Compound asymm_mt2_lester_bisect is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:372: warning: Compound hcalcfg::ParserDestroyCaller is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:373: warning: Compound hcalcfg::ParserDestroyCaller is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:337: warning: Compound hcalcfg::ParserDestroyExistsRecognizer::DestroyExistsType is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:62: warning: Compound hcalcfg::Token is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/rocPlot.py:11: warning: Compound rocPlot::Plotter is not documented.
@@ -241,12 +241,12 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTagg/home/travis/build/sus
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:233: warning: Compound hcalcfg::Scanner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:7: warning: Compound FileNameQueue::FileNameQueue is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:356: warning: Compound hcalcfg::ParserInitCaller is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:380: warning: Compound hcalcfg::ParserDestroyCaller< T, true > is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:382: warning: Compound hcalcfg::ParserDestroyCaller< T, true > is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:121: warning: Compound hcalcfg::StartStates is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Condition.hh:13: warning: Compound cfg::Term is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:15: warning: Compound cfg::CfgDocument is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:185: warning: Compound PrepVariables is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:364: warning: Compound hcalcfg::ParserInitCaller< T, true > is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:365: warning: Compound hcalcfg::ParserInitCaller< T, true > is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:313: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitExistsType is not documented.
 er/src/TTMOpenCVMVA.cpp...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOverlapResolution.cpp...
@@ -879,9 +879,9 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:338: warning: Member dummy2 (variable) of class hcalcfg::ParserDestroyExistsRecognizer::DestroyExistsType is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:334: warning: Member dummy1 (variable) of class hcalcfg::ParserDestroyExistsRecognizer::DestroyIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:357: warning: Member CallInit(T *t) (function) of class hcalcfg::ParserInitCaller is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:365: warning: Member CallInit(T *t) (function) of class hcalcfg::ParserInitCaller< T, true > is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:373: warning: Member CallDestroy(T *t) (function) of class hcalcfg::ParserDestroyCaller is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:381: warning: Member CallDestroy(T *t) (function) of class hcalcfg::ParserDestroyCaller< T, true > is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:366: warning: Member CallInit(T *t) (function) of class hcalcfg::ParserInitCaller< T, true > is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:374: warning: Member CallDestroy(T *t) (function) of class hcalcfg::ParserDestroyCaller is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:383: warning: Member CallDestroy(T *t) (function) of class hcalcfg::ParserDestroyCaller< T, true > is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:138: warning: Member EllipseParams(const double c_xx2, const double c_yy2, const double c_xy2, const double c_x2, const double c_y2, const double c2) (function) of class Lester::EllipseParams is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:159: warning: Member setDet() (function) of class Lester::EllipseParams is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:163: warning: Member EllipseParams(const double x0, const double y0) (function) of class Lester::EllipseParams is not documented.

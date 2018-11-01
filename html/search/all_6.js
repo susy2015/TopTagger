@@ -7,7 +7,7 @@ var searchData=
   ['getdrmax',['getDRmax',['../classTopObject.html#ad6c8e1a0ef46d400075b1c2dbb05e37d',1,'TopObject']]],
   ['getdthetamax',['getDThetaMax',['../classTopObject.html#afd9525b26ff81392af3773c5c88f2f68',1,'TopObject']]],
   ['getdthetamin',['getDThetaMin',['../classTopObject.html#a6751962b83bc4b348cebee05aa23c299',1,'TopObject']]],
-  ['getextravar',['getExtraVar',['../classConstituent.html#ac83cdd5829f544e5ad488c3b48b8cc08',1,'Constituent']]],
+  ['getextravar',['getExtraVar',['../classConstituent.html#a8fc04ce34e4e9c162f3d02f62f6b50cb',1,'Constituent']]],
   ['getgentopmatches',['getGenTopMatches',['../classTopObject.html#a51cc6fbaacb2cf502cad0b57d99ae91f',1,'TopObject']]],
   ['getinstance',['getInstance',['../classTTMFactory.html#a728fa564c6c1e78450c69a9a875746da',1,'TTMFactory']]],
   ['getmcscalefactor',['getMCScaleFactor',['../classTopObject.html#a77edcc1258a253b60747eb557c12dd52',1,'TopObject']]],
