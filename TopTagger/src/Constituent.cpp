@@ -100,7 +100,7 @@ void Constituent::setExtraVar(const std::string& name, const double var)
     extraVars_[name] = var;
 }
 
-const double Constituent::getExtraVar(const std::string var) const 
+double Constituent::getExtraVar(const std::string var) const 
 {
     auto iter = extraVars_.find(var);
 

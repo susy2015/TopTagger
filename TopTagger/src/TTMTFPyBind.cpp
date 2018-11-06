@@ -139,6 +139,9 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     varCalculator_->setPtr(static_cast<float*>(PyArray_GETPTR2(reinterpret_cast<PyArrayObject*>(nparray_), 0, 0)));
 
 #else
+    //Mark variables unused to suppress warnings
+    (void)cfgDoc;
+    (void)localContextName;
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with python support!!!");
 #endif
 }
@@ -199,6 +202,9 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
     Py_DECREF(outputOpName);
     Py_DECREF(pArgs);
 
+#else
+    //Mark variables unused to suppress warnings
+    (void)ttResults;
 #endif
 }
 

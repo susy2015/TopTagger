@@ -60,6 +60,9 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
         THROW_TTEXCEPTION("Incorrect number of variables specified!!! " + std::to_string(treePtr_->getVarCount()) + "expected " + std::to_string(vars_.size()) + " found.");
     }
 #else
+    //Mark variables unused to suppress warnings
+    (void)cfgDoc;
+    (void)localContextName;
     THROW_TTEXCEPTION("Top tagger was not compiled with support for OpenCV!!!!"); 
 #endif
 }
@@ -104,5 +107,8 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
             }
         }
     }
+#else
+    //Mark variables unused to suppress warnings
+    (void)ttResults;
 #endif
 }

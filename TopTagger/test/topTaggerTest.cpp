@@ -14,8 +14,6 @@
 //this include is necessary to handle exceptions thrown by the top tagger code
 #include "TopTagger/CfgParser/include/TTException.h"
 
-#include "rootdict.h"
-
 int main()
 {
     //Open input ntuple file 

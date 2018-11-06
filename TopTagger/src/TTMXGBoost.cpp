@@ -82,6 +82,9 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
     varCalculator_->setPtr(data_.data());
 
 #else
+    //Mark variables unused to suppress warnings
+    (void)cfgDoc;
+    (void)localContextName;
     THROW_TTEXCEPTION("ERROR: TopTagger not compiled with XGBoost support!!!");
 #endif
 }
@@ -137,6 +140,9 @@ void TTMXGBoost::run(TopTaggerResults& ttResults)
             }
         }
     }
+#else
+    //Mark variables unused to suppress warnings
+    (void)ttResults;
 #endif
 }
 
