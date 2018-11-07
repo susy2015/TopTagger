@@ -42,6 +42,15 @@ function print_help {
     echo ""
 }
 
+function print_ok {
+    echo "  ______    __  ___" 
+    echo " /  __  \\  |  |/  /" 
+    echo "|  |  |  | |  '  / " 
+    echo "|  |  |  | |    <  " 
+    echo "|  \`--'  | |  .  \\ " 
+    echo " \\______/  |__|\\__\\" 
+    echo ""
+}
 
 # Initialize our own variables:
 
@@ -87,34 +96,43 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 if [[ -z $OVERWRITE ]]
 then
     # OVERWRITE is not set
-    # continue
-    echo "INFO: OVERWRITE is not set. Existing files and softlinks will not be replaced."
-    echo "  To replace existing softlinks and files, use the OVERWRITE option -o."
+    # check if softlink exists
+    if [[ -L $TOP_CFG_NAME ]]
+    then
+        echo "INFO: OVERWRITE is not set. Existing softlinks will not be replaced."
+        printf "  Enter \"o\" to overwrite existing softlinks, and anything else to continue without overwriting: "
+        read answer
+        if [[ $answer == "ok" ]]
+        then
+            # "Easter Egg"...
+            print_ok
+        elif [[ $answer == "o" ]]
+        then
+            OVERWRITE="-f"
+        fi
+    fi
 else
     # OVERWRITE is set
-    # ask user for confirmation before continuing
-    echo   "INFO: OVERWRITE is set. Existing files and softlinks will be replaced."
-    echo   "  Would you like to continue and replace existing files?"
-    printf "  Enter (Y/y/yes/si/oui/ja/da) to continue, and anything else to quit: "
-    read answer
-    if [[ $answer == "ok" ]]
+    # check if file exists and is not a softlink
+    if [[ -f $TOP_CFG_NAME && ! -L $TOP_CFG_NAME ]]
     then
-        # "Easter Egg"...
-        echo "  ______    __  ___" 
-        echo " /  __  \\  |  |/  /" 
-        echo "|  |  |  | |  '  / " 
-        echo "|  |  |  | |    <  " 
-        echo "|  \`--'  | |  .  \\ " 
-        echo " \\______/  |__|\\__\\" 
-        echo ""
-        exit 0
-    fi
-    if [[ $answer == "Y" || $answer == "y" || $answer == "yes" || $answer == "si" || $answer == "oui" || $answer == "ja" || $answer == "da" ]]
-    then
-        echo " - Continuing..."
-    else
-        echo " - Quitting..."
-        exit 0
+        # ask user for confirmation before continuing
+        echo   "INFO: OVERWRITE is set. Existing files will be replaced."
+        printf "  Enter (Y/y/yes/si/oui/ja/da) to replace existing files, and anything else to quit: "
+        read answer
+        if [[ $answer == "ok" ]]
+        then
+            # "Easter Egg"...
+            print_ok
+            exit 0
+        fi
+        if [[ $answer == "Y" || $answer == "y" || $answer == "yes" || $answer == "si" || $answer == "oui" || $answer == "ja" || $answer == "da" ]]
+        then
+            echo " - Continuing..."
+        else
+            echo " - Quitting..."
+            exit 0
+        fi
     fi
 fi
 
