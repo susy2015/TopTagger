@@ -82,6 +82,11 @@ void Constituent::setWDisc(const double& WDisc)
     WDisc_ = WDisc;
 }
 
+void Constituent::setIndex(const unsigned int& index)
+{
+    index_ = index;
+}
+
 void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter)
 {
     genMatches_[&genTop].insert(genDaughter);

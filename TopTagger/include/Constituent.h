@@ -22,6 +22,7 @@ class Constituent
 private:
     TLorentzVector p_;
     ConstituentType type_;
+    unsigned int index_;
 
     //AK4 specific variables 
     double bTagDisc_, qgLikelihood_;
@@ -62,6 +63,7 @@ public:
     void setWMassCorr(const double& wMassCorr);
     void setTopDisc(const double& topDisc);
     void setWDisc(const double& WDisc);
+    void setIndex(const unsigned int& index);
 
     /** 
      *Adds an extra variable which is not included in the primary members of the Constituent class.  These will be added and retrieved by name. 
@@ -99,6 +101,7 @@ public:
     double getQGAxis2() const                       { return qgAxis2_; }
     double getTopDisc() const                       { return topDisc_; }
     double getWDisc() const                         { return WDisc_; }
+    int getIndex() const                         { return index_; }
     /** 
      *Retrieve an extra variable based upon its name 
      *@param [in] var Name of the variable to retrieve
