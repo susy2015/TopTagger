@@ -43,7 +43,7 @@ def customizeResolvedTagger(process):
         singleton=cms.bool(False),
         extension=cms.bool(False),
         variables=cms.PSet(P4Vars,
-                           discriminator = Var("getDiscriminator()", float, doc="top discriminator"),
+                           discriminator = Var("getDiscriminator()", float, doc="top discriminator", precision=10),
                            type = Var("getType()", int, doc="top type (http://susy2015.github.io/TopTagger/html/classTopObject.html, \"enum Type\")"),
                            j1Idx = Var("getJ1Idx()", int, doc="index to the first jet in the top"),
                            j2Idx = Var("getJ2Idx()", int, doc="index to the second jet in the top"),
@@ -53,10 +53,6 @@ def customizeResolvedTagger(process):
 
     process.resolvedTask = cms.Task(process.QGTagger, process.slimmedJetsAuxiliary, process.SHOTProducer, process.resolvedTopTable)
 
-    path = None
-    if path is None:
-        process.schedule.associate(process.resolvedTask)
-    else:
-        getattr(process, path).associate(process.resolvedTask)    
+    process.schedule.associate(process.resolvedTask)
 
     return process
