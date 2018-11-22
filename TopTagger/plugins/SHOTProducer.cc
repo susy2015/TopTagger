@@ -66,7 +66,6 @@ private:
     void compute(const reco::Jet * jet, bool isReco, double& totalMult_, double& ptD_, double& axis1_, double& axis2_);
 
     // ----------member data ---------------------------
-    edm::InputTag jetSrc_;
     edm::EDGetTokenT<std::vector<pat::Jet> > JetTok_;
 
     std::string qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
@@ -82,7 +81,7 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     produces<std::vector<TopObjLite>>();
  
     //now do what ever other initialization is needed
-    jetSrc_ = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
+    edm::InputTag jetSrc = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
     ak4ptCut_ = iConfig.getParameter<double>("ak4ptCut");
 
     qgTaggerKey_ = iConfig.getParameter<std::string>("qgTaggerKey");
@@ -91,7 +90,7 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 
     taggerCfgFile_ = iConfig.getParameter<std::string>("taggerCfgFile");
 
-    JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc_);
+    JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
 
     //configure the top tagger 
     tt.setCfgFile(taggerCfgFile_);
