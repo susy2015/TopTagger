@@ -118,7 +118,7 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     std::vector<Constituent> constituents;
 
     //initialize iJet such that it is incrememted to 0 upon start of loop
-    unsigned int iJet = static_cast<unsigned int>(-1);
+    int iJet = -1;
     for(const pat::Jet& jet : *jets)
     {
         //We must increment iJet before the continue statement 
