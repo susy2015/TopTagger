@@ -12,7 +12,7 @@ class TopObjLite : public reco::LeafCandidate
 private:
     float discriminator_;
     int type_;
-    unsigned int j1Index_, j2Index_, j3Index_;
+    int j1Index_, j2Index_, j3Index_;
 
 public:
     TopObjLite() {}
@@ -32,7 +32,7 @@ public:
     //getters for the internal variables
     float getDiscriminator() const { return discriminator_; }
     int getType() const { return type_; }
-    unsigned int getJ1Idx() const { return j1Index_; }
-    unsigned int getJ2Idx() const { return j2Index_; }
-    unsigned int getJ3Idx() const { return j3Index_; }
+    int getJ1Idx() const { return j1Index_; }
+    int getJ2Idx() const { return j2Index_; }
+    int getJ3Idx() const { return j3Index_; }
 };
