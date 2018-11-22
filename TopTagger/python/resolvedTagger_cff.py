@@ -26,11 +26,12 @@ def addJetInfo(process, JetTag, userFloats=[], userInts=[], btagDiscrs=cms.VInpu
 
 
 def customizeResolvedTagger(process):
+
+    jetTag = cms.InputTag("updatedJets")
     process.load('RecoJets.JetProducers.QGTagger_cfi')
-    process.QGTagger.srcJets   = cms.InputTag("slimmedJets")
-    process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
+    process.QGTagger.srcJets   = jetTag
     
-    process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
+    process, jetTag = addJetInfo(process, jetTag, userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
     
     process.load("TopTagger.TopTagger.SHOTProducer_cfi")
     process.SHOTProducer.ak4JetSrc = jetTag
@@ -51,7 +52,7 @@ def customizeResolvedTagger(process):
         )
     )
 
-    process.resolvedTask = cms.Task(process.QGTagger, process.slimmedJetsAuxiliary, process.SHOTProducer, process.resolvedTopTable)
+    process.resolvedTask = cms.Task(process.QGTagger, getattr(process, jetTag.getModuleLabel()), process.SHOTProducer, process.resolvedTopTable)
 
     process.schedule.associate(process.resolvedTask)
 
