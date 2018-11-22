@@ -35,6 +35,8 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
 
+#include "FWCore/Utilities/interface/Exception.h"
+
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
@@ -48,6 +50,9 @@
 #include "TopTagger/TopTagger/include/TopObject.h"
 #include "TopTagger/TopTagger/include/Constituent.h"
 #include "TopTagger/TopTagger/include/TopObjLite.h"
+
+//this include is necessary to handle exceptions thrown by the top tagger code                                                                                                                                                               
+#include "TopTagger/CfgParser/include/TTException.h"
 
 class SHOTProducer : public edm::stream::EDProducer<> 
 {
@@ -93,7 +98,15 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
 
     //configure the top tagger 
-    tt.setCfgFile(taggerCfgFile_);
+    try
+    {
+        tt.setCfgFile(taggerCfgFile_);
+    }
+    catch(const TTException& e)
+    {
+        //Convert the TTException into a cms::Exception
+        throw cms::Exception(e.getFileName() + ":" + std::to_string(e.getLineNumber()) + ", in function \"" + e.getFunctionName() + "\" -- " + e.getMessage());
+    }
 }
 
 
@@ -181,7 +194,15 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
     //run top tagger
-    tt.runTagger(constituents);
+    try
+    {
+        tt.runTagger(constituents);
+    }
+    catch(const TTException& e)
+    {
+        //Convert the TTException into a cms::Exception
+        throw cms::Exception(e.getFileName() + ":" + std::to_string(e.getLineNumber()) + ", in function \"" + e.getFunctionName() + "\" -- " + e.getMessage());
+    }
 
     //retrieve the top tagger results object
     const TopTaggerResults& ttr = tt.getResults();
