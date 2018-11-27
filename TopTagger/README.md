@@ -33,7 +33,7 @@ These instructions explain how to install the top tagger code if you want to run
 
 #### Instructions for saving tagger results to nanoAOD with CMSSW_9_4_11
 
-If starting from a freash release of CMSSW run the following setup commands
+If starting from a fresh release of CMSSW run the following setup commands
 
 ~~~~~~~~~~~~~{.sh}
 #get CMSSW release
