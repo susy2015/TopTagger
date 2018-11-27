@@ -247,13 +247,11 @@ fi
 if [[ -z $NO_SOFTLINK ]]
 then
     # create softlinks
-    echo " - Creating softlinks to $REPO_NAME config file"
-    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME > /dev/null 2>&1
+    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME config file"
     if [[ ! -z ${MVAFILES// } ]] 
     then
-        echo " - Creating softlinks to $REPO_NAME MVA files"
         for MVAFILE in $MVAFILES; do
-            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE > /dev/null 2>&1
+            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME MVA files"
         done
     fi
 fi
