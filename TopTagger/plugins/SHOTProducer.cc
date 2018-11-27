@@ -39,6 +39,8 @@
 
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 
 //#include "FWCore/Framework/interface/EventSetup.h"
 //#include "FWCore/Framework/interface/ESHandle.h"
@@ -72,6 +74,8 @@ private:
 
     // ----------member data ---------------------------
     edm::EDGetTokenT<std::vector<pat::Jet> > JetTok_;
+    edm::EDGetTokenT<std::vector<pat::Muon> > muonTok_;
+    edm::EDGetTokenT<std::vector<pat::Electron> > elecTok_;
 
     std::string qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
     double ak4ptCut_;
@@ -87,6 +91,10 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
  
     //now do what ever other initialization is needed
     edm::InputTag jetSrc = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
+
+    edm::InputTag muonSrc = iConfig.getParameter<edm::InputTag>("muonSrc");
+    edm::InputTag elecSrc = iConfig.getParameter<edm::InputTag>("eldcSrc");
+
     ak4ptCut_ = iConfig.getParameter<double>("ak4ptCut");
 
     qgTaggerKey_ = iConfig.getParameter<std::string>("qgTaggerKey");
@@ -96,6 +104,9 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     taggerCfgFile_ = iConfig.getParameter<std::string>("taggerCfgFile");
 
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
+
+    muonTok_ = consumes<std::vector<pat::Muon>>(muonSrc);
+    elecTok_ = consumes<std::vector<pat::Electron>>(elecSrc);
 
     //configure the top tagger 
     try
@@ -125,8 +136,24 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     using namespace edm;
 
+    //Get jet collection 
     edm::Handle<std::vector<pat::Jet> > jets;
     iEvent.getByToken(JetTok_, jets);
+
+    //Get lepton collections 
+    edm::Handle<std::vector<pat::Muon> > muons;
+    iEvent.getByToken(muonTok_, muons);
+    edm::Handle<std::vector<pat::Electron> > elecs;
+    iEvent.getByToken(elecTok_, elecs);
+
+
+    for(const pat::Muon& muon : *muons)
+    {
+        if(muon.passed(reco::Muon::CutBasedIdMedium))
+        {
+            //Add muon to objects to clean from jets
+        }
+    }
 
     std::vector<Constituent> constituents;
 
