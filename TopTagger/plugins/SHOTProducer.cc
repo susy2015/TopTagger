@@ -65,6 +65,26 @@ public:
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
+    template<typename T>
+    int findDrMatch(const T& lepton, const edm::Handle<std::vector<pat::Jet> >& jets)
+    {
+        double mindR = 999.9;
+        int iJetMindR = -1;
+        for(int i = 0; i < static_cast<int>(jets->size()); ++i)
+        {
+            const pat::Jet& jet = (*jets)[i];
+            double dR = deltaR(lepton.p4(), jet.p4());
+            if(dR < mindR)
+            {
+                mindR = dR;
+                iJetMindR = i;
+            }
+        }
+        if(mindR < leptonJetDr_) return iJetMindR;
+        else                     return -1;
+    }
+
+
     virtual void beginStream(edm::StreamID) override;
     virtual void produce(edm::Event&, const edm::EventSetup&) override;
     virtual void endStream() override;
@@ -77,8 +97,10 @@ private:
     edm::EDGetTokenT<std::vector<pat::Muon> > muonTok_;
     edm::EDGetTokenT<std::vector<pat::Electron> > elecTok_;
 
-    std::string qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
-    double ak4ptCut_;
+    std::string elecIDFlag_, qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
+    double ak4ptCut_, leptonJetDr_;
+    bool doLeptonCleaning_;
+    reco::Muon::Selector muonIDFlag_;
 
     TopTagger tt;
 };
@@ -93,9 +115,20 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     edm::InputTag jetSrc = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
 
     edm::InputTag muonSrc = iConfig.getParameter<edm::InputTag>("muonSrc");
-    edm::InputTag elecSrc = iConfig.getParameter<edm::InputTag>("eldcSrc");
+    edm::InputTag elecSrc = iConfig.getParameter<edm::InputTag>("elecSrc");
 
     ak4ptCut_ = iConfig.getParameter<double>("ak4ptCut");
+
+    std::string muonIDFlagName = iConfig.getParameter<std::string>("muonIDFlag");
+    if     (muonIDFlagName.compare("CutBasedIdLoose")  == 0) muonIDFlag_ = reco::Muon::CutBasedIdLoose;
+    else if(muonIDFlagName.compare("CutBasedIdMedium") == 0) muonIDFlag_ = reco::Muon::CutBasedIdMedium;
+    else if(muonIDFlagName.compare("CutBasedIdTight")  == 0) muonIDFlag_ = reco::Muon::CutBasedIdTight;
+
+    elecIDFlag_  = iConfig.getParameter<std::string>("elecIDFlag");
+
+    leptonJetDr_ = iConfig.getParameter<double>("leptonJetDr");
+
+    doLeptonCleaning_  = iConfig.getParameter<bool>("doLeptonCleaning");
 
     qgTaggerKey_ = iConfig.getParameter<std::string>("qgTaggerKey");
     deepCSVBJetTags_ = iConfig.getParameter<std::string>("deepCSVBJetTags");
@@ -140,31 +173,48 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     edm::Handle<std::vector<pat::Jet> > jets;
     iEvent.getByToken(JetTok_, jets);
 
-    //Get lepton collections 
-    edm::Handle<std::vector<pat::Muon> > muons;
-    iEvent.getByToken(muonTok_, muons);
-    edm::Handle<std::vector<pat::Electron> > elecs;
-    iEvent.getByToken(elecTok_, elecs);
-
-
-    for(const pat::Muon& muon : *muons)
+    std::set<int> jetToClean;
+    if(doLeptonCleaning_)
     {
-        if(muon.passed(reco::Muon::CutBasedIdMedium))
+
+        //Get lepton collections 
+        edm::Handle<std::vector<pat::Muon> > muons;
+        iEvent.getByToken(muonTok_, muons);
+        edm::Handle<std::vector<pat::Electron> > elecs;
+        iEvent.getByToken(elecTok_, elecs);
+
+        //remove leptons that match to jets with a dR cone 
+        for(const pat::Muon& muon : *muons)
         {
-            //Add muon to objects to clean from jets
+            if(muon.passed(muonIDFlag_))
+            {
+                int matchIndex = findDrMatch(muon, jets);
+                if(matchIndex >= 0) jetToClean.insert(matchIndex);
+            }
+        }
+        for(const pat::Electron& elec : *elecs)
+        {
+            if(elec.userInt(elecIDFlag_))
+            {
+                int matchIndex = findDrMatch(elec, jets);
+                if(matchIndex >= 0) jetToClean.insert(matchIndex);
+            }
         }
     }
 
+    //container holding input jet info for top tagger
     std::vector<Constituent> constituents;
 
     //initialize iJet such that it is incrememted to 0 upon start of loop
-    int iJet = -1;
-    for(const pat::Jet& jet : *jets)
+    for(int iJet = 0; iJet < static_cast<int>(jets->size()); ++iJet)
     {
-        //We must increment iJet before the continue statement 
-        ++iJet;
+        const pat::Jet& jet = (*jets)[iJet];
 
+        //Apply pt cut on jets 
         if(jet.pt() < ak4ptCut_) continue;
+
+        //Apply lepton cleaning
+        if(doLeptonCleaning_ && jetToClean.count(iJet)) continue;
 
         TLorentzVector perJetLVec(jet.p4().X(), jet.p4().Y(), jet.p4().Z(), jet.p4().T());
 
@@ -223,7 +273,7 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //run top tagger
     try
     {
-        tt.runTagger(constituents);
+        tt.runTagger(std::move(constituents));
     }
     catch(const TTException& e)
     {
@@ -237,13 +287,9 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //get reconstructed top
     const std::vector<TopObject*>& tops = ttr.getTops();
 
+    //Translate TopObject to TopObjLite and save to event
     std::unique_ptr<std::vector<TopObjLite>> liteTops(new std::vector<TopObjLite>());
-    
-    for(auto* top : tops)
-    {
-        liteTops->emplace_back(*top);
-    }
-
+    for(auto const * const top : tops) liteTops->emplace_back(*top);
     iEvent.put(std::move(liteTops));
 }
 

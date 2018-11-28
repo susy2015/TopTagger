@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+
 from  PhysicsTools.NanoAOD.common_cff import *
 
 #Kevin's function of magic #1
@@ -35,6 +36,8 @@ def customizeResolvedTagger(process):
     
     process.load("TopTagger.TopTagger.SHOTProducer_cfi")
     process.SHOTProducer.ak4JetSrc = jetTag
+    process.SHOTProducer.muonSrc = cms.InputTag("slimmedMuonsWithUserData")
+    process.SHOTProducer.elecSrc = cms.InputTag("slimmedElectronsWithUserData")
     
     process.resolvedTopTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("SHOTProducer"),
