@@ -74,7 +74,7 @@ process.source = cms.Source('PoolSource',
 
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents  = cms.untracked.PSet( 
-    input = cms.untracked.int32 (-1) 
+    input = cms.untracked.int32 (10000) 
 )
 
 ###############################################################################################################################
@@ -89,6 +89,8 @@ process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['
 
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
 process.SHOTProducer.ak4JetSrc = jetTag
+#This is set to false because the 
+process.SHOTProducer.doLeptonCleaning = cms.Bool(False)
 
 ###############################################################################################################################
 
