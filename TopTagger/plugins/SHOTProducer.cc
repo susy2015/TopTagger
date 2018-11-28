@@ -65,25 +65,21 @@ public:
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
-    template<typename T>
-    int findDrMatch(const T& lepton, const edm::Handle<std::vector<pat::Jet> >& jets)
+    template<typename LEP>
+    bool lepJetPassdRMatch(const int& jetIndex, const LEP& lepton, const edm::Handle<std::vector<pat::Jet> >& jets)
     {
-        double mindR = 999.9;
-        int iJetMindR = -1;
-        for(int i = 0; i < static_cast<int>(jets->size()); ++i)
+        //Get the index of the jet closest to the lepton
+        if(jetIndex < 0 || jetIndex >= static_cast<int>(jets->size()))
         {
-            const pat::Jet& jet = (*jets)[i];
-            double dR = deltaR(lepton.p4(), jet.p4());
-            if(dR < mindR)
-            {
-                mindR = dR;
-                iJetMindR = i;
-            }
+            //There is no match
+            return false;
         }
-        if(mindR < leptonJetDr_) return iJetMindR;
-        else                     return -1;
+        
+        //Check if it falls within the dR criterion
+        const pat::Jet& jet = (*jets)[jetIndex];
+        double dR = deltaR(lepton.p4(), jet.p4());
+        return dR < leptonJetDr_;
     }
-
 
     virtual void beginStream(edm::StreamID) override;
     virtual void produce(edm::Event&, const edm::EventSetup&) override;
@@ -188,16 +184,16 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
             if(muon.passed(muonIDFlag_))
             {
-                int matchIndex = findDrMatch(muon, jets);
-                if(matchIndex >= 0) jetToClean.insert(matchIndex);
+                const int jetIndex = static_cast<int>(muon.userCand("jet").key());
+                if(lepJetPassdRMatch(jetIndex, muon, jets)) jetToClean.insert(jetIndex);
             }
         }
         for(const pat::Electron& elec : *elecs)
         {
             if(elec.userInt(elecIDFlag_))
             {
-                int matchIndex = findDrMatch(elec, jets);
-                if(matchIndex >= 0) jetToClean.insert(matchIndex);
+                const int jetIndex = static_cast<int>(elec.userCand("jet").key());
+                if(lepJetPassdRMatch(jetIndex, elec, jets)) jetToClean.insert(jetIndex);
             }
         }
     }
