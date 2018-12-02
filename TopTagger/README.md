@@ -14,8 +14,8 @@ Add description of algorithm and general options here
 These instructions explain how to install the top tagger in a standalone way (i.e. no cmsRun or FWLite required) but taking advantage of all the tools which come packaged with a CMSSW release.  If you would rather not go through the hassle of installing ROOT/python/tensorflow, the CMSSW environment can be used to provide the necessary libraries and python modules 
 
 ~~~~~~~~~~~~~{.sh}
-cmsrel CMSSW_9_3_3
-cd CMSSW_9_3_3/src
+cmsrel CMSSW_9_4_11
+cd CMSSW_9_4_11/src
 cmsenv
 git clone git@github.com:susy2015/TopTagger.git
 cd TopTagger/TopTagger/test
