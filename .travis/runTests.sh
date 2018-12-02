@@ -9,8 +9,8 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 export SCRAM_ARCH=slc6_amd64_gcc630
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git/                       
 source $VO_CMS_SW_DIR/cmsset_default.sh 
-scramv1 project CMSSW CMSSW_9_3_3
-cd CMSSW_9_3_3/src/
+scramv1 project CMSSW CMSSW_9_4_11
+cd CMSSW_9_4_11/src/
 #suppress huge printout from "cmsenv"
 set +x
 echo "============================"
