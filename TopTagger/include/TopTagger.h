@@ -40,6 +40,7 @@ private:
     ///tagger configuration parameters
     int verbosity_;
     bool reThrow_;
+    std::string workingDirectory_;
 
     void getParameters();
     void handelException(const TTException& e) const;
@@ -48,7 +49,7 @@ public:
     ///Default constructor to create an empty TopTagger object
     TopTagger();
     ///Constructor to initialize TopTagger object from the provided configuration file 
-    TopTagger(const std::string&);
+    TopTagger(const std::string& cfgFileName, const std::string& workingDir);
 
     ~TopTagger();
 
@@ -63,6 +64,11 @@ public:
      *otherwise the exceptions will be handled internally. 
      */       
     void setRethrow(const bool reThrow) { reThrow_ = reThrow; }
+    /**
+     *If set, the top tagger will look in this directory for cfg files.
+     *This must be called BEFORE setCfgFile.
+     */       
+    void setWorkingDirectory(const std::string& workingDirectory) { workingDirectory_ = workingDirectory; }
 
     /**
      *Set the configuration file to use to configure the TopTagger object.

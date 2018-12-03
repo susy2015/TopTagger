@@ -130,7 +130,7 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     deepCSVBJetTags_ = iConfig.getParameter<std::string>("deepCSVBJetTags");
     bTagKeyString_ = iConfig.getParameter<std::string>("bTagKeyString");
 
-    taggerCfgFile_ = iConfig.getParameter<std::string>("taggerCfgFile");
+    taggerCfgFile_ = iConfig.getParameter<edm::FileInPath>("taggerCfgFile").fullPath();
 
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
 
@@ -140,6 +140,10 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     //configure the top tagger 
     try
     {
+        //For working directory use cfg file location
+        size_t splitLocation = taggerCfgFile_.rfind("/");
+        std::string workingDir = taggerCfgFile_.substr(0, splitLocation);
+        tt.setWorkingDirectory(workingDir);
         tt.setCfgFile(taggerCfgFile_);
     }
     catch(const TTException& e)

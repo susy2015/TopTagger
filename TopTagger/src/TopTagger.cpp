@@ -9,15 +9,13 @@
 #include "TopTagger/CfgParser/include/Record.hh"
 #include "TopTagger/CfgParser/include/Context.hh"
 
-TopTagger::TopTagger()
+TopTagger::TopTagger() : topTaggerResults_(nullptr), verbosity_(1), reThrow_(true), workingDirectory_()
 {
-    topTaggerResults_ = nullptr;
-    verbosity_ = 1;
-    reThrow_ = true;
 }
 
-TopTagger::TopTagger(const std::string& cfgFileName) : TopTagger()
+TopTagger::TopTagger(const std::string& cfgFileName, const std::string& workingDir) : TopTagger()
 {
+    workingDirectory_ = workingDir;
     setCfgFile(cfgFileName);
 }
 
@@ -120,6 +118,8 @@ void TopTagger::getParameters()
 
                 //Create module and add to module to vector
                 topTaggerModules_.emplace_back(TTMFactory::createModule(moduleName));
+                //Set working directory 
+                topTaggerModules_.back()->setWorkingDirectory(workingDirectory_);
                 //configure the new module from the config document
                 topTaggerModules_.back()->getParameters(cfgDoc_.get(), contextName);
             }

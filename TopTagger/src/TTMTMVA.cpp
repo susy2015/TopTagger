@@ -20,6 +20,10 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
     filter_        = cfgDoc->get("filter",        localCxt, false);
 
+    std::string modelFileFullPath;
+    if(workingDirectory_.size()) modelFileFullPath = workingDirectory_ + "/" + modelFile_;
+    else                         modelFileFullPath = modelFile_;
+
     int iVar = 0;
     bool keepLooping;
     do
@@ -94,11 +98,11 @@ void TTMTMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& l
     }
 
     //load model file into reader
-    auto* imethod = reader_->BookMVA( modelName_.c_str(), modelFile_.c_str() );
+    auto* imethod = reader_->BookMVA( modelName_.c_str(), modelFileFullPath.c_str() );
     if(imethod == nullptr)
     {
         //Throw if this is an invalid pointer
-        THROW_TTEXCEPTION("TMVA reader could not load model named \"" + modelName_ + "\" from file \"" + modelFile_ + "\"!!!");        
+        THROW_TTEXCEPTION("TMVA reader could not load model named \"" + modelName_ + "\" from file \"" + modelFileFullPath + "\"!!!");        
     }
 
 #else

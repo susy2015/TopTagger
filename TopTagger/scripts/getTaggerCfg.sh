@@ -56,7 +56,7 @@ function print_ok {
 
 # Initialize our own variables:
 
-while getopts "h?d:f:t:nov" opt; do
+while getopts "h?d:f:t:l:nov" opt; do
     case "$opt" in
     h|\?)
         print_help

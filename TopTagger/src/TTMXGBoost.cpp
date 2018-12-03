@@ -29,6 +29,10 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    std::string modelFileFullPath;
+    if(workingDirectory_.size()) modelFileFullPath = workingDirectory_ + "/" + modelFile_;
+    else                         modelFileFullPath = modelFile_;
+
     int iVar = 0;
     bool keepLooping;
     do
@@ -54,12 +58,12 @@ void TTMXGBoost::getParameters(const cfg::CfgDocument* cfgDoc, const std::string
 
     //get the booster from the file
     status =  XGBoosterCreate({}, 0, &h_booster);
-    status |= XGBoosterLoadModel(h_booster, modelFile_.c_str());
+    status |= XGBoosterLoadModel(h_booster, modelFileFullPath.c_str());
     status |= XGBoosterSetParam(h_booster, "nthread", std::to_string(nCores_).c_str());
 
     if(status) 
     {
-        THROW_TTEXCEPTION("ERROR: Unable to import model from file: " + modelFile_);
+        THROW_TTEXCEPTION("ERROR: Unable to import model from file: " + modelFileFullPath);
     }
 
     //resize data vector and map data vector to variable calclator 

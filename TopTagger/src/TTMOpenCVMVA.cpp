@@ -21,6 +21,10 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    std::string modelFileFullPath;
+    if(workingDirectory_.size()) modelFileFullPath = workingDirectory_ + "/" + modelFile_;
+    else                         modelFileFullPath = modelFile_;
+
     int iVar = 0;
     bool keepLooping;
     do
@@ -41,7 +45,7 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     }
     while(keepLooping);
 
-    treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFile_);
+    treePtr_ = cv::ml::RTrees::load<cv::ml::RTrees>(modelFileFullPath);
     if(treePtr_ == nullptr || treePtr_->empty())
     {
         //Throw if this is an invalid pointer
