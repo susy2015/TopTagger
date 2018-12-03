@@ -94,7 +94,7 @@ private:
     edm::EDGetTokenT<std::vector<pat::Electron> > elecTok_;
 
     std::string elecIDFlag_, qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
-    double ak4ptCut_, leptonJetDr_;
+    double ak4ptCut_, leptonJetDr_, discriminatorCut_;
     bool doLeptonCleaning_;
     reco::Muon::Selector muonIDFlag_;
 
@@ -131,6 +131,8 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     bTagKeyString_ = iConfig.getParameter<std::string>("bTagKeyString");
 
     taggerCfgFile_ = iConfig.getParameter<edm::FileInPath>("taggerCfgFile").fullPath();
+
+    discriminatorCut_ = iConfig.getParameter<double>("discriminatorCut");
 
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
 
@@ -289,7 +291,13 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     //Translate TopObject to TopObjLite and save to event
     std::unique_ptr<std::vector<TopObjLite>> liteTops(new std::vector<TopObjLite>());
-    for(auto const * const top : tops) liteTops->emplace_back(*top);
+    for(auto const * const top : tops)
+    {
+        if(top->getDiscriminator() > discriminatorCut_)
+        {
+            liteTops->emplace_back(*top);
+        }
+    }
     iEvent.put(std::move(liteTops));
 }
 
