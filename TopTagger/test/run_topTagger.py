@@ -90,7 +90,7 @@ process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
 process.SHOTProducer.ak4JetSrc = jetTag
 #This is set to false because the 
-process.SHOTProducer.doLeptonCleaning = cms.Bool(False)
+process.SHOTProducer.doLeptonCleaning = cms.bool(False)
 
 ###############################################################################################################################
 
