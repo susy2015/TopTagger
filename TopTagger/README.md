@@ -75,7 +75,7 @@ The configuration file to generate nanoAOD can then be generated with the follow
 cd ${CMSSW_BASE}/src
 cmsDriver.py test94X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions auto:phase1_2017_realistic -n 100 --era Run2_2017,run2_nanoAOD_94XMiniAODv1 --customise TopTagger/TopTagger/resolvedTagger_cff.customizeResolvedTagger
 mkdir -p ${CMSSW_BASE}/src/TopTagger/TopTagger/data
-getTaggerCfg.sh -o -n -t DeepResolved_DeepCSV_GR_Medium_v1.0.0 -l $CMSSW_BASE/src/TopTagger/TopTagger/data -d $CMSSW_BASE/src/TopTagger/TopTagger/data
+getTaggerCfg.sh -o -n -t DeepResolved_DeepCSV_GR_noDisc_Release_v1.0.0 -l $CMSSW_BASE/src/TopTagger/TopTagger/data -d $CMSSW_BASE/src/TopTagger/TopTagger/data
 ~~~~~~~~~~~~~
 
 For running over 2016 MC insread use the following cmsDriver command 
