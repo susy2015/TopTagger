@@ -11,6 +11,7 @@ RELEASE_URL="$GITHUB_SUSY2015_URL/$REPO_NAME/releases"
 
 STARTING_DIR=$PWD
 CFG_DIRECTORY=$PWD
+CHECKOUT_DIRECTORY=$PWD
 TAG=
 NO_SOFTLINK=
 OVERWRITE=
@@ -31,6 +32,7 @@ function print_help {
     echo "    -d checkout_directory :  This is the directory where the configuration files will be downloaded to (default: .)"
     echo "    -f cfg_filename :        Specify this option to name the softlink to the cfg file something other than \"TopTagger.cfg\""
     echo "    -o :                     Overwrite the softlinks if they already exist"
+    echo "    -l checkout location :   Location to check out tagger cfg files (default: .)"
     echo "    -n :                     Download files without producing softlinks"
     echo "    -v :                     increase verbosity: print more stuff... for those who like stuff"
     echo ""
@@ -65,6 +67,8 @@ while getopts "h?d:f:t:nov" opt; do
     f)  TOP_CFG_NAME=$OPTARG
         ;;
     t)  TAG=$OPTARG
+        ;;
+    l)  CHECKOUT_DIRECTORY=$OPTARG
         ;;
     o) OVERWRITE="-f"
         ;;
@@ -247,11 +251,11 @@ fi
 if [[ -z $NO_SOFTLINK ]]
 then
     # create softlinks
-    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $TOP_CFG_NAME > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME config file"
+    ln $OVERWRITE -s $DOWNLOAD_DIR/TopTagger.cfg $CHECKOUT_DIRECTORY/$TOP_CFG_NAME > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME config file"
     if [[ ! -z ${MVAFILES// } ]] 
     then
         for MVAFILE in $MVAFILES; do
-            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $MVAFILE > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME MVA files"
+            ln $OVERWRITE -s $DOWNLOAD_DIR/$MVAFILE $CHECKOUT_DIRECTORY/$MVAFILE > /dev/null 2>&1 && echo " - Created softlinks to $REPO_NAME MVA files"
         done
     fi
 fi

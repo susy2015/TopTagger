@@ -52,11 +52,12 @@ git clone git@github.com:susy2015/TopTagger.git
 scram b -j4
 ~~~~~~~~~~~~~
 
-The configuration file to generate nanoAOD can then be generated with the following set of instructions via cmsDriver.py
+The configuration file to generate nanoAOD can then be generated with the following set of instructions via cmsDriver.py and download the top tagger configuration file 
 
 ~~~~~~~~~~~~~{.sh}
 cd ${CMSSW_BASE}/src
 cmsDriver.py test94X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions auto:phase1_2017_realistic -n 100 --era Run2_2017,run2_nanoAOD_94XMiniAODv1 --customise TopTagger/TopTagger/resolvedTagger_cff.customizeResolvedTagger
+getTaggerCfg.py
 ~~~~~~~~~~~~~
 
 This will produce a file "test94X_NANO.py" which can be run as follows to produce a small test nanoAOD file with the top tagger variables included
