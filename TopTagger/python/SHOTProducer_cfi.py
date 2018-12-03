@@ -15,6 +15,6 @@ SHOTProducer = cms.EDProducer(
   CvsBCJetTags = cms.string('pfCombinedCvsBJetTags'),
   CvsLCJetTags = cms.string('pfCombinedCvsLJetTags'),
   bTagKeyString = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
-  taggerCfgFile = "TopTagger/TopTagger/data/TopTagger.cfg",
+  taggerCfgFile = cms.FileInPath("TopTagger/TopTagger/data/TopTaggerCfg-DeepResolved_DeepCSV_GR_Medium_v1.0.0/TopTagger.cfg"),
 )
 
