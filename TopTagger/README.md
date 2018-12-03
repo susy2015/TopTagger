@@ -31,6 +31,23 @@ These instructions explain how to install the top tagger code if you want to run
 
 #### Description of top tagger nanoAOD format
 
+The tagger will save an abbreviated TopObject for each top into the nanoAOD.  The information stored includes 
+
+~~~~~~~~~~~~~
+nResolvedTop (int): The number of resolved tops in the event
+ResolvedTop_discriminator (float): The neural network discrimimnator for topness (1 is most top like, 0 is least top like)
+ResolvedTop_pt (float): Pt of the top
+ResolvedTop_eta (float): Eta of the top
+ResolvedTop_phi (float): Phi of the top
+ResolvedTop_mass (float): Mass of the top
+ResolvedTop_j1Idx (int): Index of the first constituent jet in the main nanoAOD jet collection
+ResolvedTop_j2Idx (int): Index of the second constituent jet in the main nanoAOD jet collectino
+ResolvedTop_j3Idx (int): Index of the third constituent jet in the main nanoAOD jet collection
+ResolvedTop_type (int): The type of top (3 for resolved tops)
+~~~~~~~~~~~~~
+
+In order to save space in the nanoAOD only top objects passing a basic discriminator cut are saved.  
+
 #### Instructions for saving tagger results to nanoAOD with CMSSW_9_4_11
 
 If starting from a fresh release of CMSSW run the following setup commands
@@ -60,7 +77,14 @@ cmsDriver.py test94X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSI
 getTaggerCfg.py
 ~~~~~~~~~~~~~
 
-This will produce a file "test94X_NANO.py" which can be run as follows to produce a small test nanoAOD file with the top tagger variables included
+For running over 2016 MC insread use the following cmsDriver command 
+
+~~~~~~~~~~~~~{.sh}
+cd ${CMSSW_BASE}/src
+cmsDriver.py test80X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions auto:run2_mc -n 100 --era Run2_2016,run2_miniAOD_80XLegacy --customise TopTagger/TopTagger/resolvedTagger_cff.customizeResolvedTagger
+~~~~~~~~~~~~~
+
+This will produce a file "test[80/94]X_NANO.py" which can be run as follows to produce a small test nanoAOD file with the top tagger variables included
 
 ~~~~~~~~~~~~~{.sh}
 cmsRun test94X_NANO.py
@@ -108,9 +132,13 @@ cmsRun run_topTagger.py
 
 The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).  
 
-### Instructions for producing jet variables for resolved top tagger with CMSSW 9_4_11 to run the tagger later
+### Instructions for producing jet variables for resolved top tagger in nanoAOD
 
-### Instructions for producing jet variables for resolved top tagger with CMSSW 8_0_28_patch1 to run the tagger later
+Instructions comming ... eventually ... 
+
+### OLD: Instructions for producing jet variables for resolved top tagger in CMSSW_8_0_28_patch1
+
+The solution using nanoAOD is the recomended way to get resolved top tagger variables.  
 
 Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.
 

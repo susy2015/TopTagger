@@ -16,12 +16,12 @@ Follow the instructions to install ROOT on your system
 Follow the instructions to install tensorflow for C.  GPU support is not necessary unless you will be training new models.  For compatibility with the TopTagger model run the following download command in place of step 2 on this page to download tensorflow v1.3.0 instead of the lastest version 
 
 ~~~~~~~~~~~~~sh
-TF_TYPE="cpu" # Change to "gpu" for GPU support
- OS="linux" # Change to "darwin" for macOS
- TARGET_DIRECTORY="/usr/local"
- curl -L \
-   "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.3.0.tar.gz" |
-   sudo tar -C $TARGET_DIRECTORY -xz
+TF_TYPE="cpu" # Change to "gpu" for GPU support (not necessary for inferance)
+OS="linux" # Change to "darwin" for macOS
+TARGET_DIRECTORY="/usr/local"  #Change this to install the c-api in other places 
+curl -L \
+  "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.3.0.tar.gz" |
+  sudo tar -C $TARGET_DIRECTORY -xz
 ~~~~~~~~~~~~~
 
 ### Compiling the top tagger
@@ -33,8 +33,9 @@ After all the necessary packages are installed, checkout the TopTagger repositor
 cd TopTagger/TopTagger/test
 ./configure
 make -j4
-#the command below is optional for system wide install (will require sudo rights)
 #To install in a non-standard directory add PREFIX=/install/path to the configure command
+#If the tensorflow c-api was installed elsewhere than "/usr/local" add TENSORFLOWPATH=[path to c-api] to the configure command
+#the command below is optional for system wide install (will require sudo rights)
 make install
 ~~~~~~~~~~~~~
 
