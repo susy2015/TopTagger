@@ -63,7 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -85,20 +85,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Follow the instructions to install ROOT on your system</p>
 <p>[2] <a href="https://www.tensorflow.org/install/install_c">https://www.tensorflow.org/install/install_c</a></p>
 <p>Follow the instructions to install tensorflow for C. GPU support is not necessary unless you will be training new models. For compatibility with the <a class="el" href="classTopTagger.html">TopTagger</a> model run the following download command in place of step 2 on this page to download tensorflow v1.3.0 instead of the lastest version</p>
-<div class="fragment"><div class="line">TF_TYPE=<span class="stringliteral">&quot;cpu&quot;</span> # Change to <span class="stringliteral">&quot;gpu&quot;</span> <span class="keywordflow">for</span> GPU support</div>
-<div class="line"> OS=<span class="stringliteral">&quot;linux&quot;</span> # Change to <span class="stringliteral">&quot;darwin&quot;</span> <span class="keywordflow">for</span> macOS</div>
-<div class="line"> TARGET_DIRECTORY=<span class="stringliteral">&quot;/usr/local&quot;</span></div>
-<div class="line"> curl -L \</div>
-<div class="line">   <span class="stringliteral">&quot;https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.3.0.tar.gz&quot;</span> |</div>
-<div class="line">   sudo tar -C $TARGET_DIRECTORY -xz</div>
+<div class="fragment"><div class="line">TF_TYPE=<span class="stringliteral">&quot;cpu&quot;</span> # Change to <span class="stringliteral">&quot;gpu&quot;</span> <span class="keywordflow">for</span> GPU support (not necessary <span class="keywordflow">for</span> inferance)</div>
+<div class="line">OS=<span class="stringliteral">&quot;linux&quot;</span> # Change to <span class="stringliteral">&quot;darwin&quot;</span> <span class="keywordflow">for</span> macOS</div>
+<div class="line">TARGET_DIRECTORY=<span class="stringliteral">&quot;/usr/local&quot;</span>  #Change <span class="keyword">this</span> to install the c-api in other places </div>
+<div class="line">curl -L \</div>
+<div class="line">  <span class="stringliteral">&quot;https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.3.0.tar.gz&quot;</span> |</div>
+<div class="line">  sudo tar -C $TARGET_DIRECTORY -xz</div>
 </div><!-- fragment --><h3>Compiling the top tagger</h3>
 <p>After all the necessary packages are installed, checkout the <a class="el" href="classTopTagger.html">TopTagger</a> repository and compile with the following command (with a terminal configured to use root/tensorflow)</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#After downloading the code from github or untaring the standalone tarball </span></div>
 <div class="line"><span class="preprocessor"></span>cd <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
 <div class="line">./configure</div>
 <div class="line">make -j4</div>
-<div class="line"><span class="preprocessor">#the command below is optional for system wide install (will require sudo rights)</span></div>
-<div class="line"><span class="preprocessor"></span><span class="preprocessor">#To install in a non-standard directory add PREFIX=/install/path to the configure command</span></div>
+<div class="line"><span class="preprocessor">#To install in a non-standard directory add PREFIX=/install/path to the configure command</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">#If the tensorflow c-api was installed elsewhere than &quot;/usr/local&quot; add TENSORFLOWPATH=[path to c-api] to the configure command</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">#the command below is optional for system wide install (will require sudo rights)</span></div>
 <div class="line"><span class="preprocessor">make install</span></div>
 </div><!-- fragment --><p>This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code. This will also compile a standalone example called ``topTaggerTest''.</p>
 <h2>Example code</h2>
@@ -364,7 +365,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:06 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:30 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

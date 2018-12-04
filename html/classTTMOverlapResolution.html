@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -108,6 +108,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4dd88bd8480301018cfba596ae226157"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4099ee72e105acbcca10078068775bef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMOverlapResolution.html#a4099ee72e105acbcca10078068775bef">run</a> (<a class="el" href="classTopTaggerResults.html">TopTaggerResults</a> &amp;)</td></tr>
 <tr class="separator:a4099ee72e105acbcca10078068775bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classTTModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classTTModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classTTModule.html">TTModule</a></td></tr>
+<tr class="memitem:a0f9c9948826e630e6c6e7943e98a1f37 inherit pub_methods_classTTModule"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f9c9948826e630e6c6e7943e98a1f37"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setWorkingDirectory</b> (const std::string &amp;workingDir)</td></tr>
+<tr class="separator:a0f9c9948826e630e6c6e7943e98a1f37 inherit pub_methods_classTTModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -116,6 +120,11 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a98fd6161e5b20134fb1b963c182ba630 inherit pro_methods_classTTMFilterBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaddc805db839d120d018855e4ba12c67 inherit pro_methods_classTTMFilterBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMFilterBase.html#aaddc805db839d120d018855e4ba12c67">markConstituentsUsed</a> (const std::vector&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt; &amp;, std::set&lt; const <a class="el" href="classConstituent.html">Constituent</a> * &gt; &amp;, const double, const double) const </td></tr>
 <tr class="separator:aaddc805db839d120d018855e4ba12c67 inherit pro_methods_classTTMFilterBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classTTModule"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classTTModule')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classTTModule.html">TTModule</a></td></tr>
+<tr class="memitem:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ef21f981480be1787d2d606023fafd8"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTModule.html#a7ef21f981480be1787d2d606023fafd8">workingDirectory_</a></td></tr>
+<tr class="memdesc:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the location where the tagger will resolve relative file paths. <br/></td></tr>
+<tr class="separator:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>After top candidates are added to the final top list it is possible that some constituent jets can be included in more than one top in the list. This module is used to remove the tops which share constituents. It functions by first sorting the list of tops by a figure of merit, and then in the case that 2 tops share a constituent, the top with the better figure of merit is removed. The module can by run on the entire list of tops, or it can be run category by category.</p>
@@ -202,7 +211,7 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:07 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:32 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

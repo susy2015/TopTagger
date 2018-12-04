@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['top_20tagger',['Top Tagger',['../index.html',1,'']]],
   ['toptagger',['TopTagger',['../md__home_travis_build_susy2015_TopTagger_README.html',1,'']]],
   ['tagger_20development_20tools',['Tagger development tools',['../md__home_travis_build_susy2015_TopTagger_Tools_README.html',1,'']]],
   ['taggeroptions',['taggerOptions',['../classtaggerOptions_1_1taggerOptions.html',1,'taggerOptions']]],
@@ -9,7 +10,8 @@ var searchData=
   ['token',['Token',['../classhcalcfg_1_1Token.html',1,'hcalcfg']]],
   ['topcat',['TopCat',['../classTopCat.html',1,'']]],
   ['topobject',['TopObject',['../classTopObject.html',1,'TopObject'],['../classTopObject.html#a0eb6419f5a625d5ad777df5363e02f90',1,'TopObject::TopObject()'],['../classTopObject.html#a7888dbf304a6fb09af55b4a632cab5ef',1,'TopObject::TopObject(std::vector&lt; Constituent const * &gt; constituents, const Type &amp;type=NONE)']]],
-  ['toptagger',['TopTagger',['../classTopTagger.html',1,'TopTagger'],['../classTopTagger.html#a26e4654b1eef1f7e7dcffeb02b9fc41b',1,'TopTagger::TopTagger()'],['../classTopTagger.html#a21d623a93398346401fb78bb09fe98b6',1,'TopTagger::TopTagger(const std::string &amp;)']]],
+  ['topobjlite',['TopObjLite',['../classTopObjLite.html',1,'']]],
+  ['toptagger',['TopTagger',['../classTopTagger.html',1,'TopTagger'],['../classTopTagger.html#a26e4654b1eef1f7e7dcffeb02b9fc41b',1,'TopTagger::TopTagger()'],['../classTopTagger.html#a21e38d6b697bc079ab6fb0eb7a1ea3bb',1,'TopTagger::TopTagger(const std::string &amp;cfgFileName, const std::string &amp;workingDir)']]],
   ['toptaggerresults',['TopTaggerResults',['../classTopTaggerResults.html',1,'TopTaggerResults'],['../classTopTaggerResults.html#a661fa9c839fd16be88ea1205cf274c7e',1,'TopTaggerResults::TopTaggerResults()']]],
   ['toptaggerutilities_2eh',['TopTaggerUtilities.h',['../TopTaggerUtilities_8h.html',1,'']]],
   ['topvar',['TopVar',['../classTopVar.html',1,'']]],

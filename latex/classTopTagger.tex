@@ -11,12 +11,14 @@
 \hypertarget{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}{\hyperlink{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}{Top\-Tagger} ()}\label{classTopTagger_a26e4654b1eef1f7e7dcffeb02b9fc41b}
 
 \begin{DoxyCompactList}\small\item\em Default constructor to create an empty \hyperlink{classTopTagger}{Top\-Tagger} object. \end{DoxyCompactList}\item 
-\hypertarget{classTopTagger_a21d623a93398346401fb78bb09fe98b6}{\hyperlink{classTopTagger_a21d623a93398346401fb78bb09fe98b6}{Top\-Tagger} (const std\-::string \&)}\label{classTopTagger_a21d623a93398346401fb78bb09fe98b6}
+\hypertarget{classTopTagger_a21e38d6b697bc079ab6fb0eb7a1ea3bb}{\hyperlink{classTopTagger_a21e38d6b697bc079ab6fb0eb7a1ea3bb}{Top\-Tagger} (const std\-::string \&cfg\-File\-Name, const std\-::string \&working\-Dir)}\label{classTopTagger_a21e38d6b697bc079ab6fb0eb7a1ea3bb}
 
 \begin{DoxyCompactList}\small\item\em Constructor to initialize \hyperlink{classTopTagger}{Top\-Tagger} object from the provided configuration file. \end{DoxyCompactList}\item 
 void \hyperlink{classTopTagger_ad7e22571559cb7afe0f0cf0e14d1ef41}{set\-Verbosity} (const int verbosity)
 \item 
 void \hyperlink{classTopTagger_ae117c09fc42674a09247fd1ad8dcb3ce}{set\-Rethrow} (const bool re\-Throw)
+\item 
+void \hyperlink{classTopTagger_ae03dce4873628bfd529924a9004b3304}{set\-Working\-Directory} (const std\-::string \&working\-Directory)
 \item 
 void \hyperlink{classTopTagger_ac18bfe0673dbd05973f45c668ed2b190}{set\-Cfg\-File} (const std\-::string \&)
 \item 
@@ -94,7 +96,14 @@ If set to true the \hyperlink{classTopTagger}{Top\-Tagger} internal error handel
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTagger_ad7e22571559cb7afe0f0cf0e14d1ef41}
 Set the verbosity level of the top tagger \par
  0 -\/ print nothing \par
- 1 -\/ print exception error messages 
+ 1 -\/ print exception error messages \hypertarget{classTopTagger_ae03dce4873628bfd529924a9004b3304}{\index{Top\-Tagger@{Top\-Tagger}!set\-Working\-Directory@{set\-Working\-Directory}}
+\index{set\-Working\-Directory@{set\-Working\-Directory}!TopTagger@{Top\-Tagger}}
+\subsubsection[{set\-Working\-Directory}]{\setlength{\rightskip}{0pt plus 5cm}void Top\-Tagger\-::set\-Working\-Directory (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{working\-Directory}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTopTagger_ae03dce4873628bfd529924a9004b3304}
+If set, the top tagger will look in this directory for cfg files. This must be called B\-E\-F\-O\-R\-E set\-Cfg\-File. 
 
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 

@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -107,6 +107,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad86f4c8dc3dfc9b2a3925892e9ea82ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5815a6c66595320c1d0f0f006dd67a4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTMHEPRequirements.html#a5815a6c66595320c1d0f0f006dd67a4d">run</a> (<a class="el" href="classTopTaggerResults.html">TopTaggerResults</a> &amp;)</td></tr>
 <tr class="separator:a5815a6c66595320c1d0f0f006dd67a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classTTModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classTTModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classTTModule.html">TTModule</a></td></tr>
+<tr class="memitem:a0f9c9948826e630e6c6e7943e98a1f37 inherit pub_methods_classTTModule"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f9c9948826e630e6c6e7943e98a1f37"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setWorkingDirectory</b> (const std::string &amp;workingDir)</td></tr>
+<tr class="separator:a0f9c9948826e630e6c6e7943e98a1f37 inherit pub_methods_classTTModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_attribs_classTTModule"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classTTModule')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classTTModule.html">TTModule</a></td></tr>
+<tr class="memitem:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ef21f981480be1787d2d606023fafd8"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTModule.html#a7ef21f981480be1787d2d606023fafd8">workingDirectory_</a></td></tr>
+<tr class="memdesc:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the location where the tagger will resolve relative file paths. <br/></td></tr>
+<tr class="separator:a7ef21f981480be1787d2d606023fafd8 inherit pro_attribs_classTTModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This module applies the HEP top tagging criterion to the candidates as well as applying basic requirements on the number of b-jets in the candidate. For trijet candidates the full HEP requirements are applied. For dijet candidates the module applies a simplified version of the HEP criterion designed for use with a W and an additional jet. The dijet and trijet categories will function with either inputs from <a class="el" href="classTTMLazyClusterAlgo.html">TTMLazyClusterAlgo</a> or <a class="el" href="classTTMBasicClusterAlgo.html">TTMBasicClusterAlgo</a>. If the monojet mode is activated it will simply pass all AK4 monojet top candidates, but not AK8 monojet tops (this is instead done by "TTMAK8TopFilter"). Candidates passed by this module are placed into the final top list.</p>
@@ -194,7 +206,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:07 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:31 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

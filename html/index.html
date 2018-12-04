@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TopTagger: My Main Page</title>
+<title>TopTagger: Top Tagger</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -64,7 +64,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -75,14 +75,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">My Main Page </div>  </div>
+<div class="title">Top Tagger </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>Installing the tagger in CMS software release</h2>
+<div class="textblock"><h1>Top Tagging Algorithm</h1>
+<p>Add description of algorithm and general options here</p>
+<h1>Installation Instructions</h1>
+<h2>Installing the tagger in CMS software release</h2>
 <h3>Standalone (edm free) install instructions within CMSSW</h3>
-<p>If you would rather not go through the hassle of installing ROOT/python/tensorflow the CMSSW environment can be used to provide the necessary libraries and python modules</p>
-<div class="fragment"><div class="line">cmsrel CMSSW_9_3_3</div>
-<div class="line">cd CMSSW_9_3_3/src</div>
+<p>These instructions explain how to install the top tagger in a standalone way (i.e. no cmsRun or FWLite required) but taking advantage of all the tools which come packaged with a CMSSW release. If you would rather not go through the hassle of installing ROOT/python/tensorflow, the CMSSW environment can be used to provide the necessary libraries and python modules</p>
+<div class="fragment"><div class="line">cmsrel CMSSW_9_4_11</div>
+<div class="line">cd CMSSW_9_4_11/src</div>
 <div class="line">cmsenv</div>
 <div class="line">git clone git@github.com:susy2015/<a class="code" href="classTopTagger.html">TopTagger</a>.git</div>
 <div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
@@ -90,8 +93,81 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">make -j8 </div>
 </div><!-- fragment --><p>The test code can then be run identically to the completely standalone instructions found <a href="../README.md#running-the-example">here</a></p>
 <h3>Install tagger integrated in the edm framework</h3>
-<p>For the time being it is suggested to produce flat NTuples containing the input variables which are necessary to run the resolved tagger offline. This is because running tensorflow alongside CMSSW 8_X_Y requires some rather convoluted hacks (instructions are given below, but these are very involved). It is much easier to produce flat tuples where all the necessary jet information is kept and use the stansalong instructions above to process the flat NTuples.</p>
-<h4>Instructions for producing jet variables for resolved top tagger with CMSSW 8_0_28_patch1</h4>
+<p>These instructions explain how to install the top tagger code if you want to run the tagger during nanoAOD production or other cmsRun driven analysis tasks.</p>
+<h4>Description of top tagger nanoAOD format</h4>
+<p>The tagger will save an abbreviated <a class="el" href="classTopObject.html">TopObject</a> for each top into the nanoAOD. The information stored includes</p>
+<div class="fragment"><div class="line">nResolvedTop (<span class="keywordtype">int</span>): The number of resolved tops in the event</div>
+<div class="line">ResolvedTop_discriminator (float): The neural network discrimimnator for topness (1 is most top like, 0 is least top like)</div>
+<div class="line">ResolvedTop_pt (float): Pt of the top</div>
+<div class="line">ResolvedTop_eta (float): Eta of the top</div>
+<div class="line">ResolvedTop_phi (float): Phi of the top</div>
+<div class="line">ResolvedTop_mass (float): Mass of the top</div>
+<div class="line">ResolvedTop_j1Idx (int): Index of the first constituent jet in the main nanoAOD jet collection</div>
+<div class="line">ResolvedTop_j2Idx (int): Index of the second constituent jet in the main nanoAOD jet collectino</div>
+<div class="line">ResolvedTop_j3Idx (int): Index of the third constituent jet in the main nanoAOD jet collection</div>
+<div class="line">ResolvedTop_type (int): The type of top (3 for resolved tops)</div>
+</div><!-- fragment --><p>In order to save space in the nanoAOD only top objects passing a basic discriminator cut are saved.</p>
+<h4>Instructions for saving tagger results to nanoAOD with CMSSW_9_4_11</h4>
+<p>If starting from a fresh release of CMSSW run the following setup commands</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
+<div class="line"><span class="preprocessor"></span>cmsrel CMSSW_9_4_11</div>
+<div class="line">cd CMSSW_9_4_11/src/</div>
+<div class="line">cmsenv</div>
+<div class="line">git cms-init</div>
+</div><!-- fragment --><p>The following additional packages should then be checked out to get the top tagging code and the qgAxis1 variable necessary for the latest versions of the tagger.</p>
+<div class="fragment"><div class="line">cd ${CMSSW_BASE}/src</div>
+<div class="line">git cms-merge-topic -u pastika:AddAxis1_946p1</div>
+<div class="line">git clone git@github.com:susy2015/<a class="code" href="classTopTagger.html">TopTagger</a>.git</div>
+<div class="line">scram b -j4</div>
+</div><!-- fragment --><p>The configuration file to generate nanoAOD can then be generated with the following set of instructions via cmsDriver.py and download the top tagger configuration file</p>
+<div class="fragment"><div class="line">cd ${CMSSW_BASE}/src</div>
+<div class="line">cmsDriver.py test94X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions <span class="keyword">auto</span>:phase1_2017_realistic -n 100 --era Run2_2017,run2_nanoAOD_94XMiniAODv1 --customise <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/resolvedTagger_cff.customizeResolvedTagger</div>
+<div class="line">mkdir -p ${CMSSW_BASE}/src/<a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/data</div>
+<div class="line">getTaggerCfg.sh -o -n -t DeepResolved_DeepCSV_GR_noDisc_Release_v1.0.0 -d $CMSSW_BASE/src/<a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/data</div>
+</div><!-- fragment --><p>For running over 2016 MC insread use the following cmsDriver command</p>
+<div class="fragment"><div class="line">cd ${CMSSW_BASE}/src</div>
+<div class="line">cmsDriver.py test80X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions <span class="keyword">auto</span>:run2_mc -n 100 --era Run2_2016,run2_miniAOD_80XLegacy --customise <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/resolvedTagger_cff.customizeResolvedTagger</div>
+</div><!-- fragment --><p>This will produce a file "test[80/94]X_NANO.py" which can be run as follows to produce a small test nanoAOD file with the top tagger variables included</p>
+<div class="fragment"><div class="line">cmsRun test94X_NANO.py</div>
+</div><!-- fragment --><h4>Instructions for running tagger with CMSSW 8_0_28_patch1</h4>
+<p>These instructions are not recomended. Please use the instruction above for CMSSW_9_4_X in nanoAOD.</p>
+<p>In addition to the top tagger itself these instructions include the steps to configure additional packages, including the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
+<div class="line"><span class="preprocessor"></span>cmsrel CMSSW_8_0_28_patch1</div>
+<div class="line">cd CMSSW_8_0_28_patch1/src/</div>
+<div class="line">cmsenv</div>
+<div class="line">git cms-init</div>
+<div class="line"><span class="preprocessor">#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet</span></div>
+<div class="line"><span class="preprocessor"></span>git cms-merge-topic -u mverzett:Experimental_DeepFlavour_80X</div>
+<div class="line">cd RecoBTag/DeepFlavour/scripts/</div>
+<div class="line">wget -nv http:<span class="comment">//www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz</span></div>
+<div class="line">tar -zxf tensorflow-cmssw8-0-26.tar.gz</div>
+<div class="line">mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python</div>
+<div class="line">rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/</div>
+<div class="line">cd <span class="stringliteral">&quot;$CMSSW_BASE/src&quot;</span></div>
+<div class="line">scram setup <span class="stringliteral">&quot;RecoBTag/Tensorflow/py2-numpy-c-api.xml&quot;</span></div>
+<div class="line">cmsenv</div>
+<div class="line"><span class="preprocessor">#patch to gq producer to add axis1</span></div>
+<div class="line"><span class="preprocessor"></span>git cms-merge-topic -u pastika:AddJetAxis1</div>
+<div class="line"><span class="preprocessor">#patched version of jet toolbox</span></div>
+<div class="line"><span class="preprocessor"></span>git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix_NoLep_jetToolbox_80X_V3</div>
+<div class="line"><span class="preprocessor">#download top tagger code </span></div>
+<div class="line"><span class="preprocessor"></span>git clone -b IntermediateRecipeV0 git@github.com:susy2015/<a class="code" href="classTopTagger.html">TopTagger</a>.git</div>
+<div class="line"><span class="preprocessor">#compile everything </span></div>
+<div class="line"><span class="preprocessor"></span>scram b -j12</div>
+<div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
+<div class="line"><span class="preprocessor">#get qgl database file</span></div>
+<div class="line"><span class="preprocessor"></span>wget https:<span class="comment">//raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL_cmssw8020_v2.db</span></div>
+<div class="line"><span class="preprocessor">#get top tager cfg file and MVA model files </span></div>
+<div class="line"><span class="preprocessor"></span>../../Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0</div>
+<div class="line"><span class="preprocessor">#run example code</span></div>
+<div class="line"><span class="preprocessor"></span>voms-proxy-init</div>
+<div class="line">cmsRun run_topTagger.py</div>
+</div><!-- fragment --><p>The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).</p>
+<h3>Instructions for producing jet variables for resolved top tagger in nanoAOD</h3>
+<p>Instructions comming ... eventually ...</p>
+<h3>OLD: Instructions for producing jet variables for resolved top tagger in CMSSW_8_0_28_patch1</h3>
+<p>The solution using nanoAOD is the recomended way to get resolved top tagger variables.</p>
 <p>Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
 <div class="line"><span class="preprocessor"></span>cmsrel CMSSW_8_0_28_patch1</div>
@@ -171,42 +247,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="keywordtype">double</span> muonMultiplicity = jet.muonMultiplicity();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>For convinenent use with the top tagger the 4-vector and each jet variable can be saved in a flat tuple in its own std::vector per event.</p>
-<h4>Instructions for running tagger online with CMSSW 8_0_28_patch1</h4>
-<p>The instructions are currently for CMSSW8, but these will be updated when MC is avaliable for 9X series releases. In addition to the top tagger itself these instructions include the steps to configure additional packages, uncluding the deepFlavor tagger (for the tagger itself along with the tensorflow configuration for 8X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
-<div class="line"><span class="preprocessor"></span>cmsrel CMSSW_8_0_28_patch1</div>
-<div class="line">cd CMSSW_8_0_28_patch1/src/</div>
-<div class="line">cmsenv</div>
-<div class="line">git cms-init</div>
-<div class="line"><span class="preprocessor">#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet</span></div>
-<div class="line"><span class="preprocessor"></span>git cms-merge-topic -u mverzett:Experimental_DeepFlavour_80X</div>
-<div class="line">cd RecoBTag/DeepFlavour/scripts/</div>
-<div class="line">wget -nv http:<span class="comment">//www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz</span></div>
-<div class="line">tar -zxf tensorflow-cmssw8-0-26.tar.gz</div>
-<div class="line">mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python</div>
-<div class="line">rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/</div>
-<div class="line">cd <span class="stringliteral">&quot;$CMSSW_BASE/src&quot;</span></div>
-<div class="line">scram setup <span class="stringliteral">&quot;RecoBTag/Tensorflow/py2-numpy-c-api.xml&quot;</span></div>
-<div class="line">cmsenv</div>
-<div class="line"><span class="preprocessor">#patch to gq producer to add axis1</span></div>
-<div class="line"><span class="preprocessor"></span>git cms-merge-topic -u pastika:AddJetAxis1</div>
-<div class="line"><span class="preprocessor">#patched version of jet toolbox</span></div>
-<div class="line"><span class="preprocessor"></span>git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix_NoLep_jetToolbox_80X_V3</div>
-<div class="line"><span class="preprocessor">#download top tagger code </span></div>
-<div class="line"><span class="preprocessor"></span>git clone -b IntermediateRecipeV0 git@github.com:susy2015/<a class="code" href="classTopTagger.html">TopTagger</a>.git</div>
-<div class="line"><span class="preprocessor">#compile everything </span></div>
-<div class="line"><span class="preprocessor"></span>scram b -j12</div>
-<div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
-<div class="line"><span class="preprocessor">#get qgl database file</span></div>
-<div class="line"><span class="preprocessor"></span>wget https:<span class="comment">//raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL_cmssw8020_v2.db</span></div>
-<div class="line"><span class="preprocessor">#get top tager cfg file and MVA model files </span></div>
-<div class="line"><span class="preprocessor"></span>../../Tools/getTaggerCfg.sh -t Intermediate_Example_v1.0.0</div>
-<div class="line"><span class="preprocessor">#run example code</span></div>
-<div class="line"><span class="preprocessor"></span>voms-proxy-init</div>
-<div class="line">cmsRun run_topTagger.py</div>
-</div><!-- fragment --><p>The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).</p>
-<h4>Running tagger online in CMSSW 9_4_X/10_0_X</h4>
-<p>Instructions coming soon</p>
 <h2>More about getting a configuration file</h2>
 <p>Before the top tagger can be used the top tagger configuration file must be checked out. Configuration files for top tagger working points are stored in the Susy2015/TopTaggerCfg repository and are published through releases. These should not be accessed directly, but instead you can use the script "getTaggerCfg.sh" to download the working points desired. An example of a basic checkout of the standard working point for use with the example code (different working points are found here <a href="https://github.com/susy2015/TopTaggerCfg/releases">https://github.com/susy2015/TopTaggerCfg/releases</a>) is as follows</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#run the following once to set up the top tagger and add the &quot;getTaggerCfg.sh&quot; to the path</span></div>
@@ -228,7 +268,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:10 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:34 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

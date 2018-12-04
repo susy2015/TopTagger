@@ -6,6 +6,7 @@ var searchData=
   ['token',['Token',['../classhcalcfg_1_1Token.html',1,'hcalcfg']]],
   ['topcat',['TopCat',['../classTopCat.html',1,'']]],
   ['topobject',['TopObject',['../classTopObject.html',1,'']]],
+  ['topobjlite',['TopObjLite',['../classTopObjLite.html',1,'']]],
   ['toptagger',['TopTagger',['../classTopTagger.html',1,'']]],
   ['toptaggerresults',['TopTaggerResults',['../classTopTaggerResults.html',1,'']]],
   ['topvar',['TopVar',['../classTopVar.html',1,'']]],

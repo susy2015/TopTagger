@@ -11,9 +11,10 @@ var indexSectionsWithContent =
   1: "abcdefhiklmnprstu",
   2: "t",
   3: "abcdefgimnoprstuw",
-  4: "t",
-  5: "r",
-  6: "mt"
+  4: "w",
+  5: "t",
+  6: "r",
+  7: "t"
 };
 
 var indexSectionNames =
@@ -22,9 +23,10 @@ var indexSectionNames =
   1: "classes",
   2: "files",
   3: "functions",
-  4: "enums",
-  5: "defines",
-  6: "pages"
+  4: "variables",
+  5: "enums",
+  6: "defines",
+  7: "pages"
 };
 
 function convertToId(search)

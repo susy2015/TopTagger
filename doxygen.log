@@ -132,6 +132,8 @@ Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h...
+Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h...
+Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTagger.h...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTagger.h...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h...
@@ -172,6 +174,8 @@ Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMXGBoost
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMXGBoost.h...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc...
+Reading /home/travis/build/susy2015/TopTagger/TopTagger/python/resolvedTagger_cff.py...
+Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/python/resolvedTagger_cff.py...
 Reading /home/travis/build/susy2015/TopTagger/TopTagger/python/SHOTProducer_cfi.py...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/python/SHOTProducer_cfi.py...
 Reading /home/travis/build/susy2015/TopTagger/TopTagger/README.md...
@@ -196,11 +200,7 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMFilterBase.c
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMFinalSort.cpp...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMFinalSort.cpp...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMHEPRequirements.cpp...
-Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMHEPRequirements.cpp...
-Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyClusterAlgo.cpp...
-Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyClusterAlgo.cpp...
-Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOpenCVMVA.cpp...
-Parsing file /home/travis/build/susy2015/TopTagger/TopTagg/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMAK8TopFilter.h:12: warning: Compound TTMAK8TopFilter is not documented.
+Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/T/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMAK8TopFilter.h:12: warning: Compound TTMAK8TopFilter is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh:11: warning: Compound cfg::Record is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:309: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMLazyClusterAlgo.h:9: warning: Compound TTMLazyClusterAlgo is not documented.
@@ -248,7 +248,11 @@ Parsing file /home/travis/build/susy2015/TopTagger/TopTagg/home/travis/build/sus
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:185: warning: Compound PrepVariables is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:365: warning: Compound hcalcfg::ParserInitCaller< T, true > is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:313: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitExistsType is not documented.
-er/src/TTMOpenCVMVA.cpp...
+TMHEPRequirements.cpp...
+Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyClusterAlgo.cpp...
+Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMLazyClusterAlgo.cpp...
+Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOpenCVMVA.cpp...
+Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOpenCVMVA.cpp...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOverlapResolution.cpp...
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMOverlapResolution.cpp...
 Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMRemainingSystem.cpp...
@@ -324,11 +328,8 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Context.hh...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Language.hh...
-Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parameter.hh...
-Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parser.h...
-Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh...
-Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:604: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:43: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:604: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:50: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/README.md:17: warning: explicit link request to 'events' could not be resolved
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:300: warning: Member get_mT2(const double mVis1, const double pxVis1, const double pyVis1, const double mVis2, const double pxVis2, const double pyVis2, const double pxMiss, const double pyMiss, const double mInvis1, const double mInvis2, const double desiredPrecisionOnMT2=0, const bool useDeciSectionsInitially=true) (function) of class asymm_mt2_lester_bisect is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:322: warning: Member disableCopyrightMessage(const bool printIfFirst=false) (function) of class asymm_mt2_lester_bisect is not documented.
@@ -411,94 +412,48 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgPa/home/travis
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:106: warning: Member theItemName (variable) of class CfgBuilder is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:107: warning: Member theItemIndex (variable) of class CfgBuilder is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:108: warning: Member theDoc (variable) of class CfgBuilder is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:51: warning: Member setPBtag(const TLorentzVector &p, const double &bTagDisc, const double &qgLikelihood) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:52: warning: Member setP(const TLorentzVector &p) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:53: warning: Member setBTag(const double &bTagDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:54: warning: Member setQGLikelihood(const double &qgLikelihood) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:55: warning: Member setType(const ConstituentType type) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:56: warning: Member setTau1(const double &tau1) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:57: warning: Member setTau2(const double &tau2) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:58: warning: Member setTau3(const double &tau3) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:59: warning: Member setSoftDropMass(const double &softDropMass) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:60: warning: Member setSubJets(const std::vector< Constituent > &subjets) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:61: warning: Member setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:62: warning: Member setWMassCorr(const double &wMassCorr) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:63: warning: Member setTopDisc(const double &topDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:64: warning: Member setWDisc(const double &WDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:85: warning: Member getP() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:86: warning: Member getBTagDisc() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:87: warning: Member getQGLikelihood() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:88: warning: Member getType() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:89: warning: Member getTau1() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:90: warning: Member getTau2() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:91: warning: Member getTau3() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:92: warning: Member getSoftDropMass() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:93: warning: Member getSubjets() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:94: warning: Member getGenMatches() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:95: warning: Member getWMassCorr() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:96: warning: Member getQGMult() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:97: warning: Member getQGPtD() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:98: warning: Member getQGAxis1() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:99: warning: Member getQGAxis2() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:100: warning: Member getTopDisc() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:101: warning: Member getWDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:52: warning: Member setPBtag(const TLorentzVector &p, const double &bTagDisc, const double &qgLikelihood) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:53: warning: Member setP(const TLorentzVector &p) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:54: warning: Member setBTag(const double &bTagDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:55: warning: Member setQGLikelihood(const double &qgLikelihood) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:56: warning: Member setType(const ConstituentType type) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:57: warning: Member setTau1(const double &tau1) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:58: warning: Member setTau2(const double &tau2) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:59: warning: Member setTau3(const double &tau3) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:60: warning: Member setSoftDropMass(const double &softDropMass) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:61: warning: Member setSubJets(const std::vector< Constituent > &subjets) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:62: warning: Member setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:63: warning: Member setWMassCorr(const double &wMassCorr) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:64: warning: Member setTopDisc(const double &topDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:65: warning: Member setWDisc(const double &WDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:66: warning: Member setIndex(const unsigned int &index) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:87: warning: Member getP() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:88: warning: Member getBTagDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:89: warning: Member getQGLikelihood() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:90: warning: Member getType() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:91: warning: Member getTau1() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:92: warning: Member getTau2() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:93: warning: Member getTau3() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:94: warning: Member getSoftDropMass() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:95: warning: Member getSubjets() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:96: warning: Member getGenMatches() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:97: warning: Member getWMassCorr() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:98: warning: Member getQGMult() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:99: warning: Member getQGPtD() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:100: warning: Member getQGAxis1() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:101: warning: Member getQGAxis2() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:102: warning: Member getTopDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:103: warning: Member getWDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h:104: warning: Member getIndex() const  (function) of class Constituent is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:42: warning: Member HDF5Writer(const std::map< std::string, std::vector< std::string >> &variables, int eventsPerFile, const std::string &ofname) (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:54: warning: Member setTupleVars(const std::set< std::string > &) (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:56: warning: Member initBranches(const NTupleReader &tr) (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:78: warning: Member saveHDF5File() (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:133: warning: Member fill() (function) of class HDF5Writer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:427: warning: Member PrepVariables(const std::map< std::string, std::vector< std::string >> &variables) (function) of class PrepVariables is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:439: warning: Member operator()(NTupleReader &tr) (function) of class PrepVariables is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:54: warning: Member SHOTProducer(const edm::ParameterSet &) (function) of class SHOTProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:57: warning: Member fillDescriptions(edm::ConfigurationDescriptions &descriptions) (function) of class SHOTProducer is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:56: warning: Member GetMatchedTop(const std::vector< T > &TopCand, std::vector< TopObject > &MachedTopCand, const std::vector< TLorentzVector > &Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:84: warning: Member GetMatchedTop(std::vector< TLorentzVector > TopCand, std::vector< TLorentzVector > &MachedTopCand, std::vector< TLorentzVector >Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:85: warning: Member GetMatchedTopConst(const std::vector< Constituent const * > &topconst, const std::vector< TLorentzVector > &gentopdau) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:87: warning: Member TopConst(const std::vector< T > &tops, const std::vector< TLorentzVector > &genDecayLVec, const std::vector< int > &genDecayPdgIdVec, const std::vector< int > &genDecayIdxVec, const std::vector< int > &genDecayMomIdxVec) (function) of class TopCat is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:46: warning: Member TopTaggerResults(std::vector< Constituent > &&constituents) (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:66: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:67: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:68: warning: Member getTops() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:69: warning: Member getRsys() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:70: warning: Member getTopsByType() (function) of class TopTaggerResults is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:23: warning: Member GetTopLVec(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:24: warning: Member GetTopLVec(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:25: warning: Member GetTopPt(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:26: warning: Member GetTopPt(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:27: warning: Member GetTopMass(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:28: warning: Member GetTopMass(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:30: warning: Member GetTopdRmax(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:31: warning: Member GetTopdRmax(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:32: warning: Member GetTopdRmin(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:33: warning: Member GetTopdRmin(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:34: warning: Member GetArea(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:35: warning: Member GetArea(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:36: warning: Member CalCombmass(TopObject *Top) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:37: warning: Member CalCombmass(TopObject TopCand) (function) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m12 (variable) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m23 (variable) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m13 (variable) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m123 (variable) of class TopVar is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:16: warning: Member TTException(const int, const std::string, const std::string, const std::string) (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:18: warning: Member getLineNumber() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:19: warning: Member getFunctionName() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:20: warning: Member getFileName() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:21: warning: Member getMessage() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:23: warning: Member print() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member maxAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member maxTopTau32_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopPt_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member deepAK8WDisc_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member deepAK8TopDisc_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WMass_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxAK8WMass_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxWTau21_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WPt_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK4WPt_ (variable) of class TTMConstituentReqs is not documented.
-rser/include/Scanner.h...
+Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parameter.hh...
+Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Parser.h...
+Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh...
+Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/DataFormats/src/classes.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/Tools/cpp/MVAstuff.h...
@@ -508,6 +463,7 @@ Generating code for file /home/travis/build/susy2015/TopTagger/Tools/cpp/TagTest
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/Constituent.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObject.h...
+Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTagger.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h...
@@ -541,17 +497,66 @@ Generating docs for compound BaseHistgram...
 Generating docs for compound CfgBuilder...
 Generating docs for compound Constituent...
 Generating docs for compound HDF5Writer...
-Generating docs for compound PrepVariables...
-Generating docs for compound SHOTProducer...
-Generating docs for compound TopCat...
-Generating docs for compound TopObject...
-Generating docs for compound TopTagger...
-Generating docs for compound TopTaggerResults...
-Generating docs for compound TopVar...
-Generating docs for compound TTException...
-Generating docs for compound TTMAK8TopFilter...
-Generating docs for compound TTMBasicClusterAlgo...
-Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
+Generating docs for compound PrepVariables../home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:427: warning: Member PrepVariables(const std::map< std::string, std::vector< std::string >> &variables) (function) of class PrepVariables is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:439: warning: Member operator()(NTupleReader &tr) (function) of class PrepVariables is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:62: warning: Member SHOTProducer(const edm::ParameterSet &) (function) of class SHOTProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/plugins/SHOTProducer.cc:65: warning: Member fillDescriptions(edm::ConfigurationDescriptions &descriptions) (function) of class SHOTProducer is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:56: warning: Member GetMatchedTop(const std::vector< T > &TopCand, std::vector< TopObject > &MachedTopCand, const std::vector< TLorentzVector > &Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:84: warning: Member GetMatchedTop(std::vector< TLorentzVector > TopCand, std::vector< TLorentzVector > &MachedTopCand, std::vector< TLorentzVector >Gentop, std::vector< TLorentzVector > &MGentop) (function) of class TopCat is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:85: warning: Member GetMatchedTopConst(const std::vector< Constituent const * > &topconst, const std::vector< TLorentzVector > &gentopdau) (function) of class TopCat is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:87: warning: Member TopConst(const std::vector< T > &tops, const std::vector< TLorentzVector > &genDecayLVec, const std::vector< int > &genDecayPdgIdVec, const std::vector< int > &genDecayIdxVec, const std::vector< int > &genDecayMomIdxVec) (function) of class TopCat is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:19: warning: Member TopObjLite(const TopObject &top) (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:33: warning: Member getDiscriminator() const  (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:34: warning: Member getType() const  (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:35: warning: Member getJ1Idx() const  (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:36: warning: Member getJ2Idx() const  (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopObjLite.h:37: warning: Member getJ3Idx() const  (function) of class TopObjLite is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:46: warning: Member TopTaggerResults(std::vector< Constituent > &&constituents) (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:66: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:67: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:68: warning: Member getTops() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:69: warning: Member getRsys() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerResults.h:70: warning: Member getTopsByType() (function) of class TopTaggerResults is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:23: warning: Member GetTopLVec(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:24: warning: Member GetTopLVec(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:25: warning: Member GetTopPt(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:26: warning: Member GetTopPt(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:27: warning: Member GetTopMass(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:28: warning: Member GetTopMass(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:30: warning: Member GetTopdRmax(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:31: warning: Member GetTopdRmax(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:32: warning: Member GetTopdRmin(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:33: warning: Member GetTopdRmin(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:34: warning: Member GetArea(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:35: warning: Member GetArea(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:36: warning: Member CalCombmass(TopObject *Top) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:37: warning: Member CalCombmass(TopObject TopCand) (function) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m12 (variable) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m23 (variable) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m13 (variable) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/Tools/cpp/TaggerUtility.h:21: warning: Member m123 (variable) of class TopVar is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:16: warning: Member TTException(const int, const std::string, const std::string, const std::string) (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:18: warning: Member getLineNumber() const  (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:19: warning: Member getFunctionName() const  (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:20: warning: Member getFileName() const  (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:21: warning: Member getMessage() const  (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:23: warning: Member print() const  (function) of class TTException is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member maxAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member maxTopTau32_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopPt_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member deepAK8WDisc_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member deepAK8TopDisc_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WMass_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxAK8WMass_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxWTau21_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WPt_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK4WPt_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member maxAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
@@ -572,6 +577,13 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMFilterBase.h:25: warning: The following parameters of TTMFilterBase::markConstituentsUsed(const std::vector< const Constituent * > &constituents, const std::vector< Constituent > &allConstituents, std::set< const Constituent * > &usedConstituents, const double dRMax, const double dRMaxAK8) const are not documented:
   parameter 'dRMax'
   parameter 'dRMaxAK8'
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
@@ -585,6 +597,10 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxWTau21_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WPt_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK4WPt_ (variable) of class TTMConstituentReqs is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:38: warning: Member param_itr (typedef) of class cfg::CfgDocument is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:22: warning: Member useRecord(Record *) (function) of class cfg::CfgDocument is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:24: warning: Member addCondition() (function) of class cfg::CfgDocument is not documented.
@@ -944,12 +960,18 @@ Generating docs for compound TTMConstituentReqs/home/travis/build/susy2015/TopTa
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:508: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:509: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:507: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:458: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:459: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:600: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:601: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:599: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-...
+.
+Generating docs for compound SHOTProducer...
+Generating docs for compound TopCat...
+Generating docs for compound TopObject...
+Generating docs for compound TopObjLite...
+Generating docs for compound TopTagger...
+Generating docs for compound TopTaggerResults...
+Generating docs for compound TopVar...
+Generating docs for compound TTException...
+Generating docs for compound TTMAK8TopFilter...
+Generating docs for compound TTMBasicClusterAlgo...
+Generating docs for compound TTMConstituentReqs...
 Generating docs for compound TTMFactory...
 Generating docs for compound TTMFilterBase...
 Generating docs for compound TTMFinalSort...
@@ -1013,6 +1035,11 @@ Generating docs for compound ttUtility::ConstAK8Inputs...
 Generating docs for compound ttUtility::MVAInputCalculator...
 Generating docs for compound ttUtility::BDTMonojetInputCalculator...
 Generating docs for compound ttUtility::BDTDijetInputCalculator...
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:458: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:459: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:600: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:601: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:599: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 Generating docs for compound ttUtility::TrijetInputCalculator...
 Generating graph info page...
 Generating directory documentation...
@@ -1029,5 +1056,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1329/65536 hits=8190 misses=1420
+lookup cache used 1356/65536 hits=8347 misses=1447
 finished...

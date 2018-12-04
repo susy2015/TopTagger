@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,6 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classTTModule-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">TTModule Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -118,6 +119,16 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa9d2842c9e94782059fe92044a68e3a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14e7c03fbf4ee1a5008c9344adc7c896"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTModule.html#a14e7c03fbf4ee1a5008c9344adc7c896">run</a> (<a class="el" href="classTopTaggerResults.html">TopTaggerResults</a> &amp;)=0</td></tr>
 <tr class="separator:a14e7c03fbf4ee1a5008c9344adc7c896"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f9c9948826e630e6c6e7943e98a1f37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f9c9948826e630e6c6e7943e98a1f37"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setWorkingDirectory</b> (const std::string &amp;workingDir)</td></tr>
+<tr class="separator:a0f9c9948826e630e6c6e7943e98a1f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a7ef21f981480be1787d2d606023fafd8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ef21f981480be1787d2d606023fafd8"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTTModule.html#a7ef21f981480be1787d2d606023fafd8">workingDirectory_</a></td></tr>
+<tr class="memdesc:a7ef21f981480be1787d2d606023fafd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the location where the tagger will resolve relative file paths. <br/></td></tr>
+<tr class="separator:a7ef21f981480be1787d2d606023fafd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This is a pure virtual base class which defines the interface for a top tagger module. This implements 2 pure virtual functions which must be overridden by all modules. The first, "getParameters," is used to load any configuration parameters the module may need from the config file. The second, "run," is used to run the particular algorithm implemented in the module. None of these functions should even be called directly, but instead are called automatically by the <a class="el" href="classTopTagger.html">TopTagger</a> class. It is also important that each module also include the line "REGESTER_TTMODULE(ModuleClassName)" after the class declaration. This macro calls special code so that the <a class="el" href="classTTMFactory.html">TTMFactory</a> class can dynamically implement the module by name. </p>
@@ -192,7 +203,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:07 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:31 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

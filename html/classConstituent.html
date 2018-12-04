@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -144,6 +144,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setTopDisc</b> (const
 <tr class="memitem:a48d0d129c41154c3dcaa51ff3e5c44c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48d0d129c41154c3dcaa51ff3e5c44c3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setWDisc</b> (const double &amp;WDisc)</td></tr>
 <tr class="separator:a48d0d129c41154c3dcaa51ff3e5c44c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc67caff918e263ec1e58372efa4641b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc67caff918e263ec1e58372efa4641b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setIndex</b> (const unsigned int &amp;index)</td></tr>
+<tr class="separator:abc67caff918e263ec1e58372efa4641b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b2fc086bc359e141e54ed2903c951c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a1b2fc086bc359e141e54ed2903c951c9">setExtraVar</a> (const std::string &amp;name, const double var)</td></tr>
 <tr class="separator:a1b2fc086bc359e141e54ed2903c951c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aea6bdc5229bb87227bcc8caa9c51c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a2aea6bdc5229bb87227bcc8caa9c51c6">addGenMatch</a> (const TLorentzVector &amp;genTop, const TLorentzVector *genDaughter)</td></tr>
@@ -203,6 +206,9 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>getTopDisc</b> () c
 <tr class="memitem:a9184e1d6ed1691f6efd0c5083444c021"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9184e1d6ed1691f6efd0c5083444c021"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>getWDisc</b> () const </td></tr>
 <tr class="separator:a9184e1d6ed1691f6efd0c5083444c021"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64e38c0209bf5198477160ea690bbaf9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a64e38c0209bf5198477160ea690bbaf9"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const </td></tr>
+<tr class="separator:a64e38c0209bf5198477160ea690bbaf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fc04ce34e4e9c162f3d02f62f6b50cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a8fc04ce34e4e9c162f3d02f62f6b50cb">getExtraVar</a> (const std::string var) const </td></tr>
 <tr class="separator:a8fc04ce34e4e9c162f3d02f62f6b50cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -490,7 +496,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>getWDisc</b> () con
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 27 2018 20:46:06 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 4 2018 11:14:30 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
