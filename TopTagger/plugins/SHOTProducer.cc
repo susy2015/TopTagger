@@ -80,6 +80,8 @@ private:
         double dR = deltaR(lepton.p4(), jet.p4());
         return dR < leptonJetDr_;
     }
+    std::unique_ptr<std::vector<TopObjLite>> getFinalTopObjLiteVec(const TopTaggerResults& ttr);
+    std::unique_ptr<std::vector<TopObjLite>> getCandidateTopObjLiteVec(const TopTaggerResults& ttr);
 
     virtual void beginStream(edm::StreamID) override;
     virtual void produce(edm::Event&, const edm::EventSetup&) override;
@@ -95,7 +97,7 @@ private:
 
     std::string elecIDFlag_, qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
     double ak4ptCut_, leptonJetDr_, discriminatorCut_;
-    bool doLeptonCleaning_;
+    bool doLeptonCleaning_, saveAllTopCandidates_;
     reco::Muon::Selector muonIDFlag_;
 
     TopTagger tt;
@@ -134,6 +136,8 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 
     discriminatorCut_ = iConfig.getParameter<double>("discriminatorCut");
 
+    saveAllTopCandidates_  = iConfig.getParameter<bool>("saveAllTopCandidates");
+
     JetTok_ = consumes<std::vector<pat::Jet> >(jetSrc);
 
     muonTok_ = consumes<std::vector<pat::Muon>>(muonSrc);
@@ -165,6 +169,40 @@ SHOTProducer::~SHOTProducer()
 //
 // member functions
 //
+std::unique_ptr<std::vector<TopObjLite>> SHOTProducer::getFinalTopObjLiteVec(const TopTaggerResults& ttr)
+{
+    //get reconstructed top
+    const std::vector<TopObject*>& tops = ttr.getTops();
+
+    //Translate TopObject to TopObjLite and save to event
+    std::unique_ptr<std::vector<TopObjLite>> liteTops(new std::vector<TopObjLite>());
+    for(auto const * const top : tops)
+    {
+        if(top->getDiscriminator() > discriminatorCut_)
+        {
+            liteTops->emplace_back(*top);
+        }
+    }
+    return liteTops;
+}
+
+std::unique_ptr<std::vector<TopObjLite>> SHOTProducer::getCandidateTopObjLiteVec(const TopTaggerResults& ttr)
+{
+    //get top candidates
+    const std::vector<TopObject>& tops = ttr.getTopCandidates();
+
+    //Translate TopObject to TopObjLite and save to event
+    std::unique_ptr<std::vector<TopObjLite>> liteTops(new std::vector<TopObjLite>());
+    for(const auto& top : tops)
+    {
+        if(top.getDiscriminator() > discriminatorCut_)
+        {
+            liteTops->emplace_back(top);
+        }
+    }
+    return liteTops;
+}
+
 
 // ------------ method called to produce the data  ------------
 void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -286,19 +324,8 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     //retrieve the top tagger results object
     const TopTaggerResults& ttr = tt.getResults();
     
-    //get reconstructed top
-    const std::vector<TopObject*>& tops = ttr.getTops();
-
-    //Translate TopObject to TopObjLite and save to event
-    std::unique_ptr<std::vector<TopObjLite>> liteTops(new std::vector<TopObjLite>());
-    for(auto const * const top : tops)
-    {
-        if(top->getDiscriminator() > discriminatorCut_)
-        {
-            liteTops->emplace_back(*top);
-        }
-    }
-    iEvent.put(std::move(liteTops));
+    if(saveAllTopCandidates_) iEvent.put(std::move( getCandidateTopObjLiteVec(ttr) ));
+    else                      iEvent.put(std::move( getFinalTopObjLiteVec(ttr)     ));
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

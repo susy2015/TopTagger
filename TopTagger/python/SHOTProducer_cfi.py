@@ -17,5 +17,6 @@ SHOTProducer = cms.EDProducer(
   bTagKeyString = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
   taggerCfgFile = cms.FileInPath("TopTagger/TopTagger/data/TopTaggerCfg-DeepResolved_DeepCSV_GR_Medium_v1.0.0/TopTagger.cfg"),
   discriminatorCut = cms.double(0.5),
+  saveAllTopCandidates = cms.bool(False)
 )
 
