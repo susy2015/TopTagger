@@ -60,7 +60,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
-   wantSummary=cms.untracked.bool(False)
+   wantSummary=cms.untracked.bool(True)
 )
 
 from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAODSIM
@@ -68,8 +68,7 @@ from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAO
 ###############################################################################################################################
 
 process.source = cms.Source('PoolSource',
-                            fileNames=cms.untracked.vstring (["/store/user/benwu/Stop18/NtupleSyncMiniAOD/00257B91-1808-E811-BD39-0242AC130002.root"]),
-#/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/423685A0-BFE6-E611-B2B5-001E67DBE36D.root"]),
+                            fileNames=cms.untracked.vstring (["root://cmseos.fnal.gov//store/user/benwu/Stop18/NtupleSyncMiniAOD/00257B91-1808-E811-BD39-0242AC130002.root"]),
 )
 
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
