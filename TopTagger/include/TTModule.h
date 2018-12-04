@@ -23,6 +23,8 @@ class TTModule
 private:
 
 protected:
+    ///Stores the location where the tagger will resolve relative file paths 
+    std::string workingDirectory_;
     
 public:    
 
@@ -34,6 +36,11 @@ public:
      *run is called automatically by TopTagger once per event to run th emodule.  The module interfaces with other modules through the TopTaggerResults object which is passed as a non-const reference from TopTagger.
      */
     virtual void run(TopTaggerResults&) = 0;
+
+    void setWorkingDirectory(const std::string& workingDir)
+    {
+        workingDirectory_ = workingDir;
+    }
 };
 
 //Macro to suppress the incorrect "unused variable" warnings for module factory instantiation 

@@ -14,6 +14,8 @@
 
 #include "TLorentzVector.h"
 
+#include "TopTagger/TopTagger/include/TopObjLite.h"
+
 namespace { 
   struct dictionary {
 
@@ -24,6 +26,12 @@ namespace {
 
      std::vector<std::vector<TLorentzVector> > vtt;
      edm::Wrapper<std::vector<std::vector<TLorentzVector> > > wvtt;
+
+     TopObjLite tol;
+     edm::Wrapper<TopObjLite> wtol;
+
+     std::vector<TopObjLite> vtol;
+     edm::Wrapper<std::vector<TopObjLite>> wvtol;
   };
 }
 

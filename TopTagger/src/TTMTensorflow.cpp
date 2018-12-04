@@ -30,6 +30,10 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    std::string modelFileFullPath;
+    if(workingDirectory_.size()) modelFileFullPath = workingDirectory_ + "/" + modelFile_;
+    else                         modelFileFullPath = modelFile_;
+
     int iVar = 0;
     bool keepLooping;
     do
@@ -54,7 +58,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     TF_Status* status = TF_NewStatus();
 
     //get the grafdef from the file
-    TF_Buffer* graph_def = read_file(modelFile_);
+    TF_Buffer* graph_def = read_file(modelFileFullPath);
 
     // Import graph_def into graph
     TF_Graph* graph = TF_NewGraph();

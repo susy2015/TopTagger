@@ -81,6 +81,10 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
     maxNbInTop_    = cfgDoc->get("maxNbInTop",   localCxt, -1);
 
+    std::string modelFileFullPath;
+    if(workingDirectory_.size()) modelFileFullPath = workingDirectory_ + "/" + modelFile_;
+    else                         modelFileFullPath = modelFile_;
+
     int iVar = 0;
     bool keepLooping;
     do
@@ -105,7 +109,7 @@ void TTMTFPyBind::getParameters(const cfg::CfgDocument* cfgDoc, const std::strin
 
     //create function arguements tuple
     PyObject *pArgs = PyTuple_New(1);
-    PyTuple_SetItem(pArgs, 0, PyString_FromString(modelFile_.c_str()));
+    PyTuple_SetItem(pArgs, 0, PyString_FromString(modelFileFullPath.c_str()));
 
     //start the tensorflow session
     callPython("initTFWrapper", pArgs);

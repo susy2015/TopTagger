@@ -29,18 +29,11 @@ import sys
 
 options = VarParsing.VarParsing()
 
-options.register('inputScript','',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"input Script")
-options.register('outputFile','output',VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"output File (w/o .root)")
 options.register('maxEvents',-1,VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"maximum events")
 options.register('skipEvents', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "skip N events")
-options.register('job', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "job number")
-options.register('nJobs', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "total jobs")
-options.register('release','8_0_1', VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.string,"release number (w/o CMSSW)")
 options.register('isData', 0, VarParsing.VarParsing.multiplicity.singleton,VarParsing.VarParsing.varType.int,"isData flag (0 for MC, 1 for data)")
 
 options.parseArguments()
-
-print("Using release "+options.release)
 
 process = cms.Process("SHOTTagger")
 
@@ -63,11 +56,11 @@ else:
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.options = cms.untracked.PSet(
    allowUnscheduled = cms.untracked.bool(True),  
-   wantSummary=cms.untracked.bool(False)
+   wantSummary=cms.untracked.bool(True)
 )
 
 from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAODSIM
@@ -75,98 +68,13 @@ from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAO
 ###############################################################################################################################
 
 process.source = cms.Source('PoolSource',
-                            fileNames=cms.untracked.vstring (["/store/mc/RunIISummer16MiniAODv2/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/110000/423685A0-BFE6-E611-B2B5-001E67DBE36D.root"]),
+                            fileNames=cms.untracked.vstring (["root://cmseos.fnal.gov//store/user/benwu/Stop18/NtupleSyncMiniAOD/00257B91-1808-E811-BD39-0242AC130002.root"]),
 )
-
-numberOfFiles = len(process.source.fileNames)
-numberOfJobs = options.nJobs
-jobNumber = options.job
-
-process.source.fileNames = process.source.fileNames[jobNumber:numberOfFiles:numberOfJobs]
-if options.nJobs > 1:
-    print ("running over these files:")
-    print (process.source.fileNames)
 
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents  = cms.untracked.PSet( 
-    input = cms.untracked.int32 (-1) 
+    input = cms.untracked.int32 (10000) 
 )
-
-################################################################################################################################
-
-#
-#from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
-#from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
-#
-### Filter out neutrinos from packed GenParticles
-#process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", 
-#                                                     src = cms.InputTag("prunedGenParticles"), 
-#                                                     cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
-#
-### Define GenJets
-#process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
-#
-### -- do projections --
-#process.pfCHS = cms.EDFilter("CandPtrSelector", 
-#                             src = cms.InputTag("packedPFCandidates"), 
-#                             cut = cms.string("fromPV"))
-#
-#process.pfNoMuonCHSNoMu =  cms.EDProducer("CandPtrProjector", 
-#                                          src = cms.InputTag("pfCHS"), 
-#                                          veto = cms.InputTag("prodMuons", "mu2Clean"))
-#process.pfNoElectronCHSNoEle = cms.EDProducer("CandPtrProjector", 
-#                                              src = cms.InputTag("pfNoMuonCHSNoMu"), 
-#                                              veto = cms.InputTag("prodElectrons", "ele2Clean"))
-#process.ak4PFJetsCHSNoLep = ak4PFJets.clone(src = 'pfNoElectronCHSNoEle', doAreaFastjet = True) # no idea while doArea is false by default, but it's True in RECO so we have to set it
-#
-################################################################################################################################
-#
-#jetCorrectionsAK4 = ('AK4PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute'], 'None')
-#
-#from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
-#
-#addJetCollection(
-#    process,
-#    postfix = "",
-#    labelName = 'DeepFlavour',
-#    jetSource = cms.InputTag('ak4PFJetsCHSNoLep'),
-#    pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-#    pfCandidates = cms.InputTag('packedPFCandidates'),
-#    svSource = cms.InputTag('slimmedSecondaryVertices'),
-#    elSource = cms.InputTag('slimmedElectrons'),
-#    muSource = cms.InputTag('slimmedMuons'),
-#    jetCorrections = jetCorrectionsAK4,
-##    btagDiscriminators = bTagDiscriminators,
-#    genJetCollection = cms.InputTag('ak4GenJetsNoNu'),
-#    genParticles = cms.InputTag('prunedGenParticles'),
-#    algo = 'AK', rParam = 0.4
-#    )
-
-
-###############################################################################################################################
-
-# QGLikelihood
-
-qgDatabaseVersion = 'cmssw8020_v2'
-
-databasepath='QGL_cmssw8020_v2.db'
-
-from CondCore.CondDB.CondDB_cfi import *
-process.QGPoolDBESSource = cms.ESSource("PoolDBESSource",
-      CondDB.DBParameters,
-      toGet = cms.VPSet(),
-      connect = cms.string('sqlite_file:'+databasepath),
-)
-
-for type in ['AK4PFchs','AK4PFchs_antib']:
-    process.QGPoolDBESSource.toGet.extend(cms.VPSet(cms.PSet(
-                record = cms.string('QGLikelihoodRcd'),
-                tag    = cms.string('QGLikelihoodObject_'+qgDatabaseVersion+'_'+type),
-                label  = cms.untracked.string('QGL_'+type)
-                )))
-
-process.es_prefer_jec = cms.ESPrefer("PoolDBESSource", "QGPoolDBESSource")
-
 
 ###############################################################################################################################
 
@@ -178,65 +86,10 @@ process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['
 
 ###############################################################################################################################
 
-#Deep Flavor
-
-from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-
-updateJetCollection(
-   process,
-   labelName = "DeepFlavour",
-   jetSource = jetTag,
-   jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-   btagDiscriminators = [
-      'pfDeepFlavourJetTags:probb',
-      'pfDeepFlavourJetTags:probbb',
-      'pfDeepFlavourJetTags:problepb',
-      'pfDeepFlavourJetTags:probc',
-      'pfDeepFlavourJetTags:probuds',
-      'pfDeepFlavourJetTags:probg',
-      ] ## to add discriminators
-)
-
-jetTag = cms.InputTag('selectedUpdatedPatJetsDeepFlavour')
-
-###############################################################################################################################
-
-from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
-
-# To get the lepton cleaned collection
-#process.pfCandidatesNoMu =  cms.EDProducer("CandPtrProjector", 
-#                                          src = cms.InputTag("packedPFCandidates"), 
-#                                          veto = cms.InputTag("prodMuons", "mu2Clean"))
-#process.pfCandidatesNoEle = cms.EDProducer("CandPtrProjector", 
-#                                          src = cms.InputTag("pfCandidatesNoMu"), 
-#                                          veto = cms.InputTag("prodElectrons", "ele2Clean"))
-#jetToolbox( process, 'ak8', 'ak8JetSubsNoLep', 'out', 
-#            runOnMC = not options.isData, 
-#            PUMethod='Puppi', 
-#            newPFCollection=True,
-#            nameNewPFCollection='pfCandidatesNoEle',
-#            addSoftDropSubjets = True, 
-#            addSoftDrop = True, 
-#            addNsub = True, 
-#            bTagDiscriminators = ['pfCombinedInclusiveSecondaryVertexV2BJetTags'], 
-#            addCMSTopTagger = False,
-#            postFix="NoLep")
-
-# Keep this behind the cleaned version for now, otherwise everything will be lepton cleaned
-jetToolbox( process, 'ak8', 'ak8JetSubs', 'out', 
-            runOnMC = not options.isData, 
-            PUMethod='Puppi', 
-            addSoftDropSubjets = True, 
-            addSoftDrop = True, 
-            addNsub = True, 
-            bTagDiscriminators = ['pfCombinedInclusiveSecondaryVertexV2BJetTags'], 
-            addCMSTopTagger = False)
-
-###############################################################################################################################
-
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
 process.SHOTProducer.ak4JetSrc = jetTag
-process.SHOTProducer.ak8JetSrc = cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop')
+#This is set to false because the 
+process.SHOTProducer.doLeptonCleaning = cms.bool(False)
 
 ###############################################################################################################################
 
@@ -247,6 +100,6 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 ###############################################################################################################################
 
-process.p = cms.Path(process.SHOTProducer)
+process.p = cms.Path(process.QGTagger * process.slimmedJetsAuxiliary * process.SHOTProducer)
 process.endP = cms.EndPath(process.out)
 

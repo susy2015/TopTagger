@@ -3,4 +3,8 @@
   <class name="edm::Wrapper<std::vector<TLorentzVector> >"/>
   <class name="std::vector<std::vector<TLorentzVector> >"/>
   <class name="edm::Wrapper<std::vector<std::vector<TLorentzVector> > >"/>
+  <class name="TopObjLite"/>
+  <class name="edm::Wrapper<TopObjLite>"/>
+  <class name="std::vector<TopObjLite>"/>
+  <class name="edm::Wrapper<std::vector<TopObjLite> >"/>
 </lcgdict>

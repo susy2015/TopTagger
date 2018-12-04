@@ -1,12 +1,10 @@
-<Flags CXXFLAGS="-DDOTENSORFLOWPYBIND -DSHOTTOPTAGGER_DO_TMVA"/>
+<Flags CXXFLAGS="-DDOTENSORFLOW -DSHOTTOPTAGGER_DO_TMVA"/>
 <use name="TopTagger/CfgParser"/>
 <use name="root"/>
 <use name="roottmva"/>
-<use name="python" />
-<use name="py2-numpy" />
-<use name="py2-numpy-c-api" />
+<use name="tensorflow-c" />
 <use name="PhysicsTools/Utilities"/>
-<use name="TopTagger/CfgParser"/>
+<use name="DataFormats/Candidate"/>
 <export>
   <lib name="1"/>
 </export>
