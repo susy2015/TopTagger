@@ -14,12 +14,13 @@ Inheritance diagram for T\-T\-Module\-:\begin{figure}[H]
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+virtual \hyperlink{classTTModule_a270f4faaa37f3fb382fb5fa91cdf1899}{$\sim$\-T\-T\-Module} ()=default
+\item 
 virtual void \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)=0
 \item 
 virtual void \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)=0
 \item 
-\hypertarget{classTTModule_a0f9c9948826e630e6c6e7943e98a1f37}{void {\bfseries set\-Working\-Directory} (const std\-::string \&working\-Dir)}\label{classTTModule_a0f9c9948826e630e6c6e7943e98a1f37}
-
+void \hyperlink{classTTModule_a0f9c9948826e630e6c6e7943e98a1f37}{set\-Working\-Directory} (const std\-::string \&working\-Dir)
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
@@ -31,6 +32,16 @@ virtual void \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{run} (\
 
 \subsection{Detailed Description}
 This is a pure virtual base class which defines the interface for a top tagger module. This implements 2 pure virtual functions which must be overridden by all modules. The first, \char`\"{}get\-Parameters,\char`\"{} is used to load any configuration parameters the module may need from the config file. The second, \char`\"{}run,\char`\"{} is used to run the particular algorithm implemented in the module. None of these functions should even be called directly, but instead are called automatically by the \hyperlink{classTopTagger}{Top\-Tagger} class. It is also important that each module also include the line \char`\"{}\-R\-E\-G\-E\-S\-T\-E\-R\-\_\-\-T\-T\-M\-O\-D\-U\-L\-E(\-Module\-Class\-Name)\char`\"{} after the class declaration. This macro calls special code so that the \hyperlink{classTTMFactory}{T\-T\-M\-Factory} class can dynamically implement the module by name. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classTTModule_a270f4faaa37f3fb382fb5fa91cdf1899}{\index{T\-T\-Module@{T\-T\-Module}!$\sim$\-T\-T\-Module@{$\sim$\-T\-T\-Module}}
+\index{$\sim$\-T\-T\-Module@{$\sim$\-T\-T\-Module}!TTModule@{T\-T\-Module}}
+\subsubsection[{$\sim$\-T\-T\-Module}]{\setlength{\rightskip}{0pt plus 5cm}virtual T\-T\-Module\-::$\sim$\-T\-T\-Module (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}}\label{classTTModule_a270f4faaa37f3fb382fb5fa91cdf1899}
+Virtual base distructor in case other daughter classes need distructors 
 
 \subsection{Member Function Documentation}
 \hypertarget{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{\index{T\-T\-Module@{T\-T\-Module}!get\-Parameters@{get\-Parameters}}
@@ -56,7 +67,14 @@ run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per 
 
 Implemented in \hyperlink{classTTMTensorflow_afe5cdab757948e8eb2713fab0385869b}{T\-T\-M\-Tensorflow}, \hyperlink{classTTMTFPyBind_a5815a77655f5500c117cf71269105242}{T\-T\-M\-T\-F\-Py\-Bind}, \hyperlink{classTTMXGBoost_afd522be937c0e1c8226c83cc6888c666}{T\-T\-M\-X\-G\-Boost}, \hyperlink{classTTMBasicClusterAlgo_ae1d464bf1db5762318766d109c843932}{T\-T\-M\-Basic\-Cluster\-Algo}, \hyperlink{classTTMTMVA_a640584674f072cb893685845080c5eb9}{T\-T\-M\-T\-M\-V\-A}, \hyperlink{classTTMOpenCVMVA_af51d1bf351304ef8c6e732763d58c433}{T\-T\-M\-Open\-C\-V\-M\-V\-A}, \hyperlink{classTTMOverlapResolution_a4099ee72e105acbcca10078068775bef}{T\-T\-M\-Overlap\-Resolution}, \hyperlink{classTTMHEPRequirements_a5815a6c66595320c1d0f0f006dd67a4d}{T\-T\-M\-H\-E\-P\-Requirements}, \hyperlink{classTTMFinalSort_ae4a9797de31364e116fe4b99c57c4afd}{T\-T\-M\-Final\-Sort}, \hyperlink{classTTMRemainingSystem_ab9f2abe56c30f34c2319f752c403fb09}{T\-T\-M\-Remaining\-System}, \hyperlink{classTTMAK8TopFilter_a28a8fcd8a829caae32b2a106037d3a6f}{T\-T\-M\-A\-K8\-Top\-Filter}, and \hyperlink{classTTMLazyClusterAlgo_a1ec9281c5d6c04ae788b72ca2884d870}{T\-T\-M\-Lazy\-Cluster\-Algo}.
 
-
+\hypertarget{classTTModule_a0f9c9948826e630e6c6e7943e98a1f37}{\index{T\-T\-Module@{T\-T\-Module}!set\-Working\-Directory@{set\-Working\-Directory}}
+\index{set\-Working\-Directory@{set\-Working\-Directory}!TTModule@{T\-T\-Module}}
+\subsubsection[{set\-Working\-Directory}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-Module\-::set\-Working\-Directory (
+\begin{DoxyParamCaption}
+\item[{const std\-::string \&}]{working\-Dir}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classTTModule_a0f9c9948826e630e6c6e7943e98a1f37}
+This function sets the base directory from which all files accessed through relative paths should be referenced 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 

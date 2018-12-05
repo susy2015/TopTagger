@@ -328,8 +328,8 @@ Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Context.hh...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/CfgParser/include/Language.hh...
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:604: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:50: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:608: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:58: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/README.md:17: warning: explicit link request to 'events' could not be resolved
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:300: warning: Member get_mT2(const double mVis1, const double pxVis1, const double pyVis1, const double mVis2, const double pxVis2, const double pyVis2, const double pxMiss, const double pyMiss, const double mInvis1, const double mInvis2, const double desiredPrecisionOnMT2=0, const bool useDeciSectionsInitially=true) (function) of class asymm_mt2_lester_bisect is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/lester_mt2_bisect.h:322: warning: Member disableCopyrightMessage(const bool printIfFirst=false) (function) of class asymm_mt2_lester_bisect is not documented.
@@ -541,8 +541,6 @@ Generating docs for compound PrepVariables../home/travis/build/susy2015/TopTagge
 /home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:20: warning: Member getFileName() const  (function) of class TTException is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:21: warning: Member getMessage() const  (function) of class TTException is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:23: warning: Member print() const  (function) of class TTException is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
@@ -577,13 +575,6 @@ Generating docs for compound PrepVariables../home/travis/build/susy2015/TopTagge
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMFilterBase.h:25: warning: The following parameters of TTMFilterBase::markConstituentsUsed(const std::vector< const Constituent * > &constituents, const std::vector< Constituent > &allConstituents, std::set< const Constituent * > &usedConstituents, const double dRMax, const double dRMaxAK8) const are not documented:
   parameter 'dRMax'
   parameter 'dRMaxAK8'
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatch_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:36: warning: Member dRMatchAK8_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:39: warning: Member minAK8TopMass_ (variable) of class TTMConstituentReqs is not documented.
@@ -597,10 +588,6 @@ Generating docs for compound PrepVariables../home/travis/build/susy2015/TopTagge
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member maxWTau21_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK8WPt_ (variable) of class TTMConstituentReqs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TTMConstituentReqs.h:42: warning: Member minAK4WPt_ (variable) of class TTMConstituentReqs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TTModule.h:40: warning: Member setWorkingDirectory(const std::string &workingDir) (function) of class TTModule is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:38: warning: Member param_itr (typedef) of class cfg::CfgDocument is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:22: warning: Member useRecord(Record *) (function) of class cfg::CfgDocument is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/CfgDocument.hh:24: warning: Member addCondition() (function) of class cfg::CfgDocument is not documented.
@@ -952,14 +939,14 @@ Generating docs for compound PrepVariables../home/travis/build/susy2015/TopTagge
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:462: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::mapVars(const std::vector< std::string > &)=0
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:458: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:459: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:493: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:494: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:492: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:497: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:498: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:496: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:458: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:459: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:508: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:509: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:507: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:512: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:513: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:511: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 .
 Generating docs for compound SHOTProducer...
 Generating docs for compound TopCat...
@@ -1037,9 +1024,9 @@ Generating docs for compound ttUtility::BDTMonojetInputCalculator...
 Generating docs for compound ttUtility::BDTDijetInputCalculator...
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:458: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:459: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:600: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:601: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:599: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:604: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 472 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:605: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 477 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h:603: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 462 in file /home/travis/build/susy2015/TopTagger/TopTagger/include/TopTaggerUtilities.h
 Generating docs for compound ttUtility::TrijetInputCalculator...
 Generating graph info page...
 Generating directory documentation...
@@ -1056,5 +1043,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1356/65536 hits=8347 misses=1447
+lookup cache used 1358/65536 hits=8352 misses=1449
 finished...
