@@ -135,7 +135,15 @@ The default configuration of the example cfg file "run_topTagger.py" will run ov
 
 ### Instructions for producing jet variables for resolved top tagger in nanoAOD
 
-Instructions comming ... eventually ... 
+The configuration file to generate nanoAOD with top tagger variables can be generated with the following set of instructions via cmsDriver.py
+
+~~~~~~~~~~~~~{.sh}
+cd ${CMSSW_BASE}/src
+cmsDriver.py resolvedTaggerVariables -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions auto:phase1_2017_realistic -n 100 --era Run2_2017,run2_nanoAOD_94XMiniAODv1 --customise TopTagger/TopTagger/resolvedTagger_cff.customizeResolvedTaggerVariables
+mkdir -p ${CMSSW_BASE}/src/TopTagger/TopTagger/data
+getTaggerCfg.sh -o -n -t DeepResolved_DeepCSV_GR_noDisc_Release_v1.0.0 -d $CMSSW_BASE/src/TopTagger/TopTagger/data
+~~~~~~~~~~~~~
+
 
 ### OLD: Instructions for producing jet variables for resolved top tagger in CMSSW_8_0_28_patch1
 
