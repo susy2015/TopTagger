@@ -37,6 +37,9 @@ public:
      */
     virtual void run(TopTaggerResults&) = 0;
 
+    /**
+     *This function sets the base directory from which all files accessed through relative paths should be referenced 
+     */
     void setWorkingDirectory(const std::string& workingDir)
     {
         workingDirectory_ = workingDir;
