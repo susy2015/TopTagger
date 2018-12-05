@@ -478,6 +478,10 @@ namespace ttUtility
          *@param topCand the top candidate to check
          */
         virtual bool checkCand(const TopObject&) = 0;
+        /**
+         *Base distructor to allow cleanup of derived classes when necessary
+         */
+        virtual ~MVAInputCalculator() {}
     };
 
     /**

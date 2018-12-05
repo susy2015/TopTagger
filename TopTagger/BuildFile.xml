@@ -2,7 +2,7 @@
 <use name="TopTagger/CfgParser"/>
 <use name="root"/>
 <use name="roottmva"/>
-<use name="tensorflow-c" />
+<use name="tensorflow-cc" />
 <use name="PhysicsTools/Utilities"/>
 <use name="DataFormats/Candidate"/>
 <export>
