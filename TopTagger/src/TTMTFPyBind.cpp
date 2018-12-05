@@ -212,10 +212,9 @@ void TTMTFPyBind::run(TopTaggerResults& ttResults)
 #endif
 }
 
-#ifdef DOTENSORFLOWPYBIND
-
 TTMTFPyBind::~TTMTFPyBind()
 {
+#ifdef DOTENSORFLOWPYBIND
     //close the tensorflow session 
     PyObject *pArgs = PyTuple_New(0);
     callPython("closeSession_shot", pArgs);
@@ -228,8 +227,10 @@ TTMTFPyBind::~TTMTFPyBind()
     Py_DECREF(pMain_);
     Py_DECREF(pGlobal_);
     Py_Finalize();
+#endif
 }
 
+#ifdef DOTENSORFLOWPYBIND
 
 void TTMTFPyBind::initializePyInterpreter()
 {

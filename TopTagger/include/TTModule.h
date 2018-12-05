@@ -29,6 +29,11 @@ protected:
 public:    
 
     /**
+     *Virtual base distructor in case other daughter classes need distructors 
+     */
+    virtual ~TTModule() = default;
+
+    /**
      *This function is called by TopTagger to configure each module based upon the information present in the configuration file. The inputs for this function are provided by TopTagger and are the configuration document object and the local context string for this module.  The local context string defines where to look in the configuration file for the local parameters.
      */
     virtual void getParameters(const cfg::CfgDocument*, const std::string&) = 0;
