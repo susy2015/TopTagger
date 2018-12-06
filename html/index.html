@@ -165,8 +165,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">cmsRun run_topTagger.py</div>
 </div><!-- fragment --><p>The default configuration of the example cfg file "run_topTagger.py" will run over a single-lepton ttbar sample and produce an edm formatted output file ("test.root") containing the vector of reconstructed top TLorentzVectors along with a second vector indicating the type of top (monojet, dijet, trijet).</p>
 <h3>Instructions for producing jet variables for resolved top tagger in nanoAOD</h3>
-<p>Instructions comming ... eventually ...</p>
-<h3>OLD: Instructions for producing jet variables for resolved top tagger in CMSSW_8_0_28_patch1</h3>
+<p>The configuration file to generate nanoAOD with top tagger variables can be generated with the following set of instructions via cmsDriver.py</p>
+<div class="fragment"><div class="line">cd ${CMSSW_BASE}/src</div>
+<div class="line">cmsDriver.py resolvedTaggerVariables -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of miniAOD file] --no_exec  --conditions <span class="keyword">auto</span>:phase1_2017_realistic -n 100 --era Run2_2017,run2_nanoAOD_94XMiniAODv1 --customise <a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/resolvedTagger_cff.customizeResolvedTaggerVariables</div>
+<div class="line">mkdir -p ${CMSSW_BASE}/src/<a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/data</div>
+<div class="line">getTaggerCfg.sh -o -n -t DeepResolved_DeepCSV_GR_noDisc_Release_v1.0.0 -d $CMSSW_BASE/src/<a class="code" href="classTopTagger.html">TopTagger</a>/<a class="code" href="classTopTagger.html">TopTagger</a>/data</div>
+</div><!-- fragment --><h3>OLD: Instructions for producing jet variables for resolved top tagger in CMSSW_8_0_28_patch1</h3>
 <p>The solution using nanoAOD is the recomended way to get resolved top tagger variables.</p>
 <p>Setting up a new CMSSW 8_0_28_patch1 release to produce the resolved top tagger variables.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#get CMSSW release</span></div>
@@ -268,7 +272,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 5 2018 12:43:36 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Dec 6 2018 08:58:06 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

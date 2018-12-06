@@ -154,7 +154,20 @@ The default configuration of the example cfg file \char`\"{}run\-\_\-top\-Tagger
 
 \subsubsection*{Instructions for producing jet variables for resolved top tagger in nano\-A\-O\-D}
 
-Instructions comming ... eventually ...
+The configuration file to generate nano\-A\-O\-D with top tagger variables can be generated with the following set of instructions via cms\-Driver.\-py
+
+
+\begin{DoxyCode}
+cd $\{CMSSW\_BASE\}/src
+cmsDriver.py resolvedTaggerVariables -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein 
+      [location of miniAOD file] --no\_exec  --conditions \textcolor{keyword}{auto}:phase1\_2017\_realistic -n 100 --era Run2\_2017,
+      run2\_nanoAOD\_94XMiniAODv1 --customise \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.
+      customizeResolvedTaggerVariables
+mkdir -p $\{CMSSW\_BASE\}/src/\hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
+getTaggerCfg.sh -o -n -t DeepResolved\_DeepCSV\_GR\_noDisc\_Release\_v1.0.0 -d $CMSSW\_BASE/src/
+      \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
+\end{DoxyCode}
+
 
 \subsubsection*{O\-L\-D\-: Instructions for producing jet variables for resolved top tagger in C\-M\-S\-S\-W\-\_\-8\-\_\-0\-\_\-28\-\_\-patch1}
 
