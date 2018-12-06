@@ -3,7 +3,8 @@ from  PhysicsTools.NanoAOD.common_cff import *
 
 def prepareJets(process):
 
-    inputJetCollection = cms.InputTag("slimmedJets")
+    #Get jet source used as input to nanoAOD
+    inputJetCollection = process.slimmedJetsWithUserData.src
 
     #run QGTagger code again to calculate jet axis1 
     process.load('RecoJets.JetProducers.QGTagger_cfi')
