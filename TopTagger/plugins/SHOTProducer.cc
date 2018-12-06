@@ -258,10 +258,10 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
         TLorentzVector perJetLVec(jet.p4().X(), jet.p4().Y(), jet.p4().Z(), jet.p4().T());
 
-        double qgPtD = jet.userFloat(qgTaggerKey_+":ptD");
-        double qgAxis1 = jet.userFloat(qgTaggerKey_+":axis1");
-        double qgAxis2 = jet.userFloat(qgTaggerKey_+":axis2");
-        double qgMult = static_cast<double>(jet.userInt(qgTaggerKey_+":mult"));
+        double qgPtD = jet.userFloat("qgptD");
+        double qgAxis1 = jet.userFloat("qgAxis1");
+        double qgAxis2 = jet.userFloat("qgAxis2");
+        double qgMult = static_cast<double>(jet.userInt("qgMult"));
         double deepCSVb = jet.bDiscriminator((deepCSVBJetTags_+":probb").c_str());
         double deepCSVc = jet.bDiscriminator((deepCSVBJetTags_+":probc").c_str());
         double deepCSVl = jet.bDiscriminator((deepCSVBJetTags_+":probudsg").c_str());

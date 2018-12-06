@@ -225,10 +225,9 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
 #endif
 }
 
-#ifdef DOTENSORFLOW
-
 TTMTensorflow::~TTMTensorflow()
 {
+#ifdef DOTENSORFLOW
     //tensorflow status variable
     TF_Status* status = TF_NewStatus();
 
@@ -240,7 +239,10 @@ TTMTensorflow::~TTMTensorflow()
     }
 
     TF_DeleteStatus(status);
+#endif
 }
+
+#ifdef DOTENSORFLOW
 
 void free_buffer(void* data, size_t length) 
 {

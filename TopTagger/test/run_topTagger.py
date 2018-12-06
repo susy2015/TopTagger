@@ -1,28 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-#Kevin's function of magic #1
-def addJetInfo(process, JetTag, userFloats=[], userInts=[], btagDiscrs=cms.VInputTag(), suff=""):
-    # add userfloats to jet collection
-    from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import updatedPatJets as patJetsUpdated
-
-    # default suffix
-    if len(suff)==0: suff = "Auxiliary"
-    
-    JetTagOut = cms.InputTag(JetTag.value()+suff)
-    patJetsAuxiliary = patJetsUpdated.clone(
-        jetSource = JetTag,
-        addJetCorrFactors = cms.bool(False),
-        addBTagInfo = cms.bool(False)
-    )
-    patJetsAuxiliary.userData.userFloats.src += userFloats
-    patJetsAuxiliary.userData.userInts.src += userInts
-    if len(btagDiscrs)>0:
-        patJetsAuxiliary.discriminatorSources = btagDiscrs
-        patJetsAuxiliary.addBTagInfo = cms.bool(True)
-    setattr(process,JetTagOut.value(),patJetsAuxiliary)
-    
-    return (process, JetTagOut)
-
 import FWCore.ParameterSet.VarParsing as VarParsing
 ### parsing job options 
 import sys
@@ -82,12 +59,22 @@ process.load('RecoJets.JetProducers.QGTagger_cfi')
 process.QGTagger.srcJets   = cms.InputTag("slimmedJets")
 process.QGTagger.jetsLabel = cms.string('QGL_AK4PFchs')
 
-process, jetTag = addJetInfo(process, cms.InputTag("slimmedJets"), userFloats=['QGTagger:qgLikelihood','QGTagger:ptD', 'QGTagger:axis1', 'QGTagger:axis2'], userInts=['QGTagger:mult'], suff="")
+process.slimmedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
+    src = cms.InputTag("slimmedJets"),
+    userFloats = cms.PSet(
+        qgptD   = cms.InputTag("QGTagger:ptD"),
+        qgAxis1 = cms.InputTag("QGTagger:axis1"),
+        qgAxis2 = cms.InputTag("QGTagger:axis2"),
+        ),
+    userInts = cms.PSet(
+        qgMult = cms.InputTag("QGTagger:mult")
+        ),
+)
 
 ###############################################################################################################################
 
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
-process.SHOTProducer.ak4JetSrc = jetTag
+process.SHOTProducer.ak4JetSrc = cms.InputTag("slimmedJetsWithUserData")
 #This is set to false because the 
 process.SHOTProducer.doLeptonCleaning = cms.bool(False)
 
@@ -100,6 +87,6 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 ###############################################################################################################################
 
-process.p = cms.Path(process.QGTagger * process.slimmedJetsAuxiliary * process.SHOTProducer)
+process.p = cms.Path(process.QGTagger * process.slimmedJetsWithUserData * process.SHOTProducer)
 process.endP = cms.EndPath(process.out)
 
