@@ -6,10 +6,10 @@
 #include "TLorentzVector.h"
 
 //manditory includes to use top tagger
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTagger.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 //this include is useful to get the helper function to make the vector of constituents
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
 
 //this include is necessary to handle exceptions thrown by the top tagger code
 #include "TopTagger/CfgParser/include/TTException.h"

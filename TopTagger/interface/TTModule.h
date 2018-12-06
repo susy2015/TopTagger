@@ -3,7 +3,7 @@
 
 /*! \file */ 
 
-#include "TopTagger/TopTagger/include/TTMFactory.h"
+#include "TopTagger/TopTagger/interface/TTMFactory.h"
 
 #include <functional>
 

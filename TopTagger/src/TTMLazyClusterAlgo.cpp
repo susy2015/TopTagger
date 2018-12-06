@@ -1,6 +1,6 @@
-#include "TopTagger/TopTagger/include/TTMLazyClusterAlgo.h"
+#include "TopTagger/TopTagger/interface/TTMLazyClusterAlgo.h"
 
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 

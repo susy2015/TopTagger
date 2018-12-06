@@ -1,6 +1,6 @@
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 
-#include "TopTagger/TopTagger/include/TopObject.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
 
 #include "TLorentzVector.h"
 

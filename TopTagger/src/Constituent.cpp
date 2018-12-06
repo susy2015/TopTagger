@@ -1,4 +1,4 @@
-#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
 #include "TopTagger/CfgParser/include/TTException.h"
 
 Constituent::Constituent() : type_(NOTYPE), bTagDisc_(0.0), qgLikelihood_(0.0), tau1_(0.0), tau2_(0.0), tau3_(0.0), softDropMass_(0.0), wMassCorr_(0.0) {}

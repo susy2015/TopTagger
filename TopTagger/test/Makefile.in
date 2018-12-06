@@ -151,7 +151,7 @@ install: libTopTagger.$(LIBSUFFIX)
 	$(LDCONFIG)
 	mkdir -p $(PREFIX)/include/TopTagger/TopTagger/
 	cp -r $(TAGGERDIR)/../TopTagger/TopTagger/include $(PREFIX)/include/TopTagger/TopTagger/
-	chmod 644 $(PREFIX)/include/TopTagger/TopTagger/include/*.h
+	chmod 644 $(PREFIX)/include/TopTagger/TopTagger/interface/*.h
 	mkdir -p $(PREFIX)/include/TopTagger/CfgParser/
 	cp -r $(TAGGERDIR)/../TopTagger/CfgParser/include $(PREFIX)/include/TopTagger/CfgParser/
 	chmod 644 $(PREFIX)/include/TopTagger/CfgParser/include/*.h

@@ -1,6 +1,6 @@
-#include "TopTagger/TopTagger/include/TTMConstituentReqs.h"
+#include "TopTagger/TopTagger/interface/TTMConstituentReqs.h"
 
-#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 

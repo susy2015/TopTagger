@@ -1,8 +1,8 @@
-#include "TopTagger/TopTagger/include/TopTagger.h"
+#include "TopTagger/TopTagger/interface/TopTagger.h"
 
-#include "TopTagger/TopTagger/include/TopObject.h"
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 
 #include "TopTagger/CfgParser/include/TTException.h"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"

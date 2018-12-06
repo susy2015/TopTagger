@@ -1,8 +1,8 @@
 #ifndef TTMBASICCLUSTERALGO_H
 #define TTMBASICCLUSTERALGO_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TTMConstituentReqs.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTMConstituentReqs.h"
 
 class TopTaggerResults;
 class TopObject;

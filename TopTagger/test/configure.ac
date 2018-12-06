@@ -173,7 +173,7 @@ if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../../"
 fi
 
-AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/include/TopTagger.h,        [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
+AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/interface/TopTagger.h,        [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
 AC_CHECK_HEADERS($TOPTAGGERDIR/CfgParser/include/TTException.h,     [], [AC_ERROR([CfgParser includes are not found!!!!!!!!!!])])
 
 AC_SUBST(TAGGERDIR, $TOPTAGGERDIR)
