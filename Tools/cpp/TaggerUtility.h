@@ -2,9 +2,9 @@
 #define TAGGERUTILITY_H
 
 #include "TLorentzVector.h"
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/interface/TopTagger.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
 #include "PlotUtility.h"
 
 #include <utility>
