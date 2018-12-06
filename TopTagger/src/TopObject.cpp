@@ -1,4 +1,4 @@
-#include "TopTagger/TopTagger/include/TopObject.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
 
 #include "Math/VectorUtil.h"
 

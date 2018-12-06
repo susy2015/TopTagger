@@ -1,8 +1,8 @@
 #ifndef TOPTAGGERRESULTS_H
 #define TOPTAGGERRESULTS_H
 
-#include "TopTagger/TopTagger/include/TopObject.h"
-#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
 
 #include <vector>
 #include <map>

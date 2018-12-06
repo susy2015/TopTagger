@@ -1,8 +1,8 @@
-#include "TopTagger/TopTagger/include/TTMTensorflow.h"
+#include "TopTagger/TopTagger/interface/TTMTensorflow.h"
 
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
-#include "TopTagger/TopTagger/include/TopObject.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 #include "TopTagger/CfgParser/include/TTException.h"

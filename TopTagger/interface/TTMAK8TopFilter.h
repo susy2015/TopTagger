@@ -1,9 +1,9 @@
 #ifndef TTMAK8TOPFILTER_H
 #define TTMAK8TOPFILTER_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TTMFilterBase.h"
-#include "TopTagger/TopTagger/include/TopObject.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTMFilterBase.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
 
 class TopTaggerResults;
 class Constituent;

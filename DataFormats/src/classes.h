@@ -14,7 +14,7 @@
 
 #include "TLorentzVector.h"
 
-#include "TopTagger/TopTagger/include/TopObjLite.h"
+#include "TopTagger/TopTagger/interface/TopObjLite.h"
 
 namespace { 
   struct dictionary {

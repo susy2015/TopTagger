@@ -1,6 +1,6 @@
-#include "TopTagger/TopTagger/include/TTMFactory.h"
+#include "TopTagger/TopTagger/interface/TTMFactory.h"
 
-#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
 
 //c++ is dumb and makes me declare static members again
 TTMFactory* TTMFactory::instance_;

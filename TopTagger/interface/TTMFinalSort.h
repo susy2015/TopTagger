@@ -1,8 +1,8 @@
 #ifndef TTMFINALSORT_H
 #define TTMFINALSORT_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TTMFilterBase.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTMFilterBase.h"
 
 #include <string>
 

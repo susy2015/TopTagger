@@ -10,7 +10,7 @@ class Constituent;
 class TopObject;
 class TopTaggerResults;
 
-#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
 #include "TopTagger/CfgParser/include/TTException.h"
 
 #include "TF1.h"

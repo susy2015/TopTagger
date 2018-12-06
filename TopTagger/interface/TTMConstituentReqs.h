@@ -1,7 +1,7 @@
 #ifndef TTMCONSTITUENTREQS_H
 #define TTMCONSTITUENTREQS_H
 
-#include "TopTagger/TopTagger/include/TTMFilterBase.h"
+#include "TopTagger/TopTagger/interface/TTMFilterBase.h"
 
 #include <string>
 

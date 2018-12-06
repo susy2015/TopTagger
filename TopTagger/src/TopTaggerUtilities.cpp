@@ -1,8 +1,8 @@
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
 
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 
-#include "TopTagger/TopTagger/include/lester_mt2_bisect.h"
+#include "TopTagger/TopTagger/interface/lester_mt2_bisect.h"
 
 #include <map>
 #include <utility>

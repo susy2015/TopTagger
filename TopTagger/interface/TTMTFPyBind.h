@@ -1,7 +1,7 @@
 #ifndef TTMTFPYBIND_H
 #define TTMTFPYBIND_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
 
 #include <string>
 #include <vector>

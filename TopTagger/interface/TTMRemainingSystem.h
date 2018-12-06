@@ -1,8 +1,8 @@
 #ifndef TTMREMAININGSYSTEM_H
 #define TTMREMAININGSYSTEM_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TTMConstituentReqs.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTMConstituentReqs.h"
 
 /**
  *This module calclates the remaining system.  The purpose of the remaining system is to partially reconstruct a top quark to give a second input into the MT2 calculation for the 1-top catagory.  The reconstruction algorithm used here starts by looking for a b-jet not included in a top.  If no b jet is found then the highest pt jet not in a top is selected.  The algorithm can then combine nearby jets with the first selected jet if certain requirements are satisified.  If no second jet satisifies these requirments, the fist chosen jet is used by itself.  This algorithm only finds one such object using this method.  If multiple jet pairings satisify the requirements, the pairing with the smallest dR is chosen.  

@@ -1,7 +1,7 @@
 #ifndef TTMXGBOOST_H
 #define TTMXGBOOST_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
 
 #include <memory>
 #include <string>

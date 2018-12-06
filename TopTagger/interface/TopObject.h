@@ -7,7 +7,7 @@
 
 #include "TLorentzVector.h"
 
-#include "TopTagger/TopTagger/include/Constituent.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
 
 /** 
  *  Container class which represents a top candidate or final selected top object.  

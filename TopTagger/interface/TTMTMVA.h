@@ -1,7 +1,7 @@
 #ifndef TTMTMVA_H
 #define TTMTMVA_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
 
 #include <string>
 #include <vector>

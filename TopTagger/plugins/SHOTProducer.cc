@@ -47,11 +47,11 @@
 
 #include "TLorentzVector.h"
 
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
-#include "TopTagger/TopTagger/include/TopObject.h"
-#include "TopTagger/TopTagger/include/Constituent.h"
-#include "TopTagger/TopTagger/include/TopObjLite.h"
+#include "TopTagger/TopTagger/interface/TopTagger.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
+#include "TopTagger/TopTagger/interface/Constituent.h"
+#include "TopTagger/TopTagger/interface/TopObjLite.h"
 
 //this include is necessary to handle exceptions thrown by the top tagger code                                                                                                                                                               
 #include "TopTagger/CfgParser/include/TTException.h"

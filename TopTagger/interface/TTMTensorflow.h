@@ -1,7 +1,7 @@
 #ifndef TTMTENSORFLOW_H
 #define TTMTENSORFLOW_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
 
 #include <string>
 #include <memory>
