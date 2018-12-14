@@ -65,15 +65,16 @@ def setupResolvedTaggerVariables(process):
     return process
 
 
-def setupResolvedTagger(process):
-
+def setupResolvedTagger(process, saveAllTopCandidates=False):
+    
     #top tagging producer 
     process.load("TopTagger.TopTagger.SHOTProducer_cfi")
     #updatedJets have recieved all updates from nanoAOD except final pT cut
     process.SHOTProducer.ak4JetSrc = cms.InputTag("updatedJets")
     process.SHOTProducer.muonSrc = cms.InputTag("slimmedMuonsWithUserData")
     process.SHOTProducer.elecSrc = cms.InputTag("slimmedElectronsWithUserData")
-    
+    process.SHOTProducer.saveAllTopCandidates = cms.bool(saveAllTopCandidates)
+
     #save resolved tops to nanoAOD
     process.resolvedTopTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("SHOTProducer"),
@@ -102,6 +103,11 @@ def setupResolvedTagger(process):
 def customizeResolvedTagger(process):
     process = prepareJets(process)
     process = setupResolvedTagger(process)
+    return process
+
+def customizeResolvedTaggerAllCanidiates(process):
+    process = prepareJets(process)
+    process = setupResolvedTagger(process, True)
     return process
 
 def customizeResolvedTaggerVariables(process):
