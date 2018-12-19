@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-from  PhysicsTools.NanoAOD.common_cff import *
+from PhysicsTools.NanoAOD.common_cff import *
+from Configuration.Eras.Modifier_run2_nanoAOD_94XMiniAODv1_cff import run2_nanoAOD_94XMiniAODv1
 
 def prepareJets(process):
 
@@ -41,6 +42,13 @@ def setupResolvedTaggerVariables(process):
             deepCSVudsg = Var("bDiscriminator('pfDeepCSVJetTags:probudsg')", float,doc="DeepCSV light discriminator" ,precision=10),
             deepCSVc    = Var("bDiscriminator('pfDeepCSVJetTags:probc')",    float,doc="DeepCSV charm discriminator" ,precision=10),
 
+            deepFlavourb    = Var("bDiscriminator('pfDeepFlavourJetTags:probb')",    float,doc="DeepFlavour b discriminator"           ,precision=10),
+            deepFlavourlepb = Var("bDiscriminator('pfDeepFlavourJetTags:problepb')", float,doc="DeepFlavour lep b discriminator"       ,precision=10),
+            deepFlavourbb   = Var("bDiscriminator('pfDeepFlavourJetTags:probbb')",   float,doc="DeepFlavour bb discriminator"          ,precision=10),
+            deepFlavouruds  = Var("bDiscriminator('pfDeepFlavourJetTags:probuds')",  float,doc="DeepFlavour light quark discriminator" ,precision=10),
+            deepFlavourg    = Var("bDiscriminator('pfDeepFlavourJetTags:probg')",    float,doc="DeepFlavour gluon discriminator"       ,precision=10),
+            deepFlavourc    = Var("bDiscriminator('pfDeepFlavourJetTags:probc')",    float,doc="DeepFlavour charm discriminator"       ,precision=10),
+
             qgptD = Var("userFloat('qgptD')",float,doc="QG Jet ptD",precision=10),
             qgAxis1 = Var("userFloat('qgAxis1')",float,doc="QG Jet semi major axis",precision=10),
             qgAxis2 = Var("userFloat('qgAxis2')",float,doc="QG Jet semi minor axis",precision=10),
@@ -74,6 +82,8 @@ def setupResolvedTagger(process, saveAllTopCandidates=False):
     process.SHOTProducer.muonSrc = cms.InputTag("slimmedMuonsWithUserData")
     process.SHOTProducer.elecSrc = cms.InputTag("slimmedElectronsWithUserData")
     process.SHOTProducer.saveAllTopCandidates = cms.bool(saveAllTopCandidates)
+
+    run2_nanoAOD_94XMiniAODv1.toModify(process.SHOTProducer, elecIDFlag = cms.string("cutbasedID_Fall17_V2_medium"))
 
     #save resolved tops to nanoAOD
     process.resolvedTopTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
@@ -118,6 +128,13 @@ def customizeResolvedTaggerVariables(process):
 def customizeResolvedTaggerAndVariables(process):
     process = prepareJets(process)
     process = setupResolvedTagger(process)
+    process = setupResolvedTaggerVariables(process)
+    return process
+
+
+def customizeResolvedTaggerAllCanidiatesAndVariables(process):
+    process = prepareJets(process)
+    process = setupResolvedTagger(process, True)
     process = setupResolvedTaggerVariables(process)
     return process
 
