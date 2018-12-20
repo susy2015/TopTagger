@@ -84,11 +84,16 @@ def setupResolvedTagger(process, saveAllTopCandidates=False):
     process.SHOTProducer.elecIDFlag = cms.string("cutbasedID_Fall17_V2_medium")
     process.SHOTProducer.saveAllTopCandidates = cms.bool(saveAllTopCandidates)
 
+    if saveAllTopCandidates:
+        resolvedCollectionName = "ResolvedTopCandidate"
+    else:
+        resolvedCollectionName = "ResolvedTop"
+
     #save resolved tops to nanoAOD
     process.resolvedTopTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("SHOTProducer"),
         cut=cms.string(""),
-        name=cms.string("ResolvedTop"),
+        name=cms.string(resolvedCollectionName),
         doc=cms.string("Neural network top tagger results (http://susy2015.github.io/TopTagger)."),
         singleton=cms.bool(False),
         extension=cms.bool(False),
