@@ -82,9 +82,8 @@ def setupResolvedTagger(process, saveAllTopCandidates=False):
     process.SHOTProducer.ak4JetSrc = cms.InputTag("updatedJets")
     process.SHOTProducer.muonSrc = cms.InputTag("slimmedMuonsWithUserData")
     process.SHOTProducer.elecSrc = cms.InputTag("slimmedElectronsWithUserData")
+    process.SHOTProducer.elecIDFlag = cms.string("cutbasedID_Fall17_V2_medium")
     process.SHOTProducer.saveAllTopCandidates = cms.bool(saveAllTopCandidates)
-
-    run2_nanoAOD_94XMiniAODv1.toModify(process.SHOTProducer, elecIDFlag = cms.string("cutbasedID_Fall17_V2_medium"))
 
     #save resolved tops to nanoAOD
     process.resolvedTopTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
