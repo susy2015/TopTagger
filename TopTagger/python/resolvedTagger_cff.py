@@ -35,6 +35,11 @@ def prepareJets(process):
 
 def setupResolvedTaggerVariables(process):
 
+    #Add missing deepFlavour variables
+    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probc"))
+    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probuds"))
+    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probg"))
+
     topTaggerJetVars = process.jetTable.variables.clone(
             deepCSVb    = Var("bDiscriminator('pfDeepCSVJetTags:probb')",    float,doc="DeepCSV b discriminator"     ,precision=10),
             deepCSVbb   = Var("bDiscriminator('pfDeepCSVJetTags:probbb')",   float,doc="DeepCSV bb discriminator"    ,precision=10),
