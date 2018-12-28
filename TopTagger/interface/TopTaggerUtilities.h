@@ -45,19 +45,19 @@ namespace ttUtility
     /**
      *Class to gather the information necessary to construct the AK4 jet constituents
      */
-    template<typename FLOATTYPE>
+    template<typename FLOATTYPE, typename FLOATCONTAINERTYPE = std::vector<FLOATTYPE>, typename INTCONTAINERTYPE = std::vector<int>>
     class ConstAK4Inputs : public ConstGenInputs
     {
     private:
         const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<FLOATTYPE>* btagFactors_;
-        const std::vector<FLOATTYPE>* qgLikelihood_;
-        const std::vector<int>* qgMult_;
-        const std::vector<FLOATTYPE>* qgPtD_;
-        const std::vector<FLOATTYPE>* qgAxis1_;
-        const std::vector<FLOATTYPE>* qgAxis2_;
+        const FLOATCONTAINERTYPE* btagFactors_;
+        const FLOATCONTAINERTYPE* qgLikelihood_;
+        const INTCONTAINERTYPE* qgMult_;
+        const FLOATCONTAINERTYPE* qgPtD_;
+        const FLOATCONTAINERTYPE* qgAxis1_;
+        const FLOATCONTAINERTYPE* qgAxis2_;
 
-        std::map<std::string, const std::vector<FLOATTYPE>*> extraInputVariables_;
+        std::map<std::string, const FLOATCONTAINERTYPE*> extraInputVariables_;
 
     public:
         /**
@@ -66,13 +66,13 @@ namespace ttUtility
          *@param btagFactors B-tag discriminators for each jet
          *@param qgLikelihood Quark-gluon likelihoods for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
         /**
          *Basic constructor
          *@param jetsLVec Jet TLorentzVectors for each jet
          *@param btagFactors B-tag discriminators for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
         /**
          *Constructor with gen informaion 
          *@param jetsLVec Jet TLorentzVectors for each jet
@@ -81,11 +81,11 @@ namespace ttUtility
          *@param hadGenTops Vector of hadronicly decaying gen top TLorentzVectors
          *@param hadGenTopDaughters Vector of direct decay daughters of the top quarks
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
         /**
          *Adds jet shape inputs from the quark-gluon likelihood calculator
          */
-        void addQGLVectors(const std::vector<int>& qgMult, const std::vector<FLOATTYPE>& qgPtD, const std::vector<FLOATTYPE>& qgAxis1, const std::vector<FLOATTYPE>& qgAxis2)
+        void addQGLVectors(const INTCONTAINERTYPE& qgMult, const FLOATCONTAINERTYPE& qgPtD, const FLOATCONTAINERTYPE& qgAxis1, const FLOATCONTAINERTYPE& qgAxis2)
         {
             qgMult_ = &qgMult;
             qgPtD_ = &qgPtD;
@@ -98,7 +98,7 @@ namespace ttUtility
          *@param name The name to use to store the extra variables
          *@param vector the values for the extra variable for each jet
          */
-        void addSupplamentalVector(const std::string& name, const std::vector<FLOATTYPE>& vector)
+        void addSupplamentalVector(const std::string& name, const FLOATCONTAINERTYPE& vector)
         {
             extraInputVariables_[name] = &vector;
         }
@@ -165,6 +165,8 @@ namespace ttUtility
         }
 
     };
+
+    typedef ConstAK4Inputs<float> ConstAK4InputsFloat;
 
     /**
      *Class to gather the information necessary to construct the AK8 jet constituents
@@ -498,6 +500,9 @@ namespace ttUtility
 
         return constituents;        
     }
+
+    ///Python compatibility function
+    std::vector<Constituent> packageConstituentsAK4(ConstAK4Inputs<float>& inputs);
 
     ///backwards compatability overload
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);
