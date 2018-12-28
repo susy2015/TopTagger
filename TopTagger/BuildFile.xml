@@ -1,8 +1,9 @@
-<Flags CXXFLAGS="-DDOTENSORFLOW -DSHOTTOPTAGGER_DO_TMVA"/>
+<Flags CXXFLAGS="-DDOTENSORFLOW -DSHOTTOPTAGGER_DO_TMVA -DDOPYCAPIBIND"/>
 <use name="TopTagger/CfgParser"/>
 <use name="root"/>
 <use name="rootcore"/>
 <use name="roottmva"/>
+<use name="python"/>
 <use name="tensorflow-cc" />
 <use name="PhysicsTools/Utilities"/>
 <use name="DataFormats/Candidate"/>

@@ -53,7 +53,7 @@ endif
 ifdef PYTHONCFG
 	INCLUDESDIRS  += $(shell $(PYTHONCFG) --includes)
 
-	CXXFLAGS += -DDOTENSORFLOWPYBIND
+	CXXFLAGS += -DDOPYCAPIBIND
 	LIBS     += -L$(shell $(PYTHONCFG) --prefix)/lib $(shell $(PYTHONCFG) --libs)
 endif
 
