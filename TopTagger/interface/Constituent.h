@@ -11,7 +11,7 @@
 
 enum ConstituentType
 {
-    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET, AK8SUBJET
+    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET, AK8SUBJET, RESOLVEDTOPCAND
 };
 
 /**
@@ -35,6 +35,7 @@ private:
 
     //Extra Variables
     std::map<std::string, double> extraVars_;
+    std::vector<int> jetIndices_;
 
     //Variables for gen matching studies
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatches_;
@@ -64,6 +65,8 @@ public:
     void setTopDisc(const double& topDisc);
     void setWDisc(const double& WDisc);
     void setIndex(const unsigned int& index);
+
+    void addJetIndex(const int& jetIndex);
 
     /** 
      *Adds an extra variable which is not included in the primary members of the Constituent class.  These will be added and retrieved by name. 
@@ -108,6 +111,7 @@ public:
      *@return Value of the variable
      */
     double getExtraVar(const std::string var) const;
+    const std::vector<int>& getJetIndicies() const;
 };
 
 #endif

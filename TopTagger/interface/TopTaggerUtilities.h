@@ -409,6 +409,69 @@ namespace ttUtility
         }
     };
 
+///////////////////////////////////////////
+
+    /**
+     *Class to gather the information necessary to construct the ResolvedTopCand Constituents
+     */
+    template<typename FLOATTYPE>
+    class ConstResolvedCandInputs
+    {
+    private:
+        const std::vector<TLorentzVector>* topCandLVec_;
+        const std::vector<FLOATTYPE>* topCandDisc_;
+        const std::vector<int>* topCandJ1_;
+        const std::vector<int>* topCandJ2_;
+        const std::vector<int>* topCandJ3_;
+
+    public:
+        /**
+         *Basic constructor
+         *@param topCandLVec Vector of lorentz vectors of resolved top candidates 
+         *@param topCandDisc Vector of discriminator values for resolved top candidates
+         *@param topCandJ1 Vector of jet 1 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         *@param topCandJ2 Vector of jet 2 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         *@param topCandJ3 Vector of jet 3 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         */
+        ConstResolvedCandInputs(const std::vector<TLorentzVector>& topCandLVec, const std::vector<FLOATTYPE>& topCandDisc, const std::vector<int>& topCandJ1, const std::vector<int>& topCandJ2, const std::vector<int>& topCandJ3) : topCandLVec_(&topCandLVec), topCandDisc_(&topCandDisc), topCandJ1_(&topCandJ1), topCandJ2_(&topCandJ2), topCandJ3_(&topCandJ3) {}
+
+        /**
+         *Called to fill the constituents using the information collected in the class. 
+         *Not intended to be called directly.
+         *@param constituents vector to insert resolved top candidate constituents into
+         */
+        void packageConstituents(std::vector<Constituent>& constituents)
+        {
+            //Check that vectors are of equal length
+            if(topCandLVec_->size() != topCandDisc_->size() || topCandLVec_->size() != topCandJ1_->size() || topCandLVec_->size() != topCandJ2_->size() || topCandLVec_->size() != topCandJ3_->size())
+            {
+                THROW_TTEXCEPTION("Vector sizes are unequal!!!");
+            }
+
+            //Find the start of the AK4 constituents 
+            unsigned int ak4Offset = 0;
+            for(const auto& constituent : constituents)
+            {
+                if(constituent.getType() == AK4JET) break;
+                ++ak4Offset;
+            }
+
+            //Fill the constituent with the necessary information 
+            for(unsigned int iTop = 0; iTop < topCandLVec_->size(); ++iTop)
+            {
+                constituents.emplace_back((*topCandLVec_)[iTop], RESOLVEDTOPCAND);
+                auto& constituent = constituents.back();
+                constituent.setTopDisc((*topCandDisc_)[iTop]);
+                constituent.addJetIndex(ak4Offset + (*topCandJ1_)[iTop]);
+                constituent.addJetIndex(ak4Offset + (*topCandJ2_)[iTop]);
+                constituent.addJetIndex(ak4Offset + (*topCandJ3_)[iTop]);
+            }
+        }
+    };
+
+    //Typedef for python
+    typedef ConstResolvedCandInputs<float> ConstResolvedCandInputsFloat;
+
     //template metaprogramming magic 
     ///Resurcive function to assemble constituents from arbitrary list of input classes. Don't call this function!
     template<typename T, typename... Args> void packageConstituentsRecurse(std::vector<Constituent>& constituents, T input, Args... args)
