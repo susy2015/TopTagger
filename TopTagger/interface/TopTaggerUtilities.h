@@ -166,8 +166,6 @@ namespace ttUtility
 
     };
 
-    typedef ConstAK4Inputs<float> ConstAK4InputsFloat;
-
     /**
      *Class to gather the information necessary to construct the AK8 jet constituents
      */
