@@ -12,7 +12,7 @@ namespace ttPython
 {
 
     /**
-     *Wrapper class to take a Py_buffer* and hold it in a vector-like implementation for use in ttUtilities classes.
+     *Wrapper class to take a Py_buffer* and hold it in a vector-like implementation for use in ttUtilities classes.  Overloaded constructor for use with vectors.  In both the case of the PyBuffer and std::vector it is the users responcibility to ensure that the memory pass into this wrapper stays in scope until the wrapper is destroyed .
      */
     template<typename T>
     class Py_buffer_wrapper
@@ -20,11 +20,6 @@ namespace ttPython
     private:
     #ifdef DOPYCAPIBIND
         PyObject* pObj_;
-    #else
-        T dummy;
-    #endif
-        unsigned int len_;
-        T* buf_;
 
         ///This function is copied from the ROOT source as it is not exposed to the user ... ... ... thanks ROOT
         unsigned int buffer_length( PyObject* self )
@@ -65,19 +60,30 @@ namespace ttPython
 
             return buf;
         }
+#else
+        T dummy;
+#endif
+        unsigned int len_;
+        T* buf_;
 
 
     public:
-    #ifdef DOPYCAPIBIND
-    Py_buffer_wrapper(PyObject* buf) : pObj_(buf)
-    {
-        len_ = buffer_length(pObj_);
-        buf_ = (T*)(buffer_get(pObj_));
-    }
-    #else
+#ifdef DOPYCAPIBIND
+        Py_buffer_wrapper(PyObject* buf) : pObj_(buf)
+        {
+            len_ = buffer_length(pObj_);
+            buf_ = (T*)(buffer_get(pObj_));
+        }
+#else
         Py_buffer_wrapper(void* buf) : len_(0), buf_(&dummy) {}
-    #endif
-    
+#endif
+
+        Py_buffer_wrapper(std::vector<T>* buf) : pObj_(nullptr)
+        {
+            len_ = buf->size();
+            buf_ = buf->data();
+        }
+        
         unsigned int size() const 
         {
             return len_;
@@ -108,7 +114,7 @@ namespace ttPython
         const T* end() const 
         {
             return buf_ + size(); 
-        }
+        }    
     };
 
     std::vector<Constituent> packageConstituentsAK4(PyObject* jet_pt, PyObject* jet_eta, PyObject* jet_phi, PyObject* jet_mass, PyObject* jet_btag, PyDictObject* extraVars);
