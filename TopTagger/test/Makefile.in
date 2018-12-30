@@ -92,7 +92,7 @@ endif
 
 PROGRAMS = topTaggerTest
 
-LIBRARIES = TopTagger
+LIBRARIES = TopTagger TopTaggerInterface
 
 all: mkobj $(LIBRARIES) $(PROGRAMS)
 
@@ -129,6 +129,9 @@ $(ODIR)/%.o : $(ODIR)/%.cc
 #Compile top tagger library
 TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
 
+#Compile top tagger python library
+TopTaggerInterface: TopTaggerInterface.so
+
 #link shared library
 libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
 	${LD} -shared -o $@ $^ $(LIBS)
@@ -136,6 +139,14 @@ libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, 
 #create static library
 libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
 	ar rcs $@ $^
+
+#link python module 
+TopTaggerInterface.so: libTopTagger.$(LIBSUFFIX) $(ODIR)/TopTaggerInterface.o	
+	$(LD) -shared $(ODIR)/TopTaggerInterface.o $(LIBSTOPTAGGER) $(LIBS) -o $@
+
+#compile python module 
+$(ODIR)/TopTaggerInterface.o: $(TTSDIR)/TopTaggerInterface.c
+	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
 #compile topTaggerTest code
 topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
