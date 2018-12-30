@@ -42,7 +42,22 @@ void TopTagger::setCfgFile(const std::string& cfgFileName)
         std::string cfgText;
 
         //Read text from file
-        FILE *f = fopen(cfgFileName.c_str(), "r");
+        std::string cfgFileNameAndPath;
+        if(workingDirectory_.size() > 0)
+        {
+            cfgFileNameAndPath = workingDirectory_ + "/" + cfgFileName;
+        }
+        else
+        {
+            cfgFileNameAndPath = cfgFileName;
+        }
+
+
+        FILE *f = fopen(cfgFileNameAndPath.c_str(), "r");
+
+        
+
+
         if(f)
         {
             char buff[1024];
@@ -56,7 +71,7 @@ void TopTagger::setCfgFile(const std::string& cfgFileName)
         else
         {
             //throw "TopTagger::setCfgFile(...) : Invalid configuration file name \"" + cfgFileName + "\"";
-            THROW_TTEXCEPTION("Invalid configuration file name \"" + cfgFileName + "\"");
+            THROW_TTEXCEPTION("Invalid configuration file name \"" + cfgFileNameAndPath + "\"");
         }
 
         //pass raw text to cfg parser, to return parsed document
