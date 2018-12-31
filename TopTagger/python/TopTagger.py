@@ -1,6 +1,46 @@
 import TopTaggerInterface as tti
 
+class Top:
+    def __init__(self, pt, eta, phi, mass, disc, type):
+        self.pt = pt
+        self.eta = eta
+        self.phi = phi
+        self.mass = mass
+        self.disc = disc
+        self.type = type
+
+class TopTaggerResult:
+    def __init__(self, results):
+        self.floatVals = results[0]
+        self.intVals = results[1]
+
+    def __len__(self):
+        return self.floatVals.shape[0]
+
+    def __iter__(self):
+        for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol()):
+            yield Top(*variables)
+
+    def ptCol(self):
+        return self.floatVals[:, 0]
+
+    def etaCol(self):
+        return self.floatVals[:, 1]
+
+    def phiCol(self):
+        return self.floatVals[:, 2]
+
+    def massCol(self):
+        return self.floatVals[:, 3]
+
+    def discCol(self):
+        return self.floatVals[:, 4]
+
+    def typeCol(self):
+        return self.intVals[:, 0]
+
 class TopTagger:
+
     def __init__(self, cfgFile, workingDir = ""):
         self.tt = None
         self.cfgFile = cfgFile
@@ -28,7 +68,8 @@ class TopTagger:
 
     def run(self, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars):
         tti.run(self.tt, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars)
-        return tti.getResults(self.tt)
+        results = tti.getResults(self.tt)
+        return TopTaggerResult(results)
 
 
 
@@ -74,12 +115,11 @@ if __name__ == "__main__":
             "qgMult":                               event.Jet_qgMult,
         }
         
-        topsFloat, topsInt = tt.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+        tops = tt.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
     
-        print "\tN tops:", topsFloat.shape[0]
+        print "\tN tops:", len(tops)
     
-        for topFloat, topInt in zip(topsFloat, topsInt):
-            print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(topInt[0], topFloat[0], topFloat[1], topFloat[2], topFloat[3], topFloat[4])
+        for top in tops:
+            print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(top.type, top.pt, top.eta, top.phi, top.mass, top.disc)
         print ""
-
 
