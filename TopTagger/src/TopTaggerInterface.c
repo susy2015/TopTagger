@@ -15,6 +15,15 @@
 extern "C"
 {
 
+    /// Destructor function for TopTagger object cleanup 
+    static void TopTaggerInterface_cleanup(PyObject *ptt)
+    {
+        //Get top tagger pointer from capsule 
+        TopTagger* tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger");
+
+        if(tt) delete tt;
+    }
+
     static PyObject* TopTaggerInterface_setup(PyObject *self, PyObject *args)
     {
         //suppress unused parameter warning as self is manditory
@@ -35,7 +44,7 @@ extern "C"
         }
         tt->setCfgFile(cfgFile);
 
-        PyObject * ret = PyCapsule_New(tt, "TopTagger", NULL);
+        PyObject * ret = PyCapsule_New(tt, "TopTagger", TopTaggerInterface_cleanup);
 
         return Py_BuildValue("N", ret);
     }
@@ -217,42 +226,10 @@ extern "C"
         return Py_BuildValue("N", topArrayFloat);    
     }
 
-    static PyObject* TopTaggerInterface_cleanup(PyObject *self, PyObject *args)
-    {
-        //suppress unused parameter warning as self is manditory
-        (void)self;
-
-        PyObject *ptt;
-        if (!PyArg_ParseTuple(args, "O!", &PyCapsule_Type, &ptt))
-        {
-            PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
-            return NULL;
-        }
-
-        Py_INCREF(ptt);
-
-        //Get top tagger pointer from capsule 
-        TopTagger* tt;
-        if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
-        {
-            //Handle exception here 
-            return NULL;
-        }
-
-        delete tt;
-
-        Py_DECREF(ptt);
-        Py_DECREF(ptt);
-
-        Py_INCREF(Py_None);
-        return Py_None;
-    }
-
     static PyMethodDef TopTaggerInterfaceMethods[] = {
         {"setup",  TopTaggerInterface_setup, METH_VARARGS, "Configure Top Tagger."},
         {"run",  TopTaggerInterface_run, METH_VARARGS, "Run Top Tagger."},
         {"getResults",  TopTaggerInterface_getResults, METH_VARARGS, "Get Top Tagger results."},
-        {"cleanup",  TopTaggerInterface_cleanup, METH_VARARGS, "Cleanup Top Tagger."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 

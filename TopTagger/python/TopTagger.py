@@ -29,7 +29,7 @@ class TopTagger:
 
     def close(self):
         if self.tt != None:
-            tti.cleanup(self.tt)
+            del self.tt
             self.tt = None
 
     def run(self, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars):
@@ -89,4 +89,3 @@ if __name__ == "__main__":
         print ""
 
 
-    tt.close()
