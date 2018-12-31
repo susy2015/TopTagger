@@ -5,6 +5,7 @@
 #include "TLorentzVector.h"
 
 #include <vector>
+#include <iostream>
 
 #include "TopTagger/TopTagger/interface/TopTagger.h"
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
@@ -37,12 +38,34 @@ extern "C"
         }
 
         //Setup top tagger 
-        TopTagger *tt = new TopTagger();
-        if(workingDir && strlen(workingDir) > 0)
+        TopTagger *tt = nullptr;
+
+        try
         {
-            tt->setWorkingDirectory(workingDir);
+            tt = new TopTagger();
+
+            //Check that "new" succeeded
+            if(!tt)
+            {
+                PyErr_NoMemory();
+                return NULL;
+            }
+
+            //Disable internal print statements on exception 
+            tt->setVerbosity(0);
+
+            if(workingDir && strlen(workingDir) > 0)
+            {
+                tt->setWorkingDirectory(workingDir);
+            }
+            tt->setCfgFile(cfgFile);
         }
-        tt->setCfgFile(cfgFile);
+        catch(const TTException& e)
+        {
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            return NULL;
+        }
 
         PyObject * ret = PyCapsule_New(tt, "TopTagger", TopTaggerInterface_cleanup);
 
@@ -111,6 +134,17 @@ extern "C"
             else
             {
                 //Handle error here
+                Py_DECREF(ptt);
+                Py_DECREF(pJetPt);
+                Py_DECREF(pJetEta);
+                Py_DECREF(pJetPhi);
+                Py_DECREF(pJetMass);
+                Py_DECREF(pJetBtag);
+                Py_DECREF(pFloatVarsDict);
+                Py_DECREF(pIntVarsDict);
+
+                PyErr_SetString(PyExc_KeyError, "Dictionary keys must be strings for top tagger supplamentary variables.");
+                return NULL;
             }
         }
 
@@ -138,6 +172,17 @@ extern "C"
             else
             {
                 //Handle error here
+                Py_DECREF(ptt);
+                Py_DECREF(pJetPt);
+                Py_DECREF(pJetEta);
+                Py_DECREF(pJetPhi);
+                Py_DECREF(pJetMass);
+                Py_DECREF(pJetBtag);
+                Py_DECREF(pFloatVarsDict);
+                Py_DECREF(pIntVarsDict);
+
+                PyErr_SetString(PyExc_KeyError, "Dictionary keys must be strings for top tagger supplamentary variables.");
+                return NULL;
             }
         }
 
@@ -146,6 +191,16 @@ extern "C"
         if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
         {
             //Handle exception here 
+            Py_DECREF(ptt);
+            Py_DECREF(pJetPt);
+            Py_DECREF(pJetEta);
+            Py_DECREF(pJetPhi);
+            Py_DECREF(pJetMass);
+            Py_DECREF(pJetBtag);
+            Py_DECREF(pFloatVarsDict);
+            Py_DECREF(pIntVarsDict);
+
+            PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
             return NULL;
         }
 
@@ -160,7 +215,17 @@ extern "C"
         }
         catch(const TTException& e)
         {
-            e.print();
+            Py_DECREF(ptt);
+            Py_DECREF(pJetPt);
+            Py_DECREF(pJetEta);
+            Py_DECREF(pJetPhi);
+            Py_DECREF(pJetMass);
+            Py_DECREF(pJetBtag);
+            Py_DECREF(pFloatVarsDict);
+            Py_DECREF(pIntVarsDict);
+
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
             return NULL;
         }
 
@@ -196,34 +261,49 @@ extern "C"
         if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
         {
             //Handle exception here 
+            Py_DECREF(ptt);
+
+            PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
             return NULL;
         }
 
-        //Get top tagger results 
-        const auto& ttr = tt->getResults();
-
-        //Get tops 
-        const auto& tops = ttr.getTops();
-
-        //create numpy array for passing top data to python
-        const npy_intp NVARSFLOAT = 5;
-    
-        npy_intp sizearray[] = {static_cast<npy_intp>(tops.size()), NVARSFLOAT};
-        PyArrayObject* topArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(2, sizearray, NPY_FLOAT));
-
-        //fill numpy array
-        for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
+        try
         {
-            *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 0)) = tops[iTop]->p().Pt();
-            *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 1)) = tops[iTop]->p().Eta();
-            *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 2)) = tops[iTop]->p().Phi();
-            *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 3)) = tops[iTop]->p().M();
-            *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 4)) = tops[iTop]->getDiscriminator();
+            //Get top tagger results 
+            const auto& ttr = tt->getResults();
+
+            //Get tops 
+            const auto& tops = ttr.getTops();
+
+            //create numpy array for passing top data to python
+            const npy_intp NVARSFLOAT = 5;
+    
+            npy_intp sizearray[] = {static_cast<npy_intp>(tops.size()), NVARSFLOAT};
+            PyArrayObject* topArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(2, sizearray, NPY_FLOAT));
+
+            //fill numpy array
+            for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
+            {
+                *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 0)) = tops[iTop]->p().Pt();
+                *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 1)) = tops[iTop]->p().Eta();
+                *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 2)) = tops[iTop]->p().Phi();
+                *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 3)) = tops[iTop]->p().M();
+                *static_cast<float*>(PyArray_GETPTR2(topArrayFloat, iTop, 4)) = tops[iTop]->getDiscriminator();
+            }
+
+            Py_DECREF(ptt);
+
+            return Py_BuildValue("N", topArrayFloat);    
+        }
+        catch(const TTException& e)
+        {
+            Py_DECREF(ptt);
+
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            return NULL;
         }
 
-        Py_DECREF(ptt);
-
-        return Py_BuildValue("N", topArrayFloat);    
     }
 
     static PyMethodDef TopTaggerInterfaceMethods[] = {
