@@ -1,10 +1,4 @@
-try:
-    import TopTaggerInterface as tti
-except ImportError:
-    import sys
-    sys.path.append("../test")
-    import TopTaggerInterface as tti
-
+import TopTaggerInterface as tti
 
 class TopTagger:
     def __init__(self, cfgFile, workingDir = ""):
