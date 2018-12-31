@@ -74,12 +74,12 @@ if __name__ == "__main__":
             "qgMult":                               event.Jet_qgMult,
         }
         
-        tops = tt.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+        topsFloat, topsInt = tt.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
     
-        print "\tN tops:", tops.shape[0]
+        print "\tN tops:", topsFloat.shape[0]
     
-        for top in tops:
-            print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(3, top[0], top[1], top[2], top[3], top[4])
+        for topFloat, topInt in zip(topsFloat, topsInt):
+            print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(topInt[0], topFloat[0], topFloat[1], topFloat[2], topFloat[3], topFloat[4])
         print ""
 
 

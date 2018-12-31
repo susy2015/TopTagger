@@ -276,11 +276,16 @@ extern "C"
             //Get tops 
             const auto& tops = ttr.getTops();
 
-            //create numpy array for passing top data to python
+            //create numpy arrays for passing top data to python
             const npy_intp NVARSFLOAT = 5;
+            const npy_intp NVARSINT = 4;
+            const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
     
-            npy_intp sizearray[] = {static_cast<npy_intp>(tops.size()), NVARSFLOAT};
-            PyArrayObject* topArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(2, sizearray, NPY_FLOAT));
+            npy_intp floatsizearray[] = {NTOPS, NVARSFLOAT};
+            PyArrayObject* topArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(2, floatsizearray, NPY_FLOAT));
+
+            npy_intp intsizearray[] = {NTOPS, NVARSINT};
+            PyArrayObject* topArrayInt = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(2, intsizearray, NPY_INT));
 
             //fill numpy array
             for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
@@ -290,11 +295,24 @@ extern "C"
                 *static_cast<npy_float*>(PyArray_GETPTR2(topArrayFloat, iTop, 2)) = tops[iTop]->p().Phi();
                 *static_cast<npy_float*>(PyArray_GETPTR2(topArrayFloat, iTop, 3)) = tops[iTop]->p().M();
                 *static_cast<npy_float*>(PyArray_GETPTR2(topArrayFloat, iTop, 4)) = tops[iTop]->getDiscriminator();
+
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 0)) = static_cast<int>(tops[iTop]->getType());
+
+                //get constituents vector to retrieve matching index
+                const auto& topConstituents = tops[iTop]->getConstituents();
+                if(topConstituents.size() > 0) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 1)) = static_cast<int>(topConstituents[0]->getIndex());
+                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 1)) = -1;
+
+                if(topConstituents.size() > 1) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 2)) = static_cast<int>(topConstituents[1]->getIndex());
+                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 2)) = -1;
+
+                if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
+                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
             }
 
             Py_DECREF(ptt);
 
-            return Py_BuildValue("N", topArrayFloat);    
+            return Py_BuildValue("NN", topArrayFloat, topArrayInt);
         }
         catch(const TTException& e)
         {
