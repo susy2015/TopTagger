@@ -42,7 +42,6 @@ class TopTaggerResult:
 class TopTagger:
 
     def __init__(self, cfgFile, workingDir = ""):
-        self.tt = None
         self.cfgFile = cfgFile
         self.workingDir = workingDir
         self.initialize()
@@ -58,13 +57,14 @@ class TopTagger:
         self.close()
 
     def initialize(self):
-        if not self.tt:
+        if not hasattr(self, "tt"):
             self.tt = tti.setup(self.cfgFile, self.workingDir)
 
     def close(self):
-        if self.tt != None:
+        try:
             del self.tt
-            self.tt = None
+        except AttributeError:
+            pass
 
     def run(self, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars):
         tti.run(self.tt, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars)
