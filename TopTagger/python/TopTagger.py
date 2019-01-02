@@ -71,22 +71,7 @@ class TopTagger:
         results = tti.getResults(self.tt)
         return TopTaggerResult(results)
 
-
-
-if __name__ == "__main__":
-    import ROOT
-
-    f = ROOT.TFile.Open("/home/pastika/topTagger/prod2017MC_NANO.root")
-
-    tree = f.Get("Events")
-
-    tt = TopTagger("TopTagger.cfg", "../../..")
-
-    for i, event in enumerate(tree):
-        if i + 1 > 100: break
-
-        print "Event #:", i + 1
-
+    def runFromNanoAOD(self, event):
         supplementaryFloatVariables = {
             "qgPtD":                                event.Jet_qgptD,
             "qgAxis1":                              event.Jet_qgAxis1,
@@ -115,11 +100,42 @@ if __name__ == "__main__":
             "qgMult":                               event.Jet_qgMult,
         }
         
-        tops = tt.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+        return self.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+
+
+
+if __name__ == "__main__":
+    import ROOT
+    import optparse
+
+    #Option parsing 
+    parser = optparse.OptionParser()
+
+    #Add command line options 
+    parser.add_option ('-f', "--file",      dest='inputFile',  action='store',                          type=str, help="Input file")
+    parser.add_option ('-b', "--tree",      dest='treeName',   action='store', default="Events",                  help="Name of TTree (Default: Events")
+    parser.add_option ('-c', "--taggerCfg", dest='taggerCfg',  action='store', default="TopTagger.cfg",           help="Name of Tagger config file name (Default: TopTagger.cfg")
+    parser.add_option ('-w', "--workDir",   dest='workDir',    action='store', default="",                        help="orking directory for top tagger config (usually where the cfg is located) (Default: .")
+    parser.add_option ('-n', "--nEvts",     dest='nEvts',      action='store', default=-1,              type=int, help="Number of events to run over (Default: all events")
+
+    options, args = parser.parse_args()
+
+    f = ROOT.TFile.Open(options.inputFile)
+
+    tree = f.Get(options.treeName)
+
+    tt = TopTagger(options.taggerCfg, options.workDir)
+
+    for iEvt, event in enumerate(tree):
+        if (options.nEvts > 0) and (iEvt + 1 > options.nEvts): break
+    
+        print "Event #:", iEvt + 1
+    
+        tops = tt.runFromNanoAOD(event)
     
         print "\tN tops:", len(tops)
     
         for top in tops:
             print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(top.type, top.pt, top.eta, top.phi, top.mass, top.disc)
         print ""
-
+    
