@@ -409,7 +409,6 @@ namespace ttUtility
         }
     };
 
-///////////////////////////////////////////
 
     /**
      *Class to gather the information necessary to construct the ResolvedTopCand Constituents
@@ -468,9 +467,6 @@ namespace ttUtility
             }
         }
     };
-
-    //Typedef for python
-    typedef ConstResolvedCandInputs<float> ConstResolvedCandInputsFloat;
 
     //template metaprogramming magic 
     ///Resurcive function to assemble constituents from arbitrary list of input classes. Don't call this function!
