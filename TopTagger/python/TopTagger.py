@@ -66,8 +66,8 @@ class TopTagger:
         except AttributeError:
             pass
 
-    def run(self, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars):
-        tti.run(self.tt, jet_pt, jet_eta, jet_phi, jet_mass, jet_btag, floatVars, intVars)
+    def run(self, *args, **kwargs):
+        tti.run(self.tt, *args, **kwargs)
         results = tti.getResults(self.tt)
         return TopTaggerResult(results)
 
@@ -99,8 +99,12 @@ class TopTagger:
         supplementaryIntVariables = {
             "qgMult":                               event.Jet_qgMult,
         }
+
+        ak4Inputs = (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+
+        ak8Inputs = (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
         
-        return self.run(event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+        return self.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs)
 
 
 
