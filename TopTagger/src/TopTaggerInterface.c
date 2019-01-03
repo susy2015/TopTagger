@@ -32,7 +32,6 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict;
     if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict))
     {
-        PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
         return 1;
     }
 
@@ -122,7 +121,6 @@ static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8In
     PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetSDMass, *pJetTDisc, *pJetWDisc, *pSubjetPt, *pSubjetEta, *pSubjetPhi, *pSubjetMass, *pSubjetIdx1, *pSubjetIdx2;
     if (!PyArg_ParseTuple(pArgTuple, "OOOOOOOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetSDMass, &pJetTDisc, &pJetWDisc, &pSubjetPt, &pSubjetEta, &pSubjetPhi, &pSubjetMass, &pSubjetIdx1, &pSubjetIdx2))
     {
-        PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
         return 1;
     }
 
@@ -211,7 +209,6 @@ extern "C"
         char *cfgFile, *workingDir = nullptr;
 
         if (!PyArg_ParseTuple(args, "s|s", &cfgFile, &workingDir)) {
-            PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
             return NULL;
         }
 
@@ -261,7 +258,6 @@ extern "C"
         char *keywords[] = {kw1, kw2, kw3, NULL};
         if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!O!", keywords, &PyCapsule_Type, &ptt, &PyTuple_Type, &pAK4Inputs, &PyTuple_Type, &pAK8Inputs))
         {
-            //PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
             return NULL;
         }
 
@@ -348,7 +344,6 @@ extern "C"
         PyObject *ptt;
         if (!PyArg_ParseTuple(args, "O!", &PyCapsule_Type, &ptt))
         {
-            PyErr_SetString(PyExc_TypeError, "Incorrect function parameters");
             return NULL;
         }
 
