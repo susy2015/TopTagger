@@ -163,6 +163,9 @@ namespace ttUtility
                     if(extraVar.second && iJet < extraVar.second->size()) constituents.back().setExtraVar(extraVar.first, static_cast<double>((*extraVar.second)[iJet]));
                     else THROW_TTEXCEPTION("Extra variable " + extraVar.first + "[" + std::to_string(iJet) + "] is not found!!!!!!!");
                 }
+
+                //Add jet index pointing back to unfiltered input jets 
+                constituents.back().setIndex(iJet);
             
                 //Get gen matches if the required info is provided
                 if(hadGenTops_ && hadGenTopDaughters_)
@@ -465,24 +468,15 @@ namespace ttUtility
                 THROW_TTEXCEPTION("Vector sizes are unequal!!!");
             }
 
-            //Find the start of the AK4 constituents 
-            //If anyone ever sorts the constituents differently before this runs we are screwed 
-            unsigned int ak4Offset = 0;
-            for(const auto& constituent : constituents)
-            {
-                if(constituent.getType() == AK4JET) break;
-                ++ak4Offset;
-            }
-
             //Fill the constituent with the necessary information 
             for(unsigned int iTop = 0; iTop < topCandLVec_->size(); ++iTop)
             {
                 constituents.emplace_back((*topCandLVec_)[iTop], RESOLVEDTOPCAND);
                 auto& constituent = constituents.back();
                 constituent.setTopDisc((*topCandDisc_)[iTop]);
-                constituent.addJetIndex(ak4Offset + (*topCandJ1_)[iTop]);
-                constituent.addJetIndex(ak4Offset + (*topCandJ2_)[iTop]);
-                constituent.addJetIndex(ak4Offset + (*topCandJ3_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ1_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ2_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ3_)[iTop]);
             }
         }
     };

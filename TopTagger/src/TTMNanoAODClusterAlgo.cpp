@@ -3,6 +3,7 @@
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/Context.hh"
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 void TTMNanoAODClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
@@ -63,13 +64,36 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
                 //Fill the resolved top 
 
                 //get top constituent indices 
-                int jetIndex1 = constituents[i].getJetIndicies()[0];
-                int jetIndex2 = constituents[i].getJetIndicies()[1];
-                int jetIndex3 = constituents[i].getJetIndicies()[2];
-                TopObject topCand({&constituents[jetIndex1], &constituents[jetIndex2], &constituents[jetIndex3]}, TopObject::RESOLVED_TOP);
-                topCand.setDiscriminator(constituents[i].getTopDisc());
+                const auto& jetRefIndices = constituents[i].getJetRefIndicies();
+                if(jetRefIndices.size() == 3)
+                {
+                    int jetIndex1 = jetRefIndices[0];
+                    int jetIndex2 = jetRefIndices[1];
+                    int jetIndex3 = jetRefIndices[2];
 
-                topCandidates.push_back(topCand);
+                    //Unfortunately we can't get a direct index to the AK4 constituents, so we have to search "by hand"
+                    std::vector<const Constituent*> resolvedTopConstituents;
+                    for(const auto& constituent : constituents)
+                    {
+                        if(constituent.getType() == AK4JET)
+                        {
+                            int constIndex = constituent.getIndex();
+                            if(jetIndex1 == constIndex || jetIndex2 == constIndex || jetIndex3 == constIndex)
+                            {
+                                resolvedTopConstituents.push_back(&constituent);
+                            }
+                        }
+                    }
+
+                    TopObject topCand(resolvedTopConstituents, TopObject::RESOLVED_TOP);
+                    topCand.setDiscriminator(constituents[i].getTopDisc());
+
+                    topCandidates.push_back(topCand);
+                }
+                else
+                {
+                    THROW_TTEXCEPTION("Malformed resolved top constituent, must have exactly 3 jet references!!!");
+                }
             }
         }
     }

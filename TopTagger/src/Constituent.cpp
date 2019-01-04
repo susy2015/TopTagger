@@ -87,9 +87,9 @@ void Constituent::setIndex(const unsigned int& index)
     index_ = index;
 }
 
-void Constituent::addJetIndex(const int& jetIndex)
+void Constituent::addJetRefIndex(const int& jetIndex)
 {
-    jetIndices_.push_back(jetIndex);
+    jetRefIndices_.push_back(jetIndex);
 }
 
 void Constituent::addGenMatch(const TLorentzVector& genTop, const TLorentzVector* genDaughter)
@@ -122,7 +122,7 @@ double Constituent::getExtraVar(const std::string var) const
     return iter->second; 
 }
 
-const std::vector<int>& Constituent::getJetIndicies() const
+const std::vector<int>& Constituent::getJetRefIndicies() const
 {
-    return jetIndices_;
+    return jetRefIndices_;
 }
