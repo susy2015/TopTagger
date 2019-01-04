@@ -2,7 +2,7 @@
 //
 // Package:    TopTagger/TopTagger
 // Class:      SHOTProducer
-// 
+//
 /**\class SHOTProducer SHOTProducer.cc TopTagger/TopTagger/plugins/SHOTProducer.cc
 
    Description: [one line class summary]
@@ -53,10 +53,10 @@
 #include "TopTagger/TopTagger/interface/Constituent.h"
 #include "TopTagger/TopTagger/interface/TopObjLite.h"
 
-//this include is necessary to handle exceptions thrown by the top tagger code                                                                                                                                                               
+//this include is necessary to handle exceptions thrown by the top tagger code
 #include "TopTagger/CfgParser/include/TTException.h"
 
-class SHOTProducer : public edm::stream::EDProducer<> 
+class SHOTProducer : public edm::stream::EDProducer<>
 {
 public:
     explicit SHOTProducer(const edm::ParameterSet&);
@@ -74,7 +74,7 @@ private:
             //There is no match
             return false;
         }
-        
+
         //Check if it falls within the dR criterion
         const pat::Jet& jet = (*jets)[jetIndex];
         double dR = deltaR(lepton.p4(), jet.p4());
@@ -87,7 +87,7 @@ private:
     virtual void produce(edm::Event&, const edm::EventSetup&) override;
     virtual void endStream() override;
 
-    // helper function to calculate subjet qg input vars 
+    // helper function to calculate subjet qg input vars
     void compute(const reco::Jet * jet, bool isReco, double& totalMult_, double& ptD_, double& axis1_, double& axis2_);
 
     // ----------member data ---------------------------
@@ -95,10 +95,11 @@ private:
     edm::EDGetTokenT<std::vector<pat::Muon> > muonTok_;
     edm::EDGetTokenT<std::vector<pat::Electron> > elecTok_;
 
-    std::string elecIDFlag_, qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_;
-    double ak4ptCut_, leptonJetDr_, discriminatorCut_;
+    std::string elecIDBitName_, qgTaggerKey_, deepCSVBJetTags_, bTagKeyString_, taggerCfgFile_, elecIsoName_, muonIsoName_;
+    double ak4ptCut_, leptonJetDr_, discriminatorCut_, muonPtCut_, elecPtCut_, muonIsoCut_, elecIsoCut_;
     bool doLeptonCleaning_, saveAllTopCandidates_;
     reco::Muon::Selector muonIDFlag_;
+    int elecIDFlag_;
 
     TopTagger tt;
 };
@@ -106,23 +107,48 @@ private:
 
 SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 {
-    //register vector of top objects 
+    //register vector of top objects
     produces<std::vector<TopObjLite>>();
- 
+
     //now do what ever other initialization is needed
     edm::InputTag jetSrc = iConfig.getParameter<edm::InputTag>("ak4JetSrc");
 
     edm::InputTag muonSrc = iConfig.getParameter<edm::InputTag>("muonSrc");
     edm::InputTag elecSrc = iConfig.getParameter<edm::InputTag>("elecSrc");
 
-    ak4ptCut_ = iConfig.getParameter<double>("ak4ptCut");
+    ak4ptCut_ = iConfig.getParameter<double>("ak4PtCut");
+
+    muonPtCut_ = iConfig.getParameter<double>("muonPtCut");
+    elecPtCut_ = iConfig.getParameter<double>("elecPtCut");
+
+    muonIsoName_ = iConfig.getParameter<std::string>("muonIsoName");
+    elecIsoName_ = iConfig.getParameter<std::string>("elecIsoName");
+
+    muonIsoCut_ = iConfig.getParameter<double>("muonIsoCut");
+    elecIsoCut_ = iConfig.getParameter<double>("elecIsoCut");
 
     std::string muonIDFlagName = iConfig.getParameter<std::string>("muonIDFlag");
     if     (muonIDFlagName.compare("CutBasedIdLoose")  == 0) muonIDFlag_ = reco::Muon::CutBasedIdLoose;
     else if(muonIDFlagName.compare("CutBasedIdMedium") == 0) muonIDFlag_ = reco::Muon::CutBasedIdMedium;
     else if(muonIDFlagName.compare("CutBasedIdTight")  == 0) muonIDFlag_ = reco::Muon::CutBasedIdTight;
+    else
+    {
+        muonIDFlag_ = reco::Muon::CutBasedIdLoose;
+        edm::LogWarning("SHOTProducer") << "Warning!!! Unrecognized muon ID flag\"" << muonIDFlagName << "\", defaulting to loose.  (Options are CutBasedIdLoose, CutBasedIdMedium, CutBasedIdTight)" << std::endl;
+    }
 
-    elecIDFlag_  = iConfig.getParameter<std::string>("elecIDFlag");
+    elecIDBitName_ = iConfig.getParameter<std::string>("elecIDBitFieldName");
+
+    std::string elecIDFlagName = iConfig.getParameter<std::string>("elecIDFlag");
+    if     (elecIDFlagName.compare("CutBasedIdVeto")   == 0) elecIDFlag_ = 1;
+    else if(elecIDFlagName.compare("CutBasedIdLoose")  == 0) elecIDFlag_ = 2;
+    else if(elecIDFlagName.compare("CutBasedIdMedium") == 0) elecIDFlag_ = 3;
+    else if(elecIDFlagName.compare("CutBasedIdTight")  == 0) elecIDFlag_ = 4;
+    else
+    {
+        elecIDFlag_ = 1;
+        edm::LogWarning("SHOTProducer") << "Warning!!! Unrecognized muon ID flag \"" << elecIDFlagName << "\", defaulting to veto.  (Options are CutBasedIdVeto, CutBasedIdLoose, CutBasedIdMedium, CutBasedIdTight)" << std::endl;
+    }
 
     leptonJetDr_ = iConfig.getParameter<double>("leptonJetDr");
 
@@ -143,7 +169,7 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
     muonTok_ = consumes<std::vector<pat::Muon>>(muonSrc);
     elecTok_ = consumes<std::vector<pat::Electron>>(elecSrc);
 
-    //configure the top tagger 
+    //configure the top tagger
     try
     {
         //For working directory use cfg file location
@@ -162,7 +188,7 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
 
 SHOTProducer::~SHOTProducer()
 {
- 
+
 }
 
 
@@ -209,7 +235,7 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     using namespace edm;
 
-    //Get jet collection 
+    //Get jet collection
     edm::Handle<std::vector<pat::Jet> > jets;
     iEvent.getByToken(JetTok_, jets);
 
@@ -217,27 +243,47 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if(doLeptonCleaning_)
     {
 
-        //Get lepton collections 
+        //Get lepton collections
         edm::Handle<std::vector<pat::Muon> > muons;
         iEvent.getByToken(muonTok_, muons);
         edm::Handle<std::vector<pat::Electron> > elecs;
         iEvent.getByToken(elecTok_, elecs);
 
-        //remove leptons that match to jets with a dR cone 
+        //remove leptons that match to jets with a dR cone
         for(const pat::Muon& muon : *muons)
         {
-            if(muon.passed(muonIDFlag_))
+            const int jetIndex = static_cast<int>(muon.userCand("jet").key());
+            if(muon.pt() > muonPtCut_ &&
+               jetIndex >= 0 && jetIndex < static_cast<int>(static_cast<int>(jets->size())) &&  //is matched to an existing jet
+               muon.passed(muonIDFlag_) && muon.userFloat(muonIsoName_)/muon.pt() < muonIsoCut_)  //passes ID and Iso
             {
-                const int jetIndex = static_cast<int>(muon.userCand("jet").key());
                 if(lepJetPassdRMatch(jetIndex, muon, jets)) jetToClean.insert(jetIndex);
             }
         }
         for(const pat::Electron& elec : *elecs)
         {
-            if(elec.userInt(elecIDFlag_))
+            const int jetIndex = static_cast<int>(elec.userCand("jet").key());
+            if(elec.pt() > elecPtCut_ &&
+               jetIndex >= 0 && jetIndex < static_cast<int>(jets->size()))  //matched to an existing jet
             {
-                const int jetIndex = static_cast<int>(elec.userCand("jet").key());
-                if(lepJetPassdRMatch(jetIndex, elec, jets)) jetToClean.insert(jetIndex);
+                //recalculate electron ID without pfRelIso
+                const int NCUTS = 10;
+                const int BITSTRIDE = 3;
+                const int BITMASK = 0x7;
+                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070 = 0x38 = 56, so this corrosponds to the three pfRelIso bits
+                int elecCutBits = elec.userInt(elecIDBitName_);
+                int cutBits = elecCutBits | ISOBITMASK; // the | masks the iso cut
+                int elecID = 07; // start with the largest 3 bit number
+                for(int i = 0; i < NCUTS; ++i)
+                {
+                    elecID = std::min(elecID, cutBits & BITMASK);
+                    cutBits = cutBits >> BITSTRIDE;
+                }
+
+                if(elecID >= elecIDFlag_ && elec.userFloat(elecIsoName_)/elec.pt() < elecIsoCut_)
+                {
+                    if(lepJetPassdRMatch(jetIndex, elec, jets)) jetToClean.insert(jetIndex);
+                }
             }
         }
     }
@@ -250,7 +296,7 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     {
         const pat::Jet& jet = (*jets)[iJet];
 
-        //Apply pt cut on jets 
+        //Apply pt cut on jets
         if(jet.pt() < ak4ptCut_) continue;
 
         //Apply lepton cleaning
@@ -323,7 +369,8 @@ void SHOTProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     //retrieve the top tagger results object
     const TopTaggerResults& ttr = tt.getResults();
-    
+
+    //save tops or top candidates
     if(saveAllTopCandidates_) iEvent.put(std::move( getCandidateTopObjLiteVec(ttr) ));
     else                      iEvent.put(std::move( getFinalTopObjLiteVec(ttr)     ));
 }
@@ -334,10 +381,10 @@ void SHOTProducer::beginStream(edm::StreamID)
 }
 
 // ------------ method called once each stream after processing all runs, lumis and events  ------------
-void SHOTProducer::endStream() 
+void SHOTProducer::endStream()
 {
 }
- 
+
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void SHOTProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     //The following says we do not know what parameters are allowed so do no validation
