@@ -30,8 +30,8 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     //number of variables which are not stored in supplamental dictionaries
     const unsigned int NEXTRAVAR = 1;
 
-    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1, *pMuonIdx1, *pElectron_pt, *pElectron_cutBasedBits, *pElectron_miniPFRelIso, *pMuon_pt, *pMuon_mediumId, *pMuon_pfRelIso;
-    if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!|OOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &pElectron_pt, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &pMuon_pt, &pMuon_mediumId, &pMuon_pfRelIso))
+    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1 = nullptr, *pMuonIdx1 = nullptr, *pElectron_pt = nullptr, *pElectron_eta = nullptr, *pElectron_phi = nullptr, *pElectron_mass = nullptr, *pElectron_cutBasedBits = nullptr, *pElectron_miniPFRelIso = nullptr, *pMuon_pt = nullptr, *pMuon_eta = nullptr, *pMuon_phi = nullptr, *pMuon_mass = nullptr, *pMuon_id = nullptr, *pMuon_pfRelIso = nullptr;
+    if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!|OOOOOOOOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &pElectron_pt, &pElectron_eta, &pElectron_phi, &pElectron_mass, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &pMuon_pt, &pMuon_eta, &pMuon_phi, &pMuon_mass, &pMuon_id, &pMuon_pfRelIso))
     {
         return 1;
     }
@@ -52,11 +52,17 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     ttPython::Py_buffer_wrapper<Int_t> muonIdx1(pMuonIdx1);
 
     ttPython::Py_buffer_wrapper<Float_t> elecPt(pElectron_pt);
+    ttPython::Py_buffer_wrapper<Float_t> elecEta(pElectron_eta);
+    ttPython::Py_buffer_wrapper<Float_t> elecPhi(pElectron_phi);
+    ttPython::Py_buffer_wrapper<Float_t> elecM(pElectron_mass);
     ttPython::Py_buffer_wrapper<Int_t> elecCutBits(pElectron_cutBasedBits);
     ttPython::Py_buffer_wrapper<Float_t> elecMiniPFRelIso(pElectron_miniPFRelIso);
 
     ttPython::Py_buffer_wrapper<Float_t> muonPt(pMuon_pt);
-    ttPython::Py_buffer_wrapper<Bool_t> muonMediumID(pMuon_mediumId);
+    ttPython::Py_buffer_wrapper<Float_t> muonEta(pMuon_eta);
+    ttPython::Py_buffer_wrapper<Float_t> muonPhi(pMuon_phi);
+    ttPython::Py_buffer_wrapper<Float_t> muonM(pMuon_mass);
+    ttPython::Py_buffer_wrapper<Bool_t> muonID(pMuon_id);
     ttPython::Py_buffer_wrapper<Float_t> muonPFRelIso(pMuon_pfRelIso);
 
     //reserve space for the vector to stop reallocations during emplacing
@@ -66,36 +72,47 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     {
         jetsLV[iJet].SetPtEtaPhiM(jetPt[iJet], jetEta[iJet], jetPhi[iJet], jetM[iJet]);
 
-        if(pMuon_mediumId)
+        //check first and last optional parameter ... assume others are here 
+        if(pElectronIdx1 && pMuon_pfRelIso)
         {
             bool isLep = false;
 
             //recalculate electron ID without isolation 
             //VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut
             //this is a 'bit' awful <- that pun is awful, but yes, this should be made a little better 
-            if(elecIdx1[iJet] >= 0)
+            if(elecIdx1[iJet] >= 0 && elecPt[elecIdx1[iJet]] > 10.0)
             {
                 const int NCUTS = 10;
                 const int BITSTRIDE = 3;
                 const int BITMASK = 0x7;
-                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070 = 0x38 = 56
+                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070 = 0x38 = 56, so this corrosponds to the three pfRelIso bits 
                 int cutBits = elecCutBits[elecIdx1[iJet]] | ISOBITMASK; // the | masks the iso cut
                 int elecID = 07; // start with the largest 3 bit number
                 for(int i = 0; i < NCUTS; ++i)
                 {
-                    elecID &= cutBits & BITMASK;
+                    elecID = std::min(elecID, cutBits & BITMASK);
                     cutBits = cutBits >> BITSTRIDE;
                 }
 
-                isLep = isLep || (elecID >= 1 && elecMiniPFRelIso[elecIdx1[iJet]] < 0.10);
+                TLorentzVector tlv;
+                tlv.SetPtEtaPhiM(elecPt[elecIdx1[iJet]], elecEta[elecIdx1[iJet]], elecPhi[elecIdx1[iJet]], elecM[elecIdx1[iJet]]);
+                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], tlv);
+
+                isLep = isLep || (elecID >= 1 && elecMiniPFRelIso[elecIdx1[iJet]] < 0.10 && dR < 0.2);
             }
             
-            if(muonIdx1[iJet] >= 0)
+            if(muonIdx1[iJet] >= 0 && muonPt[muonIdx1[iJet]] > 10.0)
             {
-                isLep = isLep || (muonMediumID[muonIdx1[iJet]] && muonPFRelIso[muonIdx1[iJet]] < 0.2);
+                TLorentzVector tlv;
+                tlv.SetPtEtaPhiM(muonPt[muonIdx1[iJet]], muonEta[muonIdx1[iJet]], muonPhi[muonIdx1[iJet]], muonM[muonIdx1[iJet]]);
+                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], tlv);
+
+                //pMuon_id == Py_None is a hack because moun loose ID is not a variable, but instead only loose muons are saved 
+                isLep = isLep || ((pMuon_id == Py_None || muonID[muonIdx1[iJet]]) && muonPFRelIso[muonIdx1[iJet]] < 0.2 && dR < 0.2);
             }
 
-            filterVec[iJet] = !isLep;
+            //filter out jet if it is matched to a lepton, of if it has pt < 20 GeV
+            filterVec[iJet] = !isLep && jetPt[iJet] > 20.0;
         }
     }
 

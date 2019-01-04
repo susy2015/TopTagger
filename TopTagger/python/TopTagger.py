@@ -99,8 +99,8 @@ class TopTagger:
         supplementaryIntVariables = {
             "qgMult":                               event.Jet_qgMult,
         }
-        
-        ak4Inputs = (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.Electron_pt, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.Muon_pt, event.Muon_mediumId, event.Muon_miniPFRelIso_all)
+
+        ak4Inputs = (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)#, event.Jet_electronIdx1, event.Jet_muonIdx1, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
 
         ak8Inputs = (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
 
