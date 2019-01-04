@@ -6,10 +6,6 @@
 #include "TopTagger/CfgParser/include/CfgDocument.hh"
 #include "TopTagger/CfgParser/include/TTException.h"
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-
 void TTMDiscriminatorFilter::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {
     //Construct contexts
