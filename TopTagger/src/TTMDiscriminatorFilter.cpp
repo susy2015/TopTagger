@@ -20,7 +20,7 @@ void TTMDiscriminatorFilter::getParameters(const cfg::CfgDocument* cfgDoc, const
     discOffset_    = cfgDoc->get("discOffset",    localCxt, 999.9);
     discSlope_     = cfgDoc->get("discSlope",     localCxt, 0.0);
 
-    type_          = static_cast<TopObject::Type>(cfgDoc->get("topObjType",    localCxt, 0));
+    type_          = static_cast<TopObject::Type>(cfgDoc->get("type",    localCxt, 0));
 
     bdiscThreshold_  = cfgDoc->get("bdiscThreshold", localCxt, -999.9);
     bEtaCut_         = cfgDoc->get("bEtaCut",        localCxt, -999.9);
