@@ -56,9 +56,10 @@ namespace ttUtility
         const FLOATCONTAINERTYPE* qgPtD_;
         const FLOATCONTAINERTYPE* qgAxis1_;
         const FLOATCONTAINERTYPE* qgAxis2_;
-
+        const std::vector<unsigned char>* filter_;
+        
         std::map<std::string, const FLOATCONTAINERTYPE*> extraInputVariables_;
-
+        
     public:
         /**
          *Basic constructor with QGL
@@ -66,13 +67,13 @@ namespace ttUtility
          *@param btagFactors B-tag discriminators for each jet
          *@param qgLikelihood Quark-gluon likelihoods for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Basic constructor
          *@param jetsLVec Jet TLorentzVectors for each jet
          *@param btagFactors B-tag discriminators for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Constructor with gen informaion 
          *@param jetsLVec Jet TLorentzVectors for each jet
@@ -81,7 +82,7 @@ namespace ttUtility
          *@param hadGenTops Vector of hadronicly decaying gen top TLorentzVectors
          *@param hadGenTopDaughters Vector of direct decay daughters of the top quarks
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Adds jet shape inputs from the quark-gluon likelihood calculator
          */
@@ -91,6 +92,14 @@ namespace ttUtility
             qgPtD_ = &qgPtD;
             qgAxis1_ = &qgAxis1;
             qgAxis2_ = &qgAxis2;
+        }
+
+        /**
+         *Set a filter vector.  This will allow ceratin jets to be ignored when constructing the constituents vector.  The vector should contain "true" for jets to keep and "false" for jets which will not be put in the constituents vector.  
+         */
+        void setFilterVector(const std::vector<unsigned char>& filter)
+        {
+            filter_ = &filter;
         }
 
         /**
@@ -120,6 +129,11 @@ namespace ttUtility
                 THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(btagFactors_->size()));
             }
 
+            if(filter_ && jetsLVec_->size() != filter_->size())
+            {
+                THROW_TTEXCEPTION("Unequal vector size between filter and jet vectors!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(filter_->size()));
+            }
+
             if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
             {
                 if(jetsLVec_->size() != qgMult_->size() || jetsLVec_->size() != qgPtD_->size() || jetsLVec_->size() != qgAxis1_->size() || jetsLVec_->size() != qgAxis2_->size())
@@ -131,6 +145,10 @@ namespace ttUtility
             //Construct constituents in place in the vector
             for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
             {
+                //skip jet if filtering is turned on (i.e. filter_ is non-null) and the jet is not set to true
+                if(filter_ && !(*filter_)[iJet]) continue;
+                
+                //create constituent 
                 constituents.emplace_back((*jetsLVec_)[iJet], static_cast<double>((*btagFactors_)[iJet]), static_cast<double>((qgLikelihood_ != nullptr)?((*qgLikelihood_)[iJet]):(0.0)));
 
                 //Add additional QGL info if it is provided 
