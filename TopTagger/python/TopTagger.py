@@ -99,12 +99,14 @@ class TopTagger:
         supplementaryIntVariables = {
             "qgMult":                               event.Jet_qgMult,
         }
-
-        ak4Inputs = (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+        
+        ak4Inputs = (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.Electron_pt, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.Muon_pt, event.Muon_mediumId, event.Muon_miniPFRelIso_all)
 
         ak8Inputs = (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
+
+        resTopInputs = (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
         
-        return self.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs)
+        return self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
 
 
 
@@ -132,13 +134,13 @@ if __name__ == "__main__":
 
     for iEvt, event in enumerate(tree):
         if (options.nEvts > 0) and (iEvt + 1 > options.nEvts): break
-    
+
         print "Event #:", iEvt + 1
     
         tops = tt.runFromNanoAOD(event)
-    
+
         print "\tN tops:", len(tops)
-    
+
         for top in tops:
             print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(top.type, top.pt, top.eta, top.phi, top.mass, top.disc)
         print ""

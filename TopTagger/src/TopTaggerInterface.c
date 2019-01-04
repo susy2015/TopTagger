@@ -4,6 +4,7 @@
 #include "numpy/arrayobject.h"
 
 #include "TLorentzVector.h"
+#include "Math/VectorUtil.h"
 
 #include <vector>
 #include <iostream>
@@ -24,13 +25,13 @@ static void TopTaggerInterface_cleanup(PyObject *ptt)
     if(tt) delete tt;
 }
 
-static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>>& ak4ConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<std::vector<Float_t>>& tempIntToFloatVectors, std::vector<TLorentzVector>& jetsLV, PyObject* pArgTuple)
+static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>>& ak4ConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<std::vector<Float_t>>& tempIntToFloatVectors, std::vector<TLorentzVector>& jetsLV, std::vector<unsigned char>& filterVec, PyObject* pArgTuple)
 {
-    //number of variables which are not stored in supplamental dictionaries (
+    //number of variables which are not stored in supplamental dictionaries
     const unsigned int NEXTRAVAR = 1;
 
-    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict;
-    if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict))
+    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1, *pMuonIdx1, *pElectron_pt, *pElectron_cutBasedBits, *pElectron_miniPFRelIso, *pMuon_pt, *pMuon_mediumId, *pMuon_pfRelIso;
+    if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!|OOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &pElectron_pt, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &pMuon_pt, &pMuon_mediumId, &pMuon_pfRelIso))
     {
         return 1;
     }
@@ -46,11 +47,56 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi);
     ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass);
 
+    //lepton matching variables
+    ttPython::Py_buffer_wrapper<Int_t> elecIdx1(pElectronIdx1);
+    ttPython::Py_buffer_wrapper<Int_t> muonIdx1(pMuonIdx1);
+
+    ttPython::Py_buffer_wrapper<Float_t> elecPt(pElectron_pt);
+    ttPython::Py_buffer_wrapper<Int_t> elecCutBits(pElectron_cutBasedBits);
+    ttPython::Py_buffer_wrapper<Float_t> elecMiniPFRelIso(pElectron_miniPFRelIso);
+
+    ttPython::Py_buffer_wrapper<Float_t> muonPt(pMuon_pt);
+    ttPython::Py_buffer_wrapper<Bool_t> muonMediumID(pMuon_mediumId);
+    ttPython::Py_buffer_wrapper<Float_t> muonPFRelIso(pMuon_pfRelIso);
+
     //reserve space for the vector to stop reallocations during emplacing
     jetsLV.resize(jetPt.size());
+    filterVec.resize(jetPt.size(), true);
     for(unsigned int iJet = 0; iJet < jetPt.size(); ++iJet)
     {
         jetsLV[iJet].SetPtEtaPhiM(jetPt[iJet], jetEta[iJet], jetPhi[iJet], jetM[iJet]);
+
+        if(pMuon_mediumId)
+        {
+            bool isLep = false;
+
+            //recalculate electron ID without isolation 
+            //VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut
+            //this is a 'bit' awful <- that pun is awful, but yes, this should be made a little better 
+            if(elecIdx1[iJet] >= 0)
+            {
+                const int NCUTS = 10;
+                const int BITSTRIDE = 3;
+                const int BITMASK = 0x7;
+                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070 = 0x38 = 56
+                int cutBits = elecCutBits[elecIdx1[iJet]] | ISOBITMASK; // the | masks the iso cut
+                int elecID = 07; // start with the largest 3 bit number
+                for(int i = 0; i < NCUTS; ++i)
+                {
+                    elecID &= cutBits & BITMASK;
+                    cutBits = cutBits >> BITSTRIDE;
+                }
+
+                isLep = isLep || (elecID >= 1 && elecMiniPFRelIso[elecIdx1[iJet]] < 0.10);
+            }
+            
+            if(muonIdx1[iJet] >= 0)
+            {
+                isLep = isLep || (muonMediumID[muonIdx1[iJet]] && muonPFRelIso[muonIdx1[iJet]] < 0.2);
+            }
+
+            filterVec[iJet] = !isLep;
+        }
     }
 
     //prepare b-tag discriminator
@@ -59,6 +105,7 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
 
     //Create the AK4 constituent helper
     ak4ConstInputs.reset(new ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>(jetsLV, jetBTag));
+    ak4ConstInputs->setFilterVector(filterVec);
 
     //prepare floating point supplamental "vectors"
     PyObject *key, *value;
@@ -178,20 +225,71 @@ static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8In
     return 0;
 }
 
-template<typename A, typename B>
-static inline std::vector<Constituent> createConstituents(A& ak4Inputs, B& ak8Inputs)
+static int TopTaggerInterface_makeResolvedTopConst(std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>>& resolvedTopConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<ttPython::Py_buffer_wrapper<Int_t>>& tempIntBuffers, std::vector<TLorentzVector>& topCandsLV, PyObject* pArgTuple)
+{
+    //number of variables
+    const unsigned int NFLOATVAR = 1;
+    const unsigned int NINTVAR = 3;
+
+    PyObject *pTopCandPt, *pTopCandEta, *pTopCandPhi, *pTopCandMass, *pTopCandDisc, *pTopCandIdxJ1, *pTopCandIdxJ2, *pTopCandIdxJ3;
+    if (!PyArg_ParseTuple(pArgTuple, "OOOOOOOO", &pTopCandPt, &pTopCandEta, &pTopCandPhi, &pTopCandMass, &pTopCandDisc, &pTopCandIdxJ1, &pTopCandIdxJ2, &pTopCandIdxJ3))
+    {
+        return 1;
+    }
+
+    //Prepare std::vector<TLorentzVector> for topCand 4-vector
+    ttPython::Py_buffer_wrapper<Float_t> topCandPt(pTopCandPt);
+    ttPython::Py_buffer_wrapper<Float_t> topCandEta(pTopCandEta);
+    ttPython::Py_buffer_wrapper<Float_t> topCandPhi(pTopCandPhi);
+    ttPython::Py_buffer_wrapper<Float_t> topCandM(pTopCandMass);
+    
+    //reserve space for the vector to stop reallocations during emplacing
+    topCandsLV.resize(topCandPt.size());
+    for(unsigned int iTopCand = 0; iTopCand < topCandPt.size(); ++iTopCand)
+    {
+        topCandsLV[iTopCand].SetPtEtaPhiM(topCandPt[iTopCand], topCandEta[iTopCand], topCandPhi[iTopCand], topCandM[iTopCand]);
+    }
+
+    //Wrap basic floating point/integer vectors
+    //reserve space for the vector to stop reallocations during emplacing
+    tempFloatBuffers.reserve(NFLOATVAR);
+    tempIntBuffers.reserve(NINTVAR);
+
+    tempFloatBuffers.emplace_back(pTopCandDisc);
+    auto& topCandDisc = tempFloatBuffers.back();
+
+    tempIntBuffers.emplace_back(pTopCandIdxJ1);
+    auto& topCandIdxJ1 = tempIntBuffers.back();
+
+    tempIntBuffers.emplace_back(pTopCandIdxJ2);
+    auto& topCandIdxJ2 = tempIntBuffers.back();
+
+    tempIntBuffers.emplace_back(pTopCandIdxJ3);
+    auto& topCandIdxJ3 = tempIntBuffers.back();
+
+    //Create the AK8 constituent helper
+    resolvedTopConstInputs.reset(new ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>(topCandsLV, topCandDisc, topCandIdxJ1, topCandIdxJ2, topCandIdxJ3));
+
+    return 0;
+}
+
+template<typename A, typename B, typename C>
+static inline std::vector<Constituent> createConstituents(A& ak4Inputs, B& ak8Inputs, C& resTopInputs)
 {
     //bit mask for terrible switch below
     unsigned int constituentCreationBitMask = 0;
-    if(ak4Inputs) constituentCreationBitMask |= 0x1;
-    if(ak8Inputs) constituentCreationBitMask |= 0x2;
+    if(ak4Inputs)    constituentCreationBitMask |= 0x1;
+    if(ak8Inputs)    constituentCreationBitMask |= 0x2;
+    if(resTopInputs) constituentCreationBitMask |= 0x4;
 
     //Create constituents 
     switch(constituentCreationBitMask)
     {
     case 0x1: return ttUtility::packageConstituents(*ak4Inputs);
+    case 0x5: return ttUtility::packageConstituents(*ak4Inputs, *resTopInputs);
     case 0x2: return ttUtility::packageConstituents(*ak8Inputs);
     case 0x3: return ttUtility::packageConstituents(*ak4Inputs, *ak8Inputs);
+    case 0x7: return ttUtility::packageConstituents(*ak4Inputs, *resTopInputs, *ak8Inputs);
     default:
         THROW_TTEXCEPTION("Illegal constituent combination");
         break;
@@ -252,11 +350,11 @@ extern "C"
         //suppress unused parameter warning as self is manditory
         (void)self;
 
-        PyObject *ptt, *pAK4Inputs = nullptr, *pAK8Inputs = nullptr;
+        PyObject *ptt, *pAK4Inputs = nullptr, *pAK8Inputs = nullptr, *pResolvedTopCandInputs = nullptr;
         //PYTHON, LEARN ABOUT CONST!!!!!!!!!!!!!!!!!!
-        char kw1[] = "topTagger", kw2[] = "ak4Inputs", kw3[] = "ak8Inputs";
-        char *keywords[] = {kw1, kw2, kw3, NULL};
-        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!O!", keywords, &PyCapsule_Type, &ptt, &PyTuple_Type, &pAK4Inputs, &PyTuple_Type, &pAK8Inputs))
+        char kw1[] = "topTagger", kw2[] = "ak4Inputs", kw3[] = "ak8Inputs", kw4[] = "resolvedTopInputs";
+        char *keywords[] = {kw1, kw2, kw3, kw4, NULL};
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!O!O!", keywords, &PyCapsule_Type, &ptt, &PyTuple_Type, &pAK4Inputs, &PyTuple_Type, &pAK8Inputs, &PyTuple_Type, &pResolvedTopCandInputs))
         {
             return NULL;
         }
@@ -264,18 +362,21 @@ extern "C"
         Py_INCREF(ptt);
         if(pAK4Inputs) Py_INCREF(pAK4Inputs);
         if(pAK8Inputs) Py_INCREF(pAK8Inputs);
+        if(pResolvedTopCandInputs) Py_INCREF(pResolvedTopCandInputs);
 
         //Prepare ak4 jet input constituents 
         std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>> ak4ConstInputs;
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak4TempFloatBuffers;
         std::vector<std::vector<Float_t>> ak4TempIntToFloatVectors;
         std::vector<TLorentzVector> ak4JetsLV;
-        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempFloatBuffers, ak4TempIntToFloatVectors, ak4JetsLV, pAK4Inputs))
+        std::vector<unsigned char> ak4FilterVec;
+        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempFloatBuffers, ak4TempIntToFloatVectors, ak4JetsLV, ak4FilterVec, pAK4Inputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
 
             return NULL;
         }
@@ -291,6 +392,22 @@ extern "C"
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+
+            return NULL;
+        }
+
+        std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>> resolvedTopConstInputs;
+        std::vector<ttPython::Py_buffer_wrapper<Float_t>> resTopTempFloatBuffers;
+        std::vector<ttPython::Py_buffer_wrapper<Int_t>> resTopTempIntBuffers;
+        std::vector<TLorentzVector> topCandsLV;
+        if(pResolvedTopCandInputs && TopTaggerInterface_makeResolvedTopConst(resolvedTopConstInputs, resTopTempFloatBuffers, resTopTempIntBuffers, topCandsLV, pResolvedTopCandInputs))
+        {
+            //Status is not 0, there was an error, PyErr_SetString is called in function 
+            Py_DECREF(ptt);
+            if(pAK4Inputs) Py_DECREF(pAK4Inputs);
+            if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
 
             return NULL;
         }
@@ -303,6 +420,7 @@ extern "C"
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
 
             PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
             return NULL;
@@ -312,7 +430,7 @@ extern "C"
         try
         {
             //create constituent vector 
-            const auto constituents = createConstituents(ak4ConstInputs, ak8ConstInputs);
+            const auto constituents = createConstituents(ak4ConstInputs, ak8ConstInputs, resolvedTopConstInputs);
 
             //Run top tagger 
             tt->runTagger(constituents);
@@ -322,6 +440,7 @@ extern "C"
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
             PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
@@ -331,6 +450,7 @@ extern "C"
         Py_DECREF(ptt);
         if(pAK4Inputs) Py_DECREF(pAK4Inputs);
         if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+        if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
 
         Py_INCREF(Py_None);
         return Py_None;
@@ -393,13 +513,13 @@ extern "C"
                 //get constituents vector to retrieve matching index
                 const auto& topConstituents = tops[iTop]->getConstituents();
                 if(topConstituents.size() > 0) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 1)) = static_cast<int>(topConstituents[0]->getIndex());
-                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 1)) = -1;
+                else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 1)) = -1;
 
                 if(topConstituents.size() > 1) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 2)) = static_cast<int>(topConstituents[1]->getIndex());
-                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 2)) = -1;
+                else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 2)) = -1;
 
                 if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
-                else                                  *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
+                else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
             }
 
             Py_DECREF(ptt);
