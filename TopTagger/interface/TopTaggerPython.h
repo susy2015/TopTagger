@@ -71,8 +71,16 @@ namespace ttPython
 #ifdef DOPYCAPIBIND
         Py_buffer_wrapper(PyObject* buf) : pObj_(buf)
         {
-            len_ = buffer_length(pObj_);
-            buf_ = (T*)(buffer_get(pObj_));
+            if(pObj_)
+            {
+                len_ = buffer_length(pObj_);
+                buf_ = (T*)(buffer_get(pObj_));
+            }
+            else
+            {
+                len_ = 0;
+                buf_ = nullptr;
+            }
         }
 #else
         Py_buffer_wrapper(void* buf) : len_(0), buf_(&dummy) {}
