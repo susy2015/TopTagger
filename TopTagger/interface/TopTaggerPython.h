@@ -124,9 +124,6 @@ namespace ttPython
             return buf_ + size(); 
         }    
     };
-
-    std::vector<Constituent> packageConstituentsAK4(PyObject* jet_pt, PyObject* jet_eta, PyObject* jet_phi, PyObject* jet_mass, PyObject* jet_btag, PyDictObject* extraVars);
-
 }
 
 #endif
