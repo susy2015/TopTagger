@@ -254,7 +254,9 @@ void free_buffer(void* data, size_t length)
 
 TF_Buffer* TTMTensorflow::read_file(const std::string& file) 
 {
-    FILE *f = fopen(file.c_str(), "rb");
+    std::string fname=file;
+    ttUtility::autoExpandEnvironmentVariables(fname);
+    FILE *f = fopen(fname.c_str(), "rb");
 
     if(f == nullptr)
     {
