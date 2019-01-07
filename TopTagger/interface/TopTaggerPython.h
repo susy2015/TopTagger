@@ -69,11 +69,11 @@ namespace ttPython
 
     public:
 #ifdef DOPYCAPIBIND
-        Py_buffer_wrapper(PyObject* buf) : pObj_(buf)
+        Py_buffer_wrapper(PyObject* buf, int len = 0) : pObj_(buf)
         {
             if(pObj_ && pObj_ != Py_None)
             {
-                len_ = buffer_length(pObj_);
+                len_ = len;//buffer_length(pObj_);
                 buf_ = (T*)(buffer_get(pObj_));
             }
             else

@@ -29,9 +29,10 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
 {
     //number of variables which are not stored in supplamental dictionaries
     const unsigned int NEXTRAVAR = 1;
+    int nJet, nElec, nMuon;
 
     PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1 = nullptr, *pMuonIdx1 = nullptr, *pElectron_pt = nullptr, *pElectron_eta = nullptr, *pElectron_phi = nullptr, *pElectron_mass = nullptr, *pElectron_cutBasedBits = nullptr, *pElectron_miniPFRelIso = nullptr, *pMuon_pt = nullptr, *pMuon_eta = nullptr, *pMuon_phi = nullptr, *pMuon_mass = nullptr, *pMuon_id = nullptr, *pMuon_pfRelIso = nullptr;
-    if (!PyArg_ParseTuple(pArgTuple, "OOOOOO!O!|OOOOOOOOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &pElectron_pt, &pElectron_eta, &pElectron_phi, &pElectron_mass, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &pMuon_pt, &pMuon_eta, &pMuon_phi, &pMuon_mass, &pMuon_id, &pMuon_pfRelIso))
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOO!O!|OOiOOOOOOiOOOOOO", &nJet, &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &nElec, &pElectron_pt, &pElectron_eta, &pElectron_phi, &pElectron_mass, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &nMuon, &pMuon_pt, &pMuon_eta, &pMuon_phi, &pMuon_mass, &pMuon_id, &pMuon_pfRelIso))
     {
         return 1;
     }
@@ -42,28 +43,28 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     tempFloatBuffers.reserve(NEXTRAVAR + floatSize + intSize);
 
     //Prepare std::vector<TLorentzVector> for jets lorentz vectors
-    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt);
-    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta);
-    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi);
-    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass);
+    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt, nJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta, nJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi, nJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass, nJet);
 
     //lepton matching variables
-    ttPython::Py_buffer_wrapper<Int_t> elecIdx1(pElectronIdx1);
-    ttPython::Py_buffer_wrapper<Int_t> muonIdx1(pMuonIdx1);
+    ttPython::Py_buffer_wrapper<Int_t> elecIdx1(pElectronIdx1, nJet);
+    ttPython::Py_buffer_wrapper<Int_t> muonIdx1(pMuonIdx1, nJet);
 
-    ttPython::Py_buffer_wrapper<Float_t> elecPt(pElectron_pt);
-    ttPython::Py_buffer_wrapper<Float_t> elecEta(pElectron_eta);
-    ttPython::Py_buffer_wrapper<Float_t> elecPhi(pElectron_phi);
-    ttPython::Py_buffer_wrapper<Float_t> elecM(pElectron_mass);
-    ttPython::Py_buffer_wrapper<Int_t> elecCutBits(pElectron_cutBasedBits);
-    ttPython::Py_buffer_wrapper<Float_t> elecMiniPFRelIso(pElectron_miniPFRelIso);
+    ttPython::Py_buffer_wrapper<Float_t> elecPt(pElectron_pt, nElec);
+    ttPython::Py_buffer_wrapper<Float_t> elecEta(pElectron_eta, nElec);
+    ttPython::Py_buffer_wrapper<Float_t> elecPhi(pElectron_phi, nElec);
+    ttPython::Py_buffer_wrapper<Float_t> elecM(pElectron_mass, nElec);
+    ttPython::Py_buffer_wrapper<Int_t> elecCutBits(pElectron_cutBasedBits, nElec);
+    ttPython::Py_buffer_wrapper<Float_t> elecMiniPFRelIso(pElectron_miniPFRelIso, nElec);
 
-    ttPython::Py_buffer_wrapper<Float_t> muonPt(pMuon_pt);
-    ttPython::Py_buffer_wrapper<Float_t> muonEta(pMuon_eta);
-    ttPython::Py_buffer_wrapper<Float_t> muonPhi(pMuon_phi);
-    ttPython::Py_buffer_wrapper<Float_t> muonM(pMuon_mass);
-    ttPython::Py_buffer_wrapper<Bool_t> muonID(pMuon_id);
-    ttPython::Py_buffer_wrapper<Float_t> muonPFRelIso(pMuon_pfRelIso);
+    ttPython::Py_buffer_wrapper<Float_t> muonPt(pMuon_pt, nMuon);
+    ttPython::Py_buffer_wrapper<Float_t> muonEta(pMuon_eta, nMuon);
+    ttPython::Py_buffer_wrapper<Float_t> muonPhi(pMuon_phi, nMuon);
+    ttPython::Py_buffer_wrapper<Float_t> muonM(pMuon_mass, nMuon);
+    ttPython::Py_buffer_wrapper<Bool_t> muonID(pMuon_id, nMuon);
+    ttPython::Py_buffer_wrapper<Float_t> muonPFRelIso(pMuon_pfRelIso, nMuon);
 
     //reserve space for the vector to stop reallocations during emplacing
     jetsLV.resize(jetPt.size());
@@ -117,7 +118,7 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     }
 
     //prepare b-tag discriminator
-    tempFloatBuffers.emplace_back(pJetBtag);
+    tempFloatBuffers.emplace_back(pJetBtag, nJet);
     auto& jetBTag = tempFloatBuffers.back();
 
     //Create the AK4 constituent helper
@@ -133,7 +134,7 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
         if(PyString_Check(key))
         {
             //Get the ROOT.PyFloatBuffer into a c++ friendly format
-            tempFloatBuffers.emplace_back(value);
+            tempFloatBuffers.emplace_back(value, nJet);
 
             char *vecName = PyString_AsString(key);
             ak4ConstInputs->addSupplamentalVector(vecName, tempFloatBuffers.back());
@@ -155,7 +156,7 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
         if(PyString_Check(key))
         {
             //Get the ROOT.PyIntBuffer into a c++ friendly format
-            ttPython::Py_buffer_wrapper<Int_t> buffer(value);
+            ttPython::Py_buffer_wrapper<Int_t> buffer(value, nJet);
             
             //translate the integers to floats
             tempIntToFloatVectors.emplace_back(buffer.begin(), buffer.end());
@@ -181,26 +182,27 @@ static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8In
 {
     //number of variables
     const unsigned int NFLOATVAR = 3;
+    int nFatJet, nSubJet;
 
     PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetSDMass, *pJetTDisc, *pJetWDisc, *pSubjetPt, *pSubjetEta, *pSubjetPhi, *pSubjetMass, *pSubjetIdx1, *pSubjetIdx2;
-    if (!PyArg_ParseTuple(pArgTuple, "OOOOOOOOOOOOO", &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetSDMass, &pJetTDisc, &pJetWDisc, &pSubjetPt, &pSubjetEta, &pSubjetPhi, &pSubjetMass, &pSubjetIdx1, &pSubjetIdx2))
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOOOiOOOOOO", &nFatJet, &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetSDMass, &pJetTDisc, &pJetWDisc, &nSubJet, &pSubjetPt, &pSubjetEta, &pSubjetPhi, &pSubjetMass, &pSubjetIdx1, &pSubjetIdx2))
     {
         return 1;
     }
 
     //Prepare std::vector<TLorentzVector> for jets and subjets lorentz vectors and subjet linking 
-    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt);
-    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta);
-    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi);
-    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass);
+    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt, nFatJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta, nFatJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi, nFatJet);
+    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass, nFatJet);
 
-    ttPython::Py_buffer_wrapper<Int_t> subjetIdx1(pSubjetIdx1);
-    ttPython::Py_buffer_wrapper<Int_t> subjetIdx2(pSubjetIdx2);
+    ttPython::Py_buffer_wrapper<Int_t> subjetIdx1(pSubjetIdx1, nFatJet);
+    ttPython::Py_buffer_wrapper<Int_t> subjetIdx2(pSubjetIdx2, nFatJet);
 
-    ttPython::Py_buffer_wrapper<Float_t> subjetPt(pSubjetPt);
-    ttPython::Py_buffer_wrapper<Float_t> subjetEta(pSubjetEta);
-    ttPython::Py_buffer_wrapper<Float_t> subjetPhi(pSubjetPhi);
-    ttPython::Py_buffer_wrapper<Float_t> subjetM(pSubjetMass);
+    ttPython::Py_buffer_wrapper<Float_t> subjetPt(pSubjetPt, nSubJet);
+    ttPython::Py_buffer_wrapper<Float_t> subjetEta(pSubjetEta, nSubJet);
+    ttPython::Py_buffer_wrapper<Float_t> subjetPhi(pSubjetPhi, nSubJet);
+    ttPython::Py_buffer_wrapper<Float_t> subjetM(pSubjetMass, nSubJet);
 
     //reserve space for the vector to stop reallocations during emplacing
     jetsLV.resize(jetPt.size());
@@ -227,13 +229,13 @@ static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8In
     //reserve space for the vector to stop reallocations during emplacing
     tempFloatBuffers.reserve(NFLOATVAR);
 
-    tempFloatBuffers.emplace_back(pJetSDMass);
+    tempFloatBuffers.emplace_back(pJetSDMass, nFatJet);
     auto& jetSDMass = tempFloatBuffers.back();
 
-    tempFloatBuffers.emplace_back(pJetTDisc);
+    tempFloatBuffers.emplace_back(pJetTDisc, nFatJet);
     auto& jetTopDisc = tempFloatBuffers.back();
 
-    tempFloatBuffers.emplace_back(pJetWDisc);
+    tempFloatBuffers.emplace_back(pJetWDisc, nFatJet);
     auto& jetWDisc = tempFloatBuffers.back();
 
     //Create the AK8 constituent helper
@@ -247,18 +249,19 @@ static int TopTaggerInterface_makeResolvedTopConst(std::unique_ptr<ttUtility::Co
     //number of variables
     const unsigned int NFLOATVAR = 1;
     const unsigned int NINTVAR = 3;
+    int nResTopCand;
 
     PyObject *pTopCandPt, *pTopCandEta, *pTopCandPhi, *pTopCandMass, *pTopCandDisc, *pTopCandIdxJ1, *pTopCandIdxJ2, *pTopCandIdxJ3;
-    if (!PyArg_ParseTuple(pArgTuple, "OOOOOOOO", &pTopCandPt, &pTopCandEta, &pTopCandPhi, &pTopCandMass, &pTopCandDisc, &pTopCandIdxJ1, &pTopCandIdxJ2, &pTopCandIdxJ3))
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOOOO", &nResTopCand, &pTopCandPt, &pTopCandEta, &pTopCandPhi, &pTopCandMass, &pTopCandDisc, &pTopCandIdxJ1, &pTopCandIdxJ2, &pTopCandIdxJ3))
     {
         return 1;
     }
 
     //Prepare std::vector<TLorentzVector> for topCand 4-vector
-    ttPython::Py_buffer_wrapper<Float_t> topCandPt(pTopCandPt);
-    ttPython::Py_buffer_wrapper<Float_t> topCandEta(pTopCandEta);
-    ttPython::Py_buffer_wrapper<Float_t> topCandPhi(pTopCandPhi);
-    ttPython::Py_buffer_wrapper<Float_t> topCandM(pTopCandMass);
+    ttPython::Py_buffer_wrapper<Float_t> topCandPt(pTopCandPt, nResTopCand);
+    ttPython::Py_buffer_wrapper<Float_t> topCandEta(pTopCandEta, nResTopCand);
+    ttPython::Py_buffer_wrapper<Float_t> topCandPhi(pTopCandPhi, nResTopCand);
+    ttPython::Py_buffer_wrapper<Float_t> topCandM(pTopCandMass, nResTopCand);
     
     //reserve space for the vector to stop reallocations during emplacing
     topCandsLV.resize(topCandPt.size());
@@ -272,16 +275,16 @@ static int TopTaggerInterface_makeResolvedTopConst(std::unique_ptr<ttUtility::Co
     tempFloatBuffers.reserve(NFLOATVAR);
     tempIntBuffers.reserve(NINTVAR);
 
-    tempFloatBuffers.emplace_back(pTopCandDisc);
+    tempFloatBuffers.emplace_back(pTopCandDisc, nResTopCand);
     auto& topCandDisc = tempFloatBuffers.back();
 
-    tempIntBuffers.emplace_back(pTopCandIdxJ1);
+    tempIntBuffers.emplace_back(pTopCandIdxJ1, nResTopCand);
     auto& topCandIdxJ1 = tempIntBuffers.back();
 
-    tempIntBuffers.emplace_back(pTopCandIdxJ2);
+    tempIntBuffers.emplace_back(pTopCandIdxJ2, nResTopCand);
     auto& topCandIdxJ2 = tempIntBuffers.back();
 
-    tempIntBuffers.emplace_back(pTopCandIdxJ3);
+    tempIntBuffers.emplace_back(pTopCandIdxJ3, nResTopCand);
     auto& topCandIdxJ3 = tempIntBuffers.back();
 
     //Create the AK8 constituent helper
