@@ -22,31 +22,9 @@ namespace ttPython
         PyObject* pObj_;
 
         ///This function is copied from the ROOT source as it is not exposed to the user ... ... ... thanks ROOT
-        unsigned int buffer_length( PyObject* self )
+        char* buffer_get( PyObject* self)
         {
-            // Retrieve the (type-strided) size of the the buffer; may be a guess.                                                                                                                                                                    
-#if PY_VERSION_HEX < 0x03000000
-            Py_ssize_t nlen = (*(PyBuffer_Type.tp_as_sequence->sq_length))(self);
-#else
-            Py_buffer bufinfo;
-            (*(Py_TYPE(self)->tp_as_buffer->bf_getbuffer))( self, &bufinfo, PyBUF_SIMPLE );
-            Py_ssize_t nlen = bufinfo.len;
-#endif
-            if ( nlen != INT_MAX )  // INT_MAX is the default, i.e. unknown actual length                                                                                                                                                             
-                return nlen;
-
-            return (unsigned int)(nlen);            // return nlen after all, since have nothing better                                                                                                                                               
-        }
-
-        ///This function is copied from the ROOT source as it is not exposed to the user ... ... ... thanks ROOT
-        const char* buffer_get( PyObject* self)
-        {
-
-#if PY_VERSION_HEX < 0x02050000
-            const char* buf = 0;
-#else
-            char* buf = 0;     // interface change in 2.5, no other way to handle it                                                                                                                                                                  
-#endif
+            char* buf = 0;
 #if PY_VERSION_HEX < 0x03000000
             (*(PyBuffer_Type.tp_as_buffer->bf_getcharbuffer))( self, 0, &buf );
 #else
@@ -71,15 +49,24 @@ namespace ttPython
 #ifdef DOPYCAPIBIND
         Py_buffer_wrapper(PyObject* buf, int len = 0) : pObj_(buf)
         {
-            if(pObj_ && pObj_ != Py_None)
-            {
-                len_ = len;//buffer_length(pObj_);
-                buf_ = (T*)(buffer_get(pObj_));
-            }
-            else
+            if(!pObj_ || (pObj_ == Py_None)) //Check if this is a invalid pointer
             {
                 len_ = 0;
                 buf_ = nullptr;
+            }
+            else if(TPython::ObjectProxy_Check(pObj_))  //Check if this is a root object 
+            {
+                //it is a root object ... not sure if we can check what type of object because TTreeReader does not derive from TObject
+                //(unsafe) cast pointer as TTreeReader
+                TTreeReaderArray<T> * tra = static_cast<TTreeReaderArray<T>*>(TPython::ObjectProxy_AsVoidPtr(pObj_));
+
+                len_ = tra->GetSize();
+                buf_ = static_cast<T*>(tra->GetAddress());
+            }
+            else //This must be a basic T* pointer
+            {
+                len_ = len;
+                buf_ = reinterpret_cast<T*>(buffer_get(pObj_));
             }
         }
 #else

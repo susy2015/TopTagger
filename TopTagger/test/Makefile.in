@@ -42,6 +42,7 @@ LIBSTOPTAGGER += -L$(TTTDIR) -lTopTagger
 INCLUDESDIRS += $(shell root-config --cflags)
 # ROOT libraries
 LIBS         += $(shell root-config --glibs)
+PYROOTLIBS = 
 
 # TMVA library
 ifdef TMVALIB
@@ -55,6 +56,7 @@ ifdef PYTHONCFG
 
 	CXXFLAGS += -DDOPYCAPIBIND
 	LIBS     += -L$(shell $(PYTHONCFG) --prefix)/lib $(shell $(PYTHONCFG) --libs)
+	PYROOTLIBS += -lPyROOT
 endif
 
 #scram specific numpy c-api
@@ -142,7 +144,7 @@ libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst 
 
 #link python module 
 TopTaggerInterface.so: libTopTagger.$(LIBSUFFIX) $(ODIR)/TopTaggerInterface.o	
-	$(LD) -shared $(ODIR)/TopTaggerInterface.o $(LIBSTOPTAGGER) $(LIBS) -o $@
+	$(LD) -shared $(ODIR)/TopTaggerInterface.o $(LIBSTOPTAGGER) $(LIBS) $(PYROOTLIBS) -o $@
 
 #compile python module 
 $(ODIR)/TopTaggerInterface.o: $(TTSDIR)/TopTaggerInterface.c
