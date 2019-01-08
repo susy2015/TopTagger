@@ -4,6 +4,7 @@
 #ifdef DOPYCAPIBIND
 #include "Python.h"
 #include "TPython.h"
+#include "TTreeReaderArray.h"
 #endif
 
 #include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
