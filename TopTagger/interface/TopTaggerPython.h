@@ -57,8 +57,7 @@ namespace ttPython
             }
             else if(TPython::ObjectProxy_Check(pObj_))  //Check if this is a root object 
             {
-                //it is a root object ... not sure if we can check what type of object because TTreeReader does not derive from TObject
-                //(unsafe) cast pointer as TTreeReader
+                //(unsafe) cast pointer as TTreeReader, can we do more type checking?
                 TTreeReaderArray<T> * tra = static_cast<TTreeReaderArray<T>*>(TPython::ObjectProxy_AsVoidPtr(pObj_));
 
                 len_ = tra->GetSize();
