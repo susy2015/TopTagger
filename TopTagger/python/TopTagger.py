@@ -48,6 +48,7 @@ class TopTagger:
         self.cfgFile = cfgFile
         self.workingDir = workingDir
         self.initialize()
+        self.firstEvent = True
 
     def __enter__(self):
         self.initialize()
@@ -75,41 +76,51 @@ class TopTagger:
         return TopTaggerResult(results)
 
     def runFromNanoAOD(self, event):
-        supplementaryFloatVariables = {
-            "qgPtD":                                event.Jet_qgptD,
-            "qgAxis1":                              event.Jet_qgAxis1,
-            "qgAxis2":                              event.Jet_qgAxis2,
-            "recoJetschargedHadronEnergyFraction":  event.Jet_chHEF,
-            "recoJetschargedEmEnergyFraction":      event.Jet_chEmEF,
-            "recoJetsneutralEmEnergyFraction":      event.Jet_neEmEF,
-            "recoJetsmuonEnergyFraction":           event.Jet_muEF,
-            "recoJetsHFHadronEnergyFraction":       event.Jet_hfHadEF,
-            "recoJetsHFEMEnergyFraction":           event.Jet_hfEMEF,
-            "recoJetsneutralEnergyFraction":        event.Jet_neHEF,
-            "PhotonEnergyFraction":                 event.Jet_phEF,
-            "ElectronEnergyFraction":               event.Jet_elEF,
-            "ChargedHadronMultiplicity":            event.Jet_chHadMult,
-            "NeutralHadronMultiplicity":            event.Jet_neHadMult,
-            "PhotonMultiplicity":                   event.Jet_phMult,
-            "ElectronMultiplicity":                 event.Jet_elMult,
-            "MuonMultiplicity":                     event.Jet_muMult,
-            "DeepCSVb":                             event.Jet_deepCSVb,
-            "DeepCSVc":                             event.Jet_deepCSVc,
-            "DeepCSVl":                             event.Jet_deepCSVudsg,
-            "DeepCSVbb":                            event.Jet_deepCSVbb,
-        }
-    
-        supplementaryIntVariables = {
-            "qgMult":                               event.Jet_qgMult,
-        }
+        #This is a hack for the nanoAOD postprocessor to force it to read all necessary variables before passing them to C because each new branch accessed causes all branches to be reallocated 
+        nHackLoop = 1
+        if self.firstEvent:
+            nHackLoop = 2
+            self.firstEvent = False
 
-        ak4Inputs = (event.nJet, event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.nElectron, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.nMuon, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
+        for i in xrange(nHackLoop):
 
-        ak8Inputs = (event.nFatJet, event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.nSubJet, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
+            supplementaryFloatVariables = {
+                "qgPtD":                                event.Jet_qgptD,
+                "qgAxis1":                              event.Jet_qgAxis1,
+                "qgAxis2":                              event.Jet_qgAxis2,
+                "recoJetschargedHadronEnergyFraction":  event.Jet_chHEF,
+                "recoJetschargedEmEnergyFraction":      event.Jet_chEmEF,
+                "recoJetsneutralEmEnergyFraction":      event.Jet_neEmEF,
+                "recoJetsmuonEnergyFraction":           event.Jet_muEF,
+                "recoJetsHFHadronEnergyFraction":       event.Jet_hfHadEF,
+                "recoJetsHFEMEnergyFraction":           event.Jet_hfEMEF,
+                "recoJetsneutralEnergyFraction":        event.Jet_neHEF,
+                "PhotonEnergyFraction":                 event.Jet_phEF,
+                "ElectronEnergyFraction":               event.Jet_elEF,
+                "ChargedHadronMultiplicity":            event.Jet_chHadMult,
+                "NeutralHadronMultiplicity":            event.Jet_neHadMult,
+                "PhotonMultiplicity":                   event.Jet_phMult,
+                "ElectronMultiplicity":                 event.Jet_elMult,
+                "MuonMultiplicity":                     event.Jet_muMult,
+                "DeepCSVb":                             event.Jet_deepCSVb,
+                "DeepCSVc":                             event.Jet_deepCSVc,
+                "DeepCSVl":                             event.Jet_deepCSVudsg,
+                "DeepCSVbb":                            event.Jet_deepCSVbb,
+            }
+            
+            supplementaryIntVariables = {
+                "qgMult":                               event.Jet_qgMult,
+            }
 
-        resTopInputs = (event.nResolvedTopCandidate, event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
+            ak4Inputs = (event.nJet, event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.nElectron, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.nMuon, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
+            
+            ak8Inputs = (event.nFatJet, event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.nSubJet, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
 
-        return self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+            resTopInputs = (event.nResolvedTopCandidate, event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
+
+        results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+
+        return results
 
 
 if __name__ == "__main__":
