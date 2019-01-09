@@ -9,6 +9,9 @@ class Top:
         self.disc = disc
         self.type = type
 
+    def __str__(self):
+        return "Top properties:   pt:  %7.3f,    eta:  %7.3f,    phi:  %7.3f,    mass:  %7.3f,    disc:  %7.3f,    type:  %3i"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type)
+
 class TopTaggerResult:
     def __init__(self, results):
         self.floatVals = results[0]
