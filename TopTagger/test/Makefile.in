@@ -128,34 +128,32 @@ $(ODIR)/%.o : $(TPSDIR)/%.cpp
 $(ODIR)/%.o : $(ODIR)/%.cc
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
 
-#Compile top tagger library
-TopTagger : libTopTagger.$(LIBSUFFIX) libTopTagger.a
-
-#Compile top tagger python library
-TopTaggerInterface: TopTaggerInterface.so
-
-#link shared library
-libTopTagger.$(LIBSUFFIX): $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
-	${LD} -shared -o $@ $^ $(LIBS)
-
-#create static library
-libTopTagger.a: $(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cpp $(TTSDIR)/*.cc $(TPSDIR)/*.cpp $(TPSDIR)/*.cc)))))
-	ar rcs $@ $^
-
-#link python module 
-TopTaggerInterface.so: libTopTagger.$(LIBSUFFIX) $(ODIR)/TopTaggerInterface.o	
-	$(LD) -shared $(ODIR)/TopTaggerInterface.o $(LIBSTOPTAGGER) $(LIBS) $(PYROOTLIBS) -o $@
-
 #compile python module 
 $(ODIR)/TopTaggerInterface.o: $(TTSDIR)/TopTaggerInterface.c
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) $(INCLUDESDIRS) -fPIC -o $@ -c $<
+
+#Compile top tagger library
+TopTagger : libTopTagger.$(LIBSUFFIX)
+
+#Compile top tagger python library
+TopTaggerInterface: TopTaggerInterface.$(LIBSUFFIX)
+
+LIBRARY_OBJECT_FILES=$(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
+
+#link shared library
+libTopTagger.$(LIBSUFFIX): $(LIBRARY_OBJECT_FILES)
+	${LD} -shared -o $@ $^ $(LIBS)
+
+#link python module (link as standalone module)
+TopTaggerInterface.$(LIBSUFFIX): $(ODIR)/TopTaggerInterface.o $(LIBRARY_OBJECT_FILES)
+	$(LD) -shared $^ $(LIBS) $(PYROOTLIBS) -o $@
 
 #compile topTaggerTest code
 topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o
 	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBSTOPTAGGER) $(LIBS) -o $@
 
 clean:
-	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(addprefix lib, $(addsuffix .a, $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
 
 install: libTopTagger.$(LIBSUFFIX)
 	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/
