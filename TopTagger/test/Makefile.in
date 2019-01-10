@@ -136,7 +136,7 @@ $(ODIR)/TopTaggerInterface.o: $(TTSDIR)/TopTaggerInterface.c
 TopTagger : libTopTagger.$(LIBSUFFIX)
 
 #Compile top tagger python library
-TopTaggerInterface: TopTaggerInterface.$(LIBSUFFIX)
+TopTaggerInterface: libTopTaggerInterface.$(LIBSUFFIX) installPython
 
 LIBRARY_OBJECT_FILES=$(addprefix $(ODIR)/, $(notdir $(patsubst %.cc, %.o, $(patsubst %.cpp, %.o, $(wildcard $(TTSDIR)/*.cc $(TTSDIR)/*.cpp $(TPSDIR)/*.cc $(TPSDIR)/*.cpp)))))
 
@@ -145,7 +145,7 @@ libTopTagger.$(LIBSUFFIX): $(LIBRARY_OBJECT_FILES)
 	${LD} -shared -o $@ $^ $(LIBS)
 
 #link python module (link as standalone module)
-TopTaggerInterface.$(LIBSUFFIX): $(ODIR)/TopTaggerInterface.o $(LIBRARY_OBJECT_FILES)
+libTopTaggerInterface.$(LIBSUFFIX): $(ODIR)/TopTaggerInterface.o $(LIBRARY_OBJECT_FILES)
 	$(LD) -shared $^ $(LIBS) $(PYROOTLIBS) -o $@
 
 #compile topTaggerTest code
@@ -153,7 +153,12 @@ topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdi
 	${LD} $(ODIR)/topTaggerTest.o $(ODIR)/rootdict.o $(LIBSTOPTAGGER) $(LIBS) -o $@
 
 clean:
-	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(ODIR)/*.d $(PROGRAMS) core 
+	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(TAGGERDIR)/python/TopTaggerInterface.$(LIBSUFFIX) $(ODIR)/*.d $(PROGRAMS) core 
+
+installPython: $(TAGGERDIR)/TopTagger/python/TopTaggerInterface.$(LIBSUFFIX)
+
+$(TAGGERDIR)/TopTagger/python/TopTaggerInterface.$(LIBSUFFIX):
+	ln -s $(TAGGERDIR)/TopTagger/test/libTopTaggerInterface.$(LIBSUFFIX) $@
 
 install: libTopTagger.$(LIBSUFFIX)
 	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/
