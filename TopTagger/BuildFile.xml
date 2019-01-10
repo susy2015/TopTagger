@@ -5,6 +5,7 @@
 <use name="roottmva"/>
 <use name="python"/>
 <use name="py2-numpy" />
+<use name="numpy-c-api" />
 <use name="tensorflow-cc" />
 <use name="PhysicsTools/Utilities"/>
 <use name="DataFormats/Candidate"/>
