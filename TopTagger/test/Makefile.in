@@ -104,7 +104,7 @@ mkobj:
 
 #special rule to make root reflex dictionary
 $(ODIR)/rootdict.cc : $(TTTDIR)/rootdict.h
-	rootcint -f $@ $^
+	rootcling -f $@ $^
 	mv $(ODIR)/rootdict_rdict.pcm $(TTTDIR)
 
 $(ODIR)/%.o : $(TTSDIR)/%.cc
