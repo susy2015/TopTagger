@@ -231,6 +231,9 @@ then
     fi
 fi
 
+# make all files in DOWNLOAD_DIR read only
+chmod uog-w *
+
 cd $STARTING_DIR
 
 if [[ ! -z $VERBOSE ]] # True if VERBOSE is set
@@ -259,5 +262,4 @@ then
         done
     fi
 fi
-
 
