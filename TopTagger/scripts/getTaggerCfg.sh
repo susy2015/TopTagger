@@ -232,7 +232,8 @@ then
 fi
 
 # make all files in DOWNLOAD_DIR read only
-chmod uog-w *
+# a (all) = ugo (user group others)
+chmod a-w *
 
 cd $STARTING_DIR
 
