@@ -231,6 +231,10 @@ then
     fi
 fi
 
+# make all files in DOWNLOAD_DIR read only
+# a (all) = ugo (user group others)
+chmod a-w *
+
 cd $STARTING_DIR
 
 if [[ ! -z $VERBOSE ]] # True if VERBOSE is set
@@ -259,5 +263,4 @@ then
         done
     fi
 fi
-
 
