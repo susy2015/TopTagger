@@ -133,79 +133,53 @@ if __name__ == "__main__":
     import ROOT
     import optparse
 
-#    "ak4jetsLVec"
-#    "ak4recoJetsBtag"
-#    "ak4qgMult"
-#    "ak4qgPtD"
-#    "ak4qgAxis1"
-#    "ak4qgAxis2"
-#    "ak4recoJetschargedHadronEnergyFraction"
-#    "ak4recoJetschargedEmEnergyFraction"
-#    "ak4recoJetsneutralEmEnergyFraction"
-#    "ak4ElectronEnergyFraction"
-#    "ak4PhotonEnergyFraction"
-#    "ak4recoJetsneutralEnergyFraction"
-#    "ak4recoJetsHFHadronEnergyFraction"
-#    "ak4recoJetsmuonEnergyFraction"
-#    "ak4recoJetsHFEMEnergyFraction"
-#    "ak4NeutralHadronMultiplicity"
-#    "ak4ChargedHadronMultiplicity"
-#    "ak4ElectronMultiplicity"
-#    "ak4MuonMultiplicity"
-#    "ak4PhotonMultiplicity"
-#    "ak4DeepCSVbb"
-#    "ak4DeepCSVb"
-#    "ak4DeepCSVc"
-#    "ak4DeepCSVcc"
-#    "ak4DeepCSVl"
-#    "ak8JetsLVec"
-#    "ak8SubJetsLVec"
-#    "ak8DeepAK8Top"
-#    "ak8DeepAK8W"
-#    "ak8softDropMass"
-#
-#    def getDataFromExampleFile(tt, event):
-#        supplementaryFloatVariables = {
-#            "qgPtD":                                event.Jet_qgptD,
-#            "qgAxis1":                              event.Jet_qgAxis1,
-#            "qgAxis2":                              event.Jet_qgAxis2,
-#            "recoJetschargedHadronEnergyFraction":  event.Jet_chHEF,
-#            "recoJetschargedEmEnergyFraction":      event.Jet_chEmEF,
-#            "recoJetsneutralEmEnergyFraction":      event.Jet_neEmEF,
-#            "recoJetsmuonEnergyFraction":           event.Jet_muEF,
-#            "recoJetsHFHadronEnergyFraction":       event.Jet_hfHadEF,
-#            "recoJetsHFEMEnergyFraction":           event.Jet_hfEMEF,
-#            "recoJetsneutralEnergyFraction":        event.Jet_neHEF,
-#            "PhotonEnergyFraction":                 event.Jet_phEF,
-#            "ElectronEnergyFraction":               event.Jet_elEF,
-#            "ChargedHadronMultiplicity":            event.Jet_chHadMult,
-#            "NeutralHadronMultiplicity":            event.Jet_neHadMult,
-#            "PhotonMultiplicity":                   event.Jet_phMult,
-#            "ElectronMultiplicity":                 event.Jet_elMult,
-#            "MuonMultiplicity":                     event.Jet_muMult,
-#            "DeepCSVb":                             event.Jet_deepCSVb,
-#            "DeepCSVc":                             event.Jet_deepCSVc,
-#            "DeepCSVl":                             event.Jet_deepCSVudsg,
-#            "DeepCSVbb":                            event.Jet_deepCSVbb,
-#            }
-#        
-#        supplementaryIntVariables = {
-#            "qgMult":                               event.Jet_qgMult,
-#            }
-#        
-#        ak4Inputs = (event.nJet, event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.nElectron, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.nMuon, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
-#            
-#        ak8Inputs = (event.nFatJet, event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.nSubJet, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
+    def getTopsFromExampleFile(tt, event):
+        supplementaryFloatVariables = {
+            "qgPtD":                                event.ak4qgPtD,
+            "qgAxis1":                              event.ak4qgAxis1,
+            "qgAxis2":                              event.ak4qgAxis2,
+            "qgMult":                               event.ak4qgMult,
+            "recoJetschargedHadronEnergyFraction":  event.ak4recoJetschargedHadronEnergyFraction,
+            "recoJetschargedEmEnergyFraction":      event.ak4recoJetschargedEmEnergyFraction,
+            "recoJetsneutralEmEnergyFraction":      event.ak4recoJetsneutralEmEnergyFraction,
+            "recoJetsmuonEnergyFraction":           event.ak4recoJetsmuonEnergyFraction,
+            "recoJetsHFHadronEnergyFraction":       event.ak4recoJetsHFHadronEnergyFraction,
+            "recoJetsHFEMEnergyFraction":           event.ak4recoJetsHFEMEnergyFraction,
+            "recoJetsneutralEnergyFraction":        event.ak4recoJetsneutralEnergyFraction,
+            "PhotonEnergyFraction":                 event.ak4PhotonEnergyFraction,
+            "ElectronEnergyFraction":               event.ak4ElectronEnergyFraction,
+            "ChargedHadronMultiplicity":            event.ak4ChargedHadronMultiplicity,
+            "NeutralHadronMultiplicity":            event.ak4NeutralHadronMultiplicity,
+            "PhotonMultiplicity":                   event.ak4PhotonMultiplicity,
+            "ElectronMultiplicity":                 event.ak4ElectronMultiplicity,
+            "MuonMultiplicity":                     event.ak4MuonMultiplicity,
+            "DeepCSVb":                             event.ak4DeepCSVb,
+            "DeepCSVc":                             event.ak4DeepCSVc,
+            "DeepCSVl":                             event.ak4DeepCSVl,
+            "DeepCSVbb":                            event.ak4DeepCSVbb,
+            }
+        
+        supplementaryIntVariables = {
+            }
+        
+        ak4LorentzVector = event.ak4jetsLVec
+        ak4Inputs = (len(ak4LorentzVector), ak4LorentzVector, event.ak4recoJetsBtag, supplementaryFloatVariables, supplementaryIntVariables)
+    
+        tops = tt.run(ak4Inputs = ak4Inputs)
+
+        return tops
 
     #Option parsing 
     parser = optparse.OptionParser()
 
     #Add command line options 
     parser.add_option ('-f', "--file",      dest='inputFile',  action='store',                          type=str, help="Input file")
-    parser.add_option ('-b', "--tree",      dest='treeName',   action='store', default="Events",                  help="Name of TTree (Default: Events")
-    parser.add_option ('-c', "--taggerCfg", dest='taggerCfg',  action='store', default="TopTagger.cfg",           help="Name of Tagger config file name (Default: TopTagger.cfg")
-    parser.add_option ('-w', "--workDir",   dest='workDir',    action='store', default="",                        help="orking directory for top tagger config (usually where the cfg is located) (Default: .")
-    parser.add_option ('-n', "--nEvts",     dest='nEvts',      action='store', default=-1,              type=int, help="Number of events to run over (Default: all events")
+    parser.add_option ('-b', "--tree",      dest='treeName',   action='store', default="Events",                  help="Name of TTree (Default: Events)")
+    parser.add_option ('-c', "--taggerCfg", dest='taggerCfg',  action='store', default="TopTagger.cfg",           help="Name of Tagger config file name (Default: TopTagger.cfg)")
+    parser.add_option ('-w', "--workDir",   dest='workDir',    action='store', default="",                        help="orking directory for top tagger config (usually where the cfg is located) (Default: .)")
+    parser.add_option ('-n', "--nEvts",     dest='nEvts',      action='store', default=-1,              type=int, help="Number of events to run over (Default: all events)")
+    parser.add_option ('-e', "--example",   dest='example',    action='store_true',                               help="Switch to read from exmaple file using std::vectors (Default: False")
+
 
     options, args = parser.parse_args()
 
@@ -220,11 +194,14 @@ if __name__ == "__main__":
 
         print "Event #:", iEvt + 1
     
-        tops = tt.runFromNanoAOD(event)
+        if options.example:
+            tops = getTopsFromExampleFile(tt, event)
+        else:
+            tops = tt.runFromNanoAOD(event)
 
         print "\tN tops:", len(tops)
 
         for top in tops:
-            print "\tTop properties: Type: %3d,   Pt: %6.1lf,   Eta: %7.3lf,   Phi: %7.3lf,   M: %7.3lf,   Disc: %7.3f"%(top.type, top.pt, top.eta, top.phi, top.mass, top.disc)
+            print "\t%s"%str(top)
         print ""
     

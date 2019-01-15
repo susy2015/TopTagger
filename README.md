@@ -74,7 +74,7 @@ source ../test/taggerSetup.sh
 #do once in any directory where you will run the top tagger example
 getTaggerCfg.sh -t DeepCombined_Example_v1.0.1
 #run the example code
-python ../python/TopTagger.py -f exampleInputs.root
+python ../python/TopTagger.py -e -f exampleInputs.root -b slimmedTuple
 ~~~~~~~~~~~~~ 
 
 
