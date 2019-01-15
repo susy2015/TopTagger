@@ -27,7 +27,10 @@ static void TopTaggerInterface_cleanup(PyObject *ptt)
 
 static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lorentzVector)
 {
-    if(PyTuple_Check(lorentzVector)) // this is 4-vector components
+    if(!lorentzVector || lorentzVector == Py_None) //is invalid pointer
+    {
+    }
+    else if(PyTuple_Check(lorentzVector)) // this is 4-vector components
     {
         PyObject *pPt, *pEta, *pPhi, *pMass;
         int len = 0;
@@ -48,10 +51,13 @@ static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lor
 
         return ttPython::Py_buffer_wrapper<TLorentzVector>(std::move(vec));
     }
-    else  //this is already vector<TLorentzVector>
+    else if(TPython::ObjectProxy_Check(lorentzVector)) //this is already vector<TLorentzVector>
     {
         return ttPython::Py_buffer_wrapper<TLorentzVector>(lorentzVector);
     }
+    
+    //No idea what this is 
+    return ttPython::Py_buffer_wrapper<TLorentzVector>(nullptr);
 }
 
 static int TopTaggerInterface_makeAK4Const(
