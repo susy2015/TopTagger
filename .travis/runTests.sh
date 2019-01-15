@@ -30,5 +30,8 @@ source taggerSetup.sh
 getTaggerCfg.sh -t DeepCombined_Example_v1.0.2
 ./topTaggerTest
 echo "========================================================================="
+cd ../python
+python TopTagger.py -e -f ../test/exampleInputs.root -b slimmedTuple -w ../test
+echo "========================================================================="
 cd ../..
 scram b -j
