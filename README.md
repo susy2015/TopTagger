@@ -41,15 +41,16 @@ make install
 
 This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code.  This will also compile a standalone example called ``topTaggerTest''.  
 
-## Example code
+## C++ Example code
 
 A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp".  This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  For reference the output of this script can be seen at the end of this readme.  
 
 ### Running the example
 
-The example executable is compiled along with the standalone library as described above.  If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded"
+The example executable is compiled along with the standalone library as described above.  If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded.
 
 ~~~~~~~~~~~~~{sh}
+cd TopTagger/test
 #do once per terminal if opencv or the top tagger are not installed system wide
 source taggerSetup.sh
 #do once in any directory where you will run the top tagger example
@@ -57,6 +58,25 @@ getTaggerCfg.sh -t DeepCombined_Example_v1.0.1
 #run the example code
 ./topTaggerTest
 ~~~~~~~~~~~~~ 
+
+## Python example code
+
+A basic standalone example using the top tagging code is provided in "TopTagger/python/TopTagger.py".  This test code gives an example of using the top tagger from python.  By default it is configured to read from nanoAOD files where the necessary extra variables have been added, but this can also read from the example root file.  As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed.  This file "TopTagger.py" can be imported into other python scripts and the "TopTagger" python class used as a general interface to the top tagger from python.  "TopTaggerProducer.py" is a nanoAOD postprocessor module which will add the output of the rerun tagger to the postprocessed files assuming the necessary inputs have been added to the nanoAOD.  
+
+### Running the example
+
+The necessary c-api interface to use the tagger in python is compiled along with the standalone library as described above.  There is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded.
+
+~~~~~~~~~~~~~{sh}
+cd TopTagger/test
+#do once per terminal if opencv or the top tagger are not installed system wide
+source ../test/taggerSetup.sh
+#do once in any directory where you will run the top tagger example
+getTaggerCfg.sh -t DeepCombined_Example_v1.0.1
+#run the example code
+python ../python/TopTagger.py -f exampleInputs.root
+~~~~~~~~~~~~~ 
+
 
 ### Tagger input variables
 

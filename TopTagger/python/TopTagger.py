@@ -112,11 +112,17 @@ class TopTagger:
                 "qgMult":                               event.Jet_qgMult,
             }
 
-            ak4Inputs = (event.nJet, event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.nElectron, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.nMuon, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
+            nJets = event.nJet
+            nElec = event.nElectron
+            nMuon = event.nMuon
+            ak4Inputs = (nJets, (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, nJets), event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
             
-            ak8Inputs = (event.nFatJet, event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.nSubJet, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
+            nFatJet = event.nFatJet
+            nSubJet = event.nSubJet
+            ak8Inputs = (nFatJet, (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, nFatJet), event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, nSubJet, (event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, nSubJet), event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
 
-            resTopInputs = (event.nResolvedTopCandidate, event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
+            nResCand = event.nResolvedTopCandidate
+            resTopInputs = (nResCand, (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, nResCand), event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
 
         results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
 
@@ -126,6 +132,70 @@ class TopTagger:
 if __name__ == "__main__":
     import ROOT
     import optparse
+
+#    "ak4jetsLVec"
+#    "ak4recoJetsBtag"
+#    "ak4qgMult"
+#    "ak4qgPtD"
+#    "ak4qgAxis1"
+#    "ak4qgAxis2"
+#    "ak4recoJetschargedHadronEnergyFraction"
+#    "ak4recoJetschargedEmEnergyFraction"
+#    "ak4recoJetsneutralEmEnergyFraction"
+#    "ak4ElectronEnergyFraction"
+#    "ak4PhotonEnergyFraction"
+#    "ak4recoJetsneutralEnergyFraction"
+#    "ak4recoJetsHFHadronEnergyFraction"
+#    "ak4recoJetsmuonEnergyFraction"
+#    "ak4recoJetsHFEMEnergyFraction"
+#    "ak4NeutralHadronMultiplicity"
+#    "ak4ChargedHadronMultiplicity"
+#    "ak4ElectronMultiplicity"
+#    "ak4MuonMultiplicity"
+#    "ak4PhotonMultiplicity"
+#    "ak4DeepCSVbb"
+#    "ak4DeepCSVb"
+#    "ak4DeepCSVc"
+#    "ak4DeepCSVcc"
+#    "ak4DeepCSVl"
+#    "ak8JetsLVec"
+#    "ak8SubJetsLVec"
+#    "ak8DeepAK8Top"
+#    "ak8DeepAK8W"
+#    "ak8softDropMass"
+#
+#    def getDataFromExampleFile(tt, event):
+#        supplementaryFloatVariables = {
+#            "qgPtD":                                event.Jet_qgptD,
+#            "qgAxis1":                              event.Jet_qgAxis1,
+#            "qgAxis2":                              event.Jet_qgAxis2,
+#            "recoJetschargedHadronEnergyFraction":  event.Jet_chHEF,
+#            "recoJetschargedEmEnergyFraction":      event.Jet_chEmEF,
+#            "recoJetsneutralEmEnergyFraction":      event.Jet_neEmEF,
+#            "recoJetsmuonEnergyFraction":           event.Jet_muEF,
+#            "recoJetsHFHadronEnergyFraction":       event.Jet_hfHadEF,
+#            "recoJetsHFEMEnergyFraction":           event.Jet_hfEMEF,
+#            "recoJetsneutralEnergyFraction":        event.Jet_neHEF,
+#            "PhotonEnergyFraction":                 event.Jet_phEF,
+#            "ElectronEnergyFraction":               event.Jet_elEF,
+#            "ChargedHadronMultiplicity":            event.Jet_chHadMult,
+#            "NeutralHadronMultiplicity":            event.Jet_neHadMult,
+#            "PhotonMultiplicity":                   event.Jet_phMult,
+#            "ElectronMultiplicity":                 event.Jet_elMult,
+#            "MuonMultiplicity":                     event.Jet_muMult,
+#            "DeepCSVb":                             event.Jet_deepCSVb,
+#            "DeepCSVc":                             event.Jet_deepCSVc,
+#            "DeepCSVl":                             event.Jet_deepCSVudsg,
+#            "DeepCSVbb":                            event.Jet_deepCSVbb,
+#            }
+#        
+#        supplementaryIntVariables = {
+#            "qgMult":                               event.Jet_qgMult,
+#            }
+#        
+#        ak4Inputs = (event.nJet, event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, event.nElectron, event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, event.nMuon, event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, None, event.Muon_miniPFRelIso_all)
+#            
+#        ak8Inputs = (event.nFatJet, event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, event.nSubJet, event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
 
     #Option parsing 
     parser = optparse.OptionParser()

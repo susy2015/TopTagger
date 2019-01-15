@@ -25,14 +25,49 @@ static void TopTaggerInterface_cleanup(PyObject *ptt)
     if(tt) delete tt;
 }
 
-static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>>& ak4ConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<std::vector<Float_t>>& tempIntToFloatVectors, std::vector<TLorentzVector>& jetsLV, std::vector<unsigned char>& filterVec, PyObject* pArgTuple)
+static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lorentzVector)
+{
+    if(PyTuple_Check(lorentzVector)) // this is 4-vector components
+    {
+        PyObject *pPt, *pEta, *pPhi, *pMass;
+        int len = 0;
+        if (!PyArg_ParseTuple(lorentzVector, "OOOO|i", &pPt, &pEta, &pPhi, &pMass, &len))
+        {
+        }
+
+        ttPython::Py_buffer_wrapper<Float_t> pt(pPt, len);
+        ttPython::Py_buffer_wrapper<Float_t> eta(pEta, len);
+        ttPython::Py_buffer_wrapper<Float_t> phi(pPhi, len);
+        ttPython::Py_buffer_wrapper<Float_t> m(pMass, len);
+
+        std::vector<TLorentzVector> vec(len);
+        for(int i = 0; i < len; ++i)
+        {
+            vec[i].SetPtEtaPhiM(pt[i], eta[i], phi[i], m[i]);
+        }
+
+        return ttPython::Py_buffer_wrapper<TLorentzVector>(std::move(vec));
+    }
+    else  //this is already vector<TLorentzVector>
+    {
+        return ttPython::Py_buffer_wrapper<TLorentzVector>(lorentzVector);
+    }
+}
+
+static int TopTaggerInterface_makeAK4Const(
+    std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>>& ak4ConstInputs, 
+    std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers, 
+    std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
+    std::vector<unsigned char>& filterVec, 
+    PyObject* pArgTuple)
 {
     //number of variables which are not stored in supplamental dictionaries
+    const unsigned int NTLVVAR = 1;
     const unsigned int NEXTRAVAR = 1;
     int nJet, nElec, nMuon;
 
-    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1 = nullptr, *pMuonIdx1 = nullptr, *pElectron_pt = nullptr, *pElectron_eta = nullptr, *pElectron_phi = nullptr, *pElectron_mass = nullptr, *pElectron_cutBasedBits = nullptr, *pElectron_miniPFRelIso = nullptr, *pMuon_pt = nullptr, *pMuon_eta = nullptr, *pMuon_phi = nullptr, *pMuon_mass = nullptr, *pMuon_id = nullptr, *pMuon_pfRelIso = nullptr;
-    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOO!O!|OOiOOOOOOiOOOOOO", &nJet, &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &nElec, &pElectron_pt, &pElectron_eta, &pElectron_phi, &pElectron_mass, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &nMuon, &pMuon_pt, &pMuon_eta, &pMuon_phi, &pMuon_mass, &pMuon_id, &pMuon_pfRelIso))
+    PyObject *pJet, *pJetBtag, *pFloatVarsDict, *pIntVarsDict, *pElectronIdx1 = nullptr, *pMuonIdx1 = nullptr, *pElectron = nullptr, *pElectron_cutBasedBits = nullptr, *pElectron_miniPFRelIso = nullptr, *pMuon = nullptr, *pMuon_id = nullptr, *pMuon_pfRelIso = nullptr;
+    if (!PyArg_ParseTuple(pArgTuple, "iOOO!O!|OOiOOOiOOO", &nJet, &pJet, &pJetBtag, &PyDict_Type, &pFloatVarsDict, &PyDict_Type, &pIntVarsDict, &pElectronIdx1, &pMuonIdx1, &nElec, &pElectron, &pElectron_cutBasedBits, &pElectron_miniPFRelIso, &nMuon, &pMuon, &pMuon_id, &pMuon_pfRelIso))
     {
         return 1;
     }
@@ -43,36 +78,27 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     tempFloatBuffers.reserve(NEXTRAVAR + floatSize + intSize);
 
     //Prepare std::vector<TLorentzVector> for jets lorentz vectors
-    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt, nJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta, nJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi, nJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass, nJet);
+    //reserve space for the vector to stop reallocations during emplacing
+    tempTLVBuffers.reserve(NTLVVAR);
+    tempTLVBuffers.emplace_back(createLorentzP4(pJet));
+    auto& jetsLV = tempTLVBuffers.back();
 
     //lepton matching variables
     ttPython::Py_buffer_wrapper<Int_t> elecIdx1(pElectronIdx1, nJet);
     ttPython::Py_buffer_wrapper<Int_t> muonIdx1(pMuonIdx1, nJet);
 
-    ttPython::Py_buffer_wrapper<Float_t> elecPt(pElectron_pt, nElec);
-    ttPython::Py_buffer_wrapper<Float_t> elecEta(pElectron_eta, nElec);
-    ttPython::Py_buffer_wrapper<Float_t> elecPhi(pElectron_phi, nElec);
-    ttPython::Py_buffer_wrapper<Float_t> elecM(pElectron_mass, nElec);
+    auto elecLV = createLorentzP4(pElectron);
     ttPython::Py_buffer_wrapper<Int_t> elecCutBits(pElectron_cutBasedBits, nElec);
     ttPython::Py_buffer_wrapper<Float_t> elecMiniPFRelIso(pElectron_miniPFRelIso, nElec);
 
-    ttPython::Py_buffer_wrapper<Float_t> muonPt(pMuon_pt, nMuon);
-    ttPython::Py_buffer_wrapper<Float_t> muonEta(pMuon_eta, nMuon);
-    ttPython::Py_buffer_wrapper<Float_t> muonPhi(pMuon_phi, nMuon);
-    ttPython::Py_buffer_wrapper<Float_t> muonM(pMuon_mass, nMuon);
+    auto muonLV = createLorentzP4(pMuon);
     ttPython::Py_buffer_wrapper<Bool_t> muonID(pMuon_id, nMuon);
     ttPython::Py_buffer_wrapper<Float_t> muonPFRelIso(pMuon_pfRelIso, nMuon);
 
     //reserve space for the vector to stop reallocations during emplacing
-    jetsLV.resize(jetPt.size());
-    filterVec.resize(jetPt.size(), true);
-    for(unsigned int iJet = 0; iJet < jetPt.size(); ++iJet)
+    filterVec.resize(jetsLV.size(), true);
+    for(unsigned int iJet = 0; iJet < jetsLV.size(); ++iJet)
     {
-        jetsLV[iJet].SetPtEtaPhiM(jetPt[iJet], jetEta[iJet], jetPhi[iJet], jetM[iJet]);
-
         //check first and last optional parameter ... assume others are here 
         if(pElectronIdx1 && pMuon_pfRelIso)
         {
@@ -81,12 +107,13 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
             //recalculate electron ID without isolation 
             //VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut
             //this is a 'bit' awful <- that pun is awful, but yes, this should be made a little better 
-            if(elecIdx1[iJet] >= 0 && elecPt[elecIdx1[iJet]] > 10.0)
+            if(elecIdx1[iJet] >= 0 && elecLV[elecIdx1[iJet]].Pt() > 10.0)
             {
+                //MAsk relIso from the ID so we can apply miniIso
                 const int NCUTS = 10;
                 const int BITSTRIDE = 3;
                 const int BITMASK = 0x7;
-                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070 = 0x38 = 56, so this corrosponds to the three pfRelIso bits 
+                const int ISOBITMASK = 070000000;  //note to the curious, 0 before an integer is octal, so 070000000 = 0xE00000 = 14680064, so this corrosponds to the three pfRelIso bits 
                 int cutBits = elecCutBits[elecIdx1[iJet]] | ISOBITMASK; // the | masks the iso cut
                 int elecID = 07; // start with the largest 3 bit number
                 for(int i = 0; i < NCUTS; ++i)
@@ -95,25 +122,21 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
                     cutBits = cutBits >> BITSTRIDE;
                 }
 
-                TLorentzVector tlv;
-                tlv.SetPtEtaPhiM(elecPt[elecIdx1[iJet]], elecEta[elecIdx1[iJet]], elecPhi[elecIdx1[iJet]], elecM[elecIdx1[iJet]]);
-                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], tlv);
+                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], elecLV[elecIdx1[iJet]]);
 
                 isLep = isLep || (elecID >= 1 && elecMiniPFRelIso[elecIdx1[iJet]] < 0.10 && dR < 0.2);
             }
             
-            if(muonIdx1[iJet] >= 0 && muonPt[muonIdx1[iJet]] > 10.0)
+            if(muonIdx1[iJet] >= 0 && muonLV[muonIdx1[iJet]].Pt() > 10.0)
             {
-                TLorentzVector tlv;
-                tlv.SetPtEtaPhiM(muonPt[muonIdx1[iJet]], muonEta[muonIdx1[iJet]], muonPhi[muonIdx1[iJet]], muonM[muonIdx1[iJet]]);
-                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], tlv);
+                double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], muonLV[muonIdx1[iJet]]);
 
                 //pMuon_id == Py_None is a hack because moun loose ID is not a variable, but instead only loose muons are saved 
                 isLep = isLep || ((pMuon_id == Py_None || muonID[muonIdx1[iJet]]) && muonPFRelIso[muonIdx1[iJet]] < 0.2 && dR < 0.2);
             }
 
-            //filter out jet if it is matched to a lepton, of if it has pt < 20 GeV
-            filterVec[iJet] = !isLep && jetPt[iJet] > 20.0;
+            //filter out jet if it is matched to a lepton, or if it has pt < 20 GeV
+            filterVec[iJet] = !isLep && jetsLV[iJet].Pt() > 20.0;
         }
     }
 
@@ -122,7 +145,7 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     auto& jetBTag = tempFloatBuffers.back();
 
     //Create the AK4 constituent helper
-    ak4ConstInputs.reset(new ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>(jetsLV, jetBTag));
+    ak4ConstInputs.reset(new ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetBTag));
     ak4ConstInputs->setFilterVector(filterVec);
 
     //prepare floating point supplamental "vectors"
@@ -150,7 +173,6 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     //prepare integer supplamental "vectors" and convert to float vector 
     pos = 0;
     //reserve space for the vector to stop reallocations during emplacing 
-    tempIntToFloatVectors.reserve(intSize);
     while(PyDict_Next(pIntVarsDict, &pos, &key, &value)) 
     {
         if(PyString_Check(key))
@@ -159,10 +181,10 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
             ttPython::Py_buffer_wrapper<Int_t> buffer(value, nJet);
             
             //translate the integers to floats
-            tempIntToFloatVectors.emplace_back(buffer.begin(), buffer.end());
+            std::vector<float> tempIntToFloat(buffer.begin(), buffer.end());
 
             //wrap vector in buffer
-            tempFloatBuffers.emplace_back(&(tempIntToFloatVectors.back()));
+            tempFloatBuffers.emplace_back(std::move(tempIntToFloat));
             
             char *vecName = PyString_AsString(key);
             ak4ConstInputs->addSupplamentalVector(vecName, tempFloatBuffers.back());
@@ -178,51 +200,45 @@ static int TopTaggerInterface_makeAK4Const(std::unique_ptr<ttUtility::ConstAK4In
     return 0;
 }
 
-static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>>& ak8ConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<TLorentzVector>& jetsLV, std::vector<std::vector<TLorentzVector>>& subjetsLV, PyObject* pArgTuple)
+static int TopTaggerInterface_makeAK8Const(
+    std::unique_ptr<ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>>& ak8ConstInputs, 
+    std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
+    std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers, 
+    std::vector<std::vector<TLorentzVector>>& vecSubjetsLV, 
+    PyObject* pArgTuple)
 {
     //number of variables
     const unsigned int NFLOATVAR = 3;
+    const unsigned int NTLVVAR = 1;
     int nFatJet, nSubJet;
 
-    PyObject *pJetPt, *pJetEta, *pJetPhi, *pJetMass, *pJetSDMass, *pJetTDisc, *pJetWDisc, *pSubjetPt, *pSubjetEta, *pSubjetPhi, *pSubjetMass, *pSubjetIdx1, *pSubjetIdx2;
-    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOOOiOOOOOO", &nFatJet, &pJetPt, &pJetEta, &pJetPhi, &pJetMass, &pJetSDMass, &pJetTDisc, &pJetWDisc, &nSubJet, &pSubjetPt, &pSubjetEta, &pSubjetPhi, &pSubjetMass, &pSubjetIdx1, &pSubjetIdx2))
+    PyObject *pJet, *pJetSDMass, *pJetTDisc, *pJetWDisc, *pSubjet, *pSubjetIdx1, *pSubjetIdx2;
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOOiOOO", &nFatJet, &pJet, &pJetSDMass, &pJetTDisc, &pJetWDisc, &nSubJet, &pSubjet, &pSubjetIdx1, &pSubjetIdx2))
     {
         return 1;
     }
 
+    //reserve space for the vector to stop reallocations during emplacing
+    tempTLVBuffers.reserve(NTLVVAR);
     //Prepare std::vector<TLorentzVector> for jets and subjets lorentz vectors and subjet linking 
-    ttPython::Py_buffer_wrapper<Float_t> jetPt(pJetPt, nFatJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetEta(pJetEta, nFatJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetPhi(pJetPhi, nFatJet);
-    ttPython::Py_buffer_wrapper<Float_t> jetM(pJetMass, nFatJet);
+    tempTLVBuffers.emplace_back(createLorentzP4(pJet));
+    auto& jetsLV = tempTLVBuffers.back();
 
     ttPython::Py_buffer_wrapper<Int_t> subjetIdx1(pSubjetIdx1, nFatJet);
     ttPython::Py_buffer_wrapper<Int_t> subjetIdx2(pSubjetIdx2, nFatJet);
 
-    ttPython::Py_buffer_wrapper<Float_t> subjetPt(pSubjetPt, nSubJet);
-    ttPython::Py_buffer_wrapper<Float_t> subjetEta(pSubjetEta, nSubJet);
-    ttPython::Py_buffer_wrapper<Float_t> subjetPhi(pSubjetPhi, nSubJet);
-    ttPython::Py_buffer_wrapper<Float_t> subjetM(pSubjetMass, nSubJet);
+    auto subjetsLV = createLorentzP4(pSubjet);
 
     //reserve space for the vector to stop reallocations during emplacing
-    jetsLV.resize(jetPt.size());
-    subjetsLV.reserve(jetPt.size());
-    for(unsigned int iJet = 0; iJet < jetPt.size(); ++iJet)
+    vecSubjetsLV.resize(jetsLV.size());
+    for(unsigned int iJet = 0; iJet < jetsLV.size(); ++iJet)
     {
-        jetsLV[iJet].SetPtEtaPhiM(jetPt[iJet], jetEta[iJet], jetPhi[iJet], jetM[iJet]);
-
         //reserve space for the vector to stop reallocations during emplacing
-        int nSubjet = 0;
         int idx1 = subjetIdx1[iJet];
         int idx2 = subjetIdx2[iJet];
-        if(idx1 < 0 && idx2 < 0)        nSubjet = 0;
-        else if(idx1 >= 0 && idx2 >= 0) nSubjet = 2;
-        else                            nSubjet = 1;
 
-        subjetsLV.emplace_back(nSubjet);
-        int iSubjet = 0;
-        if(idx1 >= 0) subjetsLV[iJet][iSubjet++].SetPtEtaPhiM(subjetPt[idx1], subjetEta[idx1], subjetPhi[idx1], subjetM[idx1]);
-        if(idx2 >= 0) subjetsLV[iJet][iSubjet++].SetPtEtaPhiM(subjetPt[idx2], subjetEta[idx2], subjetPhi[idx2], subjetM[idx2]);
+        if(idx1 >= 0 && idx1 < static_cast<int>(subjetsLV.size())) vecSubjetsLV[iJet].push_back(subjetsLV[idx1]);
+        if(idx2 >= 0 && idx2 < static_cast<int>(subjetsLV.size())) vecSubjetsLV[iJet].push_back(subjetsLV[idx2]);
     }
 
     //Wrap basic floating point vectors
@@ -239,36 +255,35 @@ static int TopTaggerInterface_makeAK8Const(std::unique_ptr<ttUtility::ConstAK8In
     auto& jetWDisc = tempFloatBuffers.back();
 
     //Create the AK8 constituent helper
-    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, subjetsLV));
+    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, subjetsLV));
 
     return 0;
 }
 
-static int TopTaggerInterface_makeResolvedTopConst(std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>>& resolvedTopConstInputs, std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, std::vector<ttPython::Py_buffer_wrapper<Int_t>>& tempIntBuffers, std::vector<TLorentzVector>& topCandsLV, PyObject* pArgTuple)
+static int TopTaggerInterface_makeResolvedTopConst(
+    std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>>& resolvedTopConstInputs, 
+    std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
+    std::vector<ttPython::Py_buffer_wrapper<Int_t>>& tempIntBuffers, 
+    std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& vecTopCandsLV, 
+    PyObject* pArgTuple)
 {
     //number of variables
     const unsigned int NFLOATVAR = 1;
     const unsigned int NINTVAR = 3;
+    const unsigned int NTLVVAR = 1;
     int nResTopCand;
 
-    PyObject *pTopCandPt, *pTopCandEta, *pTopCandPhi, *pTopCandMass, *pTopCandDisc, *pTopCandIdxJ1, *pTopCandIdxJ2, *pTopCandIdxJ3;
-    if (!PyArg_ParseTuple(pArgTuple, "iOOOOOOOO", &nResTopCand, &pTopCandPt, &pTopCandEta, &pTopCandPhi, &pTopCandMass, &pTopCandDisc, &pTopCandIdxJ1, &pTopCandIdxJ2, &pTopCandIdxJ3))
+    PyObject *pTopCand, *pTopCandDisc, *pTopCandIdxJ1, *pTopCandIdxJ2, *pTopCandIdxJ3;
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOOO", &nResTopCand, &pTopCand, &pTopCandDisc, &pTopCandIdxJ1, &pTopCandIdxJ2, &pTopCandIdxJ3))
     {
         return 1;
     }
 
-    //Prepare std::vector<TLorentzVector> for topCand 4-vector
-    ttPython::Py_buffer_wrapper<Float_t> topCandPt(pTopCandPt, nResTopCand);
-    ttPython::Py_buffer_wrapper<Float_t> topCandEta(pTopCandEta, nResTopCand);
-    ttPython::Py_buffer_wrapper<Float_t> topCandPhi(pTopCandPhi, nResTopCand);
-    ttPython::Py_buffer_wrapper<Float_t> topCandM(pTopCandMass, nResTopCand);
-    
+    //Prepare topCand 4-vector
     //reserve space for the vector to stop reallocations during emplacing
-    topCandsLV.resize(topCandPt.size());
-    for(unsigned int iTopCand = 0; iTopCand < topCandPt.size(); ++iTopCand)
-    {
-        topCandsLV[iTopCand].SetPtEtaPhiM(topCandPt[iTopCand], topCandEta[iTopCand], topCandPhi[iTopCand], topCandM[iTopCand]);
-    }
+    vecTopCandsLV.reserve(NTLVVAR);
+    vecTopCandsLV.emplace_back(createLorentzP4(pTopCand));
+    auto& topCandsLV = vecTopCandsLV.back();
 
     //Wrap basic floating point/integer vectors
     //reserve space for the vector to stop reallocations during emplacing
@@ -288,7 +303,7 @@ static int TopTaggerInterface_makeResolvedTopConst(std::unique_ptr<ttUtility::Co
     auto& topCandIdxJ3 = tempIntBuffers.back();
 
     //Create the AK8 constituent helper
-    resolvedTopConstInputs.reset(new ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>(topCandsLV, topCandDisc, topCandIdxJ1, topCandIdxJ2, topCandIdxJ3));
+    resolvedTopConstInputs.reset(new ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(topCandsLV, topCandDisc, topCandIdxJ1, topCandIdxJ2, topCandIdxJ3));
 
     return 0;
 }
@@ -385,12 +400,11 @@ extern "C"
         if(pResolvedTopCandInputs) Py_INCREF(pResolvedTopCandInputs);
 
         //Prepare ak4 jet input constituents 
-        std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>> ak4ConstInputs;
+        std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>> ak4ConstInputs;
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak4TempTLVBuffers;
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak4TempFloatBuffers;
-        std::vector<std::vector<Float_t>> ak4TempIntToFloatVectors;
-        std::vector<TLorentzVector> ak4JetsLV;
         std::vector<unsigned char> ak4FilterVec;
-        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempFloatBuffers, ak4TempIntToFloatVectors, ak4JetsLV, ak4FilterVec, pAK4Inputs))
+        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempTLVBuffers, ak4TempFloatBuffers, ak4FilterVec, pAK4Inputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
@@ -402,11 +416,11 @@ extern "C"
         }
 
         //Prepare ak8 jet input constituents 
-        std::unique_ptr<ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>>> ak8ConstInputs;
+        std::unique_ptr<ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>> ak8ConstInputs;
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak8TempFloatBuffers;
-        std::vector<TLorentzVector> ak8JetsLV;
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak8TempTLVBuffers;
         std::vector<std::vector<TLorentzVector>> ak8SubjetsLV;
-        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8JetsLV, ak8SubjetsLV, pAK8Inputs))
+        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8TempTLVBuffers, ak8SubjetsLV, pAK8Inputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
@@ -417,10 +431,10 @@ extern "C"
             return NULL;
         }
 
-        std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>>> resolvedTopConstInputs;
+        std::unique_ptr<ttUtility::ConstResolvedCandInputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<Int_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>> resolvedTopConstInputs;
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> resTopTempFloatBuffers;
         std::vector<ttPython::Py_buffer_wrapper<Int_t>> resTopTempIntBuffers;
-        std::vector<TLorentzVector> topCandsLV;
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> topCandsLV;
         if(pResolvedTopCandInputs && TopTaggerInterface_makeResolvedTopConst(resolvedTopConstInputs, resTopTempFloatBuffers, resTopTempIntBuffers, topCandsLV, pResolvedTopCandInputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
@@ -557,7 +571,31 @@ extern "C"
 
     }
 
+    static PyObject* TopTaggerInterface_test(PyObject *self, PyObject *args)
+    {
+        //suppress unused parameter warning as self is manditory
+        (void)self;
+
+        PyObject *p;
+        if (!PyArg_ParseTuple(args, "O", &p))
+        {
+            return NULL;
+        }
+
+        Py_INCREF(p);
+
+        if(TPython::ObjectProxy_Check(p))
+        std::cout << Py_TYPE(p)->tp_name << std::endl;
+
+        Py_DECREF(p);
+
+        Py_INCREF(Py_None);
+        return Py_None;
+
+    }
+
     static PyMethodDef TopTaggerInterfaceMethods[] = {
+        {"test",       TopTaggerInterface_test,            METH_VARARGS,                 "test."},
         {"setup",       TopTaggerInterface_setup,            METH_VARARGS,                 "Configure Top Tagger."},
         {"run",         (PyCFunction)TopTaggerInterface_run, METH_VARARGS | METH_KEYWORDS, "Run Top Tagger."},
         {"getResults",  TopTaggerInterface_getResults,       METH_VARARGS,                 "Get Top Tagger results."},
