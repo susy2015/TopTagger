@@ -517,11 +517,6 @@ namespace ttUtility
     ///Tool to calcualte MT2 from tagger results
     double calculateMT2(const TopTaggerResults& ttr, const TLorentzVector& metLVec);
 
-    //MVA helper functions
-    /* \fn std::map<std::string, double> ttUtility::createMVAInputs(const TopObject& topCand, const double csvThresh) */
-    ///Function to calculate MVA input variables from a TopObject. This function is depricated in favor of the new MVAInputCalculator based approach.
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
-
     //New MVA variable helper class
     /**
      *Base class for MVA input variable calculator 
