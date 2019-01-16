@@ -9,16 +9,18 @@
 #include <map>
 #include <string>
 
-enum ConstituentType
-{
-    NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET, AK8SUBJET, RESOLVEDTOPCAND
-};
-
 /**
  *Serves as a container class for jet objects including the 4-vector for each jet along with supporting information such as the b-tag discriminator and jet type
  */
 class Constituent
 {
+public:
+    enum ConstituentType
+    {
+        NOTYPE, AK4JET, AK6JET, AK8JET, CA8JET, AK8SUBJET, RESOLVEDTOPCAND
+    };
+
+
 private:
     TLorentzVector p_;
     ConstituentType type_;
@@ -46,7 +48,7 @@ public:
     /** Construct an AK4 jet from TLorentzVector, b-tag discriminator, and quark-gluonlikelihood */
     Constituent(const TLorentzVector& p, const double& bTagDisc, const double& qgLikelihood);
     /** Construct generic constituent jet from TLorentzVector and type */
-    Constituent(const TLorentzVector& p, const ConstituentType& type);
+    Constituent(const TLorentzVector& p, const Constituent::ConstituentType& type);
     /** Construct an AK8 jet from TLorentzVector, Nsubjettiness inputs tau1/2/3, softdrop mass, softdrop subjets vector and wMassCorrection (if applicable). */
     Constituent(const TLorentzVector& p, const double& tau1, const double& tau2, const double& tau3, const double& softDropMass, const std::vector<Constituent>& subjets, const double& wMassCorr);
     
@@ -54,7 +56,7 @@ public:
     void setP(const TLorentzVector& p);
     void setBTag(const double&  bTagDisc);
     void setQGLikelihood(const double& qgLikelihood);
-    void setType(const ConstituentType type);
+    void setType(const Constituent::ConstituentType type);
     void setTau1(const double& tau1);
     void setTau2(const double& tau2);
     void setTau3(const double& tau3);

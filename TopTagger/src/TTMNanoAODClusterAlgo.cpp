@@ -59,7 +59,7 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
         if(doTrijet_)
         {
             //We assume all clustering was done before, we only need to check the type
-            if(constituents[i].getType() == RESOLVEDTOPCAND)
+            if(constituents[i].getType() == Constituent::RESOLVEDTOPCAND)
             {
                 //Fill the resolved top 
 
@@ -75,7 +75,7 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
                     std::vector<const Constituent*> resolvedTopConstituents;
                     for(const auto& constituent : constituents)
                     {
-                        if(constituent.getType() == AK4JET)
+                        if(constituent.getType() == Constituent::AK4JET)
                         {
                             int constIndex = constituent.getIndex();
                             if(jetIndex1 == constIndex || jetIndex2 == constIndex || jetIndex3 == constIndex)

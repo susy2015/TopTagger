@@ -136,7 +136,7 @@ namespace ttUtility
         if(topCand.getNConstituents() == 2)
         {
             const auto* fatjet = topCand.getConstituents()[0];
-            if(fatjet->getType() != AK8JET) fatjet = topCand.getConstituents()[1];
+            if(fatjet->getType() != Constituent::AK8JET) fatjet = topCand.getConstituents()[1];
             varMap["var_fj_sdmass"]   = fatjet->getSoftDropMass();
             varMap["var_fj_tau21"]    = fatjet->getTau1() > 0 ? fatjet->getTau2()/fatjet->getTau1() : 1e9;
             // filling subjet variables
@@ -373,7 +373,7 @@ namespace ttUtility
     {
         return topCand.getNConstituents() == 1
             && topCand.getType() == TopObject::MERGED_TOP
-            && topCand.getConstituents()[0]->getType() == AK8JET
+            && topCand.getConstituents()[0]->getType() == Constituent::AK8JET
             && topCand.getConstituents()[0]->getSubjets().size() == 2;
     }
 
@@ -408,7 +408,7 @@ namespace ttUtility
         if(checkCand(topCand))
         {
             const auto* fatjet = topCand.getConstituents()[0];
-            if(fatjet->getType() != AK8JET) fatjet = topCand.getConstituents()[1];
+            if(fatjet->getType() != Constituent::AK8JET) fatjet = topCand.getConstituents()[1];
             if(var_fj_sdmass_ >= 0)     *(basePtr_ + var_fj_sdmass_ + len_*iCand)   = fatjet->getSoftDropMass();
             if(var_fj_tau21_ >= 0)      *(basePtr_ + var_fj_tau21_ + len_*iCand)    = fatjet->getTau1() > 0 ? fatjet->getTau2()/fatjet->getTau1() : 1e9;
             // filling subjet variables

@@ -15,7 +15,7 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
             //First return true if constituent is found (this covers all AK4 and most AK8 jets)
             return true;
         }
-        else if(constituent->getType() == AK8JET)
+        else if(constituent->getType() == Constituent::AK8JET)
         {
             //If the constituent is AK8 we will also check its subjets are not used
             if(constituent->getSubjets().size() >= 1)
@@ -59,7 +59,7 @@ void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>&
         usedConstituents.insert(constituent);
 
         //If the constituent is an AK8JET, then add AK4JETs matching its subjets as well 
-        if(constituent->getType() == AK8JET)
+        if(constituent->getType() == Constituent::AK8JET)
         {
             if(constituent->getSubjets().size() >= 1)
             {

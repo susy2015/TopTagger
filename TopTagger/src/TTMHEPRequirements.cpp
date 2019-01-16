@@ -74,18 +74,18 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
         }
         else if(doDijet_ && jets.size() == 2) //dijets
         {
-            double m23  = (jets[0]->getType() == AK8JET)?(jets[0]->getSoftDropMass() * jets[0]->getWMassCorr()):(jets[1]->getSoftDropMass() * jets[1]->getWMassCorr());
+            double m23  = (jets[0]->getType() == Constituent::AK8JET)?(jets[0]->getSoftDropMass() * jets[0]->getWMassCorr()):(jets[1]->getSoftDropMass() * jets[1]->getWMassCorr());
             //small hack for legacy tagger
-            if(jets[0]->getType() == AK4JET && jets[1]->getType() == AK4JET) m23 = jets[0]->p().M();
+            if(jets[0]->getType() == Constituent::AK4JET && jets[1]->getType() == Constituent::AK4JET) m23 = jets[0]->p().M();
 
             double m123 = topCand.p().M();
-            if(jets[0]->getType() == AK8JET)
+            if(jets[0]->getType() == Constituent::AK8JET)
             {
                 TLorentzVector psudoVec;
                 psudoVec.SetPtEtaPhiM(jets[0]->p().Pt(), jets[0]->p().Eta(), jets[0]->p().Phi(), jets[0]->getSoftDropMass() * jets[0]->getWMassCorr());
                 m123 = (psudoVec + jets[1]->p()).M();
             }
-            else if(jets[1]->getType() == AK8JET)
+            else if(jets[1]->getType() == Constituent::AK8JET)
             {
                 TLorentzVector psudoVec;
                 psudoVec.SetPtEtaPhiM(jets[1]->p().Pt(), jets[1]->p().Eta(), jets[1]->p().Phi(), jets[1]->getSoftDropMass() * jets[1]->getWMassCorr());
@@ -98,7 +98,7 @@ void TTMHEPRequirements::run(TopTaggerResults& ttResults)
         else if(doMonojet_ && jets.size() == 1) //monojets
         {
             //Monojets just get passed if they are active and AK4
-            if(jets[0]->getType() == AK4JET)
+            if(jets[0]->getType() == Constituent::AK4JET)
             {
                 passHEPRequirments = true;
             }

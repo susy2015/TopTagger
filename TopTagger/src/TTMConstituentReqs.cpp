@@ -39,7 +39,7 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
 bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
 {
     //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
+    if(constituent.getType() != Constituent::AK8JET) return false;
 
     //check that tau1 and 2 are valid
     if(constituent.getTau1() <= 0 || constituent.getTau2() <= 0) return false;
@@ -55,7 +55,7 @@ bool TTMConstituentReqs::passAK8WReqs(const Constituent& constituent) const
 bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent, const Constituent& constituentAK8) const
 {
     //basic AK4 jet requirements 
-    bool basicReqs = constituent.getType() == AK4JET && constituent.p().Pt() > minAK4WPt_;
+    bool basicReqs = constituent.getType() == Constituent::AK4JET && constituent.p().Pt() > minAK4WPt_;
 
     //check that the AK4 jet does not overlap with the selected AK8 subjets
     //to keep the algorithm from needing to do unnecessary calculations on all matches
@@ -68,7 +68,7 @@ bool TTMConstituentReqs::passAK4WReqs(const Constituent& constituent, const Cons
 bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const
 {
     //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
+    if(constituent.getType() != Constituent::AK8JET) return false;
 
     //check that tau2 and 3 are valid
     if(constituent.getTau2() <= 0 || constituent.getTau3() <= 0) return false;
@@ -84,7 +84,7 @@ bool TTMConstituentReqs::passAK8TopReqs(const Constituent& constituent) const
 bool TTMConstituentReqs::passDeepAK8WReqs(const Constituent& constituent) const
 {
     //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
+    if(constituent.getType() != Constituent::AK8JET) return false;
 
     return constituent.p().Pt() > minAK8WPt_ &&
            constituent.getSoftDropMass() > minAK8WMass_  && 
@@ -95,7 +95,7 @@ bool TTMConstituentReqs::passDeepAK8WReqs(const Constituent& constituent) const
 bool TTMConstituentReqs::passDeepAK8TopReqs(const Constituent& constituent) const
 {
     //check that it is an AK8 jet
-    if(constituent.getType() != AK8JET) return false;
+    if(constituent.getType() != Constituent::AK8JET) return false;
 
     return constituent.p().Pt() > minAK8TopPt_ &&
            constituent.getSoftDropMass() > minAK8TopMass_  && 
@@ -105,5 +105,5 @@ bool TTMConstituentReqs::passDeepAK8TopReqs(const Constituent& constituent) cons
 
 bool TTMConstituentReqs::passAK4ResolvedReqs(const Constituent& constituent, const double minPt) const
 {
-    return constituent.getType() == AK4JET && constituent.p().Pt() > minPt;
+    return constituent.getType() == Constituent::AK4JET && constituent.p().Pt() > minPt;
 }

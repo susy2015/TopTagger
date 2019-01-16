@@ -39,7 +39,7 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
                 m1 = t1->p().M();
                 break;
             case 2:
-                if(constVec1[0]->getType() == AK8JET)
+                if(constVec1[0]->getType() == Constituent::AK8JET)
                 {
                     TLorentzVector psudoVec;
                     psudoVec.SetPtEtaPhiM(constVec1[0]->p().Pt(), constVec1[0]->p().Eta(), constVec1[0]->p().Phi(), constVec1[0]->getSoftDropMass() * constVec1[0]->getWMassCorr());
@@ -64,7 +64,7 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
                 m2 = t2->p().M();
                 break;
             case 2:
-                if(constVec2[0]->getType() == AK8JET)
+                if(constVec2[0]->getType() == Constituent::AK8JET)
                 {
                     TLorentzVector psudoVec;
                     psudoVec.SetPtEtaPhiM(constVec2[0]->p().Pt(), constVec2[0]->p().Eta(), constVec2[0]->p().Phi(), constVec2[0]->getSoftDropMass() * constVec2[0]->getWMassCorr());

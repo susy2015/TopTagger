@@ -32,7 +32,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
 
     for(unsigned int i = 0; i < constituents.size(); ++i)
     {
-        if(constituents[i].p().Pt() < minJetPt_ || constituents[i].getType() != AK4JET) continue;
+        if(constituents[i].p().Pt() < minJetPt_ || constituents[i].getType() != Constituent::AK4JET) continue;
 
         //singlet tops
         if(doMonojet_)
@@ -54,7 +54,7 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
                 for(unsigned int j = 0; j < constituents.size(); ++j)
                 {
                     if(i == j) continue;
-                    if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != AK4JET) continue;
+                    if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != Constituent::AK4JET) continue;
 
                     TopObject topCand({&constituents[i], &constituents[j]});
                 
@@ -71,11 +71,11 @@ void TTMLazyClusterAlgo::run(TopTaggerResults& ttResults)
         {
             for(unsigned int j = 0; j < i; ++j)
             {
-                if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != AK4JET) continue;
+                if(constituents[j].p().Pt() < minJetPt_ || constituents[j].getType() != Constituent::AK4JET) continue;
 
                 for(unsigned int k = 0; k < j; ++k)
                 {
-                    if(constituents[k].p().Pt() < minJetPt_ || constituents[k].getType() != AK4JET) continue;
+                    if(constituents[k].p().Pt() < minJetPt_ || constituents[k].getType() != Constituent::AK4JET) continue;
 
                     TopObject topCand({&constituents[k], &constituents[j], &constituents[i]});
 
