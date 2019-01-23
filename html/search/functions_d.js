@@ -6,6 +6,7 @@ var searchData=
   ['setconstituents',['setConstituents',['../classTopTaggerResults.html#a2d7cf77c1e4591e6fbdf0b297a3f87bd',1,'TopTaggerResults::setConstituents(const std::vector&lt; Constituent &gt; &amp;constituents)'],['../classTopTaggerResults.html#a4ab733379f6e450ce98b2afdb4f6e523',1,'TopTaggerResults::setConstituents(std::vector&lt; Constituent &gt; &amp;&amp;constituents)']]],
   ['setdiscriminator',['setDiscriminator',['../classTopObject.html#abf5123e8c707e9059c8ec96b35643bef',1,'TopObject']]],
   ['setextravar',['setExtraVar',['../classConstituent.html#a1b2fc086bc359e141e54ed2903c951c9',1,'Constituent']]],
+  ['setfiltervector',['setFilterVector',['../classttUtility_1_1ConstAK4Inputs.html#ad29d1b97be9cb85f8c331a716640d2a6',1,'ttUtility::ConstAK4Inputs']]],
   ['setptr',['setPtr',['../classttUtility_1_1MVAInputCalculator.html#afae8a686f0fd4310a75c79216a39fa53',1,'ttUtility::MVAInputCalculator']]],
   ['setrethrow',['setRethrow',['../classTopTagger.html#ae117c09fc42674a09247fd1ad8dcb3ce',1,'TopTagger']]],
   ['setverbosity',['setVerbosity',['../classTopTagger.html#ad7e22571559cb7afe0f0cf0e14d1ef41',1,'TopTagger']]],

@@ -102,16 +102,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="preprocessor"></span><span class="preprocessor">#the command below is optional for system wide install (will require sudo rights)</span></div>
 <div class="line"><span class="preprocessor">make install</span></div>
 </div><!-- fragment --><p>This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code. This will also compile a standalone example called ``topTaggerTest''.</p>
-<h2>Example code</h2>
+<h2>C++ Example code</h2>
 <p>A basic standalone example using the top tagging code is provided in "TopTagger/test/topTaggerTest.cpp". This is a basic example program which reads in the necessary top tagger inputs from a file (``exampleInputs.root'') and runs the top tagger code. As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed. For reference the output of this script can be seen at the end of this readme.</p>
 <h3>Running the example</h3>
-<p>The example executable is compiled along with the standalone library as described above. If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded"</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#do once per terminal if opencv or the top tagger are not installed system wide</span></div>
+<p>The example executable is compiled along with the standalone library as described above. If the top tagger was not installed system wide, then there is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded.</p>
+<div class="fragment"><div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
+<div class="line"><span class="preprocessor">#do once per terminal if opencv or the top tagger are not installed system wide</span></div>
 <div class="line"><span class="preprocessor"></span>source taggerSetup.sh</div>
 <div class="line"><span class="preprocessor">#do once in any directory where you will run the top tagger example</span></div>
 <div class="line"><span class="preprocessor"></span>getTaggerCfg.sh -t DeepCombined_Example_v1.0.1</div>
 <div class="line"><span class="preprocessor">#run the example code</span></div>
 <div class="line"><span class="preprocessor">./topTaggerTest</span></div>
+</div><!-- fragment --><h2>Python example code</h2>
+<p>A basic standalone example using the top tagging code is provided in "TopTagger/python/TopTagger.py". This test code gives an example of using the top tagger from python. By default it is configured to read from nanoAOD files where the necessary extra variables have been added, but this can also read from the example root file. As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed. This file "TopTagger.py" can be imported into other python scripts and the "TopTagger" python class used as a general interface to the top tagger from python. "TopTaggerProducer.py" is a nanoAOD postprocessor module which will add the output of the rerun tagger to the postprocessed files assuming the necessary inputs have been added to the nanoAOD.</p>
+<h3>Running the example</h3>
+<p>The necessary c-api interface to use the tagger in python is compiled along with the standalone library as described above. There is a script "taggerSetup.sh" which is produced by the configure command which must be sourced to set system variables appropriately. A ".csh" version is also proveded.</p>
+<div class="fragment"><div class="line">cd <a class="code" href="classTopTagger.html">TopTagger</a>/test</div>
+<div class="line"><span class="preprocessor">#do once per terminal if opencv or the top tagger are not installed system wide</span></div>
+<div class="line"><span class="preprocessor"></span>source ../test/taggerSetup.sh</div>
+<div class="line"><span class="preprocessor">#do once in any directory where you will run the top tagger example</span></div>
+<div class="line"><span class="preprocessor"></span>getTaggerCfg.sh -t DeepCombined_Example_v1.0.1</div>
+<div class="line"><span class="preprocessor">#run the example code</span></div>
+<div class="line"><span class="preprocessor">python ../python/TopTagger.py -e -f exampleInputs.root -b slimmedTuple</span></div>
 </div><!-- fragment --><h3>Tagger input variables</h3>
 <p>The top tagging algorithm takes both a collection of all AK4 jets and all AK8 jets (passing basic pt and |eta| acceptance requirments) along with supporting variables. The input variables used for the example program are listed below</p>
 <div class="fragment"><div class="line"><span class="comment">//Variables to hold inputs</span></div>
@@ -365,7 +377,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 15 2019 02:29:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 23 2019 18:32:22 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

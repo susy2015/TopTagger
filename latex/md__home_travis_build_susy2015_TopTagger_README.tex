@@ -44,22 +44,43 @@ make -j4
 
 This command will produce a static and a shared library which contain all the necessary symbols to link the top tagger into other C++ code. This will also compile a standalone example called ``top\-Tagger\-Test''.
 
-\subsection*{Example code}
+\subsection*{C++ Example code}
 
 A basic standalone example using the top tagging code is provided in \char`\"{}\-Top\-Tagger/test/top\-Tagger\-Test.\-cpp\char`\"{}. This is a basic example program which reads in the necessary top tagger inputs from a file (``example\-Inputs.root'') and runs the top tagger code. As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed. For reference the output of this script can be seen at the end of this readme.
 
 \subsubsection*{Running the example}
 
-The example executable is compiled along with the standalone library as described above. If the top tagger was not installed system wide, then there is a script \char`\"{}tagger\-Setup.\-sh\char`\"{} which is produced by the configure command which must be sourced to set system variables appropriately. A \char`\"{}.\-csh\char`\"{} version is also proveded"
+The example executable is compiled along with the standalone library as described above. If the top tagger was not installed system wide, then there is a script \char`\"{}tagger\-Setup.\-sh\char`\"{} which is produced by the configure command which must be sourced to set system variables appropriately. A \char`\"{}.\-csh\char`\"{} version is also proveded.
 
 
 \begin{DoxyCode}
+cd \hyperlink{classTopTagger}{TopTagger}/test
 \textcolor{preprocessor}{#do once per terminal if opencv or the top tagger are not installed system wide}
 \textcolor{preprocessor}{}source taggerSetup.sh
 \textcolor{preprocessor}{#do once in any directory where you will run the top tagger example}
 \textcolor{preprocessor}{}getTaggerCfg.sh -t DeepCombined\_Example\_v1.0.1
 \textcolor{preprocessor}{#run the example code}
 \textcolor{preprocessor}{./topTaggerTest}
+\end{DoxyCode}
+
+
+\subsection*{Python example code}
+
+A basic standalone example using the top tagging code is provided in \char`\"{}\-Top\-Tagger/python/\-Top\-Tagger.\-py\char`\"{}. This test code gives an example of using the top tagger from python. By default it is configured to read from nano\-A\-O\-D files where the necessary extra variables have been added, but this can also read from the example root file. As validation, this prints out the number of top quarks reconstructed in each event as well as some basic properties of each top quark reconstructed. This file \char`\"{}\-Top\-Tagger.\-py\char`\"{} can be imported into other python scripts and the \char`\"{}\-Top\-Tagger\char`\"{} python class used as a general interface to the top tagger from python. \char`\"{}\-Top\-Tagger\-Producer.\-py\char`\"{} is a nano\-A\-O\-D postprocessor module which will add the output of the rerun tagger to the postprocessed files assuming the necessary inputs have been added to the nano\-A\-O\-D.
+
+\subsubsection*{Running the example}
+
+The necessary c-\/api interface to use the tagger in python is compiled along with the standalone library as described above. There is a script \char`\"{}tagger\-Setup.\-sh\char`\"{} which is produced by the configure command which must be sourced to set system variables appropriately. A \char`\"{}.\-csh\char`\"{} version is also proveded.
+
+
+\begin{DoxyCode}
+cd \hyperlink{classTopTagger}{TopTagger}/test
+\textcolor{preprocessor}{#do once per terminal if opencv or the top tagger are not installed system wide}
+\textcolor{preprocessor}{}source ../test/taggerSetup.sh
+\textcolor{preprocessor}{#do once in any directory where you will run the top tagger example}
+\textcolor{preprocessor}{}getTaggerCfg.sh -t DeepCombined\_Example\_v1.0.1
+\textcolor{preprocessor}{#run the example code}
+\textcolor{preprocessor}{python ../python/TopTagger.py -e -f exampleInputs.root -b slimmedTuple}
 \end{DoxyCode}
 
 

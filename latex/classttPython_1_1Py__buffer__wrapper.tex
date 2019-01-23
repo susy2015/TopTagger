@@ -1,0 +1,53 @@
+\hypertarget{classttPython_1_1Py__buffer__wrapper}{\section{tt\-Python\-:\-:Py\-\_\-buffer\-\_\-wrapper$<$ T $>$ Class Template Reference}
+\label{classttPython_1_1Py__buffer__wrapper}\index{tt\-Python\-::\-Py\-\_\-buffer\-\_\-wrapper$<$ T $>$@{tt\-Python\-::\-Py\-\_\-buffer\-\_\-wrapper$<$ T $>$}}
+}
+
+
+{\ttfamily \#include $<$Top\-Tagger\-Python.\-h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a56901c5eaa03f74d09575553ba694c02}{{\bfseries Py\-\_\-buffer\-\_\-wrapper} (void $\ast$buf)}\label{classttPython_1_1Py__buffer__wrapper_a56901c5eaa03f74d09575553ba694c02}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a18101320c66c7c066866e6fda8e41116}{{\bfseries Py\-\_\-buffer\-\_\-wrapper} (\hyperlink{classttPython_1_1Py__buffer__wrapper}{Py\-\_\-buffer\-\_\-wrapper} \&)=delete}\label{classttPython_1_1Py__buffer__wrapper_a18101320c66c7c066866e6fda8e41116}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_aed14786291095cbd9aa1fd3c5f68ac1a}{{\bfseries Py\-\_\-buffer\-\_\-wrapper} (\hyperlink{classttPython_1_1Py__buffer__wrapper}{Py\-\_\-buffer\-\_\-wrapper} \&\&old)}\label{classttPython_1_1Py__buffer__wrapper_aed14786291095cbd9aa1fd3c5f68ac1a}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a7ba53310e416a8b8a0ff56ca1568ba0b}{{\bfseries Py\-\_\-buffer\-\_\-wrapper} (std\-::vector$<$ T $>$ \&\&buf)}\label{classttPython_1_1Py__buffer__wrapper_a7ba53310e416a8b8a0ff56ca1568ba0b}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a025070123ca2b75de184c42cbca24fc6}{unsigned int {\bfseries size} () const }\label{classttPython_1_1Py__buffer__wrapper_a025070123ca2b75de184c42cbca24fc6}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a738aaf24bd0d1e52e559039e62cab787}{T \& {\bfseries operator\mbox{[}$\,$\mbox{]}} (unsigned int i)}\label{classttPython_1_1Py__buffer__wrapper_a738aaf24bd0d1e52e559039e62cab787}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_af13e3bfd741987b1823e24a7cd73a26c}{const T \& {\bfseries operator\mbox{[}$\,$\mbox{]}} (unsigned int i) const }\label{classttPython_1_1Py__buffer__wrapper_af13e3bfd741987b1823e24a7cd73a26c}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a0fa992161236e4454b167740b6e30b97}{T $\ast$ {\bfseries begin} ()}\label{classttPython_1_1Py__buffer__wrapper_a0fa992161236e4454b167740b6e30b97}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_aeacb1dc0fe90db32455f27643881540f}{const T $\ast$ {\bfseries begin} () const }\label{classttPython_1_1Py__buffer__wrapper_aeacb1dc0fe90db32455f27643881540f}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a41c4971f28ee2ed808d5250b5c47bbc2}{T $\ast$ {\bfseries end} ()}\label{classttPython_1_1Py__buffer__wrapper_a41c4971f28ee2ed808d5250b5c47bbc2}
+
+\item 
+\hypertarget{classttPython_1_1Py__buffer__wrapper_a7670be3ca39ee4cd6756ee324f54e554}{const T $\ast$ {\bfseries end} () const }\label{classttPython_1_1Py__buffer__wrapper_a7670be3ca39ee4cd6756ee324f54e554}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T$>$class tt\-Python\-::\-Py\-\_\-buffer\-\_\-wrapper$<$ T $>$}
+
+Wrapper class to take a Py\-\_\-buffer$\ast$ and hold it in a vector-\/like implementation for use in tt\-Utilities classes. Overloaded constructor for use with vectors. In both the case of the Py\-Buffer and std\-::vector it is the users responcibility to ensure that the memory pass into this wrapper stays in scope until the wrapper is destroyed . 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/interface/Top\-Tagger\-Python.\-h\end{DoxyCompactItemize}

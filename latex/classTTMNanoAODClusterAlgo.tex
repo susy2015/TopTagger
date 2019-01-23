@@ -1,0 +1,67 @@
+\hypertarget{classTTMNanoAODClusterAlgo}{\section{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo Class Reference}
+\label{classTTMNanoAODClusterAlgo}\index{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo@{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classTTMNanoAODClusterAlgo}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMNanoAODClusterAlgo_a980b0557cadd8b08953f2fc8f3b26f05}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMNanoAODClusterAlgo_a9885e4ee2ebfe17b5ce9cb86f54830ad}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+This module is used to cluster top candidates from nano\-A\-O\-D data format. This algorithm assumes that the nano\-A\-O\-D contains all deep\-A\-K8 and deep\-Resolved candidates in the nano\-A\-O\-D already. This module is capable of clustering trijet (resolved tops) and monojet (fully merged top/\-W) candidates.
+
+
+\begin{DoxyParams}{Parameters}
+{\em do\-Trijet} & (bool) Enable the resolved top category clustering. \\
+\hline
+{\em do\-Monojet} & (bool) Enable the fully merged top category clustering. \\
+\hline
+{\em do\-Mono\-W} & (bool) Enable the fully merged W category clustering.\\
+\hline
+\end{DoxyParams}
+See \hyperlink{classTTMConstituentReqs}{T\-T\-M\-Constituent\-Reqs} for more parameters 
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMNanoAODClusterAlgo_a980b0557cadd8b08953f2fc8f3b26f05}{\index{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo@{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMNanoAODClusterAlgo@{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMNanoAODClusterAlgo_a980b0557cadd8b08953f2fc8f3b26f05}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMNanoAODClusterAlgo_a9885e4ee2ebfe17b5ce9cb86f54830ad}{\index{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo@{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo}!run@{run}}
+\index{run@{run}!TTMNanoAODClusterAlgo@{T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMNanoAODClusterAlgo_a9885e4ee2ebfe17b5ce9cb86f54830ad}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/interface/T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Nano\-A\-O\-D\-Cluster\-Algo.\-cpp\end{DoxyCompactItemize}

@@ -147,6 +147,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setWDisc</b> (const d
 <tr class="memitem:abc67caff918e263ec1e58372efa4641b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc67caff918e263ec1e58372efa4641b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setIndex</b> (const unsigned int &amp;index)</td></tr>
 <tr class="separator:abc67caff918e263ec1e58372efa4641b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a663d519cdaf8688be9f51152b9058c7e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a663d519cdaf8688be9f51152b9058c7e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addJetRefIndex</b> (const int &amp;jetIndex)</td></tr>
+<tr class="separator:a663d519cdaf8688be9f51152b9058c7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b2fc086bc359e141e54ed2903c951c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a1b2fc086bc359e141e54ed2903c951c9">setExtraVar</a> (const std::string &amp;name, const double var)</td></tr>
 <tr class="separator:a1b2fc086bc359e141e54ed2903c951c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aea6bdc5229bb87227bcc8caa9c51c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a2aea6bdc5229bb87227bcc8caa9c51c6">addGenMatch</a> (const TLorentzVector &amp;genTop, const TLorentzVector *genDaughter)</td></tr>
@@ -211,6 +214,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
 <tr class="separator:a64e38c0209bf5198477160ea690bbaf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fc04ce34e4e9c162f3d02f62f6b50cb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a8fc04ce34e4e9c162f3d02f62f6b50cb">getExtraVar</a> (const std::string var) const </td></tr>
 <tr class="separator:a8fc04ce34e4e9c162f3d02f62f6b50cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa1bb377b75859b50c40feb217c98cb9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#aaa1bb377b75859b50c40feb217c98cb9">getJetRefIndicies</a> () const </td></tr>
+<tr class="separator:aaa1bb377b75859b50c40feb217c98cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Serves as a container class for jet objects including the 4-vector for each jet along with supporting information such as the b-tag discriminator and jet type </p>
@@ -407,6 +412,23 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
 
 </div>
 </div>
+<a class="anchor" id="aaa1bb377b75859b50c40feb217c98cb9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; &amp; Constituent::getJetRefIndicies </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve list of jet index references </p>
+<dl class="section return"><dt>Returns</dt><dd>Vector containing jet reference indices </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a3f918f1210cc666288327544e32d728c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -496,7 +518,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 15 2019 02:29:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 23 2019 18:32:22 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

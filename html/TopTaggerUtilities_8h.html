@@ -106,9 +106,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstGenInputs.html">ttUtility::ConstGenInputs</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstAK4Inputs.html">ttUtility::ConstAK4Inputs&lt; FLOATTYPE &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstAK4Inputs.html">ttUtility::ConstAK4Inputs&lt; FLOATTYPE, FLOATCONTAINERTYPE, LORENTZVECTORCONTAINER, INTCONTAINERTYPE &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstAK8Inputs.html">ttUtility::ConstAK8Inputs&lt; FLOATTYPE &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstAK8Inputs.html">ttUtility::ConstAK8Inputs&lt; FLOATTYPE, FLOATCONTAINERTYPE, LORENTZVECTORCONTAINER &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1ConstResolvedCandInputs.html">ttUtility::ConstResolvedCandInputs&lt; FLOATTYPE, FLOATCONTAINERTYPE, INTCONTAINERTYPE, LORENTZVECTORCONTAINER &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classttUtility_1_1MVAInputCalculator.html">ttUtility::MVAInputCalculator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,6 +138,10 @@ template&lt;typename... Args&gt; </td></tr>
 <tr class="memitem:afe8c7a2d46380c2f4d17d1ac0d140571"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ttUtility::packageConstituents</b> (Args...args)</td></tr>
 <tr class="memdesc:afe8c7a2d46380c2f4d17d1ac0d140571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to fill constituent list based upon arbitrary list of input objects. <br/></td></tr>
 <tr class="separator:afe8c7a2d46380c2f4d17d1ac0d140571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abea3ec7286f12e4786567d7c83ecc47f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abea3ec7286f12e4786567d7c83ecc47f"></a>
+std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ttUtility::packageConstituentsAK4</b> (ConstAK4Inputs&lt; float &gt; &amp;inputs)</td></tr>
+<tr class="memdesc:abea3ec7286f12e4786567d7c83ecc47f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Python compatibility function. <br/></td></tr>
+<tr class="separator:abea3ec7286f12e4786567d7c83ecc47f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af895527e07e2dc4f5a9b275aa20965d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af895527e07e2dc4f5a9b275aa20965d3"></a>
 std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ttUtility::packageConstituents</b> (const std::vector&lt; TLorentzVector &gt; &amp;jetsLVec, const std::vector&lt; double &gt; &amp;btagFactors, const std::vector&lt; double &gt; &amp;qgLikelihood)</td></tr>
 <tr class="memdesc:af895527e07e2dc4f5a9b275aa20965d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">backwards compatability overload <br/></td></tr>
@@ -164,7 +170,7 @@ TLorentzVector * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ttUt
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jan 15 2019 02:29:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 23 2019 18:32:22 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

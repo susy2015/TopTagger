@@ -5,6 +5,15 @@
 
 {\ttfamily \#include $<$Top\-Tagger.\-h$>$}
 
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classTopTagger_1_1Top}{Top}
+\item 
+class \hyperlink{classTopTagger_1_1TopTagger}{Top\-Tagger}
+\item 
+class \hyperlink{classTopTagger_1_1TopTaggerResult}{Top\-Tagger\-Result}
+\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -29,6 +38,24 @@ void \hyperlink{classTopTagger_accf43da3b1469e524bfe6f568116219a}{run\-Tagger} (
 void \hyperlink{classTopTagger_ac4d5c2b7983a99495fa6cfa7e0287e74}{run\-Tagger} (std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&\&)
 \item 
 const \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \& \hyperlink{classTopTagger_ac6f06aeb683b0b761ad09ac018e11d08}{get\-Results} () const 
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classTopTagger_a482c3ca721ab70156011038be1ab88b8}{tuple {\bfseries parser} = optparse.\-Option\-Parser()}\label{classTopTagger_a482c3ca721ab70156011038be1ab88b8}
+
+\item 
+\hypertarget{classTopTagger_a9439149c855b5990c2b8382f56881720}{tuple {\bfseries f} = R\-O\-O\-T.\-T\-File.\-Open(options.\-input\-File)}\label{classTopTagger_a9439149c855b5990c2b8382f56881720}
+
+\item 
+\hypertarget{classTopTagger_adb9ad8b9c2a2261fc433b96f8adcb5cb}{tuple {\bfseries tree} = f.\-Get(options.\-tree\-Name)}\label{classTopTagger_adb9ad8b9c2a2261fc433b96f8adcb5cb}
+
+\item 
+\hypertarget{classTopTagger_a8f479f6e3e86c29ffe18b45eaf87b680}{tuple {\bfseries tt} = \hyperlink{classTopTagger_1_1TopTagger}{Top\-Tagger}(options.\-tagger\-Cfg, options.\-work\-Dir)}\label{classTopTagger_a8f479f6e3e86c29ffe18b45eaf87b680}
+
+\item 
+\hypertarget{classTopTagger_a5fe6daaea9a504350d3c1c33dd87e94d}{tuple {\bfseries tops} = get\-Tops\-From\-Example\-File(tt, event)}\label{classTopTagger_a5fe6daaea9a504350d3c1c33dd87e94d}
+
 \end{DoxyCompactItemize}
 
 
@@ -108,4 +135,5 @@ If set, the top tagger will look in this directory for cfg files. This must be c
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
 /home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/interface/Top\-Tagger.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/python/Top\-Tagger.\-py\item 
 /home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/Top\-Tagger.\-cpp\end{DoxyCompactItemize}

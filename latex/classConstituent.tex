@@ -61,6 +61,9 @@
 \hypertarget{classConstituent_abc67caff918e263ec1e58372efa4641b}{void {\bfseries set\-Index} (const unsigned int \&index)}\label{classConstituent_abc67caff918e263ec1e58372efa4641b}
 
 \item 
+\hypertarget{classConstituent_a663d519cdaf8688be9f51152b9058c7e}{void {\bfseries add\-Jet\-Ref\-Index} (const int \&jet\-Index)}\label{classConstituent_a663d519cdaf8688be9f51152b9058c7e}
+
+\item 
 void \hyperlink{classConstituent_a1b2fc086bc359e141e54ed2903c951c9}{set\-Extra\-Var} (const std\-::string \&name, const double var)
 \item 
 void \hyperlink{classConstituent_a2aea6bdc5229bb87227bcc8caa9c51c6}{add\-Gen\-Match} (const T\-Lorentz\-Vector \&gen\-Top, const T\-Lorentz\-Vector $\ast$gen\-Daughter)
@@ -124,6 +127,8 @@ const T\-Lorentz\-Vector \& \hyperlink{classConstituent_a9f95db0ef9ae97fa0dc2cf4
 
 \item 
 double \hyperlink{classConstituent_a8fc04ce34e4e9c162f3d02f62f6b50cb}{get\-Extra\-Var} (const std\-::string var) const 
+\item 
+const std\-::vector$<$ int $>$ \& \hyperlink{classConstituent_aaa1bb377b75859b50c40feb217c98cb9}{get\-Jet\-Ref\-Indicies} () const 
 \end{DoxyCompactItemize}
 
 
@@ -200,6 +205,16 @@ Retrieve an extra variable based upon its name
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
 Value of the variable 
+\end{DoxyReturn}
+\hypertarget{classConstituent_aaa1bb377b75859b50c40feb217c98cb9}{\index{Constituent@{Constituent}!get\-Jet\-Ref\-Indicies@{get\-Jet\-Ref\-Indicies}}
+\index{get\-Jet\-Ref\-Indicies@{get\-Jet\-Ref\-Indicies}!Constituent@{Constituent}}
+\subsubsection[{get\-Jet\-Ref\-Indicies}]{\setlength{\rightskip}{0pt plus 5cm}const std\-::vector$<$ int $>$ \& Constituent\-::get\-Jet\-Ref\-Indicies (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classConstituent_aaa1bb377b75859b50c40feb217c98cb9}
+Retrieve list of jet index references \begin{DoxyReturn}{Returns}
+Vector containing jet reference indices 
 \end{DoxyReturn}
 \hypertarget{classConstituent_a3f918f1210cc666288327544e32d728c}{\index{Constituent@{Constituent}!p@{p}}
 \index{p@{p}!Constituent@{Constituent}}
