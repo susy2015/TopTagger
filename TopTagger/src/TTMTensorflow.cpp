@@ -266,8 +266,11 @@ TF_Buffer* TTMTensorflow::read_file(const std::string& file)
     fseek(f, 0, SEEK_SET);  //same as rewind(f);
 
     void* data = malloc(fsize);
-    fread(data, fsize, 1, f);
+    size_t nbRead = fread(data, fsize, 1, f);
     fclose(f);
+
+    //Check that something was read 
+    if(nbRead <= 0) return nullptr;
 
     TF_Buffer* buf = TF_NewBuffer();
     buf->data = data;

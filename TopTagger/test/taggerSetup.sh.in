@@ -3,6 +3,7 @@ XGBOOSTPATH=@XGBOOSTDIR@/lib
 TENSORFLOWPATH=@TENSORFLOWDIR@/lib
 TAGGERDIR=@TAGGERDIR@/TopTagger/test
 SCRIPTDIR=@TAGGERDIR@/TopTagger/scripts
+PYTHONDIR=@TAGGERDIR@/TopTagger/python
 
 OSNAME=$(uname -s)
 if [[ "$OSNAME" == "Darwin" ]]; then
@@ -42,4 +43,16 @@ fi
 
 if [[ $PATH != *"${SCRIPTDIR}"* ]]; then
     export PATH=${SCRIPTDIR}:${PATH}
+fi
+
+if [ -z ${PYTHONPATH+x} ]
+then 
+    export PYTHONPATH=${TAGGERDIR}:${PYTHONDIR}
+else
+    if [[ $PYTHONPATH != *"${TAGGERDIR}"* ]]; then
+	export PYTHONPATH=${TAGGERDIR}:${PYTHONPATH}
+    fi
+    if [[ $PYTHONPATH != *"${PYTHONDIR}"* ]]; then
+	export PYTHONPATH=${PYTHONDIR}:${PYTHONPATH}
+    fi
 fi

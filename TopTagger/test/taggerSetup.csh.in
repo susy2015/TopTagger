@@ -3,6 +3,7 @@ set XGBOOSTPATH=@XGBOOSTDIR@/lib
 set TENSORFLOWPATH=@TENSORFLOWDIR@/lib
 set TAGGERDIR=@TAGGERDIR@/TopTagger/test
 set SCRIPTDIR=@TAGGERDIR@/TopTagger/scripts
+set PYTHONDIR=@TAGGERDIR@/TopTagger/test
 
 set OSNAME=`uname -s`
 if ( "$OSNAME" == "Darwin" ) then
@@ -57,4 +58,16 @@ endif
 
 if ! ( $PATH:q =~ *$SCRIPTDIR:q* ) then
     setenv PATH ${SCRIPTDIR}:${PATH}
+endif
+
+if ( ! ($?PYTHONPATH) ) 
+then 
+    setenv PYTHONPATH ${TAGGERDIR}:${PYTHONDIR}
+else
+    if ! ( $PYTHONPATH:q =~ *$TAGGERDIR:q* ) then
+	setenv PYTHONPATH ${TAGGERDIR}:${PYTHONPATH}
+    endif
+    if ! ( $PYTHONPATH:q =~ *$PYTHONDIR:q* ) then
+	setenv PYTHONPATH ${PYTHONDIR}:${PYTHONPATH}
+    endif
 endif

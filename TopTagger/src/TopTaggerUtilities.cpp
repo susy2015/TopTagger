@@ -18,6 +18,7 @@ namespace ttUtility
         return packageConstituents(ConstAK4Inputs<double>(jetsLVec, btagFactors, qgLikelihood));
     }
 
+
     double coreMT2calc(const TLorentzVector & fatJet1LVec, const TLorentzVector & fatJet2LVec, const TLorentzVector& metLVec)
     {
         // The input parameters associated with the particle
@@ -732,7 +733,7 @@ namespace ttUtility
                 if(j_DeepCSVc_[i] >= 0)                            *(basePtr_ + j_DeepCSVc_[i] + len_*iCand)                            = relu(RF_constituents[i].getExtraVar("DeepCSVc"));
                 if(j_DeepCSVl_[i] >= 0)                            *(basePtr_ + j_DeepCSVl_[i] + len_*iCand)                            = relu(RF_constituents[i].getExtraVar("DeepCSVl"));
                 if(j_DeepCSVbb_[i] >= 0)                           *(basePtr_ + j_DeepCSVbb_[i] + len_*iCand)                           = relu(RF_constituents[i].getExtraVar("DeepCSVbb"));
-                if(j_DeepCSVcc_[i] >= 0)                           *(basePtr_ + j_DeepCSVcc_[i] + len_*iCand)                           = relu(RF_constituents[i].getExtraVar("DeepCSVcc"));
+                if(j_DeepCSVcc_[i] >= 0)                           *(basePtr_ + j_DeepCSVcc_[i] + len_*iCand)                           = 0.0;
                 if(j_DeepFlavorb_[i] >= 0)                         *(basePtr_ + j_DeepFlavorb_[i] + len_*iCand)                         = relu(RF_constituents[i].getExtraVar("DeepFlavorb"));
                 if(j_DeepFlavorbb_[i] >= 0)                        *(basePtr_ + j_DeepFlavorbb_[i] + len_*iCand)                        = relu(RF_constituents[i].getExtraVar("DeepFlavorbb"));
                 if(j_DeepFlavorlepb_[i] >= 0)                      *(basePtr_ + j_DeepFlavorlepb_[i] + len_*iCand)                      = relu(RF_constituents[i].getExtraVar("DeepFlavorlepb"));

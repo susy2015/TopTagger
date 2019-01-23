@@ -45,20 +45,21 @@ namespace ttUtility
     /**
      *Class to gather the information necessary to construct the AK4 jet constituents
      */
-    template<typename FLOATTYPE>
+    template<typename FLOATTYPE, typename FLOATCONTAINERTYPE = std::vector<FLOATTYPE>, typename LORENTZVECTORCONTAINER = std::vector<TLorentzVector>, typename INTCONTAINERTYPE = std::vector<int>>
     class ConstAK4Inputs : public ConstGenInputs
     {
     private:
-        const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<FLOATTYPE>* btagFactors_;
-        const std::vector<FLOATTYPE>* qgLikelihood_;
-        const std::vector<int>* qgMult_;
-        const std::vector<FLOATTYPE>* qgPtD_;
-        const std::vector<FLOATTYPE>* qgAxis1_;
-        const std::vector<FLOATTYPE>* qgAxis2_;
-
-        std::map<std::string, const std::vector<FLOATTYPE>*> extraInputVariables_;
-
+        const LORENTZVECTORCONTAINER* jetsLVec_;
+        const FLOATCONTAINERTYPE* btagFactors_;
+        const FLOATCONTAINERTYPE* qgLikelihood_;
+        const INTCONTAINERTYPE* qgMult_;
+        const FLOATCONTAINERTYPE* qgPtD_;
+        const FLOATCONTAINERTYPE* qgAxis1_;
+        const FLOATCONTAINERTYPE* qgAxis2_;
+        const std::vector<unsigned char>* filter_;
+        
+        std::map<std::string, const FLOATCONTAINERTYPE*> extraInputVariables_;
+        
     public:
         /**
          *Basic constructor with QGL
@@ -66,13 +67,13 @@ namespace ttUtility
          *@param btagFactors B-tag discriminators for each jet
          *@param qgLikelihood Quark-gluon likelihoods for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr)    {}
+        ConstAK4Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Basic constructor
          *@param jetsLVec Jet TLorentzVectors for each jet
          *@param btagFactors B-tag discriminators for each jet
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& btagFactors) : ConstGenInputs(), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(nullptr), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Constructor with gen informaion 
          *@param jetsLVec Jet TLorentzVectors for each jet
@@ -81,11 +82,11 @@ namespace ttUtility
          *@param hadGenTops Vector of hadronicly decaying gen top TLorentzVectors
          *@param hadGenTopDaughters Vector of direct decay daughters of the top quarks
          */
-        ConstAK4Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& btagFactors, const std::vector<FLOATTYPE>& qgLikelihood, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr) {}
+        ConstAK4Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& btagFactors, const FLOATCONTAINERTYPE& qgLikelihood, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), btagFactors_(&btagFactors), qgLikelihood_(&qgLikelihood), qgMult_(nullptr), qgPtD_(nullptr), qgAxis1_(nullptr), qgAxis2_(nullptr), filter_(nullptr) {}
         /**
          *Adds jet shape inputs from the quark-gluon likelihood calculator
          */
-        void addQGLVectors(const std::vector<int>& qgMult, const std::vector<FLOATTYPE>& qgPtD, const std::vector<FLOATTYPE>& qgAxis1, const std::vector<FLOATTYPE>& qgAxis2)
+        void addQGLVectors(const INTCONTAINERTYPE& qgMult, const FLOATCONTAINERTYPE& qgPtD, const FLOATCONTAINERTYPE& qgAxis1, const FLOATCONTAINERTYPE& qgAxis2)
         {
             qgMult_ = &qgMult;
             qgPtD_ = &qgPtD;
@@ -94,11 +95,19 @@ namespace ttUtility
         }
 
         /**
+         *Set a filter vector.  This will allow ceratin jets to be ignored when constructing the constituents vector.  The vector should contain "true" for jets to keep and "false" for jets which will not be put in the constituents vector.  
+         */
+        void setFilterVector(const std::vector<unsigned char>& filter)
+        {
+            filter_ = &filter;
+        }
+
+        /**
          *Adds a vector holding additional variables which will be inserted into the "extraVars" map of the Constituent
          *@param name The name to use to store the extra variables
          *@param vector the values for the extra variable for each jet
          */
-        void addSupplamentalVector(const std::string& name, const std::vector<FLOATTYPE>& vector)
+        void addSupplamentalVector(const std::string& name, const FLOATCONTAINERTYPE& vector)
         {
             extraInputVariables_[name] = &vector;
         }
@@ -120,6 +129,11 @@ namespace ttUtility
                 THROW_TTEXCEPTION("Unequal vector size!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(btagFactors_->size()));
             }
 
+            if(filter_ && jetsLVec_->size() != filter_->size())
+            {
+                THROW_TTEXCEPTION("Unequal vector size between filter and jet vectors!!!!!!!\n" + std::to_string(jetsLVec_->size()) + "\t" + std::to_string(filter_->size()));
+            }
+
             if(qgMult_ && qgPtD_ && qgAxis1_ && qgAxis2_) 
             {
                 if(jetsLVec_->size() != qgMult_->size() || jetsLVec_->size() != qgPtD_->size() || jetsLVec_->size() != qgAxis1_->size() || jetsLVec_->size() != qgAxis2_->size())
@@ -131,6 +145,10 @@ namespace ttUtility
             //Construct constituents in place in the vector
             for(unsigned int iJet = 0; iJet < jetsLVec_->size(); ++iJet)
             {
+                //skip jet if filtering is turned on (i.e. filter_ is non-null) and the jet is not set to true
+                if(filter_ && !(*filter_)[iJet]) continue;
+                
+                //create constituent 
                 constituents.emplace_back((*jetsLVec_)[iJet], static_cast<double>((*btagFactors_)[iJet]), static_cast<double>((qgLikelihood_ != nullptr)?((*qgLikelihood_)[iJet]):(0.0)));
 
                 //Add additional QGL info if it is provided 
@@ -145,6 +163,9 @@ namespace ttUtility
                     if(extraVar.second && iJet < extraVar.second->size()) constituents.back().setExtraVar(extraVar.first, static_cast<double>((*extraVar.second)[iJet]));
                     else THROW_TTEXCEPTION("Extra variable " + extraVar.first + "[" + std::to_string(iJet) + "] is not found!!!!!!!");
                 }
+
+                //Add jet index pointing back to unfiltered input jets 
+                constituents.back().setIndex(iJet);
             
                 //Get gen matches if the required info is provided
                 if(hadGenTops_ && hadGenTopDaughters_)
@@ -169,29 +190,29 @@ namespace ttUtility
     /**
      *Class to gather the information necessary to construct the AK8 jet constituents
      */
-    template<typename FLOATTYPE>
+    template<typename FLOATTYPE, typename FLOATCONTAINERTYPE = std::vector<FLOATTYPE>, typename LORENTZVECTORCONTAINER = std::vector<TLorentzVector>>
     class ConstAK8Inputs : public ConstGenInputs
     {
     private:
-        const std::vector<TLorentzVector>* jetsLVec_;
-        const std::vector<FLOATTYPE>* tau1_;
-        const std::vector<FLOATTYPE>* tau2_;
-        const std::vector<FLOATTYPE>* tau3_;
-        const std::vector<FLOATTYPE>* deepAK8Top_;
-        const std::vector<FLOATTYPE>* deepAK8W_;
-        const std::vector<FLOATTYPE>* softDropMass_;
-        const std::vector<FLOATTYPE>* subjetsBtag_;
-        const std::vector<FLOATTYPE>* subjetsMult_;
-        const std::vector<FLOATTYPE>* subjetsPtD_;
-        const std::vector<FLOATTYPE>* subjetsAxis1_;
-        const std::vector<FLOATTYPE>* subjetsAxis2_;
-        const std::vector<TLorentzVector>* subjetsLVec_;
+        const LORENTZVECTORCONTAINER* jetsLVec_;
+        const FLOATCONTAINERTYPE* tau1_;
+        const FLOATCONTAINERTYPE* tau2_;
+        const FLOATCONTAINERTYPE* tau3_;
+        const FLOATCONTAINERTYPE* deepAK8Top_;
+        const FLOATCONTAINERTYPE* deepAK8W_;
+        const FLOATCONTAINERTYPE* softDropMass_;
+        const FLOATCONTAINERTYPE* subjetsBtag_;
+        const FLOATCONTAINERTYPE* subjetsMult_;
+        const FLOATCONTAINERTYPE* subjetsPtD_;
+        const FLOATCONTAINERTYPE* subjetsAxis1_;
+        const FLOATCONTAINERTYPE* subjetsAxis2_;
+        const LORENTZVECTORCONTAINER* subjetsLVec_;
         const std::vector<std::vector<TLorentzVector>>* vecSubjetsLVec_;
-        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsBtag_;
-        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsMult_;
-        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsPtD_;
-        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsAxis1_;
-        const std::vector<std::vector<FLOATTYPE>>* vecSubjetsAxis2_;
+        const std::vector<FLOATCONTAINERTYPE>* vecSubjetsBtag_;
+        const std::vector<FLOATCONTAINERTYPE>* vecSubjetsMult_;
+        const std::vector<FLOATCONTAINERTYPE>* vecSubjetsPtD_;
+        const std::vector<FLOATCONTAINERTYPE>* vecSubjetsAxis1_;
+        const std::vector<FLOATCONTAINERTYPE>* vecSubjetsAxis2_;
         TF1* puppisd_corrGEN_;
         TF1* puppisd_corrRECO_cen_;
         TF1* puppisd_corrRECO_for_;
@@ -221,29 +242,29 @@ namespace ttUtility
         }
 
     public:
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& deepAK8Top, const std::vector<FLOATTYPE>& deepAK8W, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& deepAK8Top, const FLOATCONTAINERTYPE& deepAK8W, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<FLOATTYPE>& subjetsBtag, const std::vector<FLOATTYPE>& subjetsMult, const std::vector<FLOATTYPE>& subjetsPtD, const std::vector<FLOATTYPE>& subjetsAxis1, const std::vector<FLOATTYPE>& subjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec, const FLOATCONTAINERTYPE& subjetsBtag, const FLOATCONTAINERTYPE& subjetsMult, const FLOATCONTAINERTYPE& subjetsPtD, const FLOATCONTAINERTYPE& subjetsAxis1, const FLOATCONTAINERTYPE& subjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const std::vector<LORENTZVECTORCONTAINER >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& deepAK8Top, const std::vector<FLOATTYPE>& deepAK8W, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& deepAK8Top, const FLOATCONTAINERTYPE& deepAK8W, const FLOATCONTAINERTYPE& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& deepAK8Top, const std::vector<FLOATTYPE>& deepAK8W, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& deepAK8Top, const FLOATCONTAINERTYPE& deepAK8W, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<TLorentzVector>& subjetsLVec, const std::vector<FLOATTYPE>& subjetsBtag, const std::vector<FLOATTYPE>& subjetsMult, const std::vector<FLOATTYPE>& subjetsPtD, const std::vector<FLOATTYPE>& subjetsAxis1, const std::vector<FLOATTYPE>& subjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const LORENTZVECTORCONTAINER& subjetsLVec, const FLOATCONTAINERTYPE& subjetsBtag, const FLOATCONTAINERTYPE& subjetsMult, const FLOATCONTAINERTYPE& subjetsPtD, const FLOATCONTAINERTYPE& subjetsAxis1, const FLOATCONTAINERTYPE& subjetsAxis2, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(&subjetsBtag), subjetsMult_(&subjetsMult), subjetsPtD_(&subjetsPtD), subjetsAxis1_(&subjetsAxis1), subjetsAxis2_(&subjetsAxis2), subjetsLVec_(&subjetsLVec), vecSubjetsLVec_(nullptr), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-        ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& deepAK8Top, const std::vector<FLOATTYPE>& deepAK8W, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+        ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& deepAK8Top, const FLOATCONTAINERTYPE& deepAK8W, const FLOATCONTAINERTYPE& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubJetsLVec, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(nullptr), tau2_(nullptr), tau3_(nullptr), deepAK8Top_(&deepAK8Top), deepAK8W_(&deepAK8W), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubJetsLVec), vecSubjetsBtag_(nullptr), vecSubjetsMult_(nullptr), vecSubjetsPtD_(nullptr), vecSubjetsAxis1_(nullptr), vecSubjetsAxis2_(nullptr), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsBtag, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsMult, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsPtD, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis1, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis2, const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*> >& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+	ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsBtag, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsMult, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsPtD, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsAxis1, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsAxis2, const LORENTZVECTORCONTAINER& hadGenTops, const std::vector<std::vector<const TLorentzVector*> >& hadGenTopDaughters) : ConstGenInputs(hadGenTops, hadGenTopDaughters), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
-	ConstAK8Inputs(const std::vector<TLorentzVector>& jetsLVec, const std::vector<FLOATTYPE>& tau1, const std::vector<FLOATTYPE>& tau2, const std::vector<FLOATTYPE>& tau3, const std::vector<FLOATTYPE>& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsBtag, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsMult, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsPtD, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis1, const std::vector<std::vector<FLOATTYPE> >& vecSubjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
+	ConstAK8Inputs(const LORENTZVECTORCONTAINER& jetsLVec, const FLOATCONTAINERTYPE& tau1, const FLOATCONTAINERTYPE& tau2, const FLOATCONTAINERTYPE& tau3, const FLOATCONTAINERTYPE& softDropMass, const std::vector<std::vector<TLorentzVector> >& vecSubjetsLVec, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsBtag, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsMult, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsPtD, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsAxis1, const std::vector<FLOATCONTAINERTYPE >& vecSubjetsAxis2) : ConstGenInputs(), jetsLVec_(&jetsLVec), tau1_(&tau1), tau2_(&tau2), tau3_(&tau3), deepAK8Top_(nullptr), deepAK8W_(nullptr), softDropMass_(&softDropMass), subjetsBtag_(nullptr), subjetsMult_(nullptr), subjetsPtD_(nullptr), subjetsAxis1_(nullptr), subjetsAxis2_(nullptr), subjetsLVec_(nullptr), vecSubjetsLVec_(&vecSubjetsLVec), vecSubjetsBtag_(&vecSubjetsBtag), vecSubjetsMult_(&vecSubjetsMult), vecSubjetsPtD_(&vecSubjetsPtD), vecSubjetsAxis1_(&vecSubjetsAxis1), vecSubjetsAxis2_(&vecSubjetsAxis2), puppisd_corrGEN_(nullptr), puppisd_corrRECO_cen_(nullptr), puppisd_corrRECO_for_(nullptr) { }
 
         void packageConstituents(std::vector<Constituent>& constituents)
         {
@@ -409,6 +430,57 @@ namespace ttUtility
         }
     };
 
+
+    /**
+     *Class to gather the information necessary to construct the ResolvedTopCand Constituents
+     */
+    template<typename FLOATTYPE, typename FLOATCONTAINERTYPE = std::vector<FLOATTYPE>, typename INTCONTAINERTYPE = std::vector<int>, typename LORENTZVECTORCONTAINER = std::vector<TLorentzVector>>
+    class ConstResolvedCandInputs
+    {
+    private:
+        const LORENTZVECTORCONTAINER* topCandLVec_;
+        const FLOATCONTAINERTYPE* topCandDisc_;
+        const INTCONTAINERTYPE* topCandJ1_;
+        const INTCONTAINERTYPE* topCandJ2_;
+        const INTCONTAINERTYPE* topCandJ3_;
+
+    public:
+        /**
+         *Basic constructor
+         *@param topCandLVec Vector of lorentz vectors of resolved top candidates 
+         *@param topCandDisc Vector of discriminator values for resolved top candidates
+         *@param topCandJ1 Vector of jet 1 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         *@param topCandJ2 Vector of jet 2 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         *@param topCandJ3 Vector of jet 3 indices for resolved top candidates, referenced with respect to the AK4 constituents 
+         */
+        ConstResolvedCandInputs(const LORENTZVECTORCONTAINER& topCandLVec, const FLOATCONTAINERTYPE& topCandDisc, const INTCONTAINERTYPE& topCandJ1, const INTCONTAINERTYPE& topCandJ2, const INTCONTAINERTYPE& topCandJ3) : topCandLVec_(&topCandLVec), topCandDisc_(&topCandDisc), topCandJ1_(&topCandJ1), topCandJ2_(&topCandJ2), topCandJ3_(&topCandJ3) {}
+
+        /**
+         *Called to fill the constituents using the information collected in the class. 
+         *Not intended to be called directly.
+         *@param constituents vector to insert resolved top candidate constituents into
+         */
+        void packageConstituents(std::vector<Constituent>& constituents)
+        {
+            //Check that vectors are of equal length
+            if(topCandLVec_->size() != topCandDisc_->size() || topCandLVec_->size() != topCandJ1_->size() || topCandLVec_->size() != topCandJ2_->size() || topCandLVec_->size() != topCandJ3_->size())
+            {
+                THROW_TTEXCEPTION("Vector sizes are unequal!!!");
+            }
+
+            //Fill the constituent with the necessary information 
+            for(unsigned int iTop = 0; iTop < topCandLVec_->size(); ++iTop)
+            {
+                constituents.emplace_back((*topCandLVec_)[iTop], RESOLVEDTOPCAND);
+                auto& constituent = constituents.back();
+                constituent.setTopDisc((*topCandDisc_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ1_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ2_)[iTop]);
+                constituent.addJetRefIndex((*topCandJ3_)[iTop]);
+            }
+        }
+    };
+
     //template metaprogramming magic 
     ///Resurcive function to assemble constituents from arbitrary list of input classes. Don't call this function!
     template<typename T, typename... Args> void packageConstituentsRecurse(std::vector<Constituent>& constituents, T input, Args... args)
@@ -435,6 +507,9 @@ namespace ttUtility
 
         return constituents;        
     }
+
+    ///Python compatibility function
+    std::vector<Constituent> packageConstituentsAK4(ConstAK4Inputs<float>& inputs);
 
     ///backwards compatability overload
     std::vector<Constituent> packageConstituents(const std::vector<TLorentzVector>& jetsLVec, const std::vector<double>& btagFactors, const std::vector<double>& qgLikelihood);

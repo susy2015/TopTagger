@@ -175,8 +175,9 @@ SHOTProducer::SHOTProducer(const edm::ParameterSet& iConfig)
         //For working directory use cfg file location
         size_t splitLocation = taggerCfgFile_.rfind("/");
         std::string workingDir = taggerCfgFile_.substr(0, splitLocation);
+        std::string configName = taggerCfgFile_.substr(splitLocation + 1);
         tt.setWorkingDirectory(workingDir);
-        tt.setCfgFile(taggerCfgFile_);
+        tt.setCfgFile(configName);
     }
     catch(const TTException& e)
     {
