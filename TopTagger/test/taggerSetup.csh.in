@@ -60,8 +60,7 @@ if ! ( $PATH:q =~ *$SCRIPTDIR:q* ) then
     setenv PATH ${SCRIPTDIR}:${PATH}
 endif
 
-if ( ! ($?PYTHONPATH) ) 
-then 
+if ( ! ($?PYTHONPATH) ) then 
     setenv PYTHONPATH ${TAGGERDIR}:${PYTHONDIR}
 else
     if ! ( $PYTHONPATH:q =~ *$TAGGERDIR:q* ) then
