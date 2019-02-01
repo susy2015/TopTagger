@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import *
+from Configuration.Eras.Modifier_run2_miniAOD_80XLegacy_cff import run2_miniAOD_80XLegacy
+from Configuration.Eras.Modifier_run2_miniAOD_94XFall17_cff import run2_miniAOD_94XFall17
 
 def prepareJets(process):
 
@@ -35,11 +37,6 @@ def prepareJets(process):
 
 def setupResolvedTaggerVariables(process):
 
-    #Add missing deepFlavour variables
-    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probc"))
-    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probuds"))
-    process.updatedPatJetsTransientCorrectedWithDeepInfo.discriminatorSources.append(cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probg"))
-
     topTaggerJetVars = process.jetTable.variables.clone(
             deepCSVb    = Var("bDiscriminator('pfDeepCSVJetTags:probb')",    float,doc="DeepCSV b discriminator"     ,precision=10),
             deepCSVbb   = Var("bDiscriminator('pfDeepCSVJetTags:probbb')",   float,doc="DeepCSV bb discriminator"    ,precision=10),
@@ -72,6 +69,14 @@ def setupResolvedTaggerVariables(process):
             CvsL = Var("bDiscriminator('pfCombinedCvsLJetTags')",    float,doc="Charm vs Light discriminator" ,precision=10),
             CvsB = Var("bDiscriminator('pfCombinedCvsBJetTags')",    float,doc="Charm vs b discriminator"     ,precision=10),
         )
+    #Add missing deepFlavour variables
+    run2_miniAOD_80XLegacy.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probg"))
+    run2_miniAOD_80XLegacy.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probuds"))
+    run2_miniAOD_80XLegacy.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probc"))
+
+    run2_miniAOD_94XFall17.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probg"))
+    run2_miniAOD_94XFall17.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probuds"))
+    run2_miniAOD_94XFall17.toModify(topTaggerJetVars, discriminatorSources = cms.InputTag("pfDeepFlavourJetTagsWithDeepInfo","probc"))     
 
     process.jetTable.variables = topTaggerJetVars
 
