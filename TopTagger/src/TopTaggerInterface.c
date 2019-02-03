@@ -261,7 +261,7 @@ static int TopTaggerInterface_makeAK8Const(
     auto& jetWDisc = tempFloatBuffers.back();
 
     //Create the AK8 constituent helper
-    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, subjetsLV));
+    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, vecSubjetsLV));
 
     return 0;
 }
