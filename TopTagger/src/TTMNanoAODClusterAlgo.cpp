@@ -85,6 +85,9 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
                         }
                     }
 
+                    //Make sure that this resolved top has exactly three constituents 
+                    if(resolvedTopConstituents.size() != 3) continue;
+
                     TopObject topCand(resolvedTopConstituents, TopObject::RESOLVED_TOP);
                     topCand.setDiscriminator(constituents[i].getTopDisc());
 
