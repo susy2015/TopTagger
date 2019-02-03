@@ -9,7 +9,7 @@ class Top:
         self.disc = disc
         self.type = type
         self.j1Idx = j1Idx
-        self.j2Idx = j2Ixd
+        self.j2Idx = j2Idx
         self.j3Idx = j3Idx
 
     def __str__(self):
