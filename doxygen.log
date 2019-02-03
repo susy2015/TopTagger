@@ -201,7 +201,7 @@ Preprocessing /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMAK8TopFilte
 Parsing file /home/travis/build/susy2015/TopTagger/TopTagger/src/TTMAK8TopFilter.cpp...
 Preprocessing /home//home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMAK8TopFilter.h:12: warning: Compound TTMAK8TopFilter is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh:11: warning: Compound cfg::Record is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:15: warning: Compound TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:21: warning: Compound TopTagger::TopTaggerResult is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:309: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMLazyClusterAlgo.h:9: warning: Compound TTMLazyClusterAlgo is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/lester_mt2_bisect.h:295: warning: Compound asymm_mt2_lester_bisect is not documented.
@@ -238,7 +238,7 @@ Preprocessing /home//home/travis/build/susy2015/TopTagger/TopTagger/interface/TT
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:305: warning: Compound hcalcfg::ParserInitExistsRecognizer is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/TTException.h:7: warning: Compound TTException is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/DataSet.py:2: warning: Compound DataSet::DataSet is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:45: warning: Compound TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:60: warning: Compound TopTagger::TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:333: warning: Compound hcalcfg::ParserDestroyExistsRecognizer::DestroyIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Scanner.h:233: warning: Compound hcalcfg::Scanner is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/FileNameQueue.py:7: warning: Compound FileNameQueue::FileNameQueue is not documented.
@@ -372,7 +372,7 @@ Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interfa
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMFinalSort.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMHEPRequirements.h...
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMLazyClusterAlgo.h...
-Generating c/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:683: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
+Generating c/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:678: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTModule.h:58: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/README.md:17: warning: explicit link request to 'events' could not be resolved
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/lester_mt2_bisect.h:300: warning: Member get_mT2(const double mVis1, const double pxVis1, const double pyVis1, const double mVis2, const double pxVis2, const double pyVis2, const double pxMiss, const double pyMiss, const double mInvis1, const double mInvis2, const double desiredPrecisionOnMT2=0, const bool useDeciSectionsInitially=true) (function) of class asymm_mt2_lester_bisect is not documented.
@@ -456,40 +456,41 @@ Generating c/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerU
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:106: warning: Member theItemName (variable) of class CfgBuilder is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:107: warning: Member theItemIndex (variable) of class CfgBuilder is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Defs.h:108: warning: Member theDoc (variable) of class CfgBuilder is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:53: warning: Member setPBtag(const TLorentzVector &p, const double &bTagDisc, const double &qgLikelihood) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:54: warning: Member setP(const TLorentzVector &p) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:55: warning: Member setBTag(const double &bTagDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:56: warning: Member setQGLikelihood(const double &qgLikelihood) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:57: warning: Member setType(const ConstituentType type) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:58: warning: Member setTau1(const double &tau1) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:59: warning: Member setTau2(const double &tau2) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:60: warning: Member setTau3(const double &tau3) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:61: warning: Member setSoftDropMass(const double &softDropMass) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:62: warning: Member setSubJets(const std::vector< Constituent > &subjets) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:63: warning: Member setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:64: warning: Member setWMassCorr(const double &wMassCorr) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:65: warning: Member setTopDisc(const double &topDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:66: warning: Member setWDisc(const double &WDisc) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:67: warning: Member setIndex(const unsigned int &index) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:69: warning: Member addJetRefIndex(const int &jetIndex) (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:90: warning: Member getP() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:91: warning: Member getBTagDisc() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:92: warning: Member getQGLikelihood() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:93: warning: Member getType() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:94: warning: Member getTau1() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:95: warning: Member getTau2() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:96: warning: Member getTau3() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:97: warning: Member getSoftDropMass() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:98: warning: Member getSubjets() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:99: warning: Member getGenMatches() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:100: warning: Member getWMassCorr() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:101: warning: Member getQGMult() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:102: warning: Member getQGPtD() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:103: warning: Member getQGAxis1() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:104: warning: Member getQGAxis2() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:105: warning: Member getTopDisc() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:106: warning: Member getWDisc() const  (function) of class Constituent is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:107: warning: Member getIndex() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:19: warning: Member ConstituentType (enumeration) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:55: warning: Member setPBtag(const TLorentzVector &p, const double &bTagDisc, const double &qgLikelihood) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:56: warning: Member setP(const TLorentzVector &p) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:57: warning: Member setBTag(const double &bTagDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:58: warning: Member setQGLikelihood(const double &qgLikelihood) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:59: warning: Member setType(const Constituent::ConstituentType type) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:60: warning: Member setTau1(const double &tau1) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:61: warning: Member setTau2(const double &tau2) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:62: warning: Member setTau3(const double &tau3) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:63: warning: Member setSoftDropMass(const double &softDropMass) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:64: warning: Member setSubJets(const std::vector< Constituent > &subjets) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:65: warning: Member setQGLVars(const double qgMult, const double qgPtD, const double qgAxis1, const double qgAxis2) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:66: warning: Member setWMassCorr(const double &wMassCorr) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:67: warning: Member setTopDisc(const double &topDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:68: warning: Member setWDisc(const double &WDisc) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:69: warning: Member setIndex(const unsigned int &index) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:71: warning: Member addJetRefIndex(const int &jetIndex) (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:92: warning: Member getP() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:93: warning: Member getBTagDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:94: warning: Member getQGLikelihood() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:95: warning: Member getType() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:96: warning: Member getTau1() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:97: warning: Member getTau2() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:98: warning: Member getTau3() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:99: warning: Member getSoftDropMass() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:100: warning: Member getSubjets() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:101: warning: Member getGenMatches() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:102: warning: Member getWMassCorr() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:103: warning: Member getQGMult() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:104: warning: Member getQGPtD() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:105: warning: Member getQGAxis1() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:106: warning: Member getQGAxis2() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:107: warning: Member getTopDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:108: warning: Member getWDisc() const  (function) of class Constituent is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/Constituent.h:109: warning: Member getIndex() const  (function) of class Constituent is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:42: warning: Member HDF5Writer(const std::map< std::string, std::vector< std::string >> &variables, int eventsPerFile, const std::string &ofname) (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:54: warning: Member setTupleVars(const std::set< std::string > &) (function) of class HDF5Writer is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/cpp/makeTrainingTuples.C:56: warning: Member initBranches(const NTupleReader &tr) (function) of class HDF5Writer is not documented.
@@ -509,42 +510,49 @@ Generating c/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerU
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopObjLite.h:35: warning: Member getJ1Idx() const  (function) of class TopObjLite is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopObjLite.h:36: warning: Member getJ2Idx() const  (function) of class TopObjLite is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopObjLite.h:37: warning: Member getJ3Idx() const  (function) of class TopObjLite is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:173: warning: Member parser (variable) of class TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:186: warning: Member f (variable) of class TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:188: warning: Member tree (variable) of class TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:190: warning: Member tt (variable) of class TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:198: warning: Member tops (variable) of class TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:187: warning: Member parser (variable) of class TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:200: warning: Member f (variable) of class TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:202: warning: Member tree (variable) of class TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:204: warning: Member tt (variable) of class TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:212: warning: Member tops (variable) of class TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:4: warning: Member __init__ (function) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:12: warning: Member __str__ (function) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:15: warning: Member __str__ (function) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:18: warning: Member __repr__ (function) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:5: warning: Member pt (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:6: warning: Member eta (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:7: warning: Member phi (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:8: warning: Member mass (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:9: warning: Member disc (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:10: warning: Member type (variable) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:47: warning: Member __init__ (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:53: warning: Member __enter__ (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:57: warning: Member __del__ (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:60: warning: Member __exit__ (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:63: warning: Member initialize (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:67: warning: Member close (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:73: warning: Member run (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:78: warning: Member runFromNanoAOD (function) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:48: warning: Member cfgFile (variable) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:49: warning: Member workingDir (variable) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:51: warning: Member firstEvent (variable) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:65: warning: Member tt (variable) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:16: warning: Member __init__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:20: warning: Member __len__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:23: warning: Member __iter__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:27: warning: Member ptCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:30: warning: Member etaCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:33: warning: Member phiCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:36: warning: Member massCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:39: warning: Member discCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:42: warning: Member typeCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:17: warning: Member floatVals (variable) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:18: warning: Member intVals (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:11: warning: Member j1Idx (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:12: warning: Member j2Idx (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:13: warning: Member j3Idx (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:62: warning: Member __init__ (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:68: warning: Member __enter__ (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:72: warning: Member __del__ (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:75: warning: Member __exit__ (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:78: warning: Member initialize (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:82: warning: Member close (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:88: warning: Member run (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:93: warning: Member runFromNanoAOD (function) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:63: warning: Member cfgFile (variable) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:64: warning: Member workingDir (variable) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:66: warning: Member firstEvent (variable) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:80: warning: Member tt (variable) of class TopTagger::TopTagger is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:22: warning: Member __init__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:26: warning: Member __len__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:29: warning: Member __iter__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:33: warning: Member ptCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:36: warning: Member etaCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:39: warning: Member phiCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:42: warning: Member massCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:45: warning: Member discCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:48: warning: Member typeCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:51: warning: Member j1IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:54: warning: Member j2IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:57: warning: Member j3IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:23: warning: Member floatVals (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:24: warning: Member intVals (variable) of class TopTagger::TopTaggerResult is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:46: warning: Member TopTaggerResults(std::vector< Constituent > &&constituents) (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:66: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:67: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
@@ -1061,26 +1069,26 @@ Generating docs for compound hcalcfg::Error/home/travis/build/susy2015/TopTagger
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:414: warning: Member prepHistosForWCorrectionFactors(const std::string &fname, TF1 *puppisd_corrGEN, TF1 *puppisd_corrRECO_cen, TF1 *puppisd_corrRECO_for) (function) of class ttUtility::ConstAK8Inputs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:32: warning: Member hadGenTops_ (variable) of class ttUtility::ConstGenInputs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:33: warning: Member hadGenTopDaughters_ (variable) of class ttUtility::ConstGenInputs is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:533: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:534: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:547: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::calculateVars(const TopObject &, int)=0
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:552: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::checkCand(const TopObject &)=0
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:537: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::mapVars(const std::vector< std::string > &)=0
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:533: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:534: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:572: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:573: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 552 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:571: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 537 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:533: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:534: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:587: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:588: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 552 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:586: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 537 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:533: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:534: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:679: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:680: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 552 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:678: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 537 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:528: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:529: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:542: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::calculateVars(const TopObject &, int)=0
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:547: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::checkCand(const TopObject &)=0
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:532: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::MVAInputCalculator::mapVars(const std::vector< std::string > &)=0
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:528: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:529: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:567: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 542 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:568: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:566: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTMonojetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 532 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:528: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:529: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:582: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 542 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:583: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:581: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::BDTDijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 532 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:528: warning: Member basePtr_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:529: warning: Member len_ (variable) of class ttUtility::MVAInputCalculator is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:674: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::calculateVars(const TopObject &, int) inherited from member calculateVars at line 542 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:675: warning: argument 'topCand' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::checkCand(const TopObject &) inherited from member checkCand at line 547 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:673: warning: argument 'vars' of command @param is not found in the argument list of ttUtility::TrijetInputCalculator::mapVars(const std::vector< std::string > &) inherited from member mapVars at line 532 in file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h
 s...
 Generating docs for compound hcalcfg::Parser...
 Generating docs for compound hcalcfg::Token...
@@ -1131,5 +1139,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1449/65536 hits=9262 misses=1543
+lookup cache used 1451/65536 hits=9281 misses=1545
 finished...

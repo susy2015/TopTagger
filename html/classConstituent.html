@@ -83,6 +83,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classConstituent-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -92,14 +93,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="Constituent_8h_source.html">Constituent.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a3d8249a65c5155829532a4483d6461f4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>ConstituentType</b> { <br/>
+&#160;&#160;<b>NOTYPE</b>, 
+<b>AK4JET</b>, 
+<b>AK6JET</b>, 
+<b>AK8JET</b>, 
+<br/>
+&#160;&#160;<b>CA8JET</b>, 
+<b>AK8SUBJET</b>, 
+<b>RESOLVEDTOPCAND</b>
+<br/>
+ }</td></tr>
+<tr class="separator:a3d8249a65c5155829532a4483d6461f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a70507cdd41d24d156a07bb9409bc95cf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a70507cdd41d24d156a07bb9409bc95cf">Constituent</a> ()</td></tr>
 <tr class="separator:a70507cdd41d24d156a07bb9409bc95cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86026ceffb0b81b7f1b306474325789b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a86026ceffb0b81b7f1b306474325789b">Constituent</a> (const TLorentzVector &amp;<a class="el" href="classConstituent.html#a3f918f1210cc666288327544e32d728c">p</a>, const double &amp;bTagDisc, const double &amp;qgLikelihood)</td></tr>
 <tr class="separator:a86026ceffb0b81b7f1b306474325789b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a812c45810832e1098b6d21c6050c123a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#a812c45810832e1098b6d21c6050c123a">Constituent</a> (const TLorentzVector &amp;<a class="el" href="classConstituent.html#a3f918f1210cc666288327544e32d728c">p</a>, const ConstituentType &amp;type)</td></tr>
-<tr class="separator:a812c45810832e1098b6d21c6050c123a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed3114a0fd1fdbd1d19ff1117ca9388e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#aed3114a0fd1fdbd1d19ff1117ca9388e">Constituent</a> (const TLorentzVector &amp;<a class="el" href="classConstituent.html#a3f918f1210cc666288327544e32d728c">p</a>, const Constituent::ConstituentType &amp;type)</td></tr>
+<tr class="separator:aed3114a0fd1fdbd1d19ff1117ca9388e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea65c8ccaa87cd41431adeabdd667c7b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classConstituent.html#aea65c8ccaa87cd41431adeabdd667c7b">Constituent</a> (const TLorentzVector &amp;<a class="el" href="classConstituent.html#a3f918f1210cc666288327544e32d728c">p</a>, const double &amp;tau1, const double &amp;tau2, const double &amp;tau3, const double &amp;softDropMass, const std::vector&lt; <a class="el" href="classConstituent.html">Constituent</a> &gt; &amp;subjets, const double &amp;wMassCorr)</td></tr>
 <tr class="separator:aea65c8ccaa87cd41431adeabdd667c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5282e40233ba506ee9a1e8a5c423ecd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5282e40233ba506ee9a1e8a5c423ecd3"></a>
@@ -114,9 +130,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setBTag</b> (const do
 <tr class="memitem:a8d08fcf43d1d33d4a09854b3a180499b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d08fcf43d1d33d4a09854b3a180499b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setQGLikelihood</b> (const double &amp;qgLikelihood)</td></tr>
 <tr class="separator:a8d08fcf43d1d33d4a09854b3a180499b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addfb4fd94597fee1886d4673256d4835"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="addfb4fd94597fee1886d4673256d4835"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setType</b> (const ConstituentType type)</td></tr>
-<tr class="separator:addfb4fd94597fee1886d4673256d4835"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18e4436af7fa3eb2a45e98b1917d5334"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18e4436af7fa3eb2a45e98b1917d5334"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setType</b> (const Constituent::ConstituentType type)</td></tr>
+<tr class="separator:a18e4436af7fa3eb2a45e98b1917d5334"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d1493cc1e27c929833f5d98b73ddd88"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d1493cc1e27c929833f5d98b73ddd88"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setTau1</b> (const double &amp;tau1)</td></tr>
 <tr class="separator:a9d1493cc1e27c929833f5d98b73ddd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -269,7 +285,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
 
 </div>
 </div>
-<a class="anchor" id="a812c45810832e1098b6d21c6050c123a"></a>
+<a class="anchor" id="aed3114a0fd1fdbd1d19ff1117ca9388e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -282,7 +298,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const ConstituentType &amp;&#160;</td>
+          <td class="paramtype">const Constituent::ConstituentType &amp;&#160;</td>
           <td class="paramname"><em>type</em>&#160;</td>
         </tr>
         <tr>
@@ -518,7 +534,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getIndex</b> () const 
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Feb 3 2019 09:45:08 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 3 2019 17:36:32 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

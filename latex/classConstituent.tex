@@ -5,6 +5,20 @@
 
 {\ttfamily \#include $<$Constituent.\-h$>$}
 
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries Constituent\-Type} \{ \\*
+{\bfseries N\-O\-T\-Y\-P\-E}, 
+{\bfseries A\-K4\-J\-E\-T}, 
+{\bfseries A\-K6\-J\-E\-T}, 
+{\bfseries A\-K8\-J\-E\-T}, 
+\\*
+{\bfseries C\-A8\-J\-E\-T}, 
+{\bfseries A\-K8\-S\-U\-B\-J\-E\-T}, 
+{\bfseries R\-E\-S\-O\-L\-V\-E\-D\-T\-O\-P\-C\-A\-N\-D}
+ \}
+\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -12,7 +26,7 @@
 \item 
 \hyperlink{classConstituent_a86026ceffb0b81b7f1b306474325789b}{Constituent} (const T\-Lorentz\-Vector \&\hyperlink{classConstituent_a3f918f1210cc666288327544e32d728c}{p}, const double \&b\-Tag\-Disc, const double \&qg\-Likelihood)
 \item 
-\hyperlink{classConstituent_a812c45810832e1098b6d21c6050c123a}{Constituent} (const T\-Lorentz\-Vector \&\hyperlink{classConstituent_a3f918f1210cc666288327544e32d728c}{p}, const Constituent\-Type \&type)
+\hyperlink{classConstituent_aed3114a0fd1fdbd1d19ff1117ca9388e}{Constituent} (const T\-Lorentz\-Vector \&\hyperlink{classConstituent_a3f918f1210cc666288327544e32d728c}{p}, const Constituent\-::\-Constituent\-Type \&type)
 \item 
 \hyperlink{classConstituent_aea65c8ccaa87cd41431adeabdd667c7b}{Constituent} (const T\-Lorentz\-Vector \&\hyperlink{classConstituent_a3f918f1210cc666288327544e32d728c}{p}, const double \&tau1, const double \&tau2, const double \&tau3, const double \&soft\-Drop\-Mass, const std\-::vector$<$ \hyperlink{classConstituent}{Constituent} $>$ \&subjets, const double \&w\-Mass\-Corr)
 \item 
@@ -28,7 +42,7 @@
 \hypertarget{classConstituent_a8d08fcf43d1d33d4a09854b3a180499b}{void {\bfseries set\-Q\-G\-Likelihood} (const double \&qg\-Likelihood)}\label{classConstituent_a8d08fcf43d1d33d4a09854b3a180499b}
 
 \item 
-\hypertarget{classConstituent_addfb4fd94597fee1886d4673256d4835}{void {\bfseries set\-Type} (const Constituent\-Type type)}\label{classConstituent_addfb4fd94597fee1886d4673256d4835}
+\hypertarget{classConstituent_a18e4436af7fa3eb2a45e98b1917d5334}{void {\bfseries set\-Type} (const Constituent\-::\-Constituent\-Type type)}\label{classConstituent_a18e4436af7fa3eb2a45e98b1917d5334}
 
 \item 
 \hypertarget{classConstituent_a9d1493cc1e27c929833f5d98b73ddd88}{void {\bfseries set\-Tau1} (const double \&tau1)}\label{classConstituent_a9d1493cc1e27c929833f5d98b73ddd88}
@@ -152,14 +166,14 @@ Empty constructor \hypertarget{classConstituent_a86026ceffb0b81b7f1b306474325789
 \item[{const double \&}]{qg\-Likelihood}
 \end{DoxyParamCaption}
 )}}\label{classConstituent_a86026ceffb0b81b7f1b306474325789b}
-Construct an A\-K4 jet from T\-Lorentz\-Vector, b-\/tag discriminator, and quark-\/gluonlikelihood \hypertarget{classConstituent_a812c45810832e1098b6d21c6050c123a}{\index{Constituent@{Constituent}!Constituent@{Constituent}}
+Construct an A\-K4 jet from T\-Lorentz\-Vector, b-\/tag discriminator, and quark-\/gluonlikelihood \hypertarget{classConstituent_aed3114a0fd1fdbd1d19ff1117ca9388e}{\index{Constituent@{Constituent}!Constituent@{Constituent}}
 \index{Constituent@{Constituent}!Constituent@{Constituent}}
 \subsubsection[{Constituent}]{\setlength{\rightskip}{0pt plus 5cm}Constituent\-::\-Constituent (
 \begin{DoxyParamCaption}
 \item[{const T\-Lorentz\-Vector \&}]{p, }
-\item[{const Constituent\-Type \&}]{type}
+\item[{const Constituent\-::\-Constituent\-Type \&}]{type}
 \end{DoxyParamCaption}
-)}}\label{classConstituent_a812c45810832e1098b6d21c6050c123a}
+)}}\label{classConstituent_aed3114a0fd1fdbd1d19ff1117ca9388e}
 Construct generic constituent jet from T\-Lorentz\-Vector and type \hypertarget{classConstituent_aea65c8ccaa87cd41431adeabdd667c7b}{\index{Constituent@{Constituent}!Constituent@{Constituent}}
 \index{Constituent@{Constituent}!Constituent@{Constituent}}
 \subsubsection[{Constituent}]{\setlength{\rightskip}{0pt plus 5cm}Constituent\-::\-Constituent (
