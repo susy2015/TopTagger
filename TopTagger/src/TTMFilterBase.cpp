@@ -15,12 +15,12 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
             //First return true if constituent is found (this covers all AK4 and most AK8 jets)
             return true;
         }
-        else if(constituent->getType() == AK8JET)
+        else if(constituent->getType() == Constituent::AK8JET)
         {
             //If the constituent is AK8 we will also check its subjets are not used
-            if(constituent->getSubjets().size() >= 1)
+            if(constituent->getSubjets().size() <= 1)
             {
-                // If this jet has only one subjet, use matching to the overall AK8 jet instaed 
+                // If this jet has only one subjet, use matching to the overall AK8 jet instead 
                 for(const auto& usedConstituent : usedConsts)
                 {
                     if(ROOT::Math::VectorUtil::DeltaR(constituent->p(), usedConstituent->p()) < dRMaxAK8)
@@ -28,7 +28,7 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
                         //we found a match
                         return true;
                     }
-                }                
+                }
             }
             else
             {
@@ -59,9 +59,9 @@ void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>&
         usedConstituents.insert(constituent);
 
         //If the constituent is an AK8JET, then add AK4JETs matching its subjets as well 
-        if(constituent->getType() == AK8JET)
+        if(constituent->getType() == Constituent::AK8JET)
         {
-            if(constituent->getSubjets().size() >= 1)
+            if(constituent->getSubjets().size() <= 1)
             {
                 //If there is one or fewer subjets, instead match to the overall AK8 jet
                 for(const auto& matchConst : allConstituents) 

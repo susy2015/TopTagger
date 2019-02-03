@@ -1,16 +1,22 @@
 import TopTaggerInterface as tti
 
 class Top:
-    def __init__(self, pt, eta, phi, mass, disc, type):
+    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999):
         self.pt = pt
         self.eta = eta
         self.phi = phi
         self.mass = mass
         self.disc = disc
         self.type = type
+        self.j1Idx = j1Idx
+        self.j2Idx = j2Idx
+        self.j3Idx = j3Idx
 
     def __str__(self):
         return "Top properties:   pt:  %7.3f,    eta:  %7.3f,    phi:  %7.3f,    mass:  %7.3f,    disc:  %7.3f,    type:  %3i"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type)
+
+    def __repr__(self):
+        return "Top(%f, %f, %f, %f, %f, %i, %i, %i, %i)"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.j1Idx, self.j2Idx, self.j3Idx)
 
 class TopTaggerResult:
     def __init__(self, results):
@@ -21,7 +27,7 @@ class TopTaggerResult:
         return self.floatVals.shape[0]
 
     def __iter__(self):
-        for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol()):
+        for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol()):
             yield Top(*variables)
 
     def ptCol(self):
@@ -41,6 +47,15 @@ class TopTaggerResult:
 
     def typeCol(self):
         return self.intVals[:, 0]
+
+    def j1IdxCol(self):
+        return self.intVals[:, 1]
+
+    def j2IdxCol(self):
+        return self.intVals[:, 2]
+
+    def j3IdxCol(self):
+        return self.intVals[:, 3]
 
 class TopTagger:
 
@@ -75,12 +90,11 @@ class TopTagger:
         results = tti.getResults(self.tt)
         return TopTaggerResult(results)
 
-    def runFromNanoAOD(self, event):
+    def runFromNanoAOD(self, event, isFirstEvent = False):
         #This is a hack for the nanoAOD postprocessor to force it to read all necessary variables before passing them to C because each new branch accessed causes all branches to be reallocated 
         nHackLoop = 1
-        if self.firstEvent:
+        if isFirstEvent:
             nHackLoop = 2
-            self.firstEvent = False
 
         for i in xrange(nHackLoop):
 

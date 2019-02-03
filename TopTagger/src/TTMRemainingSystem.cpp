@@ -47,13 +47,13 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
         if(usedJets.count(&jet)) continue;
 
         //Take first jet not in a top (the constituents are pt ordered)
-        if(seed == nullptr && jet.getType() == AK4JET)
+        if(seed == nullptr && jet.getType() == Constituent::AK4JET)
         {
             seed = &jet;
         }
 
         //switch to a W-jet if one is found
-        if(allowW_ && seed->getType() != AK8JET && passAK8WReqs(jet))
+        if(allowW_ && seed->getType() != Constituent::AK8JET && passAK8WReqs(jet))
         {
             seed = &jet;
         }
@@ -94,7 +94,7 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
             {
                 //if seed is AK4 jet, prefer AK8W over another AK4 jet
                 //else if seed is AK8, prefer AK4 matching jet
-                if(allowW_ && seed->getType() == AK4JET && passAK8WReqs(jet))
+                if(allowW_ && seed->getType() == Constituent::AK4JET && passAK8WReqs(jet))
                 {
                     if(!ak8wFound || dR < mindR)
                     {
@@ -105,7 +105,7 @@ void TTMRemainingSystem::run(TopTaggerResults& ttResults)
                 }
 
                 //if no AK8 jet is found use AK4 jet
-                if(!ak8wFound && jet.getType() == AK4JET && dR < mindR)
+                if(!ak8wFound && jet.getType() == Constituent::AK4JET && dR < mindR)
                 {
                     mindR = dR;
                     secondJet = &jet;

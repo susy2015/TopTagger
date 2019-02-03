@@ -142,7 +142,7 @@ static int TopTaggerInterface_makeAK4Const(
             }
 
             //filter out jet if it is matched to a lepton, or if it has pt < 20 GeV
-            filterVec[iJet] = !isLep && jetsLV[iJet].Pt() > 20.0;
+            filterVec[iJet] = !isLep && jetsLV[iJet].Pt() >= 19.9; //better to underclean just a bit because of nanoAOD rounding
         }
     }
 
@@ -261,7 +261,7 @@ static int TopTaggerInterface_makeAK8Const(
     auto& jetWDisc = tempFloatBuffers.back();
 
     //Create the AK8 constituent helper
-    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, subjetsLV));
+    ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, vecSubjetsLV));
 
     return 0;
 }

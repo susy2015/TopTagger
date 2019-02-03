@@ -296,7 +296,7 @@ namespace ttUtility
                 {	        
                     for(unsigned int iSJ = 0; iSJ < (*vecSubjetsLVec_)[iJet].size(); ++iSJ)
                     {
-                        subjets.emplace_back((*vecSubjetsLVec_)[iJet][iSJ], AK8SUBJET);
+                        subjets.emplace_back((*vecSubjetsLVec_)[iJet][iSJ], Constituent::AK8SUBJET);
                         if(vecSubjetsBtag_)  subjets.back().setBTag((*vecSubjetsBtag_)[iJet][iSJ]);
                         if(vecSubjetsMult_)  subjets.back().setExtraVar("mult",  (*vecSubjetsMult_) [iJet][iSJ]);
                         if(vecSubjetsPtD_)   subjets.back().setExtraVar("ptD",   (*vecSubjetsPtD_)  [iJet][iSJ]);
@@ -312,7 +312,7 @@ namespace ttUtility
                         double myDR = ROOT::Math::VectorUtil::DeltaR((*jetsLVec_)[iJet], (*subjetsLVec_)[iSJ]);
                         if (myDR < 0.8)
                         {
-                            subjets.emplace_back((*subjetsLVec_)[iSJ], AK8SUBJET);
+                            subjets.emplace_back((*subjetsLVec_)[iSJ], Constituent::AK8SUBJET);
                             if(subjetsBtag_)  subjets.back().setBTag((*subjetsBtag_)[iSJ]);
                             if(subjetsMult_)  subjets.back().setExtraVar("mult", (*subjetsMult_)[iSJ]);
                             if(subjetsPtD_)   subjets.back().setExtraVar("ptD", (*subjetsPtD_)[iSJ]);
@@ -471,7 +471,7 @@ namespace ttUtility
             //Fill the constituent with the necessary information 
             for(unsigned int iTop = 0; iTop < topCandLVec_->size(); ++iTop)
             {
-                constituents.emplace_back((*topCandLVec_)[iTop], RESOLVEDTOPCAND);
+                constituents.emplace_back((*topCandLVec_)[iTop], Constituent::RESOLVEDTOPCAND);
                 auto& constituent = constituents.back();
                 constituent.setTopDisc((*topCandDisc_)[iTop]);
                 constituent.addJetRefIndex((*topCandJ1_)[iTop]);
@@ -516,11 +516,6 @@ namespace ttUtility
     
     ///Tool to calcualte MT2 from tagger results
     double calculateMT2(const TopTaggerResults& ttr, const TLorentzVector& metLVec);
-
-    //MVA helper functions
-    /* \fn std::map<std::string, double> ttUtility::createMVAInputs(const TopObject& topCand, const double csvThresh) */
-    ///Function to calculate MVA input variables from a TopObject. This function is depricated in favor of the new MVAInputCalculator based approach.
-    std::map<std::string, double> createMVAInputs(const TopObject& topCand, const double csvThresh);
 
     //New MVA variable helper class
     /**
