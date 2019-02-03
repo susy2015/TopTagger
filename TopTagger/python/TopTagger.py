@@ -1,7 +1,7 @@
 import TopTaggerInterface as tti
 
 class Top:
-    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j13dx = -999):
+    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999):
         self.pt = pt
         self.eta = eta
         self.phi = phi
