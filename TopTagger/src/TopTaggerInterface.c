@@ -142,7 +142,7 @@ static int TopTaggerInterface_makeAK4Const(
             }
 
             //filter out jet if it is matched to a lepton, or if it has pt < 20 GeV
-            filterVec[iJet] = !isLep && jetsLV[iJet].Pt() > 20.0;
+            filterVec[iJet] = !isLep && jetsLV[iJet].Pt() >= 19.9; //better to underclean just a bit because of nanoAOD rounding
         }
     }
 
