@@ -75,12 +75,11 @@ class TopTagger:
         results = tti.getResults(self.tt)
         return TopTaggerResult(results)
 
-    def runFromNanoAOD(self, event):
+    def runFromNanoAOD(self, event, isFirstEvent = False):
         #This is a hack for the nanoAOD postprocessor to force it to read all necessary variables before passing them to C because each new branch accessed causes all branches to be reallocated 
         nHackLoop = 1
-        if self.firstEvent:
+        if isFirstEvent:
             nHackLoop = 2
-            self.firstEvent = False
 
         for i in xrange(nHackLoop):
 
