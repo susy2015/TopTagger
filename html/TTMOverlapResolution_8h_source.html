@@ -107,7 +107,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classTopObject.html#af82a20e421c29bc667af7cd73fc46ba4">TopObject::Type</a> type_;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::string sortMethod_;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    std::function&lt;bool (const TopObject* t1, const TopObject* t2)&gt; sortFunc_;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">bool</span> doSort_;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">bool</span> doSort_, markUsed_;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classTTMOverlapResolution.html#a4dd88bd8480301018cfba596ae226157">getParameters</a>(<span class="keyword">const</span> <a class="code" href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a>*, <span class="keyword">const</span> std::string&amp;);</div>
@@ -120,7 +120,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classTTMOverlapResolution_html"><div class="ttname"><a href="classTTMOverlapResolution.html">TTMOverlapResolution</a></div><div class="ttdef"><b>Definition:</b> TTMOverlapResolution.h:23</div></div>
 <div class="ttc" id="TTModule_8h_html_a5aff241e827824ffd2c2efc4c5bf1fda"><div class="ttname"><a href="TTModule_8h.html#a5aff241e827824ffd2c2efc4c5bf1fda">REGISTER_TTMODULE</a></div><div class="ttdeci">#define REGISTER_TTMODULE(_module)</div><div class="ttdef"><b>Definition:</b> TTModule.h:65</div></div>
 <div class="ttc" id="classTTMFilterBase_html"><div class="ttname"><a href="classTTMFilterBase.html">TTMFilterBase</a></div><div class="ttdef"><b>Definition:</b> TTMFilterBase.h:12</div></div>
-<div class="ttc" id="classTTMOverlapResolution_html_a4099ee72e105acbcca10078068775bef"><div class="ttname"><a href="classTTMOverlapResolution.html#a4099ee72e105acbcca10078068775bef">TTMOverlapResolution::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMOverlapResolution.cpp:124</div></div>
+<div class="ttc" id="classTTMOverlapResolution_html_a4099ee72e105acbcca10078068775bef"><div class="ttname"><a href="classTTMOverlapResolution.html#a4099ee72e105acbcca10078068775bef">TTMOverlapResolution::run</a></div><div class="ttdeci">void run(TopTaggerResults &amp;)</div><div class="ttdef"><b>Definition:</b> TTMOverlapResolution.cpp:125</div></div>
 <div class="ttc" id="classcfg_1_1CfgDocument_html"><div class="ttname"><a href="classcfg_1_1CfgDocument.html">cfg::CfgDocument</a></div><div class="ttdef"><b>Definition:</b> CfgDocument.hh:15</div></div>
 <div class="ttc" id="classTopTaggerResults_html"><div class="ttname"><a href="classTopTaggerResults.html">TopTaggerResults</a></div><div class="ttdef"><b>Definition:</b> TopTaggerResults.h:15</div></div>
 <div class="ttc" id="classTTMOverlapResolution_html_a4dd88bd8480301018cfba596ae226157"><div class="ttname"><a href="classTTMOverlapResolution.html#a4dd88bd8480301018cfba596ae226157">TTMOverlapResolution::getParameters</a></div><div class="ttdeci">void getParameters(const cfg::CfgDocument *, const std::string &amp;)</div><div class="ttdef"><b>Definition:</b> TTMOverlapResolution.cpp:13</div></div>
@@ -129,7 +129,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 4 2019 17:31:25 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 4 2019 21:18:47 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
