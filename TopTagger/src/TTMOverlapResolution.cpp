@@ -24,6 +24,7 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
     type_          = static_cast<TopObject::Type>(cfgDoc->get("NConstituents", localCxt,  TopObject::ANY));
     sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "EMPTY");
+    markUsed_      = cfgDoc->get("markUsed",      localCxt,  true);
 
     //select the approperiate sorting function 
     doSort_ = true;  //sort true unless option "none" is selected
@@ -160,7 +161,7 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
             //If the candidate survived, it must be a good top!!!
 
             //Add the good tops constituents to the set tracking which constituents have been used
-            markConstituentsUsed(jets, constituents, usedJets, dRMatch_, dRMatchAK8_);
+            if(markUsed_) markConstituentsUsed(jets, constituents, usedJets, dRMatch_, dRMatchAK8_);
         }
 
         ++iTop;

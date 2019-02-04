@@ -27,7 +27,7 @@ private:
     TopObject::Type type_;
     std::string sortMethod_;
     std::function<bool (const TopObject* t1, const TopObject* t2)> sortFunc_;
-    bool doSort_;
+    bool doSort_, markUsed_;
 
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);
