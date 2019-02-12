@@ -828,10 +828,11 @@ namespace ttUtility
     {
         static std::regex env("\\$\\{([^}]+)\\}");
         std::smatch match;
-        while (std::regex_search(path, match, env)){
+        while (std::regex_search(path, match, env))
+        {
             const char* s = getenv(match[1].str().c_str());
             const std::string var(s == NULL ? "" : s);
-            path.replace(match[0].first, match[0].second, var);
+            path.replace(path.find(match[0]), match[0].length(), var);
         }
     }
 
