@@ -7,6 +7,7 @@
 #include <map>
 #include <utility>
 #include <regex>
+#include <cstdlib>
 
 namespace ttUtility
 {
