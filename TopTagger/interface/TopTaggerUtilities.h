@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 class Constituent;
 class TopObject;
@@ -697,6 +698,10 @@ namespace ttUtility
 
     ///Helper function to get the direct decay products of the gen tops
     std::vector<const TLorentzVector*> GetTopdauLVec(const TLorentzVector& top, const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
+
+    //Helper function to expand env. variables in file path
+    //Originally from https://stackoverflow.com/questions/1902681/expand-file-names-that-have-environment-variables-in-their-path/20715800#20715800
+    void autoExpandEnvironmentVariables(std::string&);
 
 }
 
