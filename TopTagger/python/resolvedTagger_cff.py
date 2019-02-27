@@ -69,6 +69,8 @@ def setupResolvedTaggerVariables(process):
             phMult    = Var("photonMultiplicity()",        float, doc="photon multiplicity"         ,precision=10),
             elMult    = Var("electronMultiplicity()",      float, doc="electron multiplicity"       ,precision=10),
             muMult    = Var("muonMultiplicity()",          float, doc="muon multiplicity"           ,precision=10),
+            neMult    = Var("neutralMultiplicity()",       float, doc="pf neutral multiplicity"     ,precision=10),
+            chMult    = Var("chargedMultiplicity()",       float, doc="pf charged multiplicity"     ,precision=10),
 
             CvsL = Var("bDiscriminator('pfCombinedCvsLJetTags')",    float,doc="Charm vs Light discriminator" ,precision=10),
             CvsB = Var("bDiscriminator('pfCombinedCvsBJetTags')",    float,doc="Charm vs b discriminator"     ,precision=10),
