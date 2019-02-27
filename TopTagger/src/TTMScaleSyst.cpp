@@ -22,32 +22,6 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     //Get histogram names and variables for systematic evaluation
     std::vector<std::pair<std::string, std::string>> systematicNames;
 
-    //Sort the top vector for overlap resolution
-    if(topFlavor.compare("MERGED_TOP") == 0)
-    {
-        topType_ = TopObject::MERGED_TOP;
-    }
-    else if(topFlavor.compare("SEMIMERGEDWB_TOP") == 0)
-    {
-        topType_ = TopObject::SEMIMERGEDWB_TOP;
-    }
-    else if(topFlavor.compare("RESOLVED_TOP") == 0)
-    {
-        topType_ = TopObject::RESOLVED_TOP;
-    }
-    else if(topFlavor.compare("MERGED_W") == 0)
-    {
-        topType_ = TopObject::MERGED_W;
-    }
-    else if(topFlavor.compare("SEMIMERGEDQB_TOP") == 0)
-    {
-        topType_ = TopObject::SEMIMERGEDQB_TOP;
-    }
-    else
-    {
-        THROW_TTEXCEPTION("Invalid TopObject type: " + topFlavor);
-    }
-
     //Get the necessary and avaliable histograms from the input root file
     std::unique_ptr<TFile> file(TFile::Open(inputFileName.c_str()));
 
