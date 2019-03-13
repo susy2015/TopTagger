@@ -45,12 +45,127 @@ from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValTTbarPileUpMINIAO
 ###############################################################################################################################
 
 process.source = cms.Source('PoolSource',
-                            fileNames=cms.untracked.vstring (["root://cmseos.fnal.gov//store/user/benwu/Stop18/NtupleSyncMiniAOD/00257B91-1808-E811-BD39-0242AC130002.root"]),
+                            fileNames=cms.untracked.vstring (["/store/mc/RunIISummer16MiniAODv3/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2/120000/1E4DDC30-2AEB-E811-BBB1-0CC47A5FA3BD.root"]),
 )
 
 process.source.skipEvents = cms.untracked.uint32(options.skipEvents)
 process.maxEvents  = cms.untracked.PSet( 
-    input = cms.untracked.int32 (10000) 
+    input = cms.untracked.int32 (1000) 
+)
+
+###############################################################################################################################
+
+from PhysicsTools.PatAlgos.producersLayer1.electronProducer_cfi import patElectrons
+
+process.slimmedElectronsUpdated = cms.EDProducer("PATElectronUpdater",
+    src = cms.InputTag("slimmedElectrons"),
+    vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    computeMiniIso = cms.bool(True),
+    pfCandsForMiniIso = cms.InputTag("packedPFCandidates"),
+    miniIsoParamsB = patElectrons.miniIsoParamsB, # so they're in sync
+    miniIsoParamsE = patElectrons.miniIsoParamsE, # so they're in sync
+)
+
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import setupVIDSelection
+from RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cff import egmGsfElectronIDs
+
+process.egmGsfElectronIDs = egmGsfElectronIDs
+process.egmGsfElectronIDs.physicsObjectIDs = cms.VPSet()
+process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag("slimmedElectronsUpdated")
+
+_electron_id_modules_WorkingPoints = cms.PSet(
+    modules = cms.vstring(
+        'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
+        'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff',
+        'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
+    ),
+    WorkingPoints = cms.vstring(
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto",
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose",
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium",
+        "egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight",
+    )
+)
+
+process.bitmapVIDForEle = cms.EDProducer("EleVIDNestedWPBitmapProducer",
+    src = cms.InputTag("slimmedElectronsUpdated"),
+    WorkingPoints = _electron_id_modules_WorkingPoints.WorkingPoints
+)
+
+from math import ceil, log
+
+#this is magic ...
+for modname in _electron_id_modules_WorkingPoints.modules:
+    ids= __import__(modname, globals(), locals(), ['idName','cutFlow'])
+    for name in dir(ids):
+        _id = getattr(ids,name)
+        if hasattr(_id,'idName') and hasattr(_id,'cutFlow'):
+            setupVIDSelection(egmGsfElectronIDs,_id)
+
+process.isoForEle = cms.EDProducer("EleIsoValueMapProducer",
+    src = cms.InputTag("slimmedElectronsUpdated"),
+    relative = cms.bool(False),
+    rho_MiniIso = cms.InputTag("fixedGridRhoFastjetAll"),
+    rho_PFIso = cms.InputTag("fixedGridRhoFastjetAll"),
+    EAFile_MiniIso = cms.FileInPath("RecoEgamma/ElectronIdentification/data/Spring15/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_25ns.txt"),
+    EAFile_PFIso = cms.FileInPath("RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt"),
+)
+
+process.ptRatioRelForEle = cms.EDProducer("ElectronJetVarProducer",
+    srcJet = cms.InputTag("slimmedJets"),
+    srcLep = cms.InputTag("slimmedElectronsUpdated"),
+    srcVtx = cms.InputTag("offlineSlimmedPrimaryVertices"),
+)
+
+process.slimmedElectronsWithUserData = cms.EDProducer("PATElectronUserDataEmbedder",
+    src = cms.InputTag("slimmedElectronsUpdated"),
+    userFloats = cms.PSet(
+        miniIsoAll = cms.InputTag("isoForEle:miniIsoAll"),
+    ),
+    userInts = cms.PSet(
+        VIDNestedWPBitmap = cms.InputTag("bitmapVIDForEle"),
+    ),
+    userCands = cms.PSet(
+        jetForLepJetVar = cms.InputTag("ptRatioRelForEle:jetForLepJetVar") # warning: Ptr is null if no match is found
+    ),
+)
+
+
+###############################################################################################################################
+
+from PhysicsTools.PatAlgos.producersLayer1.muonProducer_cfi import patMuons
+
+# this below is used only in some eras
+process.slimmedMuonsUpdated = cms.EDProducer("PATMuonUpdater",
+    src = cms.InputTag("slimmedMuons"),
+    vertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    computeMiniIso = cms.bool(True),
+    pfCandsForMiniIso = cms.InputTag("packedPFCandidates"),
+    miniIsoParams = patMuons.miniIsoParams, # so they're in sync
+    recomputeMuonBasicSelectors = cms.bool(True),
+)
+
+process.isoForMu = cms.EDProducer("MuonIsoValueMapProducer",
+    src = cms.InputTag("slimmedMuonsUpdated"),
+    relative = cms.bool(False),
+    rho_MiniIso = cms.InputTag("fixedGridRhoFastjetAll"),
+    EAFile_MiniIso = cms.FileInPath("PhysicsTools/NanoAOD/data/effAreaMuons_cone03_pfNeuHadronsAndPhotons_80X.txt"),
+)
+
+process.ptRatioRelForMu = cms.EDProducer("MuonJetVarProducer",
+    srcJet = cms.InputTag("slimmedJets"),
+    srcLep = cms.InputTag("slimmedMuonsUpdated"),
+    srcVtx = cms.InputTag("offlineSlimmedPrimaryVertices"),
+)
+
+process.slimmedMuonsWithUserData = cms.EDProducer("PATMuonUserDataEmbedder",
+     src = cms.InputTag("slimmedMuonsUpdated"),
+     userFloats = cms.PSet(
+        miniIsoAll = cms.InputTag("isoForMu:miniIsoAll"),
+     ),
+     userCands = cms.PSet(
+        jetForLepJetVar = cms.InputTag("ptRatioRelForMu:jetForLepJetVar") # warning: Ptr is null if no match is found
+     ),
 )
 
 ###############################################################################################################################
@@ -75,8 +190,9 @@ process.slimmedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
 
 process.load("TopTagger.TopTagger.SHOTProducer_cfi")
 process.SHOTProducer.ak4JetSrc = cms.InputTag("slimmedJetsWithUserData")
-#This is set to false because the 
-process.SHOTProducer.doLeptonCleaning = cms.bool(False)
+process.SHOTProducer.muonSrc = cms.InputTag('slimmedMuonsWithUserData')
+process.SHOTProducer.elecSrc = cms.InputTag('slimmedElectronsWithUserData')
+process.SHOTProducer.doLeptonCleaning = cms.bool(True)
 
 ###############################################################################################################################
 
@@ -87,6 +203,6 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 ###############################################################################################################################
 
-process.p = cms.Path(process.QGTagger * process.slimmedJetsWithUserData * process.SHOTProducer)
+process.p = cms.Path(process.slimmedElectronsUpdated * process.isoForEle * process.egmGsfElectronIDs * process.bitmapVIDForEle * process.ptRatioRelForEle * process.slimmedElectronsWithUserData * process.slimmedMuonsUpdated * process.isoForMu * process.ptRatioRelForMu * process.slimmedMuonsWithUserData * process.QGTagger * process.slimmedJetsWithUserData * process.SHOTProducer)
 process.endP = cms.EndPath(process.out)
 
