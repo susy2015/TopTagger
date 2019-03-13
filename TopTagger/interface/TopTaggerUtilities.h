@@ -692,6 +692,10 @@ namespace ttUtility
 
     std::vector<std::string> getMVAVars();
 
+    bool recMomSearch(int startIndex, int targetIndex, const std::vector<int>& genDecayMomIdxVec);
+
+    std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayStatFlag, const std::vector<int>& genDecayMomIdxVec);
+
     //Gen matching helper functions 
     ///Helper function to help find the hadronically decaying gen tops 
     std::vector<TLorentzVector> GetHadTopLVec(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayIdxVec, const std::vector<int>& genDecayMomIdxVec);
