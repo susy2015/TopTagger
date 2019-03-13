@@ -677,18 +677,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;</div>
 <div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    std::vector&lt;std::string&gt; getMVAVars();</div>
 <div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    <span class="keywordtype">bool</span> recMomSearch(<span class="keywordtype">int</span> startIndex, <span class="keywordtype">int</span> targetIndex, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    std::pair&lt;std::vector&lt;TLorentzVector&gt;, std::vector&lt;std::vector&lt;const TLorentzVector*&gt;&gt;&gt; GetTopdauGenLVecFromNano(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayStatFlag, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="comment">//Helper function to expand env. variables in file path</span></div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="comment">//Originally from https://stackoverflow.com/questions/1902681/expand-file-names-that-have-environment-variables-in-their-path/20715800#20715800</span></div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <span class="keywordtype">void</span> autoExpandEnvironmentVariables(std::string&amp;);</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;}</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    <span class="comment">//Helper function to expand env. variables in file path</span></div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    <span class="comment">//Originally from https://stackoverflow.com/questions/1902681/expand-file-names-that-have-environment-variables-in-their-path/20715800#20715800</span></div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="keywordtype">void</span> autoExpandEnvironmentVariables(std::string&amp;);</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;}</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_af929778a33ce64a1c5102712a2858aa0"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#af929778a33ce64a1c5102712a2858aa0">ttUtility::BDTMonojetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:112</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html">ttUtility::ConstAK4Inputs</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:50</div></div>
 <div class="ttc" id="classttUtility_1_1ConstGenInputs_html_a520c5a594261d877f0fb4ad46aedc71e"><div class="ttname"><a href="classttUtility_1_1ConstGenInputs.html#a520c5a594261d877f0fb4ad46aedc71e">ttUtility::ConstGenInputs::ConstGenInputs</a></div><div class="ttdeci">ConstGenInputs()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:14</div></div>
@@ -727,7 +731,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 27 2019 17:56:49 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 13 2019 16:40:19 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
