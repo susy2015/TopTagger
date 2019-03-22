@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <memory>
 
 #include "TLorentzVector.h"
 
@@ -36,6 +37,8 @@ private:
 
     std::map<const TLorentzVector*, std::set<const TLorentzVector*>> genMatchPossibilities_;
     std::map<std::string, double> systematicUncertainties_;
+
+    std::shared_ptr<std::map<std::string, float>> inputMVAVars_;
 
 public:
     /// Construct default empty TopObject
@@ -79,6 +82,22 @@ public:
     double getMCScaleFactor() const; 
     /// Return systematic uncertainty 
     double getSystematicUncertainty(const std::string& source) const; 
+
+    /// Store the MVA input variables in the TopObject, this is only used for debug purposes 
+    template<typename IterType>
+    void storeMVAInputs(const std::vector<std::string>& names, const IterType& begin, const IterType& end)
+    {
+        inputMVAVars_.reset(new std::map<std::string, float>());
+        
+        int i = 0;
+        for(IterType iter = begin; iter != end; ++iter, ++i)
+        {
+            (*inputMVAVars_)[names[i]] = *iter;
+        }
+    }
+    
+    /// Get the MVA input variables in the TopObject, this is only used for debug purposes 
+    std::map<std::string, float>& getMVAInputs() const { return *inputMVAVars_; }
 };
 
 #endif

@@ -25,6 +25,7 @@ void TTMTensorflow::getParameters(const cfg::CfgDocument* cfgDoc, const std::str
     inputOp_       = cfgDoc->get("inputOp",       localCxt, "x");
     outputOp_      = cfgDoc->get("outputOp",      localCxt, "y");
     NConstituents_ = cfgDoc->get("NConstituents", localCxt, 3);
+    saveInputs_    = cfgDoc->get("saveInputs",    localCxt, false);
 
     csvThreshold_  = cfgDoc->get("csvThreshold", localCxt, -999.9);
     bEtaCut_       = cfgDoc->get("bEtaCut",      localCxt, -999.9);
@@ -171,7 +172,16 @@ void TTMTensorflow::run(TopTaggerResults& ttResults)
     unsigned int iCand = 0;
     for(auto& topCand : validCands)
     {
-        if(varCalculator_->calculateVars(*topCand, iCand)) ++iCand;
+        if(varCalculator_->calculateVars(*topCand, iCand))
+        {
+            if(saveInputs_)
+            {
+                float *start = static_cast<float*>(TF_TensorData(input_values_0)) + vars_.size() * iCand;
+                float *end = start + vars_.size();
+                topCand->storeMVAInputs(vars_, start, end);
+            }
+            ++iCand;
+        }
     }
 
     //predict values
