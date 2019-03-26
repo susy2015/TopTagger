@@ -44,6 +44,35 @@ namespace ttPython
             return buf;
         }
 
+        void translatePyList(PyObject* pList)
+        {
+            len_ = PyList_Size(pList);
+
+            //unfortunately we are going to have to copy the data to make it contiguous
+            tmpVec_.reset(new std::vector<T>(len_));
+
+            for(Py_ssize_t i = 0; i < len_; ++i)
+            {
+                PyObject* item = PyList_GetItem(pList, i);
+
+                if(PyFloat_Check(item))
+                {
+                    (*tmpVec_)[i] = static_cast<T>(PyFloat_AsDouble(item));
+                    buf_ = tmpVec_->data();
+                }
+                else if(PyInt_Check(item))
+                {
+                    (*tmpVec_)[i] = static_cast<T>(PyInt_AsLong(item));
+                    buf_ = tmpVec_->data();
+                }
+                else
+                {
+                    len_ = 0;
+                    buf_ = nullptr;
+                }
+            }
+        }
+
         void setVecBuffer(std::vector<T>& vec)
         {
             len_ = vec.size();
@@ -79,6 +108,10 @@ namespace ttPython
                     len_ = 0;
                     buf_ = nullptr;
                 }
+            }
+            else if(PyList_Check(pObj_))  //Check if this is a python list
+            {
+                translatePyList(pObj_);
             }
             else if(TPython::ObjectProxy_Check(pObj_))  //Check if this is a root generated object 
             {
@@ -163,6 +196,39 @@ namespace ttPython
     };
 
 #ifdef DOPYCAPIBIND
+    template<>
+    void Py_buffer_wrapper<TLorentzVector>::translatePyList(PyObject* pList)
+    {
+        (void)pList;
+        len_ = 0;
+        buf_ = nullptr;
+    }
+
+    template<>
+    void Py_buffer_wrapper<bool>::translatePyList(PyObject* pList)
+    {
+        len_ = PyList_Size(pList);
+        buf_ = new bool[len_];
+
+        //unfortunately we are going to have to copy the data to make it contiguous                                                                                                                                                       
+        for(Py_ssize_t i = 0; i < len_; ++i)
+        {
+            PyObject* item = PyList_GetItem(pList, i);
+
+            if(PyBool_Check(item))
+            {
+                buf_[i] = static_cast<bool>(PyInt_AsLong(item));
+            }
+            else
+            {
+                delete [] buf_;
+                len_ = 0;
+                buf_ = nullptr;
+            }
+        }
+    }
+
+
     template<>
     void Py_buffer_wrapper<bool>::setVecBuffer(std::vector<bool>& vec)
     {
