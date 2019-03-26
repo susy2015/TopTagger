@@ -35,6 +35,7 @@ namespace ttUtility
  *@param bEtaCut (float) Requirment on |eta| for a constituent to be considered a b-jet
  *@param maxNbInTop (int) The maximum number of constituent jets which can be b-tagged for the candidate to be a final top (set < 0 to disable)
  *@param mvaVar[] (string - array) MVA variable input names
+ *@param saveInputs (bool) Debug option to save MVA inputs inside TopObject.  Defaults to false. 
  */
 class TTMTensorflow : public TTModule
 {
@@ -48,6 +49,7 @@ private:
     double bEtaCut_;
     int maxNbInTop_;
     int NConstituents_;
+    bool saveInputs_;
 
     //Tensoflow session pointer
     TF_Session *session_;

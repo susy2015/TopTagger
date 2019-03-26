@@ -2,11 +2,11 @@
 
 #include "Math/VectorUtil.h"
 
-TopObject::TopObject() : dRmax_(999.9), discriminator_(-999.9), dThetaMin_(999.9), dThetaMax_(-999.9), scaleFactor_(0.0), type_(TopObject::NONE)
+TopObject::TopObject() : dRmax_(999.9), discriminator_(-999.9), dThetaMin_(999.9), dThetaMax_(-999.9), scaleFactor_(0.0), type_(TopObject::NONE), inputMVAVars_(nullptr)
 {
 }
 
-TopObject::TopObject(std::vector<Constituent const *> constituents, const Type& type) : constituents_(constituents), type_(type)
+TopObject::TopObject(std::vector<Constituent const *> constituents, const Type& type) : constituents_(constituents), type_(type), inputMVAVars_(nullptr)
 {
     discriminator_ = -999.9;
     updateVariables();
@@ -88,3 +88,4 @@ double TopObject::getSystematicUncertainty(const std::string& source) const
 {
     return 0.0;
 }
+
