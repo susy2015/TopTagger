@@ -1039,25 +1039,32 @@ Generating docs for compound /home/travis/build/susy2015/TopTagger/Tools/python/
 /home/travis/build/susy2015/TopTagger/Tools/python/submitBatch.py:16: warning: Member submitList (variable) of class submitBatch::SubmitJobs is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/submitBatch.py:17: warning: Member currentGPU (variable) of class submitBatch::SubmitJobs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:15: warning: Member __init__ (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:21: warning: Member beginJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:24: warning: Member endJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:27: warning: Member beginFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:51: warning: Member endFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:34: warning: Member beginJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:37: warning: Member endJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:40: warning: Member beginFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:65: warning: Member endFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:68: warning: Member runFromNanoAOD (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:16: warning: Member topTaggerCfg (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:17: warning: Member topTaggerWD (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:19: warning: Member tt (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:29: warning: Member out (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:115: warning: Member Py_buffer_wrapper(void *buf) (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:119: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &)=delete (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:122: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &&old) (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:125: warning: Member Py_buffer_wrapper(std::vector< T > &&buf) (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:132: warning: Member size() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:137: warning: Member operator[](unsigned int i) (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:141: warning: Member operator[](unsigned int i) const  (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:146: warning: Member begin() (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:150: warning: Member begin() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:155: warning: Member end() (function) of class ttPython::Py_buffer_wrapper is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:159: warning: Member end() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:18: warning: Member saveAK8 (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:19: warning: Member AK4JetInputs (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:20: warning: Member recalculateFromRawInputs (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:21: warning: Member useAK8 (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:22: warning: Member doLepCleaning (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:24: warning: Member tt (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:28: warning: Member suffix (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:42: warning: Member out (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:148: warning: Member Py_buffer_wrapper(void *buf) (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:152: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &)=delete (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:155: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &&old) (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:158: warning: Member Py_buffer_wrapper(std::vector< T > &&buf) (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:165: warning: Member size() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:170: warning: Member operator[](unsigned int i) (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:174: warning: Member operator[](unsigned int i) const  (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:179: warning: Member begin() (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:183: warning: Member begin() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:188: warning: Member end() (function) of class ttPython::Py_buffer_wrapper is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:192: warning: Member end() const  (function) of class ttPython::Py_buffer_wrapper is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:33: warning: Member hadGenTops_ (variable) of class ttUtility::ConstGenInputs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:34: warning: Member hadGenTopDaughters_ (variable) of class ttUtility::ConstGenInputs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:33: warning: Member hadGenTops_ (variable) of class ttUtility::ConstGenInputs is not documented.
@@ -1156,5 +1163,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1467/65536 hits=9380 misses=1561
+lookup cache used 1468/65536 hits=9454 misses=1562
 finished...
