@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from TopTagger import TopTagger
 
 class TopTaggerProducer(Module):
-    def __init__(self, cfgName="TopTagger.cfg", cfgWD=".", suffix=None, saveAK8=False, AK4JetInputs = ("Jet_pt", "Jet_eta", "Jet_phi", "Jet_mass"), recalculateFromRawInputs = False, useAK8 = True, doLepCleaning = True):
+    def __init__(self, cfgName="TopTagger.cfg", cfgWD=".", suffix=None, saveAK8=False, AK4JetInputs = ("Jet_pt", "Jet_eta", "Jet_phi", "Jet_mass"), recalculateFromRawInputs = False, useAK8 = False, doLepCleaning = True, saveCandidates = True, topDiscCut=None):
         self.topTaggerCfg = cfgName
         self.topTaggerWD = cfgWD
         self.saveAK8 = saveAK8
@@ -20,6 +20,8 @@ class TopTaggerProducer(Module):
         self.recalculateFromRawInputs = recalculateFromRawInputs
         self.useAK8 = useAK8
         self.doLepCleaning = doLepCleaning
+        self.saveCandidates = saveCandidates
+        self.topDiscCut = topDiscCut
 
         self.tt = TopTagger(self.topTaggerCfg, self.topTaggerWD)
 
@@ -129,13 +131,13 @@ class TopTaggerProducer(Module):
                 resTopInputs = None
 
         if ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates)
         elif ak8Inputs and not resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs)
+            return self.tt.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates)
         elif not ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs)
+            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, saveCandidates=self.saveCandidates)
         else:
-            return self.tt.run(ak4Inputs = ak4Inputs)
+            return self.tt.run(ak4Inputs = ak4Inputs, saveCandidates=self.saveCandidates)
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
@@ -147,6 +149,9 @@ class TopTaggerProducer(Module):
         resolvedFilter = ttr.typeCol() == 3
         mergedFilter = ttr.typeCol() == 1
         WFilter = ttr.typeCol() == 4
+
+        if self.topDiscCut:
+            resolvedFilter = resolvedFilter & (ttr.discCol() > self.topDiscCut)
 
         ### Store output
         self.out.fillBranch("ResolvedTop%s_pt"%self.suffix,            ttr.ptCol()[resolvedFilter])
