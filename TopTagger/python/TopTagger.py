@@ -85,9 +85,12 @@ class TopTagger:
         except AttributeError:
             pass
 
-    def run(self, *args, **kwargs):
+    def run(self, saveCandidates = False, *args, **kwargs):
         tti.run(self.tt, *args, **kwargs)
-        results = tti.getResults(self.tt)
+        if saveCandidates:
+            results = tti.getCandidates(self.tt)
+        else:
+            results = tti.getResults(self.tt)
         return TopTaggerResult(results)
 
     def runFromNanoAOD(self, event, isFirstEvent = False):
