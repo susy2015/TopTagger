@@ -1039,11 +1039,11 @@ Generating docs for compound /home/travis/build/susy2015/TopTagger/Tools/python/
 /home/travis/build/susy2015/TopTagger/Tools/python/submitBatch.py:16: warning: Member submitList (variable) of class submitBatch::SubmitJobs is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/python/submitBatch.py:17: warning: Member currentGPU (variable) of class submitBatch::SubmitJobs is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:15: warning: Member __init__ (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:36: warning: Member beginJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:39: warning: Member endJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:42: warning: Member beginFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:67: warning: Member endFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:70: warning: Member runFromNanoAOD (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:39: warning: Member beginJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:42: warning: Member endJob (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:45: warning: Member beginFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:70: warning: Member endFile (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:73: warning: Member runFromNanoAOD (function) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:16: warning: Member topTaggerCfg (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:17: warning: Member topTaggerWD (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:18: warning: Member saveAK8 (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
@@ -1055,7 +1055,8 @@ Generating docs for compound /home/travis/build/susy2015/TopTagger/Tools/python/
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:24: warning: Member topDiscCut (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:26: warning: Member tt (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:30: warning: Member suffix (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:44: warning: Member out (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:37: warning: Member suffixResolved (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTaggerProducer.py:47: warning: Member out (variable) of class TopTaggerProducer::TopTaggerProducer is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:148: warning: Member Py_buffer_wrapper(void *buf) (function) of class ttPython::Py_buffer_wrapper is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:152: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &)=delete (function) of class ttPython::Py_buffer_wrapper is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerPython.h:155: warning: Member Py_buffer_wrapper(Py_buffer_wrapper &&old) (function) of class ttPython::Py_buffer_wrapper is not documented.
