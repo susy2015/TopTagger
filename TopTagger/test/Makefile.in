@@ -155,10 +155,10 @@ topTaggerTest : libTopTagger.$(LIBSUFFIX) $(ODIR)/topTaggerTest.o $(ODIR)/rootdi
 clean:
 	rm -f $(ODIR)/rootdict.cc rootdict_rdict.pcm $(ODIR)/*.o $(addprefix lib, $(addsuffix .$(LIBSUFFIX), $(LIBRARIES))) $(TAGGERDIR)/TopTagger/python/TopTaggerInterface.$(LIBSUFFIX) $(ODIR)/*.d $(PROGRAMS) core 
 
-installPython: $(TAGGERDIR)/TopTagger/python/TopTaggerInterface.$(LIBSUFFIX)
+installPython: ../python/TopTaggerInterface.$(LIBSUFFIX)
 
-$(TAGGERDIR)/TopTagger/python/TopTaggerInterface.$(LIBSUFFIX):
-	ln -s $(TAGGERDIR)/TopTagger/test/libTopTaggerInterface.$(LIBSUFFIX) $@
+../python/TopTaggerInterface.$(LIBSUFFIX):
+	cd ../python/;	ln -s ../test/libTopTaggerInterface.$(LIBSUFFIX) $(notdir $(@))
 
 install: libTopTagger.$(LIBSUFFIX)
 	cp libTopTagger.$(LIBSUFFIX) $(PREFIX)/lib/
