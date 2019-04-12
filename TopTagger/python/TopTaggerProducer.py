@@ -162,9 +162,9 @@ class TopTaggerProducer(Module):
         self.out.fillBranch("ResolvedTop%s_phi"%self.suffixResolved,           ttr.phiCol()[resolvedFilter])
         self.out.fillBranch("ResolvedTop%s_mass"%self.suffixResolved,          ttr.massCol()[resolvedFilter])
         self.out.fillBranch("ResolvedTop%s_discriminator"%self.suffixResolved, ttr.discCol()[resolvedFilter])
-        self.out.fillBranch("ResolvedTop%s_j1Idx"%self.suffixResolved,         ttr.j1IdxCol()[resolvedFilter])
-        self.out.fillBranch("ResolvedTop%s_j2Idx"%self.suffixResolved,         ttr.j2IdxCol()[resolvedFilter])
-        self.out.fillBranch("ResolvedTop%s_j3Idx"%self.suffixResolved,         ttr.j3IdxCol()[resolvedFilter])
+        self.out.fillBranch("ResolvedTop%s_j1Idx"%self.suffixResolved,         ttr.j1IdxCol()[resolvedFilter].astype(int))
+        self.out.fillBranch("ResolvedTop%s_j2Idx"%self.suffixResolved,         ttr.j2IdxCol()[resolvedFilter].astype(int))
+        self.out.fillBranch("ResolvedTop%s_j3Idx"%self.suffixResolved,         ttr.j3IdxCol()[resolvedFilter].astype(int))
 
         if self.saveAK8:
             self.out.fillBranch("MergedTop%s_pt"%self.suffix,              ttr.ptCol()[mergedFilter])
