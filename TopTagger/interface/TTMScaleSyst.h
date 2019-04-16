@@ -1,8 +1,8 @@
 #ifndef TTMOVERLAPRESOLUTION_H
 #define TTMOVERLAPRESOLUTION_H
 
-#include "TopTagger/TopTagger/include/TTModule.h"
-#include "TopTagger/TopTagger/include/TopObject.h"
+#include "TopTagger/TopTagger/interface/TTModule.h"
+#include "TopTagger/TopTagger/interface/TopObject.h"
 
 #include <string>
 #include <memory>
