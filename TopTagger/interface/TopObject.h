@@ -2,6 +2,7 @@
 #define TOPOBJECT_H
 
 #include <vector>
+#include <utility>
 #include <map>
 #include <set>
 #include <memory>
@@ -9,6 +10,7 @@
 #include "TLorentzVector.h"
 
 #include "TopTagger/TopTagger/interface/Constituent.h"
+#include "TopTagger/CfgParser/include/TTException.h"
 
 /** 
  *  Container class which represents a top candidate or final selected top object.  
@@ -51,6 +53,11 @@ public:
     /// Set the Top discriminator for this candidate
     void setDiscriminator(const double disc) { discriminator_ = disc; }
 
+    /// Set the scale factor used to scale simulation events so that they better match data.
+    void setMCScaleFactor(const double& sf) { scaleFactor_ = sf; } 
+    /// Set a systematic uncertainty 
+    void setSystematicUncertainty(const std::string& source, const double& value) { systematicUncertainties_[source] = value; } 
+
     /// Returns the 4-vector momentum of the top candidate
     const TLorentzVector& p() const { return p_; }
     /// Returns the 4-vector momentum of the top candidate
@@ -76,12 +83,14 @@ public:
     /// Returns the list of all possible generator level tops which could be a match to the TopObject.  This requires that generator level information is passed to the top tagger.  
     const decltype(genMatchPossibilities_)& getGenTopMatches() const { return genMatchPossibilities_; }
     /// Returns the best matched genrator level top based on the possible matches based on the parameter dRMax which defines the matching cone between the overall generator top and the top candidate.
-    const TLorentzVector* getBestGenTopMatch(const double dRMax = 0.6) const;
+    const TLorentzVector* getBestGenTopMatch(const double dRMax = 0.6, const int NGenPartMatch = 2, const int NConstituentMatch = -1) const;
 
     /// Return the scale factor used to scale simulation events so that they better match data.
-    double getMCScaleFactor() const; 
+    double getMCScaleFactor() const { return scaleFactor_; }
     /// Return systematic uncertainty 
-    double getSystematicUncertainty(const std::string& source) const; 
+    double getSystematicUncertainty(const std::string& source) const;
+    /// Return total systematic uncertainty 
+    std::pair<double, double> getTotalSystematicUncertainty() const; 
 
     /// Store the MVA input variables in the TopObject, this is only used for debug purposes 
     template<typename IterType>

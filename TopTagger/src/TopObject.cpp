@@ -9,6 +9,7 @@ TopObject::TopObject() : dRmax_(999.9), discriminator_(-999.9), dThetaMin_(999.9
 TopObject::TopObject(std::vector<Constituent const *> constituents, const Type& type) : constituents_(constituents), type_(type), inputMVAVars_(nullptr)
 {
     discriminator_ = -999.9;
+    scaleFactor_ = 0.0;
     updateVariables();
 }
 
@@ -60,14 +61,26 @@ int TopObject::getNBConstituents(double cvsCut, double etaCut) const
     return nb;
 }
 
-const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax) const
+const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax, const int NGenPartMatch, const int NConstituentMatch) const
 {
-    //int genDaughterMatches = 0;
     const TLorentzVector* bestMatch = nullptr;
     double bestMatchDR = 999.9;
     for(const auto& genTop : genMatchPossibilities_)
     {
-        if(genTop.second.size() < 2) continue;
+        if(static_cast<int>(genTop.second.size()) < NGenPartMatch) continue;
+
+        if(NConstituentMatch > 0)
+        {
+            int nConstMatches = 0;
+            for(const auto& constituent : constituents_)
+            {
+                const auto& genTopIter = constituent->getGenMatches().find(genTop.first);
+                if(genTopIter != constituent->getGenMatches().end()) ++nConstMatches;
+            }
+
+            if(nConstMatches < NConstituentMatch) continue;
+        }
+
         double deltaR = ROOT::Math::VectorUtil::DeltaR(p_, *genTop.first);
         if(deltaR < bestMatchDR)
         {
@@ -79,13 +92,28 @@ const TLorentzVector* TopObject::getBestGenTopMatch(const double dRMax) const
     else                    return nullptr;
 }
 
-double TopObject::getMCScaleFactor() const
-{
-    return 0.0;
-}
-
 double TopObject::getSystematicUncertainty(const std::string& source) const
 {
-    return 0.0;
+    const auto& iter = systematicUncertainties_.find(source);
+
+    if(iter == systematicUncertainties_.end())
+    {
+        THROW_TTEXCEPTION("Systematic uncertainty \"" + source + "\" is not present!");
+    }
+
+    return iter->second;
+}
+
+std::pair<double, double> TopObject::getTotalSystematicUncertainty() const
+{
+    double totalUp = 0.0;
+    double totalDown = 0.0;
+    for(const auto& uncert : systematicUncertainties_)
+    {
+        if(uncert.first.find("_Up")) totalUp += uncert.second*uncert.second;
+        else if(uncert.first.find("_Down")) totalDown += uncert.second*uncert.second;
+    }
+
+    return std::make_pair(totalUp, totalDown);
 }
 
