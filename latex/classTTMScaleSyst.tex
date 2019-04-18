@@ -1,0 +1,65 @@
+\hypertarget{classTTMScaleSyst}{\section{T\-T\-M\-Scale\-Syst Class Reference}
+\label{classTTMScaleSyst}\index{T\-T\-M\-Scale\-Syst@{T\-T\-M\-Scale\-Syst}}
+}
+
+
+{\ttfamily \#include $<$T\-T\-M\-Scale\-Syst.\-h$>$}
+
+Inheritance diagram for T\-T\-M\-Scale\-Syst\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classTTMScaleSyst}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classTTMScaleSyst_a41c91f1f38431a28c1401034e5768969}{get\-Parameters} (const \hyperlink{classcfg_1_1CfgDocument}{cfg\-::\-Cfg\-Document} $\ast$, const std\-::string \&)
+\item 
+void \hyperlink{classTTMScaleSyst_a7ba1d3df652b583f75089495a7a8f215}{run} (\hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} \&)
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+This module is called to load the scale factors and systematic uncertainties.
+
+
+\begin{DoxyParams}{Parameters}
+{\em top\-Flavor} & (string) The flavor of the \hyperlink{classTopObject}{Top\-Object} which will have its systematics added (Options\-: M\-E\-R\-G\-E\-D\-\_\-\-T\-O\-P, S\-E\-M\-I\-M\-E\-R\-G\-E\-D\-W\-B\-\_\-\-T\-O\-P, R\-E\-S\-O\-L\-V\-E\-D\-\_\-\-T\-O\-P, M\-E\-R\-G\-E\-D\-\_\-\-W, S\-E\-M\-I\-M\-E\-R\-G\-E\-D\-Q\-B\-\_\-\-T\-O\-P) \\
+\hline
+{\em input\-File} & (string) The root file containing the scale factors and systematic uncertainties \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classTTMScaleSyst_a41c91f1f38431a28c1401034e5768969}{\index{T\-T\-M\-Scale\-Syst@{T\-T\-M\-Scale\-Syst}!get\-Parameters@{get\-Parameters}}
+\index{get\-Parameters@{get\-Parameters}!TTMScaleSyst@{T\-T\-M\-Scale\-Syst}}
+\subsubsection[{get\-Parameters}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Scale\-Syst\-::get\-Parameters (
+\begin{DoxyParamCaption}
+\item[{const {\bf cfg\-::\-Cfg\-Document} $\ast$}]{, }
+\item[{const std\-::string \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMScaleSyst_a41c91f1f38431a28c1401034e5768969}
+This function is called by \hyperlink{classTopTagger}{Top\-Tagger} to configure each module based upon the information present in the configuration file. The inputs for this function are provided by \hyperlink{classTopTagger}{Top\-Tagger} and are the configuration document object and the local context string for this module. The local context string defines where to look in the configuration file for the local parameters. 
+
+Implements \hyperlink{classTTModule_aa9d2842c9e94782059fe92044a68e3a6}{T\-T\-Module}.
+
+\hypertarget{classTTMScaleSyst_a7ba1d3df652b583f75089495a7a8f215}{\index{T\-T\-M\-Scale\-Syst@{T\-T\-M\-Scale\-Syst}!run@{run}}
+\index{run@{run}!TTMScaleSyst@{T\-T\-M\-Scale\-Syst}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void T\-T\-M\-Scale\-Syst\-::run (
+\begin{DoxyParamCaption}
+\item[{{\bf Top\-Tagger\-Results} \&}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classTTMScaleSyst_a7ba1d3df652b583f75089495a7a8f215}
+run is called automatically by \hyperlink{classTopTagger}{Top\-Tagger} once per event to run th emodule. The module interfaces with other modules through the \hyperlink{classTopTaggerResults}{Top\-Tagger\-Results} object which is passed as a non-\/const reference from \hyperlink{classTopTagger}{Top\-Tagger}. 
+
+Implements \hyperlink{classTTModule_a14e7c03fbf4ee1a5008c9344adc7c896}{T\-T\-Module}.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/interface/T\-T\-M\-Scale\-Syst.\-h\item 
+/home/travis/build/susy2015/\-Top\-Tagger/\-Top\-Tagger/src/T\-T\-M\-Scale\-Syst.\-cpp\end{DoxyCompactItemize}

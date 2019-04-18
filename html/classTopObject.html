@@ -127,6 +127,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#abf5123e8c707e9059c8ec96b35643bef">setDiscriminator</a> (const double disc)</td></tr>
 <tr class="memdesc:abf5123e8c707e9059c8ec96b35643bef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Top discriminator for this candidate. <br/></td></tr>
 <tr class="separator:abf5123e8c707e9059c8ec96b35643bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2764e34e00d4e19516c64bed555b4bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa2764e34e00d4e19516c64bed555b4bc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#aa2764e34e00d4e19516c64bed555b4bc">setMCScaleFactor</a> (const double &amp;sf)</td></tr>
+<tr class="memdesc:aa2764e34e00d4e19516c64bed555b4bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the scale factor used to scale simulation events so that they better match data. <br/></td></tr>
+<tr class="separator:aa2764e34e00d4e19516c64bed555b4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab74f18904e7753255374de8fe1ddce89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab74f18904e7753255374de8fe1ddce89"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#ab74f18904e7753255374de8fe1ddce89">setSystematicUncertainty</a> (const std::string &amp;source, const double &amp;value)</td></tr>
+<tr class="memdesc:ab74f18904e7753255374de8fe1ddce89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a systematic uncertainty. <br/></td></tr>
+<tr class="separator:ab74f18904e7753255374de8fe1ddce89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a52fbbf2a336d0e174f509304f8c1c984"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a52fbbf2a336d0e174f509304f8c1c984"></a>
 const TLorentzVector &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a52fbbf2a336d0e174f509304f8c1c984">p</a> () const </td></tr>
 <tr class="memdesc:a52fbbf2a336d0e174f509304f8c1c984"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the 4-vector momentum of the top candidate. <br/></td></tr>
@@ -173,10 +181,10 @@ decltype(genMatchPossibilities_) <br class="typebreak"/>
 const &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a51cc6fbaacb2cf502cad0b57d99ae91f">getGenTopMatches</a> () const </td></tr>
 <tr class="memdesc:a51cc6fbaacb2cf502cad0b57d99ae91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of all possible generator level tops which could be a match to the <a class="el" href="classTopObject.html">TopObject</a>. This requires that generator level information is passed to the top tagger. <br/></td></tr>
 <tr class="separator:a51cc6fbaacb2cf502cad0b57d99ae91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80c459ce3d60d1402087ceead3999e45"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80c459ce3d60d1402087ceead3999e45"></a>
-const TLorentzVector *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a80c459ce3d60d1402087ceead3999e45">getBestGenTopMatch</a> (const double dRMax=0.6) const </td></tr>
-<tr class="memdesc:a80c459ce3d60d1402087ceead3999e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the best matched genrator level top based on the possible matches based on the parameter dRMax which defines the matching cone between the overall generator top and the top candidate. <br/></td></tr>
-<tr class="separator:a80c459ce3d60d1402087ceead3999e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a8891d8e9a4cd4b77cb6063c48eb7c6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a8891d8e9a4cd4b77cb6063c48eb7c6"></a>
+const TLorentzVector *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a0a8891d8e9a4cd4b77cb6063c48eb7c6">getBestGenTopMatch</a> (const double dRMax=0.6, const int NGenPartMatch=2, const int NConstituentMatch=-1) const </td></tr>
+<tr class="memdesc:a0a8891d8e9a4cd4b77cb6063c48eb7c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the best matched genrator level top based on the possible matches based on the parameter dRMax which defines the matching cone between the overall generator top and the top candidate. <br/></td></tr>
+<tr class="separator:a0a8891d8e9a4cd4b77cb6063c48eb7c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77edcc1258a253b60747eb557c12dd52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a77edcc1258a253b60747eb557c12dd52"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a77edcc1258a253b60747eb557c12dd52">getMCScaleFactor</a> () const </td></tr>
 <tr class="memdesc:a77edcc1258a253b60747eb557c12dd52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the scale factor used to scale simulation events so that they better match data. <br/></td></tr>
@@ -185,6 +193,10 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#add523f130ec310825913f90f2ad92cd1">getSystematicUncertainty</a> (const std::string &amp;source) const </td></tr>
 <tr class="memdesc:add523f130ec310825913f90f2ad92cd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return systematic uncertainty. <br/></td></tr>
 <tr class="separator:add523f130ec310825913f90f2ad92cd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c0c5edafaa226f473002826f291c3ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c0c5edafaa226f473002826f291c3ef"></a>
+std::pair&lt; double, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTopObject.html#a1c0c5edafaa226f473002826f291c3ef">getTotalSystematicUncertainty</a> () const </td></tr>
+<tr class="memdesc:a1c0c5edafaa226f473002826f291c3ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return total systematic uncertainty. <br/></td></tr>
+<tr class="separator:a1c0c5edafaa226f473002826f291c3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba6a5e510488a050a1ade69ba2d87960"><td class="memTemplParams" colspan="2"><a class="anchor" id="aba6a5e510488a050a1ade69ba2d87960"></a>
 template&lt;typename IterType &gt; </td></tr>
 <tr class="memitem:aba6a5e510488a050a1ade69ba2d87960"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classTopObject.html#aba6a5e510488a050a1ade69ba2d87960">storeMVAInputs</a> (const std::vector&lt; std::string &gt; &amp;names, const IterType &amp;begin, const IterType &amp;end)</td></tr>
@@ -218,7 +230,7 @@ std::map&lt; std::string, float &gt; &amp;&#160;</td><td class="memItemRight" va
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 16 2019 15:28:58 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 18 2019 01:04:26 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

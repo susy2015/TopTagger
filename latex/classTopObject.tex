@@ -35,6 +35,12 @@ enum \hyperlink{classTopObject_af82a20e421c29bc667af7cd73fc46ba4}{Type} \{ \\*
 \hypertarget{classTopObject_abf5123e8c707e9059c8ec96b35643bef}{void \hyperlink{classTopObject_abf5123e8c707e9059c8ec96b35643bef}{set\-Discriminator} (const double disc)}\label{classTopObject_abf5123e8c707e9059c8ec96b35643bef}
 
 \begin{DoxyCompactList}\small\item\em Set the Top discriminator for this candidate. \end{DoxyCompactList}\item 
+\hypertarget{classTopObject_aa2764e34e00d4e19516c64bed555b4bc}{void \hyperlink{classTopObject_aa2764e34e00d4e19516c64bed555b4bc}{set\-M\-C\-Scale\-Factor} (const double \&sf)}\label{classTopObject_aa2764e34e00d4e19516c64bed555b4bc}
+
+\begin{DoxyCompactList}\small\item\em Set the scale factor used to scale simulation events so that they better match data. \end{DoxyCompactList}\item 
+\hypertarget{classTopObject_ab74f18904e7753255374de8fe1ddce89}{void \hyperlink{classTopObject_ab74f18904e7753255374de8fe1ddce89}{set\-Systematic\-Uncertainty} (const std\-::string \&source, const double \&value)}\label{classTopObject_ab74f18904e7753255374de8fe1ddce89}
+
+\begin{DoxyCompactList}\small\item\em Set a systematic uncertainty. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_a52fbbf2a336d0e174f509304f8c1c984}{const T\-Lorentz\-Vector \& \hyperlink{classTopObject_a52fbbf2a336d0e174f509304f8c1c984}{p} () const }\label{classTopObject_a52fbbf2a336d0e174f509304f8c1c984}
 
 \begin{DoxyCompactList}\small\item\em Returns the 4-\/vector momentum of the top candidate. \end{DoxyCompactList}\item 
@@ -70,7 +76,7 @@ const $\ast$ $>$ \& \hyperlink{classTopObject_a3bd54d089da20318d1733c2d4e28493a}
 const \& \hyperlink{classTopObject_a51cc6fbaacb2cf502cad0b57d99ae91f}{get\-Gen\-Top\-Matches} () const }\label{classTopObject_a51cc6fbaacb2cf502cad0b57d99ae91f}
 
 \begin{DoxyCompactList}\small\item\em Returns the list of all possible generator level tops which could be a match to the \hyperlink{classTopObject}{Top\-Object}. This requires that generator level information is passed to the top tagger. \end{DoxyCompactList}\item 
-\hypertarget{classTopObject_a80c459ce3d60d1402087ceead3999e45}{const T\-Lorentz\-Vector $\ast$ \hyperlink{classTopObject_a80c459ce3d60d1402087ceead3999e45}{get\-Best\-Gen\-Top\-Match} (const double d\-R\-Max=0.\-6) const }\label{classTopObject_a80c459ce3d60d1402087ceead3999e45}
+\hypertarget{classTopObject_a0a8891d8e9a4cd4b77cb6063c48eb7c6}{const T\-Lorentz\-Vector $\ast$ \hyperlink{classTopObject_a0a8891d8e9a4cd4b77cb6063c48eb7c6}{get\-Best\-Gen\-Top\-Match} (const double d\-R\-Max=0.\-6, const int N\-Gen\-Part\-Match=2, const int N\-Constituent\-Match=-\/1) const }\label{classTopObject_a0a8891d8e9a4cd4b77cb6063c48eb7c6}
 
 \begin{DoxyCompactList}\small\item\em Returns the best matched genrator level top based on the possible matches based on the parameter d\-R\-Max which defines the matching cone between the overall generator top and the top candidate. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_a77edcc1258a253b60747eb557c12dd52}{double \hyperlink{classTopObject_a77edcc1258a253b60747eb557c12dd52}{get\-M\-C\-Scale\-Factor} () const }\label{classTopObject_a77edcc1258a253b60747eb557c12dd52}
@@ -79,6 +85,9 @@ const \& \hyperlink{classTopObject_a51cc6fbaacb2cf502cad0b57d99ae91f}{get\-Gen\-
 \hypertarget{classTopObject_add523f130ec310825913f90f2ad92cd1}{double \hyperlink{classTopObject_add523f130ec310825913f90f2ad92cd1}{get\-Systematic\-Uncertainty} (const std\-::string \&source) const }\label{classTopObject_add523f130ec310825913f90f2ad92cd1}
 
 \begin{DoxyCompactList}\small\item\em Return systematic uncertainty. \end{DoxyCompactList}\item 
+\hypertarget{classTopObject_a1c0c5edafaa226f473002826f291c3ef}{std\-::pair$<$ double, double $>$ \hyperlink{classTopObject_a1c0c5edafaa226f473002826f291c3ef}{get\-Total\-Systematic\-Uncertainty} () const }\label{classTopObject_a1c0c5edafaa226f473002826f291c3ef}
+
+\begin{DoxyCompactList}\small\item\em Return total systematic uncertainty. \end{DoxyCompactList}\item 
 \hypertarget{classTopObject_aba6a5e510488a050a1ade69ba2d87960}{{\footnotesize template$<$typename Iter\-Type $>$ }\\void \hyperlink{classTopObject_aba6a5e510488a050a1ade69ba2d87960}{store\-M\-V\-A\-Inputs} (const std\-::vector$<$ std\-::string $>$ \&names, const Iter\-Type \&begin, const Iter\-Type \&end)}\label{classTopObject_aba6a5e510488a050a1ade69ba2d87960}
 
 \begin{DoxyCompactList}\small\item\em Store the M\-V\-A input variables in the \hyperlink{classTopObject}{Top\-Object}, this is only used for debug purposes. \end{DoxyCompactList}\item 
