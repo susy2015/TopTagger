@@ -4,31 +4,23 @@ from PhysicsTools.NanoAOD.common_cff import *
 def prepareJets(process):
 
     #Get jet source used as input to nanoAOD
-    inputJetCollection = process.slimmedJetsWithUserData.src
-
-    #run QGTagger code again to calculate jet axis1 
-    process.load('RecoJets.JetProducers.QGTagger_cfi')
-    process.QGTagger.srcJets = inputJetCollection
+    jetsWithUserData = process.updatedJetsWithUserData
+    inputJetCollection = jetsWithUserData.src
 
     #update jets to include new user float/int    
-    jetUserFloat = process.slimmedJetsWithUserData.userFloats.clone(
-            qgptD   = cms.InputTag("QGTagger:ptD"),
-            qgAxis1 = cms.InputTag("QGTagger:axis1"),
-            qgAxis2 = cms.InputTag("QGTagger:axis2"),
+    jetUserFloat = jetsWithUserData.userFloats.clone(
+            qgptD   = cms.InputTag("qgtagger:ptD"),
+            qgAxis1 = cms.InputTag("qgtagger:axis1"),
+            qgAxis2 = cms.InputTag("qgtagger:axis2"),
         )
 
-    process.slimmedJetsWithUserData.userFloats = jetUserFloat
+    jetsWithUserData.userFloats = jetUserFloat
 
-    jetUserInt = process.slimmedJetsWithUserData.userInts.clone(
-            qgMult = cms.InputTag("QGTagger:mult")
+    jetUserInt = jetsWithUserData.userInts.clone(
+            qgMult = cms.InputTag("qgtagger:mult")
         )
 
-    process.slimmedJetsWithUserData.userInts = jetUserInt
-
-    #Construct task list 
-    process.resolvedJetTask = cms.Task(process.QGTagger)
-
-    process.schedule.associate(process.resolvedJetTask)
+    jetsWithUserData.userInts = jetUserInt
 
     return process
 
@@ -86,7 +78,7 @@ def setupResolvedTagger(process, saveAllTopCandidates=False):
     #top tagging producer 
     process.load("TopTagger.TopTagger.SHOTProducer_cfi")
     #updatedJets have recieved all updates from nanoAOD except final pT cut
-    process.SHOTProducer.ak4JetSrc = cms.InputTag("updatedJets")
+    process.SHOTProducer.ak4JetSrc = process.jetTable.src
     process.SHOTProducer.muonSrc = cms.InputTag("slimmedMuonsWithUserData")
     process.SHOTProducer.elecSrc = cms.InputTag("slimmedElectronsWithUserData")
     process.SHOTProducer.saveAllTopCandidates = cms.bool(saveAllTopCandidates)
