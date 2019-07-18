@@ -8,7 +8,7 @@ Add description of algorithm and general options here
 
 \subsubsection*{Standalone (edm free) install instructions within C\-M\-S\-S\-W}
 
-These instructions explain how to install the top tagger in a standalone way (i.\-e. no cms\-Run or F\-W\-Lite required) but taking advantage of all the tools which come packaged with a C\-M\-S\-S\-W release. If you would rather not go through the hassle of installing R\-O\-O\-T/python/tensorflow, the C\-M\-S\-S\-W environment can be used to provide the necessary libraries and python modules
+These instructions explain how to install the top tagger in a standalone way (i.\-e. no cms\-Run or F\-W\-Lite required) but taking advantage of all the tools which come packaged with a C\-M\-S\-S\-W release. If you would rather not go through the hassle of installing R\-O\-O\-T/python/tensorflow, the C\-M\-S\-S\-W environment can be used to provide the necessary libraries and python modules (9\-\_\-3\-\_\-\-X or later)
 
 
 \begin{DoxyCode}
@@ -48,17 +48,17 @@ ResolvedTop\_type (int): The type of top (3 for resolved tops)
 \end{DoxyCode}
 
 
-In order to save space in the nano\-A\-O\-D only top objects passing a basic discriminator cut are saved.
+In order to save space in the nano\-A\-O\-D only top objects passing a basic discriminator cut are saved. Note that if you elect to save all candidates instead of final tops, then the collection will be named \char`\"{}\-Resolved\-Top\-Candidate\char`\"{} instead of \char`\"{}\-Resoloved\-Top.\char`\"{}
 
-\paragraph*{Instructions for saving tagger results to nano\-A\-O\-D with C\-M\-S\-S\-W\-\_\-9\-\_\-4\-\_\-11}
+\paragraph*{Instructions for saving tagger results to nano\-A\-O\-D with C\-M\-S\-S\-W\-\_\-10\-\_\-2\-\_\-15}
 
 If starting from a fresh release of C\-M\-S\-S\-W run the following setup commands
 
 
 \begin{DoxyCode}
 \textcolor{preprocessor}{#get CMSSW release}
-\textcolor{preprocessor}{}cmsrel CMSSW\_9\_4\_11
-cd CMSSW\_9\_4\_11/src/
+\textcolor{preprocessor}{}cmsrel CMSSW\_10\_2\_15
+cd CMSSW\_10\_2\_15/src/
 cmsenv
 git cms-init
 \end{DoxyCode}
@@ -69,88 +69,34 @@ The following additional packages should then be checked out to get the top tagg
 
 \begin{DoxyCode}
 cd $\{CMSSW\_BASE\}/src
-git cms-merge-topic -u pastika:AddAxis1\_946p1
+git cms-merge-topic -u pastika:AddAxis1\_1026
 git clone git@github.com:susy2015/\hyperlink{classTopTagger}{TopTagger}.git
 scram b -j4
 \end{DoxyCode}
 
 
-The configuration file to generate nano\-A\-O\-D can then be generated with the following set of instructions via cms\-Driver.\-py and download the top tagger configuration file
+The configuration file to generate nano\-A\-O\-D can then be generated with the following set of instructions on this \mbox{[}\mbox{[}twiki\mbox{]}\mbox{[}\href{https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD#Instructions_for_NanoAODv5_produ}{\tt https\-://twiki.\-cern.\-ch/twiki/bin/view/\-C\-M\-S\-Public/\-Work\-Book\-Nano\-A\-O\-D\#\-Instructions\-\_\-for\-\_\-\-Nano\-A\-O\-Dv5\-\_\-produ}\mbox{]}\mbox{]} via the cms\-Driver.\-py with the addition of the following customize statement as in the example below. The command to check out the required top tagger configuration file is also given below.
 
 
 \begin{DoxyCode}
 cd $\{CMSSW\_BASE\}/src
-cmsDriver.py test94X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of 
-      miniAOD file] --no\_exec  --conditions \textcolor{keyword}{auto}:phase1\_2017\_realistic -n 100 --era Run2\_2017,
-      run2\_nanoAOD\_94XMiniAODv1 --customise \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.customizeResolvedTagger
+cmsDriver.py myNanoProdMc2017 -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM  --no\_exec  --
+      conditions 102X\_mc2017\_realistic\_v7 --era Run2\_2017,run2\_nanoAOD\_94XMiniAODv2 --customise\_commands=\textcolor{stringliteral}{"
+      process.add\_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))"} --customise 
+      \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.customizeResolvedTagger
 mkdir -p $\{CMSSW\_BASE\}/src/\hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
 getTaggerCfg.sh -o -n -t DeepResolved\_DeepCSV\_GR\_noDisc\_Release\_v1.0.0 -d $CMSSW\_BASE/src/
       \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
 \end{DoxyCode}
 
 
-For running over 2016 M\-C insread use the following cms\-Driver command
+This will produce a file \char`\"{}my\-Nano\-Prod\-Mc2017\-\_\-\-N\-A\-N\-O.\-py\char`\"{} which can be run as follows to produce a small test nano\-A\-O\-D file with the top tagger variables included
 
 
 \begin{DoxyCode}
-cd $\{CMSSW\_BASE\}/src
-cmsDriver.py test80X -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein [location of 
-      miniAOD file] --no\_exec  --conditions \textcolor{keyword}{auto}:run2\_mc -n 100 --era Run2\_2016,run2\_miniAOD\_80XLegacy --customise 
-      \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.customizeResolvedTagger
+cmsRun myNanoProdMc2017\_NANO.py
 \end{DoxyCode}
 
-
-This will produce a file \char`\"{}test\mbox{[}80/94\mbox{]}\-X\-\_\-\-N\-A\-N\-O.\-py\char`\"{} which can be run as follows to produce a small test nano\-A\-O\-D file with the top tagger variables included
-
-
-\begin{DoxyCode}
-cmsRun test94X\_NANO.py
-\end{DoxyCode}
-
-
-\paragraph*{Instructions for running tagger with C\-M\-S\-S\-W 8\-\_\-0\-\_\-28\-\_\-patch1}
-
-These instructions are not recomended. Please use the instruction above for C\-M\-S\-S\-W\-\_\-9\-\_\-4\-\_\-\-X in nano\-A\-O\-D.
-
-In addition to the top tagger itself these instructions include the steps to configure additional packages, including the deep\-Flavor tagger (for the tagger itself along with the tensorflow configuration for 8\-X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,
-
-
-\begin{DoxyCode}
-\textcolor{preprocessor}{#get CMSSW release}
-\textcolor{preprocessor}{}cmsrel CMSSW\_8\_0\_28\_patch1
-cd CMSSW\_8\_0\_28\_patch1/src/
-cmsenv
-git cms-init
-\textcolor{preprocessor}{#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet}
-\textcolor{preprocessor}{}git cms-merge-topic -u mverzett:Experimental\_DeepFlavour\_80X
-cd RecoBTag/DeepFlavour/scripts/
-wget -nv http:\textcolor{comment}{//www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz}
-tar -zxf tensorflow-cmssw8-0-26.tar.gz
-mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python
-rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/
-cd \textcolor{stringliteral}{"$CMSSW\_BASE/src"}
-scram setup \textcolor{stringliteral}{"RecoBTag/Tensorflow/py2-numpy-c-api.xml"}
-cmsenv
-\textcolor{preprocessor}{#patch to gq producer to add axis1}
-\textcolor{preprocessor}{}git cms-merge-topic -u pastika:AddJetAxis1
-\textcolor{preprocessor}{#patched version of jet toolbox}
-\textcolor{preprocessor}{}git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix\_NoLep\_jetToolbox\_80X\_V3
-\textcolor{preprocessor}{#download top tagger code }
-\textcolor{preprocessor}{}git clone -b IntermediateRecipeV0 git@github.com:susy2015/\hyperlink{classTopTagger}{TopTagger}.git
-\textcolor{preprocessor}{#compile everything }
-\textcolor{preprocessor}{}scram b -j12
-cd \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/test
-\textcolor{preprocessor}{#get qgl database file}
-\textcolor{preprocessor}{}wget https:\textcolor{comment}{//raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL\_cmssw8020\_v2.db}
-\textcolor{preprocessor}{#get top tager cfg file and MVA model files }
-\textcolor{preprocessor}{}../../Tools/getTaggerCfg.sh -t Intermediate\_Example\_v1.0.0
-\textcolor{preprocessor}{#run example code}
-\textcolor{preprocessor}{}voms-proxy-init
-cmsRun run\_topTagger.py
-\end{DoxyCode}
-
-
-The default configuration of the example cfg file \char`\"{}run\-\_\-top\-Tagger.\-py\char`\"{} will run over a single-\/lepton ttbar sample and produce an edm formatted output file (\char`\"{}test.\-root\char`\"{}) containing the vector of reconstructed top T\-Lorentz\-Vectors along with a second vector indicating the type of top (monojet, dijet, trijet).
 
 \subsubsection*{Instructions for producing jet variables for resolved top tagger in nano\-A\-O\-D}
 
@@ -159,10 +105,10 @@ The configuration file to generate nano\-A\-O\-D with top tagger variables can b
 
 \begin{DoxyCode}
 cd $\{CMSSW\_BASE\}/src
-cmsDriver.py resolvedTaggerVariables -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --filein 
-      [location of miniAOD file] --no\_exec  --conditions \textcolor{keyword}{auto}:phase1\_2017\_realistic -n 100 --era Run2\_2017,
-      run2\_nanoAOD\_94XMiniAODv1 --customise \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.
-      customizeResolvedTaggerVariables
+cmsDriver.py myNanoProdMc2017 -s NANO --mc --eventcontent NANOAODSIM --datatier NANOAODSIM  --no\_exec  --
+      conditions 102X\_mc2017\_realistic\_v7 --era Run2\_2017,run2\_nanoAOD\_94XMiniAODv2 --customise\_commands=\textcolor{stringliteral}{"
+      process.add\_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))"} --customise 
+      \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/resolvedTagger\_cff.customizeResolvedTaggerVariables
 mkdir -p $\{CMSSW\_BASE\}/src/\hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
 getTaggerCfg.sh -o -n -t DeepResolved\_DeepCSV\_GR\_noDisc\_Release\_v1.0.0 -d $CMSSW\_BASE/src/
       \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/data
@@ -279,6 +225,52 @@ iEvent.getByToken(JetTok\_, jets);
 
 
 For convinenent use with the top tagger the 4-\/vector and each jet variable can be saved in a flat tuple in its own std\-::vector per event.
+
+\paragraph*{O\-L\-D\-: Instructions for running tagger with C\-M\-S\-S\-W 8\-\_\-0\-\_\-28\-\_\-patch1}
+
+D\-E\-P\-R\-I\-C\-A\-T\-E\-D!!! D\-O N\-O\-T U\-S\-E T\-H\-E I\-N\-S\-T\-R\-U\-C\-T\-I\-O\-N\-S I\-N T\-H\-I\-S S\-E\-C\-T\-I\-O\-N!!!
+
+Please use the instruction above for producing the tagger in nano\-A\-O\-D.
+
+In addition to the top tagger itself these instructions include the steps to configure additional packages, including the deep\-Flavor tagger (for the tagger itself along with the tensorflow configuration for 8\-X), a patch to the qg producer to produce the Axis1 variable, and a version of the jet toolbox with a minor bug fix,
+
+
+\begin{DoxyCode}
+\textcolor{preprocessor}{#get CMSSW release}
+\textcolor{preprocessor}{}cmsrel CMSSW\_8\_0\_28\_patch1
+cd CMSSW\_8\_0\_28\_patch1/src/
+cmsenv
+git cms-init
+\textcolor{preprocessor}{#configure deep Flavor https://twiki.cern.ch/twiki/bin/viewauth/CMS/DeepJet}
+\textcolor{preprocessor}{}git cms-merge-topic -u mverzett:Experimental\_DeepFlavour\_80X
+cd RecoBTag/DeepFlavour/scripts/
+wget -nv http:\textcolor{comment}{//www-ekp.physik.uni-karlsruhe.de/~harrendorf/tensorflow-cmssw8-0-26.tar.gz}
+tar -zxf tensorflow-cmssw8-0-26.tar.gz
+mv tensorflow-cmssw8-0-26-patch1/site-packages ../../Tensorflow/python
+rm -rf tensorflow-cmssw8-0-26.tar.gz tensorflow-cmssw8-0-26-patch1/
+cd \textcolor{stringliteral}{"$CMSSW\_BASE/src"}
+scram setup \textcolor{stringliteral}{"RecoBTag/Tensorflow/py2-numpy-c-api.xml"}
+cmsenv
+\textcolor{preprocessor}{#patch to gq producer to add axis1}
+\textcolor{preprocessor}{}git cms-merge-topic -u pastika:AddJetAxis1
+\textcolor{preprocessor}{#patched version of jet toolbox}
+\textcolor{preprocessor}{}git clone git@github.com:susy2015/JetToolbox.git JMEAnalysis/JetToolbox -b fix\_NoLep\_jetToolbox\_80X\_V3
+\textcolor{preprocessor}{#download top tagger code }
+\textcolor{preprocessor}{}git clone -b IntermediateRecipeV0 git@github.com:susy2015/\hyperlink{classTopTagger}{TopTagger}.git
+\textcolor{preprocessor}{#compile everything }
+\textcolor{preprocessor}{}scram b -j12
+cd \hyperlink{classTopTagger}{TopTagger}/\hyperlink{classTopTagger}{TopTagger}/test
+\textcolor{preprocessor}{#get qgl database file}
+\textcolor{preprocessor}{}wget https:\textcolor{comment}{//raw.githubusercontent.com/cms-jet/QGLDatabase/master/SQLiteFiles/QGL\_cmssw8020\_v2.db}
+\textcolor{preprocessor}{#get top tager cfg file and MVA model files }
+\textcolor{preprocessor}{}../../Tools/getTaggerCfg.sh -t Intermediate\_Example\_v1.0.0
+\textcolor{preprocessor}{#run example code}
+\textcolor{preprocessor}{}voms-proxy-init
+cmsRun run\_topTagger.py
+\end{DoxyCode}
+
+
+The default configuration of the example cfg file \char`\"{}run\-\_\-top\-Tagger.\-py\char`\"{} will run over a single-\/lepton ttbar sample and produce an edm formatted output file (\char`\"{}test.\-root\char`\"{}) containing the vector of reconstructed top T\-Lorentz\-Vectors along with a second vector indicating the type of top (monojet, dijet, trijet).
 
 \subsection*{More about getting a configuration file}
 
