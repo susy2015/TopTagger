@@ -20,13 +20,8 @@ import subprocess
 filestoTransferGTP = [environ["CMSSW_BASE"] + "/src/TopTagger/Tools/makeTrainingTuples",
                       environ["CMSSW_BASE"] + "/src/TopTagger/TopTagger/test/libTopTagger.so",
                       environ["CMSSW_BASE"] + "/src/TopTagger/Tools/TopTaggerClusterOnly.cfg",
-                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets.txt",
-                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections.txt",
-                      "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_core.so.3.1",
-                      "/uscms_data/d3/pastika/zinv/dev/CMSSW_7_4_8/src/opencv/lib/libopencv_ml.so.3.1",
-#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so",
-#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10",
-#                      environ["CMSSW_BASE"] + "/src/hdf5-1.8.19/lib/libhdf5.so.10.3.0",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleSets_PostProcessed_2016.cfg",
+                      environ["CMSSW_BASE"] + "/src/TopTagger/Tools/sampleCollections_2016.cfg",
                       ]
 
 
@@ -85,7 +80,7 @@ makeExeAndFriendsTarrball(filestoTransferGTP, "gtp")
 nFilesPerJob = options.numfile
 
 fileParts = [submitFile]
-sc = SampleCollection("../sampleSets.txt", "../sampleCollections.txt")
+sc = SampleCollection("../sampleSets_PostProcessed_2016.cfg", "../sampleCollections_2016.cfg")
 datasets = []
 
 if options.dataCollections or options.dataCollectionslong:
@@ -117,7 +112,7 @@ for ds in datasets:
     ds = ds.strip()
 
     print ds
-    for s, n in sc.sampleList(ds):
+    for s, n, nevts in sc.sampleList(ds):
         print "\t%s"%n
         f = open(s)
         if not f == None:
