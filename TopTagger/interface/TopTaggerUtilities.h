@@ -682,6 +682,7 @@ namespace ttUtility
         int j_qgMult_[NCONST];
         int dTheta_[NCONST];
         int j12_m_[NCONST];
+        int j_partonFlavor_[NCONST];
 
     public:
         TrijetInputCalculator();
