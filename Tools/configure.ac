@@ -45,24 +45,24 @@ if test ${rootcintfound} == no; then
 fi   
 
 dnl check for openCV
-if test -z ${OPENCVDIR+x}; then
-   OPENCVDIR=/usr/local/
-fi
-
-AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
-
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
-AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
-
-AC_SUBST(OPENCVDIR, $OPENCVDIR)
+#if test -z ${OPENCVDIR+x}; then
+#   OPENCVDIR=/usr/local/
+#fi
+#
+#AC_CHECK_FILE($OPENCVDIR/include/opencv/cv.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
+#AC_CHECK_FILE($OPENCVDIR/include/opencv/ml.h, [], [AC_ERROR([OpenCV includes are required. Specify location with ./configure OPENCVDIR=/Path])])
+#
+#AC_CHECK_FILE($OPENCVDIR/lib/libopencv_ml.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
+#AC_CHECK_FILE($OPENCVDIR/lib/libopencv_core.${LIBSUFFIX}, [], [AC_ERROR([OpenCV libraries are required. Specify location with ./configure OPENCVDIR=/Path])])
+#
+#AC_SUBST(OPENCVDIR, $OPENCVDIR)
 
 dnl check for openCV
 if test -z ${HDF5DIR+x}; then
    HDF5DIR=/usr/local/HDF_Group/HDF5/1.8.19
 fi
 
-HDF5INCDIR=src
+HDF5INCDIR=include
 AC_CHECK_FILE($HDF5DIR/$HDF5INCDIR/hdf5.h, [], [AC_ERROR([HDF5 includes are required. Specify location with ./configure HDF5DIR=/Path])])
 
 AC_CHECK_FILE($HDF5DIR/lib/libhdf5.${LIBSUFFIX}, [], [AC_ERROR([HDF5 libraries are required. Specify location with ./configure HDF5DIR=/Path])])
@@ -75,7 +75,7 @@ if test -z ${TOPTAGGERDIR+x}; then
    TOPTAGGERDIR="${PWD}/../"
 fi
 
-AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/include/TopTagger.h,        [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
+AC_CHECK_HEADER($TOPTAGGERDIR/TopTagger/interface/TopTagger.h,        [], [AC_ERROR([TopTagger includes are not found!!!!!!!!!!])])
 AC_CHECK_HEADERS($TOPTAGGERDIR/CfgParser/include/TTException.h,     [], [AC_ERROR([CfgParser includes are not found!!!!!!!!!!])])
 
 AC_SUBST(TAGGERDIR, $TOPTAGGERDIR)

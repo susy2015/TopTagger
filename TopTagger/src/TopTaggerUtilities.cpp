@@ -311,6 +311,7 @@ namespace ttUtility
             j_recoJetsBtag_[i] = -1;
             j_recoJetsCharge_[i] = -1;
             j_qgMult_[i] = -1;
+            j_partonFlavor_[i] = -1;
             dTheta_[i] = -1;
             j12_m_[i] = -1;
         }
@@ -399,6 +400,7 @@ namespace ttUtility
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_recoJetsBtag") == 0)                           j_recoJetsBtag_[i] = j;
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_recoJetsCharge") == 0)                         j_recoJetsCharge_[i] = j;
                 if(vars[j].compare("j" + std::to_string(i + 1) + "_qgMult") == 0)                                 j_qgMult_[i] = j;
+                if(vars[j].compare("j" + std::to_string(i + 1) + "_partonFlavor") == 0)                           j_partonFlavor_[i] = j;
                 if(vars[j].compare("dTheta" + std::to_string(iMin + 1) + std::to_string(iMax + 1)) == 0)          dTheta_[i] = j;
                 if(vars[j].compare("j"   + std::to_string(iMin + 1) + std::to_string(iMax + 1) + "_m") == 0)      j12_m_[i] = j;
             }
@@ -540,7 +542,8 @@ namespace ttUtility
                 if(j_JetBprob_[i] >= 0)                            *(basePtr_ + j_JetBprob_[i] + len_*iCand)                            = relu(RF_constituents[i].getExtraVar("JetBprob"));
                 if(j_recoJetsBtag_[i] >= 0)                        *(basePtr_ + j_recoJetsBtag_[i] + len_*iCand)                        = relu(RF_constituents[i].getExtraVar("recoJetsBtag"));
                 if(j_recoJetsCharge_[i] >= 0)                      *(basePtr_ + j_recoJetsCharge_[i] + len_*iCand)                      = relu(RF_constituents[i].getExtraVar("recoJetsCharge"), -2);
-                if(j_qgMult_[i] >= 0)                              *(basePtr_ + j_qgMult_[i] + len_*iCand)                              = relu(RF_constituents[i].getExtraVar("qgMult"));            
+                if(j_qgMult_[i] >= 0)                              *(basePtr_ + j_qgMult_[i] + len_*iCand)                              = relu(RF_constituents[i].getExtraVar("qgMult"));
+                if(j_partonFlavor_[i] >= 0)                        *(basePtr_ + j_partonFlavor_[i] + len_*iCand)                        = relu(RF_constituents[i].getExtraVar("partonFlavor"), -22);
 
                 //index of next jet (assumes < 4 jets)
                 unsigned int iNext = (i + 1) % RF_constituents.size();

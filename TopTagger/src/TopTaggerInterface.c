@@ -113,7 +113,7 @@ static int TopTaggerInterface_makeAK4Const(
             //recalculate electron ID without isolation 
             //VID compressed bitmap (MinPtCut,GsfEleSCEtaMultiRangeCut,GsfEleDEtaInSeedCut,GsfEleDPhiInCut,GsfEleFull5x5SigmaIEtaIEtaCut,GsfEleHadronicOverEMEnergyScaledCut,GsfEleEInverseMinusPInverseCut,GsfEleRelPFIsoScaledCut,GsfEleConversionVetoCut,GsfEleMissingHitsCut), 3 bits per cut
             //this is a 'bit' awful <- that pun is awful, but yes, this should be made a little better 
-            if(elecIdx1[iJet] >= 0 && elecIdx1[iJet] < elecLV.size() && elecLV[elecIdx1[iJet]].Pt() > 10.0)
+            if(elecIdx1[iJet] >= 0 && elecIdx1[iJet] < static_cast<int>(elecLV.size()) && elecLV[elecIdx1[iJet]].Pt() > 10.0)
 	    {
                 //MAsk relIso from the ID so we can apply miniIso
                 const int NCUTS = 10;
@@ -133,7 +133,7 @@ static int TopTaggerInterface_makeAK4Const(
                 isLep = isLep || (elecID >= 1 && elecMiniPFRelIso[elecIdx1[iJet]] < 0.10 && dR < 0.2);
             }
             
-            if(muonIdx1[iJet] >= 0 && muonIdx1[iJet] < muonLV.size() && muonLV[muonIdx1[iJet]].Pt() > 10.0)
+            if(muonIdx1[iJet] >= 0 && muonIdx1[iJet] < static_cast<int>(muonLV.size()) && muonLV[muonIdx1[iJet]].Pt() > 10.0)
             {
                 double dR = ROOT::Math::VectorUtil::DeltaR(jetsLV[iJet], muonLV[muonIdx1[iJet]]);
 

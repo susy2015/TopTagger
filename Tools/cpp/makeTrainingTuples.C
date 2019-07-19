@@ -4,9 +4,9 @@
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/SATException.h"
 
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/interface/TopTagger.h"
+#include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
+#include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 #include "TopTagger/CfgParser/include/TTException.h"
 #include "TaggerUtility.h"
 #include "PlotUtility.h"
@@ -141,12 +141,14 @@ public:
             auto& dataVec = data_[dataset.first];
             int nCand = 0;
             //get ncand
+            int iVar = 0;
             for(const auto& pp : ptrPair)
             {
+                ++iVar;
                 //Look for the first vector
                 if(pp.first)
                 {
-                    nCand = (*static_cast<const std::vector<double> * const * const>(pp.second))->size();
+                    nCand = (*static_cast<const std::vector<float> * const * const>(pp.second))->size();
                     break;
                 }
             }
@@ -155,8 +157,8 @@ public:
                 for(const auto& pp : ptrPair)
                 {
                     //Check if this is a vector or a pointer 
-                    if(pp.first) dataVec.push_back(nCand?((**static_cast<const std::vector<double> * const * const>(pp.second))[i]):0.0);
-                    else         dataVec.push_back(*static_cast<const double * const>(pp.second));
+                    if(pp.first) dataVec.push_back(nCand?((**static_cast<const std::vector<float> * const * const>(pp.second))[i]):0.0);
+                    else         dataVec.push_back(*static_cast<const float * const>(pp.second));
                 }
             }
             maxSize = std::max(maxSize, dataVec.size()/varVec.size());
@@ -220,103 +222,66 @@ private:
     const std::map<std::string, std::vector<std::string>>& variables_;
     std::shared_ptr<ttUtility::MVAInputCalculator> mvaCalc_;
     std::vector<float> values_;
+    bool signal_;
+    int Nbu_, Ncu_, Nlu_, Ngu_;
+    int Nbl_, Ncl_, Nll_, Ngl_;
 
     bool prepVariables(NTupleReader& tr)
     {
-        const std::vector<TLorentzVector>& jetsLVec  = tr.getVec<TLorentzVector>("jetsLVec");
-        const std::vector<double>& recoJetsBtag      = tr.getVec<double>("recoJetsBtag_0");
-        const std::vector<double>& qgLikelihood      = tr.getVec<double>("qgLikelihood");
+        const std::vector<TLorentzVector>& jetsLVec  = tr.getVec_LVFromNano<float>("Jet");
+        const std::vector<float>& recoJetsBtag      = tr.getVec<float>("Jet_btagDeepB");
+        const std::vector<float>& qgLikelihood      = tr.getVec<float>("Jet_qgl");
 
-        const std::vector<int>& qgMult  = tr.getVec<int>("qgMult");
-        const std::vector<double>& qgPtD   = tr.getVec<double>("qgPtD");
-        const std::vector<double>& qgAxis1 = tr.getVec<double>("qgAxis1");
-        const std::vector<double>& qgAxis2 = tr.getVec<double>("qgAxis2");
+        const std::vector<TLorentzVector>& genDecayLVec = tr.getVec_LVFromNano<float>("GenPart");
+        const std::vector<int>& genDecayStatFlag        = tr.getVec<int>("GenPart_statusFlags");
+        const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("GenPart_pdgId");
+        const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("GenPart_genPartIdxMother");
 
-        const std::vector<TLorentzVector>& genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
-        const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("genDecayPdgIdVec");
-        const std::vector<int>& genDecayIdxVec          = tr.getVec<int>("genDecayIdxVec");
-        const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("genDecayMomIdxVec");
-
-	//std::vector<TLorentzVector> jetsLVec_forTagger;
-        //std::vector<double> recoJetsBtag_forTagger;
-        //std::vector<double> qgLikelihood_forTagger;
-        //std::vector<double> recoJetsCharge_forTagger;
-        //AnaFunctions::prepareJetsForTagger(jetsLVec, recoJetsBtag, jetsLVec_forTagger, recoJetsBtag_forTagger, qgLikelihood, qgLikelihood_forTagger, AnaConsts::pt20Arr);
-
-	const double met=tr.getVar<double>("met");
-	const double metphi=tr.getVar<double>("metphi");
-	TLorentzVector metLVec; metLVec.SetPtEtaPhiM(met, 0, metphi, 0);
-        int cntNJetsPt50Eta24 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt50Eta24Arr);
-        int cntNJetsPt30Eta24 = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Eta24Arr);
-        int cntNJetsPt30      = AnaFunctions::countJets(jetsLVec, AnaConsts::pt30Arr);
-	int cntCSVS = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVS, AnaConsts::bTagArr);
-        int cntCSVL = AnaFunctions::countCSVS(jetsLVec, recoJetsBtag, AnaConsts::cutCSVL, AnaConsts::bTagArr);
-	std::vector<double> * dPhiVec = new std::vector<double>();
-        (*dPhiVec) = AnaFunctions::calcDPhi(jetsLVec, metLVec.Phi(), 3, AnaConsts::dphiArr);
-	bool passnJets = true;
-        if( cntNJetsPt50Eta24 < AnaConsts::nJetsSelPt50Eta24 ) passnJets = false;
-        if( cntNJetsPt30Eta24 < AnaConsts::nJetsSelPt30Eta24 ) passnJets = false;
-        bool passdPhis = (dPhiVec->at(0) >= AnaConsts::dPhi0_CUT && dPhiVec->at(1) >= AnaConsts::dPhi1_CUT && dPhiVec->at(2) >= AnaConsts::dPhi2_CUT);
-	bool passBJets = true;
-        if( !( (AnaConsts::low_nJetsSelBtagged == -1 || cntCSVS >= AnaConsts::low_nJetsSelBtagged) && (AnaConsts::high_nJetsSelBtagged == -1 || cntCSVS < AnaConsts::high_nJetsSelBtagged ) ) )passBJets = false;
-	bool passMET = (metLVec.Pt() >= AnaConsts::defaultMETcut);
+        std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> getTopInfo = ttUtility::GetTopdauGenLVecFromNano( genDecayLVec, genDecayPdgIdVec, genDecayStatFlag, genDecayMomIdxVec);
 
         //New Tagger starts here
         //prep input object (constituent) vector
-        std::vector<TLorentzVector> hadGenTops = ttUtility::GetHadTopLVec(genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec);
-        std::vector<std::vector<const TLorentzVector*>> hadGenTopDaughters;
-        for(const auto& top : hadGenTops)
-        {
-            hadGenTopDaughters.push_back(ttUtility::GetTopdauLVec(top, genDecayLVec, genDecayPdgIdVec, genDecayIdxVec, genDecayMomIdxVec));
-        }
-        ttUtility::ConstAK4Inputs myConstAK4Inputs = ttUtility::ConstAK4Inputs(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
+        const std::vector<TLorentzVector>& hadGenTops = getTopInfo.first;
+        const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters = getTopInfo.second;
+        ttUtility::ConstAK4Inputs<float> myConstAK4Inputs = ttUtility::ConstAK4Inputs<float>(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
 
         auto convertToDoubleandRegister = [](NTupleReader& tr, std::string name)
         {
             const std::vector<int>& intVec = tr.getVec<int>(name);
-            std::vector<double>* doubleVec = new std::vector<double>(intVec.begin(), intVec.end());
+            std::vector<float>* doubleVec = new std::vector<float>(intVec.begin(), intVec.end());
             tr.registerDerivedVec(name+"ConvertedToDouble", doubleVec);
             return doubleVec;
         };
 
-        myConstAK4Inputs.addQGLVectors(qgMult, qgPtD, qgAxis1, qgAxis2);
-        myConstAK4Inputs.addSupplamentalVector("qgMult"                              , *convertToDoubleandRegister(tr, "qgMult"));
-        myConstAK4Inputs.addSupplamentalVector("qgPtD"                               , tr.getVec<double>("qgPtD"));
-        myConstAK4Inputs.addSupplamentalVector("qgAxis1"                             , tr.getVec<double>("qgAxis1"));
-        myConstAK4Inputs.addSupplamentalVector("qgAxis2"                             , tr.getVec<double>("qgAxis2"));
-//        myConstAK4Inputs.addSupplamentalVector("recoJetsFlavor"                      , tr.getVec<double>("recoJetsFlavor"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsJecScaleRawToFull"           , tr.getVec<double>("recoJetsJecScaleRawToFull"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction" , tr.getVec<double>("recoJetschargedHadronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction"     , tr.getVec<double>("recoJetschargedEmEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction"     , tr.getVec<double>("recoJetsneutralEmEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction"          , tr.getVec<double>("recoJetsmuonEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction"      , tr.getVec<double>("recoJetsHFHadronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction"          , tr.getVec<double>("recoJetsHFEMEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction"       , tr.getVec<double>("recoJetsneutralEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction"                , tr.getVec<double>("PhotonEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction"              , tr.getVec<double>("ElectronEnergyFraction"));
-        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity"           , tr.getVec<double>("ChargedHadronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity"           , tr.getVec<double>("NeutralHadronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity"                  , tr.getVec<double>("PhotonMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity"                , tr.getVec<double>("ElectronMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity"                    , tr.getVec<double>("MuonMultiplicity"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVb"                            , tr.getVec<double>("DeepCSVb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVc"                            , tr.getVec<double>("DeepCSVc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVl"                            , tr.getVec<double>("DeepCSVl"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVbb"                           , tr.getVec<double>("DeepCSVbb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepCSVcc"                           , tr.getVec<double>("DeepCSVcc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorb"                         , tr.getVec<double>("DeepFlavorb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorbb"                        , tr.getVec<double>("DeepFlavorbb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorlepb"                      , tr.getVec<double>("DeepFlavorlepb"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorc"                         , tr.getVec<double>("DeepFlavorc"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavoruds"                       , tr.getVec<double>("DeepFlavoruds"));
-        myConstAK4Inputs.addSupplamentalVector("DeepFlavorg"                         , tr.getVec<double>("DeepFlavorg"));
-        myConstAK4Inputs.addSupplamentalVector("CvsL"                                , tr.getVec<double>("CvsL"));
-        myConstAK4Inputs.addSupplamentalVector("CvsB"                                , tr.getVec<double>("CvsB"));
-        myConstAK4Inputs.addSupplamentalVector("CombinedSvtx"                        , tr.getVec<double>("CombinedSvtx"));
-        myConstAK4Inputs.addSupplamentalVector("JetProba"                            , tr.getVec<double>("JetProba_0"));
-        myConstAK4Inputs.addSupplamentalVector("JetBprob"                            , tr.getVec<double>("JetBprob"));
-        myConstAK4Inputs.addSupplamentalVector("recoJetsCharge"                      , tr.getVec<double>("recoJetsCharge_0"));
+        myConstAK4Inputs.addSupplamentalVector("qgMult",                                *convertToDoubleandRegister(tr, "Jet_qgMult"));
+        myConstAK4Inputs.addSupplamentalVector("qgPtD",                                 tr.getVec<float>("Jet_qgptD"));
+        myConstAK4Inputs.addSupplamentalVector("qgAxis1",                               tr.getVec<float>("Jet_qgAxis1"));
+        myConstAK4Inputs.addSupplamentalVector("qgAxis2",                               tr.getVec<float>("Jet_qgAxis2"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction",   tr.getVec<float>("Jet_chHEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction",       tr.getVec<float>("Jet_chEmEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction",       tr.getVec<float>("Jet_neEmEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction",            tr.getVec<float>("Jet_muEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction",        tr.getVec<float>("Jet_hfHadEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction",            tr.getVec<float>("Jet_hfEMEF"));
+        myConstAK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction",         tr.getVec<float>("Jet_neHEF"));
+        myConstAK4Inputs.addSupplamentalVector("PhotonEnergyFraction",                  tr.getVec<float>("Jet_phEF"));
+        myConstAK4Inputs.addSupplamentalVector("ElectronEnergyFraction",                tr.getVec<float>("Jet_elEF"));
+        myConstAK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",             tr.getVec<float>("Jet_chHadMult"));
+        myConstAK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",             tr.getVec<float>("Jet_neHadMult"));
+        myConstAK4Inputs.addSupplamentalVector("PhotonMultiplicity",                    tr.getVec<float>("Jet_phMult"));
+        myConstAK4Inputs.addSupplamentalVector("ElectronMultiplicity",                  tr.getVec<float>("Jet_elMult"));
+        myConstAK4Inputs.addSupplamentalVector("MuonMultiplicity",                      tr.getVec<float>("Jet_muMult"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVb",                              tr.getVec<float>("Jet_deepCSVb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVc",                              tr.getVec<float>("Jet_deepCSVc"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVl",                              tr.getVec<float>("Jet_deepCSVudsg"));
+        myConstAK4Inputs.addSupplamentalVector("DeepCSVbb",                             tr.getVec<float>("Jet_deepCSVbb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorb",                           tr.getVec<float>("Jet_deepFlavourb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorbb",                          tr.getVec<float>("Jet_deepFlavourbb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorlepb",                        tr.getVec<float>("Jet_deepFlavourlepb"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorc",                           tr.getVec<float>("Jet_deepFlavourc"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavoruds",                         tr.getVec<float>("Jet_deepFlavouruds"));
+        myConstAK4Inputs.addSupplamentalVector("DeepFlavorg",                           tr.getVec<float>("Jet_deepFlavourg"));
+        myConstAK4Inputs.addSupplamentalVector("partonFlavor",                          *convertToDoubleandRegister(tr, "Jet_partonFlavour"));
 
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
@@ -328,16 +293,16 @@ private:
         const std::vector<TopObject>& topCands = ttr.getTopCandidates();
 
         //if there are no top candidates, discard this event and move to the next
-        if(topCands.size() == 0) return false;
+        //if(topCands.size() == 0) return false;
 
         //Get gen matching results
 
-        std::vector<double> *genMatchdR = new std::vector<double>();
-        std::vector<double> *genMatchConst = new std::vector<double>();
-        std::vector<double> *genMatchVec = new std::vector<double>();
+        std::vector<float> *genMatchdR = new std::vector<float>();
+        std::vector<float> *genMatchConst = new std::vector<float>();
+        std::vector<float> *genMatchVec = new std::vector<float>();
 
         //Class which holds and registers vectors of variables
-        VariableHolder<double> vh(tr);
+        VariableHolder<float> vh(tr);
 
         //prepare a vector of gen top pt
         int icandGen = 0;
@@ -348,21 +313,23 @@ private:
         }
         if(hadGenTops.size() == 0) 
         {
-            tr.registerDerivedVec("genTopPt", new std::vector<double>());
-            tr.registerDerivedVec("candNumGen", new std::vector<double>());
+            tr.registerDerivedVec("genTopPt", new std::vector<float>());
+            tr.registerDerivedVec("candNumGen", new std::vector<float>());
         }
 
-        std::vector<double>* candNum = new std::vector<double>();
+        std::vector<float>* candNum = new std::vector<float>();
         int iTop = 0;
         //prepare reco top quantities
         for(const TopObject& topCand : topCands)
         {
-            const auto* bestMatch = topCand.getBestGenTopMatch();
+            const auto* bestMatch = topCand.getBestGenTopMatch(0.6, 3, 3);
             bool hasBestMatch = bestMatch !=  nullptr;
-            double bestMatchPt = bestMatch?(bestMatch->Pt()):(-999.9);
+            float bestMatchPt = bestMatch?(bestMatch->Pt()):(-999.9);
+
+            const auto& topConstituents = topCand.getConstituents();
 
             int NConstMatches = 0;
-            for(const auto* constituent : topCand.getConstituents())
+            for(const auto* constituent : topConstituents)
             {
                 auto iter = constituent->getGenMatches().find(bestMatch);
                 if(iter != constituent->getGenMatches().end())
@@ -371,12 +338,30 @@ private:
                 }
             }
 
+            //parton category
+            int j1_parton = abs(static_cast<int>(topConstituents[0]->getExtraVar("partonFlavor")));
+            int j2_parton = abs(static_cast<int>(topConstituents[1]->getExtraVar("partonFlavor")));
+            int j3_parton = abs(static_cast<int>(topConstituents[2]->getExtraVar("partonFlavor")));
+
+            int Nb = (j1_parton == 5) + (j2_parton == 5) + (j3_parton == 5);
+            int Nc = (j1_parton == 4) + (j2_parton == 4) + (j3_parton == 4);
+            int Ng = (j1_parton == 21) + (j2_parton == 21) + (j3_parton == 21);
+            int Nl = (j1_parton < 4) + (j2_parton < 4) + (j3_parton < 4);
 
             //if((hasBestMatch && NConstMatches == 3) || bgPrescale_++ == 0)
-            if(!(hasBestMatch && NConstMatches == 3))
+            if( ((signal_)?( hasBestMatch && NConstMatches == 3 ):( !(hasBestMatch && NConstMatches == 3) ) )
+                && (Nbu_ < 0 || Nb <= Nbu_)
+                && (Ncu_ < 0 || Nc <= Ncu_)
+                && (Nlu_ < 0 || Nl <= Nlu_)
+                && (Ngu_ < 0 || Ng <= Ngu_)
+                && (Nbl_ < 0 || Nb >= Nbl_)
+                && (Ncl_ < 0 || Nc >= Ncl_)
+                && (Nll_ < 0 || Nl >= Nll_)
+                && (Ngl_ < 0 || Ng >= Ngl_)
+                )
             {
                 const auto& varNames = variables_.find("reco_candidates")->second;
-                candNum->push_back(static_cast<double>(iTop++));
+                candNum->push_back(static_cast<float>(iTop++));
                 genMatchConst->push_back(NConstMatches);
                 genMatchdR->push_back(hasBestMatch);
                 genMatchVec->push_back(bestMatchPt);
@@ -403,28 +388,19 @@ private:
 
         tr.registerDerivedVar("nConstituents", static_cast<int>(constituents.size()));
 
-        tr.registerDerivedVar("eventNum", static_cast<double>(eventNum_++));
+        tr.registerDerivedVar("eventNum", static_cast<float>(eventNum_++));
         tr.registerDerivedVec("candNum", candNum);
-        tr.registerDerivedVar("ncand", static_cast<double>(candNum->size()));
+        tr.registerDerivedVar("ncand", static_cast<float>(candNum->size()));
 
         //Generate basic MVA selection 
         bool passMVABaseline = true;//met > 100 && cntNJetsPt30 >= 5 && cntCSVS >= 1 && cntCSVL >= 2;//true;//(topCands.size() >= 1) || genMatches.second.second->size() >= 1;
         tr.registerDerivedVar("passMVABaseline", passMVABaseline);
-	const bool passValidationBaseline = cntNJetsPt30>=AnaConsts::nJetsSelPt30Eta24 && met>=AnaConsts::defaultMETcut && cntCSVS>=AnaConsts::low_nJetsSelBtagged;
-	tr.registerDerivedVar("passValidationBaseline",passValidationBaseline);
-	tr.registerDerivedVar("MET", met);
-	tr.registerDerivedVar("Njet",      static_cast<double>(cntNJetsPt30));
-        tr.registerDerivedVar("Bjet",      static_cast<double>(cntCSVS));
-        tr.registerDerivedVar("passnJets", static_cast<double>(passnJets));
-        tr.registerDerivedVar("passMET",   static_cast<double>(passMET));
-        tr.registerDerivedVar("passdPhis", static_cast<double>(passdPhis));
-        tr.registerDerivedVar("passBJets", static_cast<double>(passBJets));
 	
         return true;
     }
 
 public:
-    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max())
+    PrepVariables(const std::map<std::string, std::vector<std::string>>& variables, bool signal, int Nbl, int Ncl, int Nll, int Ngl, int Nbu, int Ncu, int Nlu, int Ngu) : variables_(variables), values_(variables.find("reco_candidates")->second.size(), std::numeric_limits<std::remove_reference<decltype(values_.front())>::type>::max()), signal_(signal), Nbu_(Nbu), Ncu_(Ncu), Nlu_(Nlu), Ngu_(Ngu), Nbl_(Nbl), Ncl_(Ncl), Nll_(Nll), Ngl_(Ngl)
     {
         eventNum_ = 0;
         bgPrescale_ = 0;
@@ -456,13 +432,25 @@ int main(int argc, char* argv[])
         {"startFile",  required_argument, 0, 'M'},
         {"numEvts",    required_argument, 0, 'E'},
         {"ratio"  ,    required_argument, 0, 'R'},
+        {"suffix"  ,   required_argument, 0, 'U'},
+
+        {"nbl"  ,    required_argument, 0, 'b'},
+        {"ncl"  ,    required_argument, 0, 'x'},
+        {"nll"  ,    required_argument, 0, 'l'},
+        {"ngl"  ,    required_argument, 0, 'g'},
+        {"nbu"  ,    required_argument, 0, 'B'},
+        {"ncu"  ,    required_argument, 0, 'C'},
+        {"nlu"  ,    required_argument, 0, 'L'},
+        {"ngu"  ,    required_argument, 0, 'G'},
+        {"bg"  ,     no_argument,       0, 'S'},
     };
     bool forFakeRate = false;
     bool runOnCondor = false;
-    string dataSets = "", sampleloc = AnaSamples::fileDir, outFile = "trainingTuple", sampleRatios = "1:1";
-    int nFiles = -1, startFile = 0, nEvts = -1, printInterval = 10000;
+    bool signal = true;
+    string dataSets = "", sampleloc = AnaSamples::fileDir, outFile = "trainingTuple", sampleRatios = "1:1", label = "test";
+    int nFiles = -1, startFile = 0, nEvts = -1, printInterval = 10000, Nbl = -1, Ncl = -1, Nll = -1, Ngl = -1, Nbu = -1, Ncu = -1, Nlu = -1, Ngu = -1;
 
-    while((opt = getopt_long(argc, argv, "fcD:N:M:E:R:", long_options, &option_index)) != -1)
+    while((opt = getopt_long(argc, argv, "fcD:N:M:E:R:B:C:L:G:Sb:x:l:g:U:", long_options, &option_index)) != -1)
     {
         switch(opt)
         {
@@ -493,6 +481,46 @@ int main(int argc, char* argv[])
         case 'R':
             sampleRatios = optarg;
             break;
+
+        case 'B':
+            Nbu = int(atoi(optarg));
+            break;
+
+        case 'C':
+            Ncu = int(atoi(optarg));
+            break;
+
+        case 'L':
+            Nlu = int(atoi(optarg));
+            break;
+
+        case 'G':
+            Ngu = int(atoi(optarg));
+            break;
+
+        case 'b':
+            Nbl = int(atoi(optarg));
+            break;
+
+        case 'x':
+            Ncl = int(atoi(optarg));
+            break;
+
+        case 'l':
+            Nll = int(atoi(optarg));
+            break;
+
+        case 'g':
+            Ngl = int(atoi(optarg));
+            break;
+
+        case 'S':
+            signal = false;
+            break;
+
+        case 'U':
+            label = optarg;
+            break;
         }
     }
 
@@ -505,8 +533,8 @@ int main(int argc, char* argv[])
         sampleloc = "condor";
     }
 
-    AnaSamples::SampleSet        ss("sampleSets.txt", runOnCondor);
-    AnaSamples::SampleCollection sc("sampleCollections.txt", ss);
+    AnaSamples::SampleSet        ss("sampleSets_PostProcessed_2016.cfg", runOnCondor);
+    AnaSamples::SampleCollection sc("sampleCollections_2016.cfg", ss);
 
     map<string, vector<AnaSamples::FileSummary>> fileMap;
 
@@ -538,10 +566,11 @@ int main(int argc, char* argv[])
 
     const std::map<std::string, std::vector<std::string>> variables =
     {
-        {"gen_tops", {"eventNum", "candNumGen", "genTopPt", "sampleWgt","Njet"} },
+        {"gen_tops", {"eventNum", "candNumGen", "genTopPt", "sampleWgt"} },
         {"reco_candidates", {"eventNum",
                              "candNum",
                              "ncand",
+
                              "cand_dThetaMin",
                              "cand_dThetaMax",
                              "cand_dRMax",
@@ -550,27 +579,15 @@ int main(int argc, char* argv[])
                              "cand_phi",
                              "cand_pt",
                              "cand_p",
-                             "dR12_lab",
-                             "dR13_lab",
-                             "dR1_23_lab",
-                             "dR23_lab",
-                             "dR2_13_lab",
-                             "dR3_12_lab",
-                             "dRPtTop",
-                             "dRPtW",
+
                              "dTheta12",
                              "dTheta13",
                              "dTheta23",
                              "j12_m",
-                             "j12_m_lab",
                              "j13_m",
-                             "j13_m_lab",
-                             "j1_CSV",
-                             "j1_CSV_lab",
+                             "j23_m",
+
                              "j1_ChargedHadronMultiplicity",
-                             "j1_CombinedSvtx",
-                             "j1_CvsB",
-                             "j1_CvsL",
                              "j1_DeepCSVb",
                              "j1_DeepCSVbb",
                              "j1_DeepCSVc",
@@ -584,45 +601,27 @@ int main(int argc, char* argv[])
                              "j1_DeepFlavorg",
                              "j1_ElectronEnergyFraction",
                              "j1_ElectronMultiplicity",
-//                             "j1_JetBprob",
-                             "j1_JetProba",
                              "j1_MuonMultiplicity",
                              "j1_NeutralHadronMultiplicity",
                              "j1_PhotonEnergyFraction",
                              "j1_PhotonMultiplicity",
-                             "j1_QGL",
-                             "j1_QGL_lab",
-                             "j1_eta_lab",
                              "j1_m",
-                             "j1_m_lab",
                              "j1_p",
-                             "j1_phi_lab",
                              "j1_pt_lab",
                              "j1_qgAxis1",
-                             "j1_qgAxis1_lab",
                              "j1_qgAxis2",
-                             "j1_qgAxis2_lab",
                              "j1_qgMult",
-                             "j1_qgMult_lab",
                              "j1_qgPtD",
-                             "j1_qgPtD_lab",
-//                             "j1_recoJetsCharge",
                              "j1_recoJetsHFEMEnergyFraction",
                              "j1_recoJetsHFHadronEnergyFraction",
-                             "j1_recoJetsJecScaleRawToFull",
                              "j1_recoJetschargedEmEnergyFraction",
                              "j1_recoJetschargedHadronEnergyFraction",
                              "j1_recoJetsmuonEnergyFraction",
                              "j1_recoJetsneutralEmEnergyFraction",
                              "j1_recoJetsneutralEnergyFraction",
-                             "j23_m",
-                             "j23_m_lab",
-                             "j2_CSV",
-                             "j2_CSV_lab",
+                             "j1_partonFlavor",
+
                              "j2_ChargedHadronMultiplicity",
-                             "j2_CombinedSvtx",
-                             "j2_CvsB",
-                             "j2_CvsL",
                              "j2_DeepCSVb",
                              "j2_DeepCSVbb",
                              "j2_DeepCSVc",
@@ -636,43 +635,26 @@ int main(int argc, char* argv[])
                              "j2_DeepFlavorg",
                              "j2_ElectronEnergyFraction",
                              "j2_ElectronMultiplicity",
-//                             "j2_JetBprob",
-                             "j2_JetProba",
                              "j2_MuonMultiplicity",
                              "j2_NeutralHadronMultiplicity",
                              "j2_PhotonEnergyFraction",
                              "j2_PhotonMultiplicity",
-                             "j2_QGL",
-                             "j2_QGL_lab",
-                             "j2_eta_lab",
                              "j2_m",
-                             "j2_m_lab",
                              "j2_p",
-                             "j2_phi_lab",
-                             "j2_pt_lab",
                              "j2_qgAxis1",
-                             "j2_qgAxis1_lab",
                              "j2_qgAxis2",
-                             "j2_qgAxis2_lab",
                              "j2_qgMult",
-                             "j2_qgMult_lab",
                              "j2_qgPtD",
-                             "j2_qgPtD_lab",
-//                             "j2_recoJetsCharge",
                              "j2_recoJetsHFEMEnergyFraction",
                              "j2_recoJetsHFHadronEnergyFraction",
-                             "j2_recoJetsJecScaleRawToFull",
                              "j2_recoJetschargedEmEnergyFraction",
                              "j2_recoJetschargedHadronEnergyFraction",
                              "j2_recoJetsmuonEnergyFraction",
                              "j2_recoJetsneutralEmEnergyFraction",
                              "j2_recoJetsneutralEnergyFraction",
-                             "j3_CSV",
-                             "j3_CSV_lab",
+                             "j2_partonFlavor",
+
                              "j3_ChargedHadronMultiplicity",
-                             "j3_CombinedSvtx",
-                             "j3_CvsB",
-                             "j3_CvsL",
                              "j3_DeepCSVb",
                              "j3_DeepCSVbb",
                              "j3_DeepCSVc",
@@ -686,58 +668,30 @@ int main(int argc, char* argv[])
                              "j3_DeepFlavorg",
                              "j3_ElectronEnergyFraction",
                              "j3_ElectronMultiplicity",
-//                             "j3_JetBprob",
-                             "j3_JetProba",
                              "j3_MuonMultiplicity",
                              "j3_NeutralHadronMultiplicity",
                              "j3_PhotonEnergyFraction",
                              "j3_PhotonMultiplicity",
-                             "j3_QGL",
-                             "j3_QGL_lab",
-                             "j3_eta_lab",
                              "j3_m",
-                             "j3_m_lab",
                              "j3_p",
-                             "j3_phi_lab",
-                             "j3_pt_lab",
                              "j3_qgAxis1",
-                             "j3_qgAxis1_lab",
                              "j3_qgAxis2",
-                             "j3_qgAxis2_lab",
                              "j3_qgMult",
-                             "j3_qgMult_lab",
                              "j3_qgPtD",
-                             "j3_qgPtD_lab",
-//                             "j3_recoJetsCharge",
                              "j3_recoJetsHFEMEnergyFraction",
                              "j3_recoJetsHFHadronEnergyFraction",
-                             "j3_recoJetsJecScaleRawToFull",
                              "j3_recoJetschargedEmEnergyFraction",
                              "j3_recoJetschargedHadronEnergyFraction",
                              "j3_recoJetsmuonEnergyFraction",
                              "j3_recoJetsneutralEmEnergyFraction",
                              "j3_recoJetsneutralEnergyFraction",
-//                             "sd_n2",
+                             "j3_partonFlavor",
+
                              "genTopMatchesVec",
                              "genConstiuentMatchesVec",
                              "genConstMatchGenPtVec",
-                             "Njet",
-                             "Bjet",
-                             "passnJets",
-                             "passMET",
-                             "passdPhis",
-                             "passBJets",
-                             "MET",
                              "sampleWgt",
-                             "j1_p_top",
-                             "j1_theta_top",
-                             "j1_phi_top",
-                             "j2_p_top",
-                             "j2_theta_top",
-                             "j2_phi_top",
-                             "j3_p_top",
-                             "j3_theta_top",
-                             "j3_phi_top"} }
+                             } }
     };
 
     //parse sample splitting and set up minituples
@@ -748,10 +702,10 @@ int main(int argc, char* argv[])
         int splitNum = stoi(sampleRatios.substr((pos)?(pos + 1):(0)));
         sumRatio += splitNum;
         string ofname;
-        if(iter == 0)      ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_training" + ".root";
-        else if(iter == 1) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
-        else if(iter == 2) ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
-        else               ofname = outFile + "_division_" + to_string(iter) + "_" + dataSets + ".root";
+        if(iter == 0)      ofname = outFile + "_" + label + "_division_" + to_string(iter) + "_" + dataSets + "_training" + ".root";
+        else if(iter == 1) ofname = outFile + "_" + label + "_division_" + to_string(iter) + "_" + dataSets + "_validation" + ".root";
+        else if(iter == 2) ofname = outFile + "_" + label + "_division_" + to_string(iter) + "_" + dataSets + "_test" + ".root";
+        else               ofname = outFile + "_" + label + "_division_" + to_string(iter) + "_" + dataSets + ".root";
         mtmVec.emplace_back(std::unique_ptr<HDF5Writer>(new HDF5Writer(variables, 500000, ofname)), splitNum);
     }
 
@@ -795,7 +749,7 @@ int main(int argc, char* argv[])
                     NTupleReader tr(t);
 
                     //register variable prep class with NTupleReader
-                    PrepVariables prepVars(variables);
+                    PrepVariables prepVars(variables, signal, Nbl, Ncl, Nll, Ngl, Nbu, Ncu, Nlu, Ngu);
                     tr.registerFunction(prepVars);
 
                     int splitCounter = 0, mtmIndex = 0;
@@ -806,7 +760,7 @@ int main(int argc, char* argv[])
                     {
                         //Get sample lumi weight and correct for the actual number of events 
                         //This needs to happen before we ad sampleWgt to the mini tuple variables to save
-                        double weight = file.getWeight();
+                        float weight = file.getWeight();
                         tr.registerDerivedVar("sampleWgt", weight);
 
                         //If nEvts is set, stop after so many events
@@ -834,7 +788,6 @@ int main(int argc, char* argv[])
 
                         //Get cut variable 
                         const bool& passMVABaseline = tr.getVar<bool>("passMVABaseline");
-			const bool& passValidationBaseline = tr.getVar<bool>("passValidationBaseline");
 
 			//fill mini tuple
 			bool passbaseline = passMVABaseline;
