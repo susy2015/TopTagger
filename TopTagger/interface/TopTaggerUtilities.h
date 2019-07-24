@@ -691,6 +691,8 @@ namespace ttUtility
         bool checkCand(const TopObject&);
     };
 
+    double coreMT2calc(const TLorentzVector & fatJet1LVec, const TLorentzVector & fatJet2LVec, const TLorentzVector& metLVec);
+
     std::vector<std::string> getMVAVars();
 
     bool recMomSearch(int startIndex, int targetIndex, const std::vector<int>& genDecayMomIdxVec);
