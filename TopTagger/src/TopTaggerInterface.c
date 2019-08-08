@@ -410,7 +410,7 @@ extern "C"
         catch(const TTException& e)
         {
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -536,7 +536,7 @@ extern "C"
             if(pGenInputs) Py_DECREF(pGenInputs);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -625,7 +625,83 @@ extern "C"
             Py_DECREF(ptt);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
+            return NULL;
+        }
+
+    }
+
+    static PyObject* TopTaggerInterface_getSFSyst(PyObject *self, PyObject *args)
+    {
+        //suppress unused parameter warning as self is manditory
+        (void)self;
+
+        PyObject *ptt;
+        if (!PyArg_ParseTuple(args, "O!", &PyCapsule_Type, &ptt))
+        {
+            return NULL;
+        }
+
+        Py_INCREF(ptt);
+
+        //Get top tagger pointer from capsule 
+        TopTagger* tt;
+        if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
+        {
+            //Handle exception here 
+            Py_DECREF(ptt);
+
+            PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
+            return NULL;
+        }
+
+        try
+        {
+            //Get top tagger results 
+            const auto& ttr = tt->getResults();
+
+            //Get tops 
+            const auto& tops = ttr.getTops();
+            const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
+
+            //create np array for SF
+            npy_intp floatsizearray[] = {NTOPS};
+            PyArrayObject* sfArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT));
+
+            //create dictionary of np arrays 
+            PyObject* pSystDict = PyDict_New();
+            if(NTOPS > 0)
+            {
+                for(const auto& systPair : tops.back()->getAllSystematicUncertainties())
+                {
+                    PyObject* systArrayFloat = PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT);
+                    PyDict_SetItemString(pSystDict, systPair.first.c_str(), systArrayFloat);
+                }
+            }
+
+            //fill SF and syst arrays in dictionary 
+            for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
+            {
+                //assign scale factor
+                *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
+                
+                for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
+                {
+                    PyArrayObject* systArray = reinterpret_cast<PyArrayObject*>(PyDict_GetItemString(pSystDict, systPair.first.c_str()));
+                    *static_cast<npy_float*>(PyArray_GETPTR1(systArray, iTop)) = systPair.second;
+                }
+            }
+            
+            Py_DECREF(ptt);
+            
+            return Py_BuildValue("NN", sfArrayFloat, pSystDict);
+        }
+        catch(const TTException& e)
+        {
+            Py_DECREF(ptt);
+
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -706,7 +782,7 @@ extern "C"
             Py_DECREF(ptt);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -740,6 +816,7 @@ extern "C"
         {"setup",         TopTaggerInterface_setup,            METH_VARARGS,                 "Configure Top Tagger."},
         {"run",           (PyCFunction)TopTaggerInterface_run, METH_VARARGS | METH_KEYWORDS, "Run Top Tagger."},
         {"getResults",    TopTaggerInterface_getResults,       METH_VARARGS,                 "Get Top Tagger results."},
+        {"getSFSyst",     TopTaggerInterface_getSFSyst,        METH_VARARGS,                 "Get Top Tagger SF and systematics."},
         {"getCandidates", TopTaggerInterface_getCandidates,    METH_VARARGS,                 "Get Top Tagger Candidates."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };

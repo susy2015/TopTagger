@@ -30,9 +30,14 @@ private:
     /// Set of histograms containing the systeamtic uncertainties 
     std::map<std::string, std::unique_ptr<TH1>> systematicHists_;
     /// Map containing the variable to use for each SF and systematic histogram
-    std::map<std::string, std::function<float(const TopObject&)>> variables_;
+    std::map<std::string, std::function<float(const TopObject&, const TopTaggerResults&)>> variables_;
 
-    std::function<float(const TopObject&)> parseVariable(const std::string&);
+
+    /// Parse the variable name from the cfg file to be used for the particular SF or systematic and produce a getter function
+    std::function<float(const TopObject&, const TopTaggerResults&)> parseVariable(const std::string&);
+
+    /// Internal helper function to get SF anf systematic info from the histograms into the TopObject
+    void fillSfAndSyst(TopObject&, const TopTaggerResults&, const std::string&, const std::string&);
 
 public:
     void getParameters(const cfg::CfgDocument*, const std::string&);

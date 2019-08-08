@@ -51,16 +51,17 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
         keepLooping = false;
 
         //Get variable name
-        std::string sfHist =  cfgDoc->get("sfHist", iVar, localCxt, "");
-        std::string sfVar  =  cfgDoc->get("sftVar", iVar, localCxt, "pt");
-
-        //Get syst factor histogram 
-        TH1* h_temp = static_cast<TH1*>(file->Get(sfHist.c_str()));
+        std::string sfHist =  cfgDoc->get("sfHist",  iVar, localCxt, "");
+        std::string sfVar  =  cfgDoc->get("sfVar",   iVar, localCxt, "pt");
+        std::string label  =  cfgDoc->get("sfLabel", iVar, localCxt, "");
         
         //if it is a non empty string save in vector
         if(sfHist.size() > 0 && sfVar.size() > 0)
         {
             keepLooping = true;
+
+            //Get syst factor histogram 
+            TH1* h_temp = static_cast<TH1*>(file->Get(sfHist.c_str()));
 
             //Check that the histogram pointer is valid
             if(!h_temp)
@@ -68,10 +69,12 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
                 THROW_TTEXCEPTION("Scale factor histogram  \"" + sfHist + "\" is not valid");
             }
 
-            scaleFactorHists_.emplace(h_temp->GetName(), h_temp);
+            if(label.size() == 0) label = h_temp->GetName();
+
+            scaleFactorHists_.emplace(label, h_temp);
 
             //Set the variable assigned to the histogram
-            variables_[h_temp->GetName()] = parseVariable(sfVar);
+            variables_[label] = parseVariable(sfVar);
         }
 
         ++iVar;
@@ -87,25 +90,28 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
         //Get variable name
         std::string systHist =  cfgDoc->get("systHist", iVar, localCxt, "");
         std::string systVar  =  cfgDoc->get("systVar",  iVar, localCxt, "pt");
+        std::string label  =    cfgDoc->get("systLabel", iVar, localCxt, "");
 
-        //Get syst factor histogram 
-        TH1* h_temp = static_cast<TH1*>(file->Get(systHist.c_str()));
-        
         //if it is a non empty string save in vector
         if(systHist.size() > 0 && systVar.size() > 0)
         {
             keepLooping = true;
 
+            //Get syst factor histogram 
+            TH1* h_temp = static_cast<TH1*>(file->Get(systHist.c_str()));
+        
             //Check that the histogram pointer is valid
             if(!h_temp)
             {
                 THROW_TTEXCEPTION("Systematic histogram  \"" + systHist + "\" is not valid");
             }
+
+            if(label.size() == 0) label = h_temp->GetName();
         
-            systematicHists_.emplace(h_temp->GetName(), h_temp);
+            systematicHists_.emplace(label, h_temp);
 
             //Set the variable assigned to the histogram
-            variables_[h_temp->GetName()] = parseVariable(systVar);
+            variables_[label] = parseVariable(systVar);
 
         }
 
@@ -129,56 +135,47 @@ void TTMScaleSyst::run(TopTaggerResults& ttResults)
         {
             if(topCand.getBestGenTopMatch())
             {
-                const auto& sfHist = scaleFactorHists_["hSF_SIG"];
-                const auto& varGetter = variables_["hSF_SIG"];
-
-                double scaleFactor = sfHist->GetBinContent(sfHist->FindBin(varGetter(topCand)));
-                topCand.setMCScaleFactor(scaleFactor);
-
-                const std::string systSigStr = "hSYST_SIG";
-                for(auto& syst : systematicHists_)
-                {
-                    if(syst.first.find(systSigStr) != std::string::npos)
-                    {
-                        const auto& systHist = syst.second;
-                        const auto& varGetter = variables_[syst.first];
-                        double systVal = systHist->GetBinContent(systHist->FindBin(varGetter(topCand)));
-                        topCand.setSystematicUncertainty(syst.first.substr(systSigStr.size() + 1), systVal);
-                    }
-                }
+                fillSfAndSyst(topCand, ttResults, "hSF_SIG", "hSYST_SIG");
             }
             else
             {
-                auto& sfHist = scaleFactorHists_["hSF_BG"];
-                auto& varGetter = variables_["hSF_BG"];
-                
-                double scaleFactor = sfHist->GetBinContent(sfHist->FindBin(varGetter(topCand)));
-                topCand.setMCScaleFactor(scaleFactor);
-
-                const std::string systBgStr = "hSYST_BG";
-                for(auto& syst : systematicHists_)
-                {
-                    if(syst.first.find(systBgStr) != std::string::npos)
-                    {
-                        const auto& systHist = syst.second;
-                        const auto& varGetter = variables_[syst.first];
-                        double systVal = systHist->GetBinContent(systHist->FindBin(varGetter(topCand)));
-                        topCand.setSystematicUncertainty(syst.first.substr(systBgStr.size() + 1), systVal);
-                    }
-                }
+                fillSfAndSyst(topCand, ttResults, "hSF_BG", "hSYST_BG");
             }
         }
     }
 }
 
-std::function<float(const TopObject&)> TTMScaleSyst::parseVariable(const std::string& var)
+std::function<float(const TopObject&, const TopTaggerResults&)> TTMScaleSyst::parseVariable(const std::string& var)
 {
-    if(     var.compare("pt") == 0)   return [](const TopObject& topCand) { return topCand.p().Pt(); } ;
-    else if(var.compare("eta") == 0)  return [](const TopObject& topCand) { return topCand.p().Eta(); } ;
-    else if(var.compare("phi") == 0)  return [](const TopObject& topCand) { return topCand.p().Phi(); } ;
-    else if(var.compare("mass") == 0) return [](const TopObject& topCand) { return topCand.p().M(); } ;
+    if(     var.compare("pt") == 0)               return [](const TopObject& topCand, const TopTaggerResults& ttr) { (void)ttr;     return topCand.p().Pt(); } ;
+    else if(var.compare("eta") == 0)              return [](const TopObject& topCand, const TopTaggerResults& ttr) { (void)ttr;     return topCand.p().Eta(); } ;
+    else if(var.compare("phi") == 0)              return [](const TopObject& topCand, const TopTaggerResults& ttr) { (void)ttr;     return topCand.p().Phi(); } ;
+    else if(var.compare("mass") == 0)             return [](const TopObject& topCand, const TopTaggerResults& ttr) { (void)ttr;     return topCand.p().M(); } ;
+    else if(var.compare("njet_pt30_eta2p4") == 0) return [](const TopObject& topCand, const TopTaggerResults& ttr) { (void)topCand; return ttr.countAK4Jets(30, 2.4); } ;
     else 
     {
         THROW_TTEXCEPTION("Unknown TopObject variable: \"" + var + "\"!");
     }
+}
+
+void TTMScaleSyst::fillSfAndSyst(TopObject& topCand, const TopTaggerResults& ttResults, const std::string& sfName, const std::string& systPrefix)
+{
+    const auto& sfHist = scaleFactorHists_[sfName];
+    const auto& varGetter = variables_[sfName];
+
+    double scaleFactor = sfHist->GetBinContent(sfHist->FindBin(varGetter(topCand, ttResults)));
+    topCand.setMCScaleFactor(scaleFactor);
+
+    for(auto& syst : systematicHists_)
+    {
+        if(syst.first.find(systPrefix) != std::string::npos)
+        {
+            std::string label(syst.first.substr(systPrefix.size() + 1));
+            const auto& systHist = syst.second;
+            const auto& varGetter = variables_[syst.first];
+            double systVal = systHist->GetBinContent(systHist->FindBin(varGetter(topCand, ttResults)));
+            topCand.setSystematicUncertainty(label, systVal);
+        }
+    }
+    
 }

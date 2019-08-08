@@ -89,6 +89,8 @@ public:
     double getMCScaleFactor() const { return scaleFactor_; }
     /// Return systematic uncertainty 
     double getSystematicUncertainty(const std::string& source) const;
+    /// Return all systematic uncertainties 
+    const decltype(systematicUncertainties_)& getAllSystematicUncertainties() const { return systematicUncertainties_; }
     /// Return total systematic uncertainty 
     std::pair<double, double> getTotalSystematicUncertainty() const; 
 
