@@ -232,18 +232,9 @@ private:
         const std::vector<float>& recoJetsBtag      = tr.getVec<float>("Jet_btagDeepB");
         const std::vector<float>& qgLikelihood      = tr.getVec<float>("Jet_qgl");
 
-        const std::vector<TLorentzVector>& genDecayLVec = tr.getVec_LVFromNano<float>("GenPart");
-        const std::vector<int>& genDecayStatFlag        = tr.getVec<int>("GenPart_statusFlags");
-        const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("GenPart_pdgId");
-        const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("GenPart_genPartIdxMother");
-
-        std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> getTopInfo = ttUtility::GetTopdauGenLVecFromNano( genDecayLVec, genDecayPdgIdVec, genDecayStatFlag, genDecayMomIdxVec);
-
         //New Tagger starts here
         //prep input object (constituent) vector
-        const std::vector<TLorentzVector>& hadGenTops = getTopInfo.first;
-        const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters = getTopInfo.second;
-        ttUtility::ConstAK4Inputs<float> myConstAK4Inputs = ttUtility::ConstAK4Inputs<float>(jetsLVec, recoJetsBtag, qgLikelihood, hadGenTops, hadGenTopDaughters);
+        ttUtility::ConstAK4Inputs<float> myConstAK4Inputs = ttUtility::ConstAK4Inputs<float>(jetsLVec, recoJetsBtag, qgLikelihood);
 
         auto convertToDoubleandRegister = [](NTupleReader& tr, std::string name)
         {
@@ -252,6 +243,28 @@ private:
             tr.registerDerivedVec(name+"ConvertedToDouble", doubleVec);
             return doubleVec;
         };
+
+        typedef std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GenInfoType;
+        std::unique_ptr<GenInfoType> genTopInfo(nullptr);
+        if(tr.checkBranch("GenPart_statusFlags"))
+        {
+            const std::vector<TLorentzVector>& genDecayLVec = tr.getVec_LVFromNano<float>("GenPart");
+            const std::vector<int>& genDecayStatFlag        = tr.getVec<int>("GenPart_statusFlags");
+            const std::vector<int>& genDecayPdgIdVec        = tr.getVec<int>("GenPart_pdgId");
+            const std::vector<int>& genDecayMomIdxVec       = tr.getVec<int>("GenPart_genPartIdxMother");
+
+            genTopInfo.reset(new GenInfoType(std::move(ttUtility::GetTopdauGenLVecFromNano( genDecayLVec, genDecayPdgIdVec, genDecayStatFlag, genDecayMomIdxVec))));
+            const std::vector<TLorentzVector>& hadGenTops = genTopInfo->first;
+            const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters = genTopInfo->second;
+
+            myConstAK4Inputs.addGenCollections( hadGenTops, hadGenTopDaughters );
+
+            myConstAK4Inputs.addSupplamentalVector("partonFlavor",                          *convertToDoubleandRegister(tr, "Jet_partonFlavour"));
+        }
+        else
+        {
+            myConstAK4Inputs.addSupplamentalVector("partonFlavor",                          tr.createDerivedVec<float>("thisIsATempVec", jetsLVec.size()));
+        }
 
         myConstAK4Inputs.addSupplamentalVector("qgMult",                                *convertToDoubleandRegister(tr, "Jet_qgMult"));
         myConstAK4Inputs.addSupplamentalVector("qgPtD",                                 tr.getVec<float>("Jet_qgptD"));
@@ -281,7 +294,7 @@ private:
         myConstAK4Inputs.addSupplamentalVector("DeepFlavorc",                           tr.getVec<float>("Jet_deepFlavourc"));
         myConstAK4Inputs.addSupplamentalVector("DeepFlavoruds",                         tr.getVec<float>("Jet_deepFlavouruds"));
         myConstAK4Inputs.addSupplamentalVector("DeepFlavorg",                           tr.getVec<float>("Jet_deepFlavourg"));
-        myConstAK4Inputs.addSupplamentalVector("partonFlavor",                          *convertToDoubleandRegister(tr, "Jet_partonFlavour"));
+
 
         std::vector<Constituent> constituents = ttUtility::packageConstituents(myConstAK4Inputs);
 
@@ -306,12 +319,15 @@ private:
 
         //prepare a vector of gen top pt
         int icandGen = 0;
-        for(auto& genTop : hadGenTops) 
+        if(genTopInfo)
         {
-            vh.add("candNumGen", icandGen++);
-            vh.add("genTopPt", genTop.Pt());
+            for(auto& genTop : genTopInfo->first) 
+            {
+                vh.add("candNumGen", icandGen++);
+                vh.add("genTopPt", genTop.Pt());
+            }
         }
-        if(hadGenTops.size() == 0) 
+        if(!genTopInfo || genTopInfo->first.size() == 0) 
         {
             tr.registerDerivedVec("genTopPt", new std::vector<float>());
             tr.registerDerivedVec("candNumGen", new std::vector<float>());
