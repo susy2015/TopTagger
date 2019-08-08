@@ -19,6 +19,7 @@ public:
     std::string getFunctionName() const { return funcion_; }
     std::string getFileName() const { return file_; }
     std::string getMessage() const { return message_; }
+    std::string getPrintMessage() const;
 
     void print() const;
 };

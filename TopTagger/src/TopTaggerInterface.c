@@ -60,11 +60,41 @@ static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lor
     return ttPython::Py_buffer_wrapper<TLorentzVector>(nullptr);
 }
 
+static int TopTaggerInterface_makeGenInfo(
+    std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
+    PyObject* pArgTuple)
+{
+    //number of variables
+    int nGenPart;
+
+    PyObject *pGenPart, *pPdgId, *pStatusFlag, *pGenPartIdxMother;
+    if (!PyArg_ParseTuple(pArgTuple, "iOOOO", &nGenPart, &pGenPart, &pPdgId, &pStatusFlag, &pGenPartIdxMother))
+    {
+        return 1;
+    }
+
+    //Prepare std::vector<TLorentzVector> for jets and subjets lorentz vectors and subjet linking 
+    auto genPartLV = createLorentzP4(pGenPart);
+
+    ttPython::Py_buffer_wrapper<Int_t> pdgId(pPdgId, nGenPart);
+    ttPython::Py_buffer_wrapper<Int_t> statusFlag(pStatusFlag, nGenPart);
+    ttPython::Py_buffer_wrapper<Int_t> genPartIdxMother(pGenPartIdxMother, nGenPart);
+
+    //Create gen information 
+    auto* genInfoPtr = new std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>(ttUtility::GetTopdauGenLVecFromNano(genPartLV, pdgId, statusFlag, genPartIdxMother));
+
+    //transfer new ptr to the control of the unique_ptr
+    genInfo.reset(genInfoPtr);
+
+    return 0;
+}
+
 static int TopTaggerInterface_makeAK4Const(
     std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>>& ak4ConstInputs, 
     std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers, 
     std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
     std::vector<unsigned char>& filterVec, 
+    std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
     PyObject* pArgTuple)
 {
     //number of variables which are not stored in supplamental dictionaries
@@ -153,6 +183,7 @@ static int TopTaggerInterface_makeAK4Const(
     //Create the AK4 constituent helper
     ak4ConstInputs.reset(new ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetBTag));
     ak4ConstInputs->setFilterVector(filterVec);
+    if(genInfo) ak4ConstInputs->addGenCollections(genInfo->first, genInfo->second);
 
     //prepare floating point supplamental "vectors"
     PyObject *key, *value;
@@ -211,6 +242,7 @@ static int TopTaggerInterface_makeAK8Const(
     std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
     std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers, 
     std::vector<std::vector<TLorentzVector>>& vecSubjetsLV, 
+    std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
     PyObject* pArgTuple)
 {
     //number of variables
@@ -262,6 +294,7 @@ static int TopTaggerInterface_makeAK8Const(
 
     //Create the AK8 constituent helper
     ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, vecSubjetsLV));
+    if(genInfo) ak8ConstInputs->addGenCollections(genInfo->first, genInfo->second);
 
     return 0;
 }
@@ -377,7 +410,7 @@ extern "C"
         catch(const TTException& e)
         {
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -391,11 +424,11 @@ extern "C"
         //suppress unused parameter warning as self is manditory
         (void)self;
 
-        PyObject *ptt, *pAK4Inputs = nullptr, *pAK8Inputs = nullptr, *pResolvedTopCandInputs = nullptr;
+        PyObject *ptt, *pAK4Inputs = nullptr, *pAK8Inputs = nullptr, *pResolvedTopCandInputs = nullptr, *pGenInputs = nullptr;
         //PYTHON, LEARN ABOUT CONST!!!!!!!!!!!!!!!!!!
-        char kw1[] = "topTagger", kw2[] = "ak4Inputs", kw3[] = "ak8Inputs", kw4[] = "resolvedTopInputs";
-        char *keywords[] = {kw1, kw2, kw3, kw4, NULL};
-        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!O!O!", keywords, &PyCapsule_Type, &ptt, &PyTuple_Type, &pAK4Inputs, &PyTuple_Type, &pAK8Inputs, &PyTuple_Type, &pResolvedTopCandInputs))
+        char kw1[] = "topTagger", kw2[] = "ak4Inputs", kw3[] = "ak8Inputs", kw4[] = "resolvedTopInputs", kw5[] = "genInputs";
+        char *keywords[] = {kw1, kw2, kw3, kw4, kw5, NULL};
+        if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O!O!O!O!", keywords, &PyCapsule_Type, &ptt, &PyTuple_Type, &pAK4Inputs, &PyTuple_Type, &pAK8Inputs, &PyTuple_Type, &pResolvedTopCandInputs, &PyTuple_Type, &pGenInputs))
         {
             return NULL;
         }
@@ -404,19 +437,35 @@ extern "C"
         if(pAK4Inputs) Py_INCREF(pAK4Inputs);
         if(pAK8Inputs) Py_INCREF(pAK8Inputs);
         if(pResolvedTopCandInputs) Py_INCREF(pResolvedTopCandInputs);
+        if(pGenInputs) Py_INCREF(pGenInputs);
 
-        //Prepare ak4 jet input constituents 
-        std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>> ak4ConstInputs;
-        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak4TempTLVBuffers;
-        std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak4TempFloatBuffers;
-        std::vector<unsigned char> ak4FilterVec;
-        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempTLVBuffers, ak4TempFloatBuffers, ak4FilterVec, pAK4Inputs))
+        //prepare gen matching info
+        std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>> genInfo;
+        if(pGenInputs && TopTaggerInterface_makeGenInfo(genInfo, pGenInputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
             if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
+
+            return NULL;
+        }
+
+        //Prepare ak4 jet input constituents 
+        std::unique_ptr<ttUtility::ConstAK4Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>> ak4ConstInputs;
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak4TempTLVBuffers;
+        std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak4TempFloatBuffers;
+        std::vector<unsigned char> ak4FilterVec;
+        if(pAK4Inputs && TopTaggerInterface_makeAK4Const(ak4ConstInputs, ak4TempTLVBuffers, ak4TempFloatBuffers, ak4FilterVec, genInfo, pAK4Inputs))
+        {
+            //Status is not 0, there was an error, PyErr_SetString is called in function 
+            Py_DECREF(ptt);
+            if(pAK4Inputs) Py_DECREF(pAK4Inputs);
+            if(pAK8Inputs) Py_DECREF(pAK8Inputs);
+            if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
 
             return NULL;
         }
@@ -426,13 +475,14 @@ extern "C"
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak8TempFloatBuffers;
         std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak8TempTLVBuffers;
         std::vector<std::vector<TLorentzVector>> ak8SubjetsLV;
-        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8TempTLVBuffers, ak8SubjetsLV, pAK8Inputs))
+        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8TempTLVBuffers, ak8SubjetsLV, genInfo, pAK8Inputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
             if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
 
             return NULL;
         }
@@ -448,6 +498,7 @@ extern "C"
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
             if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
 
             return NULL;
         }
@@ -461,6 +512,7 @@ extern "C"
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
             if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
 
             PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
             return NULL;
@@ -481,9 +533,10 @@ extern "C"
             if(pAK4Inputs) Py_DECREF(pAK4Inputs);
             if(pAK8Inputs) Py_DECREF(pAK8Inputs);
             if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+            if(pGenInputs) Py_DECREF(pGenInputs);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -491,6 +544,7 @@ extern "C"
         if(pAK4Inputs) Py_DECREF(pAK4Inputs);
         if(pAK8Inputs) Py_DECREF(pAK8Inputs);
         if(pResolvedTopCandInputs) Py_DECREF(pResolvedTopCandInputs);
+        if(pGenInputs) Py_DECREF(pGenInputs);
 
         Py_INCREF(Py_None);
         return Py_None;
@@ -571,7 +625,83 @@ extern "C"
             Py_DECREF(ptt);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
+            return NULL;
+        }
+
+    }
+
+    static PyObject* TopTaggerInterface_getSFSyst(PyObject *self, PyObject *args)
+    {
+        //suppress unused parameter warning as self is manditory
+        (void)self;
+
+        PyObject *ptt;
+        if (!PyArg_ParseTuple(args, "O!", &PyCapsule_Type, &ptt))
+        {
+            return NULL;
+        }
+
+        Py_INCREF(ptt);
+
+        //Get top tagger pointer from capsule 
+        TopTagger* tt;
+        if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
+        {
+            //Handle exception here 
+            Py_DECREF(ptt);
+
+            PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
+            return NULL;
+        }
+
+        try
+        {
+            //Get top tagger results 
+            const auto& ttr = tt->getResults();
+
+            //Get tops 
+            const auto& tops = ttr.getTops();
+            const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
+
+            //create np array for SF
+            npy_intp floatsizearray[] = {NTOPS};
+            PyArrayObject* sfArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT));
+
+            //create dictionary of np arrays 
+            PyObject* pSystDict = PyDict_New();
+            if(NTOPS > 0)
+            {
+                for(const auto& systPair : tops.back()->getAllSystematicUncertainties())
+                {
+                    PyObject* systArrayFloat = PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT);
+                    PyDict_SetItemString(pSystDict, systPair.first.c_str(), systArrayFloat);
+                }
+            }
+
+            //fill SF and syst arrays in dictionary 
+            for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
+            {
+                //assign scale factor
+                *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
+                
+                for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
+                {
+                    PyArrayObject* systArray = reinterpret_cast<PyArrayObject*>(PyDict_GetItemString(pSystDict, systPair.first.c_str()));
+                    *static_cast<npy_float*>(PyArray_GETPTR1(systArray, iTop)) = systPair.second;
+                }
+            }
+            
+            Py_DECREF(ptt);
+            
+            return Py_BuildValue("NN", sfArrayFloat, pSystDict);
+        }
+        catch(const TTException& e)
+        {
+            Py_DECREF(ptt);
+
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -652,7 +782,7 @@ extern "C"
             Py_DECREF(ptt);
 
             std::cout << "TopTagger exception message: " << e << std::endl;
-            PyErr_SetString(PyExc_RuntimeError, "TopTagger exception thrown (look above to find specific exception message)");
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
             return NULL;
         }
 
@@ -686,6 +816,7 @@ extern "C"
         {"setup",         TopTaggerInterface_setup,            METH_VARARGS,                 "Configure Top Tagger."},
         {"run",           (PyCFunction)TopTaggerInterface_run, METH_VARARGS | METH_KEYWORDS, "Run Top Tagger."},
         {"getResults",    TopTaggerInterface_getResults,       METH_VARARGS,                 "Get Top Tagger results."},
+        {"getSFSyst",     TopTaggerInterface_getSFSyst,        METH_VARARGS,                 "Get Top Tagger SF and systematics."},
         {"getCandidates", TopTaggerInterface_getCandidates,    METH_VARARGS,                 "Get Top Tagger Candidates."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };

@@ -19,6 +19,9 @@ private:
     ///Will never be modified or changed by modules 
     std::shared_ptr<const std::vector<Constituent>> constituents_;
 
+    ///Number of ak4 jets in the event, necessary for systematics
+    mutable int nAK4Jets_;
+
     ///List of jets used to construct final tops, needed for Rsys
     std::set<Constituent const *> usedConstituents_;
 
@@ -41,9 +44,9 @@ public:
      *the top tagger results are in scope.  This copy is totally internal and is
      *managed by the shared pointer.  
      */
-    TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(new std::vector<Constituent>(constituents)) {}
+    TopTaggerResults(const std::vector<Constituent>& constituents) : constituents_(new std::vector<Constituent>(constituents)), nAK4Jets_(-1) {}
 
-    TopTaggerResults(std::vector<Constituent>&& constituents) : constituents_(new std::vector<Constituent>(std::move(constituents))) {}
+    TopTaggerResults(std::vector<Constituent>&& constituents) : constituents_(new std::vector<Constituent>(std::move(constituents))), nAK4Jets_(-1) {}
 
     ~TopTaggerResults() {}
 
@@ -53,6 +56,7 @@ public:
     {
         //Again a copy is made to ensure this vector remains in scope
         constituents_.reset(new std::vector<Constituent>(constituents));
+        nAK4Jets_ = -1;
     }
 
     /** Set/reset the internal copy of the constituents vector */
@@ -60,6 +64,7 @@ public:
     {
         //Again a copy is made to ensure this vector remains in scope
         constituents_.reset(new std::vector<Constituent>(constituents));
+        nAK4Jets_ = -1;
     }
 
     //non-const getters (for modules)
@@ -82,6 +87,28 @@ public:
     const decltype(topsByType_)& getTopsByType() const { return topsByType_; }
     /** Get the remaining system used for MT2 calculations in the case when there is only one reconstructed top */
     const decltype(rsys_)& getRsys() const { return rsys_; }
+
+    ///Internal function to calculate the number of ak4Jets in the event 
+    int countAK4Jets(double pt = 30, double eta = 2.4) const 
+    {
+        //if this number is positive or zero it has already been calculated, else recalculate
+        if(nAK4Jets_ < 0) 
+        {
+            nAK4Jets_ = 0;
+            for(const auto& constituent : getConstituents())
+            {
+                if(constituent.getType() == Constituent::AK4JET &&
+                   constituent.p().Pt() >= pt &&
+                   fabs(constituent.p().Eta()) <= eta)
+                {
+                    ++nAK4Jets_;
+                }
+                    
+            }
+        }
+
+        return nAK4Jets_;
+    }
 };
 
 #endif

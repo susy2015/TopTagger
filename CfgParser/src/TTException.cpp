@@ -6,12 +6,17 @@ TTException::TTException(const int line, const std::string function, const std::
 {
 }
 
+std::string TTException::getPrintMessage() const
+{
+    return file_ + ":" + std::to_string(line_) + ", in function \"" + funcion_ + "\" -- " + message_;
+}
+
 void TTException::print() const
 {
-    std::cout << file_ << ":" << line_ << ", in function \"" << funcion_ << "\" -- " << message_ << std::endl;
+    std::cout << getPrintMessage() << std::endl;
 }
 
 std::ostream& operator<<(std::ostream& out, const TTException& e)
 {
-    return out << e.getFileName() << ":" << e.getLineNumber() << ", in function \"" << e.getFunctionName() << "\" -- " << e.getMessage();
+    return out << e.getPrintMessage();
 }

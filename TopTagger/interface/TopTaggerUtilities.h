@@ -41,6 +41,9 @@ namespace ttUtility
          *@param hadGenTopDaughters Vector of direct decay daughters of the top quarks
          */
         ConstGenInputs(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
+
+    public:
+        void addGenCollections(const std::vector<TLorentzVector>& hadGenTops, const std::vector<std::vector<const TLorentzVector*>>& hadGenTopDaughters);
     };
 
     /**
@@ -695,9 +698,67 @@ namespace ttUtility
 
     std::vector<std::string> getMVAVars();
 
+
+    template<typename INTCONTAINERTYPE = std::vector<int> >
+    bool recMomSearch(int startIndex, int targetIndex, const INTCONTAINERTYPE& genDecayMomIdxVec)
+    {
+        if(startIndex < 0) return false;
+        int momIdx = genDecayMomIdxVec[startIndex];
+        if(momIdx < 0)
+        {
+            return false;
+        }
+        else if(momIdx == targetIndex)
+        {
+            return true;
+        }
+        else
+        {
+            return recMomSearch(momIdx, targetIndex, genDecayMomIdxVec);
+        }
+    }
+
+
     bool recMomSearch(int startIndex, int targetIndex, const std::vector<int>& genDecayMomIdxVec);
 
-    std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const std::vector<TLorentzVector>& genDecayLVec, const std::vector<int>& genDecayPdgIdVec, const std::vector<int>& genDecayStatFlag, const std::vector<int>& genDecayMomIdxVec);
+    template<typename TLVCONTAINERTYPE = std::vector<TLorentzVector>, typename INTCONTAINERTYPE = std::vector<int> >
+    std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE& genDecayLVec, const INTCONTAINERTYPE& genDecayPdgIdVec, const INTCONTAINERTYPE& genDecayStatFlag, const INTCONTAINERTYPE& genDecayMomIdxVec)
+    {
+        std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> returnVal;
+        for(unsigned iTop=0; iTop < genDecayLVec.size(); ++iTop)
+        {
+            int pdgId = genDecayPdgIdVec[iTop];
+            int statFlag = genDecayStatFlag[iTop]; //statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                
+            if(abs(pdgId) == 6 && ((statFlag & 0x2100) == 0x2100))
+            {
+                //This is a top
+                //Search for daughters of this gen particle
+                std::vector<const TLorentzVector*> daughters;
+                for(unsigned iDau = 0; iDau < genDecayLVec.size(); ++iDau)
+                {
+                    int pdgId = abs(genDecayPdgIdVec[iDau]);
+                    int statFlag = genDecayStatFlag[iDau]; //statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                
+                    //Only looking for hadronic daughters 
+                    if(pdgId >= 1 && pdgId <= 5 && ((statFlag & 0x2100) == 0x2100))
+                    {
+                        //Check if this gen particle comes from the top 
+                        if(recMomSearch(iDau, iTop, genDecayMomIdxVec))
+                        {
+                            daughters.push_back(&genDecayLVec[iDau]);
+                        }
+                    }
+                }
+
+                if(daughters.size() >= 3)
+                {
+                    //hadronic top found 
+                    returnVal.first.push_back(genDecayLVec[iTop]);
+                    returnVal.second.push_back(daughters);
+                }
+            }
+        }
+        return returnVal;
+    }
 
     //Gen matching helper functions 
     ///Helper function to help find the hadronically decaying gen tops 

@@ -1,7 +1,7 @@
 import TopTaggerInterface as tti
 
 class Top:
-    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999):
+    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999, sf = -999.9, syst = None):
         self.pt = pt
         self.eta = eta
         self.phi = phi
@@ -11,6 +11,11 @@ class Top:
         self.j1Idx = j1Idx
         self.j2Idx = j2Idx
         self.j3Idx = j3Idx
+        self.sf = sf
+        if syst:
+            self.systs = syst
+        else:
+            self.systs = {}
 
     def __str__(self):
         return "Top properties:   pt:  %7.3f,    eta:  %7.3f,    phi:  %7.3f,    mass:  %7.3f,    disc:  %7.3f,    type:  %3i"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type)
@@ -19,16 +24,25 @@ class Top:
         return "Top(%f, %f, %f, %f, %f, %i, %i, %i, %i)"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.j1Idx, self.j2Idx, self.j3Idx)
 
 class TopTaggerResult:
-    def __init__(self, results):
+    def __init__(self, results, sfAndSyst=None):
         self.floatVals = results[0]
         self.intVals = results[1]
+
+        if sfAndSyst:
+            self.sfVals = sfAndSyst[0]
+            self.systVals = sfAndSyst[1]
+            self.systColReorg()
 
     def __len__(self):
         return self.floatVals.shape[0]
 
     def __iter__(self):
-        for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol()):
-            yield Top(*variables)
+        try:
+            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.sfCol(), self.systs):
+                yield Top(*variables)
+        except AttributeError:
+            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol()):
+                yield Top(*variables)            
 
     def ptCol(self):
         return self.floatVals[:, 0]
@@ -56,6 +70,18 @@ class TopTaggerResult:
 
     def j3IdxCol(self):
         return self.intVals[:, 3]
+
+    def sfCol(self):
+        return self.sfVals
+
+    def systCol(self, systName):
+        return self.systVals[systName]
+
+    def systColReorg(self):
+        keys = self.systVals.keys()
+        values = self.systVals.values()
+
+        self.systs = [dict(zip(keys, v)) for v in zip(*values)]
 
 class TopTagger:
 
@@ -85,12 +111,15 @@ class TopTagger:
         except AttributeError:
             pass
 
-    def run(self, saveCandidates = False, *args, **kwargs):
+    def run(self, saveCandidates = False, saveSFAndSyst = False, *args, **kwargs):
         tti.run(self.tt, *args, **kwargs)
         if saveCandidates:
             results = tti.getCandidates(self.tt)
         else:
             results = tti.getResults(self.tt)
+            if saveSFAndSyst:
+                sfAndSyst = tti.getSFSyst(self.tt)
+                return TopTaggerResult(results, sfAndSyst)
         return TopTaggerResult(results)
 
     def runFromNanoAOD(self, event, isFirstEvent = False):
@@ -98,6 +127,8 @@ class TopTagger:
         nHackLoop = 1
         if isFirstEvent:
             nHackLoop = 2
+
+        isMC = hasattr(event, "nGenPart")
 
         for i in xrange(nHackLoop):
 
@@ -132,7 +163,7 @@ class TopTagger:
             nJets = event.nJet
             nElec = event.nElectron
             nMuon = event.nMuon
-            ak4Inputs = (nJets, (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, nJets), event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
+            ak4Inputs = (nJets, (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, nJets), event.Jet_btagDeepB, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
             
             nFatJet = event.nFatJet
             nSubJet = event.nSubJet
@@ -141,7 +172,15 @@ class TopTagger:
             nResCand = event.nResolvedTopCandidate
             resTopInputs = (nResCand, (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, nResCand), event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
 
-        results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+            if isMC:
+                nGenPart = event.nGenPart
+                genInputs = (nGenPart, (event.GenPart_pt, event.GenPart_eta, event.GenPart_phi, event.GenPart_mass, nGenPart), event.GenPart_pdgId, event.GenPart_statusFlags, event.GenPart_genPartIdxMother)
+
+        
+        if isMC:
+            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs, saveSFAndSyst = True)
+        else:
+            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
 
         return results
 
