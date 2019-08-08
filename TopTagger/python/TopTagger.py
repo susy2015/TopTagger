@@ -132,7 +132,7 @@ class TopTagger:
             nJets = event.nJet
             nElec = event.nElectron
             nMuon = event.nMuon
-            ak4Inputs = (nJets, (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, nJets), event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
+            ak4Inputs = (nJets, (event.Jet_pt, event.Jet_eta, event.Jet_phi, event.Jet_mass, nJets), event.Jet_btagDeepB, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
             
             nFatJet = event.nFatJet
             nSubJet = event.nSubJet
@@ -141,7 +141,10 @@ class TopTagger:
             nResCand = event.nResolvedTopCandidate
             resTopInputs = (nResCand, (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, nResCand), event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
 
-        results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+            nGenPart = event.nGenPart
+            genInputs = (nGenPart, (event.GenPart_pt, event.GenPart_eta, event.GenPart_phi, event.GenPart_mass, nGenPart), event.GenPart_pdgId, event.GenPart_statusFlags, event.GenPart_genPartIdxMother)
+
+        results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs)
 
         return results
 
