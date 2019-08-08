@@ -242,6 +242,7 @@ static int TopTaggerInterface_makeAK8Const(
     std::vector<ttPython::Py_buffer_wrapper<Float_t>>& tempFloatBuffers, 
     std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers, 
     std::vector<std::vector<TLorentzVector>>& vecSubjetsLV, 
+    std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
     PyObject* pArgTuple)
 {
     //number of variables
@@ -293,6 +294,7 @@ static int TopTaggerInterface_makeAK8Const(
 
     //Create the AK8 constituent helper
     ak8ConstInputs.reset(new ttUtility::ConstAK8Inputs<Float_t, ttPython::Py_buffer_wrapper<Float_t>, ttPython::Py_buffer_wrapper<TLorentzVector>>(jetsLV, jetTopDisc, jetWDisc, jetSDMass, vecSubjetsLV));
+    if(genInfo) ak8ConstInputs->addGenCollections(genInfo->first, genInfo->second);
 
     return 0;
 }
@@ -473,7 +475,7 @@ extern "C"
         std::vector<ttPython::Py_buffer_wrapper<Float_t>> ak8TempFloatBuffers;
         std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> ak8TempTLVBuffers;
         std::vector<std::vector<TLorentzVector>> ak8SubjetsLV;
-        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8TempTLVBuffers, ak8SubjetsLV, pAK8Inputs))
+        if(pAK8Inputs && TopTaggerInterface_makeAK8Const(ak8ConstInputs, ak8TempFloatBuffers, ak8TempTLVBuffers, ak8SubjetsLV, genInfo, pAK8Inputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
