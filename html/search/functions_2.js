@@ -8,6 +8,7 @@ var searchData=
   ['constituent',['Constituent',['../classConstituent.html#a70507cdd41d24d156a07bb9409bc95cf',1,'Constituent::Constituent()'],['../classConstituent.html#a86026ceffb0b81b7f1b306474325789b',1,'Constituent::Constituent(const TLorentzVector &amp;p, const double &amp;bTagDisc, const double &amp;qgLikelihood)'],['../classConstituent.html#aed3114a0fd1fdbd1d19ff1117ca9388e',1,'Constituent::Constituent(const TLorentzVector &amp;p, const Constituent::ConstituentType &amp;type)'],['../classConstituent.html#aea65c8ccaa87cd41431adeabdd667c7b',1,'Constituent::Constituent(const TLorentzVector &amp;p, const double &amp;tau1, const double &amp;tau2, const double &amp;tau3, const double &amp;softDropMass, const std::vector&lt; Constituent &gt; &amp;subjets, const double &amp;wMassCorr)']]],
   ['constituentsareused',['constituentsAreUsed',['../classTTMFilterBase.html#a98fd6161e5b20134fb1b963c182ba630',1,'TTMFilterBase']]],
   ['constresolvedcandinputs',['ConstResolvedCandInputs',['../classttUtility_1_1ConstResolvedCandInputs.html#a7478c472a557e444c5de4f17fd29fa22',1,'ttUtility::ConstResolvedCandInputs']]],
+  ['countak4jets',['countAK4Jets',['../classTopTaggerResults.html#aa7bebc069e37c004c27239c130f4a101',1,'TopTaggerResults']]],
   ['createmlp',['createMLP',['../classCreateModel_1_1CreateModel.html#a7a829ae167a06dbcfec7c16e39e4690e',1,'CreateModel::CreateModel']]],
   ['createmodule',['createModule',['../classTTMFactory.html#abe788ca7a99e646c7b4d89fa41eec5aa',1,'TTMFactory']]]
 ];

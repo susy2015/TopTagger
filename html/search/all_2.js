@@ -17,6 +17,7 @@ var searchData=
   ['constresolvedcandinputs',['ConstResolvedCandInputs',['../classttUtility_1_1ConstResolvedCandInputs.html',1,'ttUtility']]],
   ['constresolvedcandinputs',['ConstResolvedCandInputs',['../classttUtility_1_1ConstResolvedCandInputs.html#a7478c472a557e444c5de4f17fd29fa22',1,'ttUtility::ConstResolvedCandInputs']]],
   ['context',['Context',['../classcfg_1_1Context.html',1,'cfg']]],
+  ['countak4jets',['countAK4Jets',['../classTopTaggerResults.html#aa7bebc069e37c004c27239c130f4a101',1,'TopTaggerResults']]],
   ['createmlp',['createMLP',['../classCreateModel_1_1CreateModel.html#a7a829ae167a06dbcfec7c16e39e4690e',1,'CreateModel::CreateModel']]],
   ['createmodel',['CreateModel',['../classCreateModel_1_1CreateModel.html',1,'CreateModel']]],
   ['createmodule',['createModule',['../classTTMFactory.html#abe788ca7a99e646c7b4d89fa41eec5aa',1,'TTMFactory']]],
