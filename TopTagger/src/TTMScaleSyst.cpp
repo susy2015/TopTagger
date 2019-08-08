@@ -31,6 +31,9 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     //Get histogram names and variables for scale factor and systematic evaluation
     std::vector<std::pair<std::string, std::string>> systematicNames;
 
+    //Magic incantation to disassociate histograms from their file 
+    TH1::AddDirectory(false);
+
     //Get the necessary and avaliable histograms from the input root file
     std::unique_ptr<TFile> file(TFile::Open(inputFileName.c_str()));
 
@@ -49,31 +52,27 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
 
         //Get variable name
         std::string sfHist =  cfgDoc->get("sfHist", iVar, localCxt, "");
-        std::string sfVar  =  cfgDoc->get("sftVar",  iVar, localCxt, "");
-            
+        std::string sfVar  =  cfgDoc->get("sftVar", iVar, localCxt, "pt");
+
         //Get syst factor histogram 
         TH1* h_temp = static_cast<TH1*>(file->Get(sfHist.c_str()));
-        
-        //Check that the histogram pointer is valid
-        if(!h_temp)
-        {
-            THROW_TTEXCEPTION("Scale factor histogram  \"" + sfHist + "\" is not valid");
-        }
         
         //if it is a non empty string save in vector
         if(sfHist.size() > 0 && sfVar.size() > 0)
         {
             keepLooping = true;
 
-            scaleFactorHists_.emplace(sfHist, h_temp);
-        }
-        else if((sfHist.size() == 0) ^ (sfVar.size() == 0)) //^ here is to catch cases where one, but not both, variables are undefined
-        {
-            THROW_TTEXCEPTION("Scale factor histogram  \"" + sfHist + "\" with variable \"" + sfVar + "\" is not valid");
-        }
+            //Check that the histogram pointer is valid
+            if(!h_temp)
+            {
+                THROW_TTEXCEPTION("Scale factor histogram  \"" + sfHist + "\" is not valid");
+            }
 
-        //Set the variable assigned to the histogram
-        variables_[sfHist] = parseVariable(sfVar);
+            scaleFactorHists_.emplace(h_temp->GetName(), h_temp);
+
+            //Set the variable assigned to the histogram
+            variables_[h_temp->GetName()] = parseVariable(sfVar);
+        }
 
         ++iVar;
     }
@@ -87,31 +86,28 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
 
         //Get variable name
         std::string systHist =  cfgDoc->get("systHist", iVar, localCxt, "");
-        std::string systVar  =  cfgDoc->get("systVar",  iVar, localCxt, "");
-            
+        std::string systVar  =  cfgDoc->get("systVar",  iVar, localCxt, "pt");
+
         //Get syst factor histogram 
         TH1* h_temp = static_cast<TH1*>(file->Get(systHist.c_str()));
-        
-        //Check that the histogram pointer is valid
-        if(!h_temp)
-        {
-            THROW_TTEXCEPTION("Systematic histogram  \"" + systHist + "\" is not valid");
-        }
         
         //if it is a non empty string save in vector
         if(systHist.size() > 0 && systVar.size() > 0)
         {
             keepLooping = true;
 
-            systematicHists_.emplace(systHist, h_temp);
-        }
-        else if((systHist.size() == 0) ^ (systVar.size() == 0)) //^ here is to catch cases where one, but not both, variables are undefined
-        {
-            THROW_TTEXCEPTION("Systematic histogram  \"" + systHist + "\" with variable \"" + systVar + "\" is not valid");
-        }
+            //Check that the histogram pointer is valid
+            if(!h_temp)
+            {
+                THROW_TTEXCEPTION("Systematic histogram  \"" + systHist + "\" is not valid");
+            }
+        
+            systematicHists_.emplace(h_temp->GetName(), h_temp);
 
-        //Set the variable assigned to the histogram
-        variables_[systHist] = parseVariable(systVar);
+            //Set the variable assigned to the histogram
+            variables_[h_temp->GetName()] = parseVariable(systVar);
+
+        }
 
         ++iVar;
     }
@@ -133,37 +129,41 @@ void TTMScaleSyst::run(TopTaggerResults& ttResults)
         {
             if(topCand.getBestGenTopMatch())
             {
-                const auto& sfHist = scaleFactorHists_["SF_SIG_" + topFlavor_];
-                const auto& varGetter = variables_["SF_SIG_" + topFlavor_];
+                const auto& sfHist = scaleFactorHists_["hSF_SIG"];
+                const auto& varGetter = variables_["hSF_SIG"];
+
                 double scaleFactor = sfHist->GetBinContent(sfHist->FindBin(varGetter(topCand)));
                 topCand.setMCScaleFactor(scaleFactor);
 
+                const std::string systSigStr = "hSYST_SIG";
                 for(auto& syst : systematicHists_)
                 {
-                    if(syst.first.find("SYST_SIG") != std::string::npos)
+                    if(syst.first.find(systSigStr) != std::string::npos)
                     {
                         const auto& systHist = syst.second;
                         const auto& varGetter = variables_[syst.first];
                         double systVal = systHist->GetBinContent(systHist->FindBin(varGetter(topCand)));
-                        topCand.setSystematicUncertainty(syst.first, systVal);
+                        topCand.setSystematicUncertainty(syst.first.substr(systSigStr.size() + 1), systVal);
                     }
                 }
             }
             else
             {
-                auto& sfHist = scaleFactorHists_["SF_BG_" + topFlavor_];
-                auto& varGetter = variables_["SF_BG_" + topFlavor_];
+                auto& sfHist = scaleFactorHists_["hSF_BG"];
+                auto& varGetter = variables_["hSF_BG"];
+                
                 double scaleFactor = sfHist->GetBinContent(sfHist->FindBin(varGetter(topCand)));
                 topCand.setMCScaleFactor(scaleFactor);
 
+                const std::string systBgStr = "hSYST_BG";
                 for(auto& syst : systematicHists_)
                 {
-                    if(syst.first.find("SYST_BG") != std::string::npos)
+                    if(syst.first.find(systBgStr) != std::string::npos)
                     {
                         const auto& systHist = syst.second;
                         const auto& varGetter = variables_[syst.first];
                         double systVal = systHist->GetBinContent(systHist->FindBin(varGetter(topCand)));
-                        topCand.setSystematicUncertainty(syst.first, systVal);
+                        topCand.setSystematicUncertainty(syst.first.substr(systBgStr.size() + 1), systVal);
                     }
                 }
             }

@@ -110,10 +110,15 @@ std::pair<double, double> TopObject::getTotalSystematicUncertainty() const
     double totalDown = 0.0;
     for(const auto& uncert : systematicUncertainties_)
     {
-        if(uncert.first.find("_Up")) totalUp += uncert.second*uncert.second;
-        else if(uncert.first.find("_Down")) totalDown += uncert.second*uncert.second;
+        if(uncert.first.find("_Up") != std::string::npos)        totalUp += uncert.second*uncert.second;
+        else if(uncert.first.find("_Down") != std::string::npos) totalDown += uncert.second*uncert.second;
+        else
+        {
+            totalDown += uncert.second*uncert.second;
+            totalUp += uncert.second*uncert.second;
+        }
     }
 
-    return std::make_pair(totalUp, totalDown);
+    return std::make_pair(sqrt(totalDown), sqrt(totalUp));
 }
 
