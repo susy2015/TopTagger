@@ -14,8 +14,14 @@
 *.stderr
 *.stdout
 
+#cfg files
+*.cfg
+
 #Root
 *.root
+
+#hdf5 files
+*.h5
 
 #other data files
 *.csv
