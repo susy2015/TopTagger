@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from TopTagger import TopTagger
 
 class TopTaggerProducer(Module):
-    def __init__(self, cfgName="TopTagger.cfg", cfgWD=".", suffix=None, saveAK8=False, AK4JetInputs = ("Jet_pt", "Jet_eta", "Jet_phi", "Jet_mass"), recalculateFromRawInputs = False, useAK8 = False, doLepCleaning = True, saveCandidates = True, topDiscCut=None):
+    def __init__(self, cfgName="TopTagger.cfg", cfgWD=".", suffix=None, saveAK8=False, AK4JetInputs = ("Jet_pt", "Jet_eta", "Jet_phi", "Jet_mass"), recalculateFromRawInputs = False, useAK8 = False, doLepCleaning = True, saveCandidates = True, saveSFAndSyst = False, systToSave = None, topDiscCut=None):
         self.topTaggerCfg = cfgName
         self.topTaggerWD = cfgWD
         self.saveAK8 = saveAK8
@@ -22,6 +22,12 @@ class TopTaggerProducer(Module):
         self.doLepCleaning = doLepCleaning
         self.saveCandidates = saveCandidates
         self.topDiscCut = topDiscCut
+        self.isMC = False
+        self.saveSFAndSyst = saveSFAndSyst
+        if systToSave:
+            self.systToSave = systToSave
+        else:
+            self.systToSave = []
 
         self.tt = TopTagger(self.topTaggerCfg, self.topTaggerWD)
 
@@ -53,6 +59,12 @@ class TopTaggerProducer(Module):
         self.out.branch("ResolvedTop%s_j1Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_j2Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_j3Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
+        self.out.branch("ResolvedTop%s_genMatch"%self.suffixResolved, "O",      lenVar="nResolvedTop%s"%self.suffixResolved)
+
+        if self.saveSFAndSyst:
+            self.out.branch("ResolvedTop%s_sf"%self.suffixResolved, "F",            lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
+            for syst in self.systToSave:
+                self.out.branch("ResolvedTop%s_syst_%s"%(self.suffixResolved, syst), "F",            lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
 
         if self.saveAK8:
             self.out.branch("MergedTop%s_pt"%self.suffix, "F",              lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
@@ -66,6 +78,7 @@ class TopTaggerProducer(Module):
             self.out.branch("MergedW%s_phi"%self.suffix, "F",           lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
             self.out.branch("MergedW%s_mass"%self.suffix, "F",          lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
             self.out.branch("MergedW%s_discriminator"%self.suffix, "F", lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
+            
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -75,6 +88,7 @@ class TopTaggerProducer(Module):
         nHackLoop = 1
         if self.isFirstEventOfFile:
             nHackLoop = 2
+            self.isMC = hasattr(event, "nGenPart")
 
         for i in xrange(nHackLoop):
 
@@ -133,14 +147,20 @@ class TopTaggerProducer(Module):
             else:
                 resTopInputs = None
 
+            if self.isMC:
+                nGenPart = event.nGenPart
+                genInputs = (nGenPart, (event.GenPart_pt, event.GenPart_eta, event.GenPart_phi, event.GenPart_mass, nGenPart), event.GenPart_pdgId, event.GenPart_statusFlags, event.GenPart_genPartIdxMother)
+            else:
+                genInputs = None
+        
         if ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates)
+            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
         elif ak8Inputs and not resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates)
+            return self.tt.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
         elif not ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, saveCandidates=self.saveCandidates)
+            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
         else:
-            return self.tt.run(ak4Inputs = ak4Inputs, saveCandidates=self.saveCandidates)
+            return self.tt.run(ak4Inputs = ak4Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
@@ -165,6 +185,24 @@ class TopTaggerProducer(Module):
         self.out.fillBranch("ResolvedTop%s_j1Idx"%self.suffixResolved,         ttr.j1IdxCol()[resolvedFilter].astype(int))
         self.out.fillBranch("ResolvedTop%s_j2Idx"%self.suffixResolved,         ttr.j2IdxCol()[resolvedFilter].astype(int))
         self.out.fillBranch("ResolvedTop%s_j3Idx"%self.suffixResolved,         ttr.j3IdxCol()[resolvedFilter].astype(int))
+        self.out.fillBranch("ResolvedTop%s_genMatch"%self.suffixResolved,      ttr.genMatchCol()[resolvedFilter].astype(bool))
+
+        if self.saveSFAndSyst:
+            #reorganize systematic data
+            rawSyst = ttr.systCol()
+            reorgSyst = dict([(n, []) for n in self.systToSave])
+            for iTop, topSysts in enumerate(rawSyst):
+                if not resolvedFilter[iTop]:
+                    continue
+                for syst in self.systToSave:
+                    try:
+                        reorgSyst[syst].append(topSysts[syst])
+                    except KeyError:
+                        reorgSyst[syst].append(0.0)
+                        
+            self.out.fillBranch("ResolvedTop%s_sf"%self.suffixResolved, ttr.sfCol()[resolvedFilter])
+            for syst in self.systToSave:
+                self.out.fillBranch("ResolvedTop%s_syst_%s"%(self.suffixResolved, syst), reorgSyst[syst])
 
         if self.saveAK8:
             self.out.fillBranch("MergedTop%s_pt"%self.suffix,              ttr.ptCol()[mergedFilter])

@@ -78,10 +78,17 @@ class TopTaggerResult:
         return self.intVals[:, 4]
 
     def sfCol(self):
-        return self.sfVals
+        try:
+            return self.sfVals
+        except AttributeError:
+            raise AttributeError("No SF values defined")
 
     def systCol(self):
-        return self.systVals
+        try:
+            return self.systVals
+        except AttributeError:
+            raise AttributeError("No systematic values defined")
+
 
 class TopTagger:
 
@@ -115,6 +122,9 @@ class TopTagger:
         tti.run(self.tt, *args, **kwargs)
         if saveCandidates:
             results = tti.getCandidates(self.tt)
+            if saveSFAndSyst:
+                sfAndSyst = tti.getCandidateSFSyst(self.tt)
+                return TopTaggerResult(results, sfAndSyst)
         else:
             results = tti.getResults(self.tt)
             if saveSFAndSyst:
