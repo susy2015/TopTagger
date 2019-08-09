@@ -669,32 +669,35 @@ extern "C"
             PyArrayObject* sfArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT));
 
             //create dictionary of np arrays 
-            PyObject* pSystDict = PyDict_New();
+            PyObject* pSystList = PyList_New(0);
+
+            //Fill SF and syst data if it is avaliable and tops exist 
             if(NTOPS > 0)
             {
-                for(const auto& systPair : tops.back()->getAllSystematicUncertainties())
+                //fill SF and syst arrays in dictionary 
+                for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
                 {
-                    PyObject* systArrayFloat = PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT);
-                    PyDict_SetItemString(pSystDict, systPair.first.c_str(), systArrayFloat);
-                }
-            }
-
-            //fill SF and syst arrays in dictionary 
-            for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
-            {
-                //assign scale factor
-                *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
+                    //assign scale factor
+                    *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
                 
-                for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
-                {
-                    PyArrayObject* systArray = reinterpret_cast<PyArrayObject*>(PyDict_GetItemString(pSystDict, systPair.first.c_str()));
-                    *static_cast<npy_float*>(PyArray_GETPTR1(systArray, iTop)) = systPair.second;
+                    //create dictionary to hold systematics 
+                    PyObject* pSystDict = PyDict_New();
+                    for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
+                    {
+                        PyObject* pFloat = PyFloat_FromDouble(systPair.second);
+                        PyDict_SetItemString(pSystDict, systPair.first.c_str(), pFloat);
+                        Py_DECREF(pFloat);
+                    }
+                    
+                    //put the systematic dictionary for this top into the list
+                    PyList_Append(pSystList, pSystDict);
+                    Py_DECREF(pSystDict);
                 }
             }
             
             Py_DECREF(ptt);
             
-            return Py_BuildValue("NN", sfArrayFloat, pSystDict);
+            return Py_BuildValue("NN", sfArrayFloat, pSystList);
         }
         catch(const TTException& e)
         {

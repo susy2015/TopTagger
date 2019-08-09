@@ -31,14 +31,13 @@ class TopTaggerResult:
         if sfAndSyst:
             self.sfVals = sfAndSyst[0]
             self.systVals = sfAndSyst[1]
-            self.systColReorg()
 
     def __len__(self):
         return self.floatVals.shape[0]
 
     def __iter__(self):
         try:
-            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.sfCol(), self.systs):
+            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.sfCol(), self.systCol()):
                 yield Top(*variables)
         except AttributeError:
             for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol()):
@@ -74,14 +73,8 @@ class TopTaggerResult:
     def sfCol(self):
         return self.sfVals
 
-    def systCol(self, systName):
-        return self.systVals[systName]
-
-    def systColReorg(self):
-        keys = self.systVals.keys()
-        values = self.systVals.values()
-
-        self.systs = [dict(zip(keys, v)) for v in zip(*values)]
+    def systCol(self):
+        return self.systVals
 
 class TopTagger:
 
