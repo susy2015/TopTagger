@@ -62,9 +62,11 @@ static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lor
 
 static int TopTaggerInterface_makeGenInfo(
     std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
+    std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers,
     PyObject* pArgTuple)
 {
-    //number of variables
+    //number of variables which are not stored in supplamental dictionaries
+    const unsigned int NTLVVAR = 1;
     int nGenPart;
 
     PyObject *pGenPart, *pPdgId, *pStatusFlag, *pGenPartIdxMother;
@@ -74,7 +76,11 @@ static int TopTaggerInterface_makeGenInfo(
     }
 
     //Prepare std::vector<TLorentzVector> for jets and subjets lorentz vectors and subjet linking 
-    auto genPartLV = createLorentzP4(pGenPart);
+    //Prepare std::vector<TLorentzVector> for jets lorentz vectors
+    //reserve space for the vector to stop reallocations during emplacing
+    tempTLVBuffers.reserve(NTLVVAR);
+    tempTLVBuffers.emplace_back(createLorentzP4(pGenPart));
+    auto& genPartLV = tempTLVBuffers.back();
 
     ttPython::Py_buffer_wrapper<Int_t> pdgId(pPdgId, nGenPart);
     ttPython::Py_buffer_wrapper<Int_t> statusFlag(pStatusFlag, nGenPart);
@@ -441,7 +447,8 @@ extern "C"
 
         //prepare gen matching info
         std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>> genInfo;
-        if(pGenInputs && TopTaggerInterface_makeGenInfo(genInfo, pGenInputs))
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> tempTLVBuffers;
+        if(pGenInputs && TopTaggerInterface_makeGenInfo(genInfo, tempTLVBuffers, pGenInputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
@@ -616,7 +623,7 @@ extern "C"
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
 
                 //get gen matching information 
-                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop]->getBestGenTopMatch() != 0);
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop]->getBestGenTopMatch() != nullptr);
             }
 
             Py_DECREF(ptt);
@@ -779,7 +786,7 @@ extern "C"
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
 
                 //get gen matching information 
-                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop].getBestGenTopMatch() != 0);
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop].getBestGenTopMatch() != nullptr);
             }
 
             Py_DECREF(ptt);
