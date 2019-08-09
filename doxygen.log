@@ -253,7 +253,7 @@ Computing nesting relations for classes...
 Building example list...
 Searching for en/home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMAK8TopFilter.h:12: warning: Compound TTMAK8TopFilter is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/include/Record.hh:11: warning: Compound cfg::Record is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:26: warning: Compound TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:30: warning: Compound TopTagger::TopTaggerResult is not documented.
 /home/travis/build/susy2015/TopTagger/CfgParser/src/Parser.cpp:309: warning: Compound hcalcfg::ParserInitExistsRecognizer::InitIsMissingType is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMLazyClusterAlgo.h:9: warning: Compound TTMLazyClusterAlgo is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/lester_mt2_bisect.h:295: warning: Compound asymm_mt2_lester_bisect is not documented.
@@ -376,9 +376,8 @@ Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interfa
 Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTMDiscriminatorFilter.h.../home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:697: warning: Member coreMT2calc(const TLorentzVector &fatJet1LVec, const TLorentzVector &fatJet2LVec, const TLorentzVector &metLVec) (function) of namespace ttUtility is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:699: warning: Member getMVAVars() (function) of namespace ttUtility is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:703: warning: Member recMomSearch(int startIndex, int targetIndex, const INTCONTAINERTYPE &genDecayMomIdxVec) (function) of namespace ttUtility is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:722: warning: Member recMomSearch(int startIndex, int targetIndex, const std::vector< int > &genDecayMomIdxVec) (function) of namespace ttUtility is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:725: warning: Member GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE &genDecayLVec, const INTCONTAINERTYPE &genDecayPdgIdVec, const INTCONTAINERTYPE &genDecayStatFlag, const INTCONTAINERTYPE &genDecayMomIdxVec) (function) of namespace ttUtility is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:772: warning: Member autoExpandEnvironmentVariables(std::string &) (function) of namespace ttUtility is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:722: warning: Member GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE &genDecayLVec, const INTCONTAINERTYPE &genDecayPdgIdVec, const INTCONTAINERTYPE &genDecayStatFlag, const INTCONTAINERTYPE &genDecayMomIdxVec) (function) of namespace ttUtility is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerUtilities.h:769: warning: Member autoExpandEnvironmentVariables(std::string &) (function) of namespace ttUtility is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TTModule.h:58: warning: Member TT_VARIABLE_IS_NOT_USED (macro definition) of file TTModule.h is not documented.
 /home/travis/build/susy2015/TopTagger/Tools/README.md:17: warning: explicit link request to 'events' could not be resolved
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/lester_mt2_bisect.h:300: warning: Member get_mT2(const double mVis1, const double pxVis1, const double pyVis1, const double mVis2, const double pxVis2, const double pyVis2, const double pxMiss, const double pyMiss, const double mInvis1, const double mInvis2, const double desiredPrecisionOnMT2=0, const bool useDeciSectionsInitially=true) (function) of class asymm_mt2_lester_bisect is not documented.
@@ -522,8 +521,8 @@ Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interfa
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:246: warning: Member tt (variable) of class TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:254: warning: Member tops (variable) of class TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:4: warning: Member __init__ (function) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:20: warning: Member __str__ (function) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:23: warning: Member __repr__ (function) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:21: warning: Member __str__ (function) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:24: warning: Member __repr__ (function) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:5: warning: Member pt (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:6: warning: Member eta (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:7: warning: Member phi (variable) of class TopTagger::Top is not documented.
@@ -533,8 +532,9 @@ Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interfa
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:11: warning: Member j1Idx (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:12: warning: Member j2Idx (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:13: warning: Member j3Idx (variable) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:14: warning: Member sf (variable) of class TopTagger::Top is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:16: warning: Member systs (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:14: warning: Member genMatch (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:15: warning: Member sf (variable) of class TopTagger::Top is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:17: warning: Member systs (variable) of class TopTagger::Top is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:88: warning: Member __init__ (function) of class TopTagger::TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:94: warning: Member __enter__ (function) of class TopTagger::TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:98: warning: Member __del__ (function) of class TopTagger::TopTagger is not documented.
@@ -547,26 +547,25 @@ Generating code for file /home/travis/build/susy2015/TopTagger/TopTagger/interfa
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:90: warning: Member workingDir (variable) of class TopTagger::TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:92: warning: Member firstEvent (variable) of class TopTagger::TopTagger is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:106: warning: Member tt (variable) of class TopTagger::TopTagger is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:27: warning: Member __init__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:36: warning: Member __len__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:39: warning: Member __iter__ (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:47: warning: Member ptCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:50: warning: Member etaCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:53: warning: Member phiCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:56: warning: Member massCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:59: warning: Member discCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:62: warning: Member typeCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:65: warning: Member j1IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:68: warning: Member j2IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:71: warning: Member j3IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:74: warning: Member sfCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:77: warning: Member systCol (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:80: warning: Member systColReorg (function) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:28: warning: Member floatVals (variable) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:29: warning: Member intVals (variable) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:32: warning: Member sfVals (variable) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:33: warning: Member systVals (variable) of class TopTagger::TopTaggerResult is not documented.
-/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:84: warning: Member systs (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:31: warning: Member __init__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:39: warning: Member __len__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:42: warning: Member __iter__ (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:50: warning: Member ptCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:53: warning: Member etaCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:56: warning: Member phiCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:59: warning: Member massCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:62: warning: Member discCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:65: warning: Member typeCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:68: warning: Member j1IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:71: warning: Member j2IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:74: warning: Member j3IdxCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:77: warning: Member genMatchCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:80: warning: Member sfCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:83: warning: Member systCol (function) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:32: warning: Member floatVals (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:33: warning: Member intVals (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:36: warning: Member sfVals (variable) of class TopTagger::TopTaggerResult is not documented.
+/home/travis/build/susy2015/TopTagger/TopTagger/python/TopTagger.py:37: warning: Member systVals (variable) of class TopTagger::TopTaggerResult is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:49: warning: Member TopTaggerResults(std::vector< Constituent > &&constituents) (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:71: warning: Member getTopCandidates() (function) of class TopTaggerResults is not documented.
 /home/travis/build/susy2015/TopTagger/TopTagger/interface/TopTaggerResults.h:72: warning: Member getUsedConstituents() (function) of class TopTaggerResults is not documented.
@@ -1186,5 +1185,5 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-lookup cache used 1499/65536 hits=9626 misses=1596
+lookup cache used 1499/65536 hits=9625 misses=1596
 finished...

@@ -703,60 +703,57 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;        }</div>
 <div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    }</div>
 <div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    <span class="keywordtype">bool</span> recMomSearch(<span class="keywordtype">int</span> startIndex, <span class="keywordtype">int</span> targetIndex, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TLVCONTAINERTYPE = std::vector&lt;TLorentzVector&gt;, <span class="keyword">typename</span> INTCONTAINERTYPE = std::vector&lt;<span class="keywordtype">int</span>&gt; &gt;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    std::pair&lt;std::vector&lt;TLorentzVector&gt;, std::vector&lt;std::vector&lt;const TLorentzVector*&gt;&gt;&gt; GetTopdauGenLVecFromNano(<span class="keyword">const</span> TLVCONTAINERTYPE&amp; genDecayLVec, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayPdgIdVec, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayStatFlag, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayMomIdxVec)</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    {</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        std::pair&lt;std::vector&lt;TLorentzVector&gt;, std::vector&lt;std::vector&lt;const TLorentzVector*&gt;&gt;&gt; returnVal;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> iTop=0; iTop &lt; genDecayLVec.size(); ++iTop)</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        {</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;            <span class="keywordtype">int</span> pdgId = genDecayPdgIdVec[iTop];</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;            <span class="keywordtype">int</span> statFlag = genDecayStatFlag[iTop]; <span class="comment">//statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                </span></div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;            <span class="keywordflow">if</span>(abs(pdgId) == 6 &amp;&amp; ((statFlag &amp; 0x2100) == 0x2100))</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;            {</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;                <span class="comment">//This is a top</span></div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;                <span class="comment">//Search for daughters of this gen particle</span></div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;                std::vector&lt;const TLorentzVector*&gt; daughters;</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;                <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> iDau = 0; iDau &lt; genDecayLVec.size(); ++iDau)</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;                {</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;                    <span class="keywordtype">int</span> pdgId = abs(genDecayPdgIdVec[iDau]);</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;                    <span class="keywordtype">int</span> statFlag = genDecayStatFlag[iDau]; <span class="comment">//statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                </span></div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;                    <span class="comment">//Only looking for hadronic daughters </span></div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;                    <span class="keywordflow">if</span>(pdgId &gt;= 1 &amp;&amp; pdgId &lt;= 5 &amp;&amp; ((statFlag &amp; 0x2100) == 0x2100))</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;                    {</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;                        <span class="comment">//Check if this gen particle comes from the top </span></div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;                        <span class="keywordflow">if</span>(recMomSearch(iDau, iTop, genDecayMomIdxVec))</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                        {</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;                            daughters.push_back(&amp;genDecayLVec[iDau]);</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;                        }</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;                    }</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;                }</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;                <span class="keywordflow">if</span>(daughters.size() &gt;= 3)</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;                {</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;                    <span class="comment">//hadronic top found </span></div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;                    returnVal.first.push_back(genDecayLVec[iTop]);</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;                    returnVal.second.push_back(daughters);</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;                }</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;            }</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;        }</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;        <span class="keywordflow">return</span> returnVal;</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    }</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> TLVCONTAINERTYPE = std::vector&lt;TLorentzVector&gt;, <span class="keyword">typename</span> INTCONTAINERTYPE = std::vector&lt;<span class="keywordtype">int</span>&gt; &gt;</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    std::pair&lt;std::vector&lt;TLorentzVector&gt;, std::vector&lt;std::vector&lt;const TLorentzVector*&gt;&gt;&gt; GetTopdauGenLVecFromNano(<span class="keyword">const</span> TLVCONTAINERTYPE&amp; genDecayLVec, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayPdgIdVec, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayStatFlag, <span class="keyword">const</span> INTCONTAINERTYPE&amp; genDecayMomIdxVec)</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    {</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        std::pair&lt;std::vector&lt;TLorentzVector&gt;, std::vector&lt;std::vector&lt;const TLorentzVector*&gt;&gt;&gt; returnVal;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> iTop=0; iTop &lt; genDecayLVec.size(); ++iTop)</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        {</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;            <span class="keywordtype">int</span> pdgId = genDecayPdgIdVec[iTop];</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;            <span class="keywordtype">int</span> statFlag = genDecayStatFlag[iTop]; <span class="comment">//statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                </span></div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;            <span class="keywordflow">if</span>(abs(pdgId) == 6 &amp;&amp; ((statFlag &amp; 0x2100) == 0x2100))</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;            {</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;                <span class="comment">//This is a top</span></div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;                <span class="comment">//Search for daughters of this gen particle</span></div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;                std::vector&lt;const TLorentzVector*&gt; daughters;</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;                <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> iDau = 0; iDau &lt; genDecayLVec.size(); ++iDau)</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;                {</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;                    <span class="keywordtype">int</span> pdgId = abs(genDecayPdgIdVec[iDau]);</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;                    <span class="keywordtype">int</span> statFlag = genDecayStatFlag[iDau]; <span class="comment">//statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                </span></div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;                    <span class="comment">//Only looking for hadronic daughters </span></div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;                    <span class="keywordflow">if</span>(pdgId &gt;= 1 &amp;&amp; pdgId &lt;= 5 &amp;&amp; ((statFlag &amp; 0x2100) == 0x2100))</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;                    {</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;                        <span class="comment">//Check if this gen particle comes from the top </span></div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;                        <span class="keywordflow">if</span>(recMomSearch(iDau, iTop, genDecayMomIdxVec))</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;                        {</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;                            daughters.push_back(&amp;genDecayLVec[iDau]);</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;                        }</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                    }</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;                }</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;                <span class="keywordflow">if</span>(daughters.size() &gt;= 3)</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;                {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;                    <span class="comment">//hadronic top found </span></div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;                    returnVal.first.push_back(genDecayLVec[iTop]);</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;                    returnVal.second.push_back(daughters);</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;                }</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;            }</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;        }</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;        <span class="keywordflow">return</span> returnVal;</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    }</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <span class="comment">//Gen matching helper functions </span></div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;<span class="comment"></span>    std::vector&lt;TLorentzVector&gt; GetHadTopLVec(<span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
 <div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    std::vector&lt;const TLorentzVector*&gt; GetTopdauLVec(<span class="keyword">const</span> TLorentzVector&amp; top, <span class="keyword">const</span> std::vector&lt;TLorentzVector&gt;&amp; genDecayLVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayPdgIdVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayIdxVec, <span class="keyword">const</span> std::vector&lt;int&gt;&amp; genDecayMomIdxVec);</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    <span class="comment">//Helper function to expand env. variables in file path</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;    <span class="comment">//Originally from https://stackoverflow.com/questions/1902681/expand-file-names-that-have-environment-variables-in-their-path/20715800#20715800</span></div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="keywordtype">void</span> autoExpandEnvironmentVariables(std::string&amp;);</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;}</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    <span class="comment">//Helper function to expand env. variables in file path</span></div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="comment">//Originally from https://stackoverflow.com/questions/1902681/expand-file-names-that-have-environment-variables-in-their-path/20715800#20715800</span></div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="keywordtype">void</span> autoExpandEnvironmentVariables(std::string&amp;);</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;}</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classttUtility_1_1BDTMonojetInputCalculator_html_af929778a33ce64a1c5102712a2858aa0"><div class="ttname"><a href="classttUtility_1_1BDTMonojetInputCalculator.html#af929778a33ce64a1c5102712a2858aa0">ttUtility::BDTMonojetInputCalculator::mapVars</a></div><div class="ttdeci">void mapVars(const std::vector&lt; std::string &gt; &amp;)</div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:118</div></div>
 <div class="ttc" id="classttUtility_1_1ConstAK4Inputs_html"><div class="ttname"><a href="classttUtility_1_1ConstAK4Inputs.html">ttUtility::ConstAK4Inputs</a></div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.h:53</div></div>
 <div class="ttc" id="classttUtility_1_1ConstGenInputs_html_a520c5a594261d877f0fb4ad46aedc71e"><div class="ttname"><a href="classttUtility_1_1ConstGenInputs.html#a520c5a594261d877f0fb4ad46aedc71e">ttUtility::ConstGenInputs::ConstGenInputs</a></div><div class="ttdeci">ConstGenInputs()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> TopTaggerUtilities.cpp:14</div></div>
@@ -795,7 +792,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Aug 8 2019 22:30:37 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 9 2019 03:31:58 for TopTagger by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
