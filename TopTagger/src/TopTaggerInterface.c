@@ -584,7 +584,7 @@ extern "C"
 
             //create numpy arrays for passing top data to python
             const npy_intp NVARSFLOAT = 5;
-            const npy_intp NVARSINT = 4;
+            const npy_intp NVARSINT = 5;
             const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
     
             npy_intp floatsizearray[] = {NTOPS, NVARSFLOAT};
@@ -614,6 +614,9 @@ extern "C"
 
                 if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
+
+                //get gen matching information 
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop]->getBestGenTopMatch() != 0);
             }
 
             Py_DECREF(ptt);
@@ -744,7 +747,7 @@ extern "C"
 
             //create numpy arrays for passing top data to python
             const npy_intp NVARSFLOAT = 5;
-            const npy_intp NVARSINT = 4;
+            const npy_intp NVARSINT = 5;
             const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
     
             npy_intp floatsizearray[] = {NTOPS, NVARSFLOAT};
@@ -774,6 +777,9 @@ extern "C"
 
                 if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
+
+                //get gen matching information 
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop].getBestGenTopMatch() != 0);
             }
 
             Py_DECREF(ptt);
