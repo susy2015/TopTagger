@@ -804,6 +804,85 @@ extern "C"
 
     }
 
+    static PyObject* TopTaggerInterface_getCandidateSFSyst(PyObject *self, PyObject *args)
+    {
+        //suppress unused parameter warning as self is manditory
+        (void)self;
+
+        PyObject *ptt;
+        if (!PyArg_ParseTuple(args, "O!", &PyCapsule_Type, &ptt))
+        {
+            return NULL;
+        }
+
+        Py_INCREF(ptt);
+
+        //Get top tagger pointer from capsule 
+        TopTagger* tt;
+        if (!(tt = (TopTagger*) PyCapsule_GetPointer(ptt, "TopTagger"))) 
+        {
+            //Handle exception here 
+            Py_DECREF(ptt);
+
+            PyErr_SetString(PyExc_ReferenceError, "TopTagger pointer invalid");
+            return NULL;
+        }
+
+        try
+        {
+            //Get top tagger results 
+            const auto& ttr = tt->getResults();
+
+            //Get tops 
+            const auto& tops = ttr.getTopCandidates();
+            const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
+
+            //create np array for SF
+            npy_intp floatsizearray[] = {NTOPS};
+            PyArrayObject* sfArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT));
+
+            //create dictionary of np arrays 
+            PyObject* pSystList = PyList_New(0);
+
+            //Fill SF and syst data if it is avaliable and tops exist 
+            if(NTOPS > 0)
+            {
+                //fill SF and syst arrays in dictionary 
+                for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
+                {
+                    //assign scale factor
+                    *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop].getMCScaleFactor();
+                
+                    //create dictionary to hold systematics 
+                    PyObject* pSystDict = PyDict_New();
+                    for(const auto& systPair : tops[iTop].getAllSystematicUncertainties())
+                    {
+                        PyObject* pFloat = PyFloat_FromDouble(systPair.second);
+                        PyDict_SetItemString(pSystDict, systPair.first.c_str(), pFloat);
+                        Py_DECREF(pFloat);
+                    }
+                    
+                    //put the systematic dictionary for this top into the list
+                    PyList_Append(pSystList, pSystDict);
+                    Py_DECREF(pSystDict);
+                }
+            }
+            
+            Py_DECREF(ptt);
+            
+            return Py_BuildValue("NN", sfArrayFloat, pSystList);
+        }
+        catch(const TTException& e)
+        {
+            Py_DECREF(ptt);
+
+            std::cout << "TopTagger exception message: " << e << std::endl;
+            PyErr_SetString(PyExc_RuntimeError, ("TopTagger exception thrown. TTException message: " + e.getPrintMessage()).c_str());
+            return NULL;
+        }
+
+    }
+
     static PyObject* TopTaggerInterface_test(PyObject *self, PyObject *args)
     {
         //suppress unused parameter warning as self is manditory
@@ -829,11 +908,12 @@ extern "C"
 
     static PyMethodDef TopTaggerInterfaceMethods[] = {
         {"test",       TopTaggerInterface_test,            METH_VARARGS,                 "test."},
-        {"setup",         TopTaggerInterface_setup,            METH_VARARGS,                 "Configure Top Tagger."},
-        {"run",           (PyCFunction)TopTaggerInterface_run, METH_VARARGS | METH_KEYWORDS, "Run Top Tagger."},
-        {"getResults",    TopTaggerInterface_getResults,       METH_VARARGS,                 "Get Top Tagger results."},
-        {"getSFSyst",     TopTaggerInterface_getSFSyst,        METH_VARARGS,                 "Get Top Tagger SF and systematics."},
-        {"getCandidates", TopTaggerInterface_getCandidates,    METH_VARARGS,                 "Get Top Tagger Candidates."},
+        {"setup",              TopTaggerInterface_setup,              METH_VARARGS,                 "Configure Top Tagger."},
+        {"run",                (PyCFunction)TopTaggerInterface_run,   METH_VARARGS | METH_KEYWORDS, "Run Top Tagger."},
+        {"getResults",         TopTaggerInterface_getResults,         METH_VARARGS,                 "Get Top Tagger results."},
+        {"getSFSyst",          TopTaggerInterface_getSFSyst,          METH_VARARGS,                 "Get Top Tagger SF and systematics."},
+        {"getCandidates",      TopTaggerInterface_getCandidates,      METH_VARARGS,                 "Get Top Tagger Candidates."},
+        {"getCandidateSFSyst", TopTaggerInterface_getCandidateSFSyst, METH_VARARGS,                 "Get Top Tagger candidate SF and systematics."},
         {NULL, NULL, 0, NULL}        /* Sentinel */
     };
 
