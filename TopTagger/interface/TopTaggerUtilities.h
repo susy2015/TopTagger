@@ -718,9 +718,6 @@ namespace ttUtility
         }
     }
 
-
-    bool recMomSearch(int startIndex, int targetIndex, const std::vector<int>& genDecayMomIdxVec);
-
     template<typename TLVCONTAINERTYPE = std::vector<TLorentzVector>, typename INTCONTAINERTYPE = std::vector<int> >
     std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE& genDecayLVec, const INTCONTAINERTYPE& genDecayPdgIdVec, const INTCONTAINERTYPE& genDecayStatFlag, const INTCONTAINERTYPE& genDecayMomIdxVec)
     {

@@ -1,7 +1,7 @@
 import TopTaggerInterface as tti
 
 class Top:
-    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999, sf = -999.9, syst = None):
+    def __init__(self, pt, eta, phi, mass, disc, type, j1Idx = -999, j2Idx = -999, j3Idx = -999, genMatch = -999, sf = -999.9, syst = None):
         self.pt = pt
         self.eta = eta
         self.phi = phi
@@ -11,6 +11,7 @@ class Top:
         self.j1Idx = j1Idx
         self.j2Idx = j2Idx
         self.j3Idx = j3Idx
+        self.genMatch = genMatch
         self.sf = sf
         if syst:
             self.systs = syst
@@ -18,10 +19,13 @@ class Top:
             self.systs = {}
 
     def __str__(self):
-        return "Top properties:   pt:  %7.3f,    eta:  %7.3f,    phi:  %7.3f,    mass:  %7.3f,    disc:  %7.3f,    type:  %3i"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type)
+        return "Top properties:   pt:  %7.3f,    eta:  %7.3f,    phi:  %7.3f,    mass:  %7.3f,    disc:  %7.3f,    type:  %3i,    genMatch:  %3i"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.genMatch)
 
     def __repr__(self):
-        return "Top(%f, %f, %f, %f, %f, %i, %i, %i, %i)"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.j1Idx, self.j2Idx, self.j3Idx)
+        try:
+            return "Top(%f, %f, %f, %f, %f, %i, %i, %i, %i)"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.j1Idx, self.j2Idx, self.j3Idx, self.genMatch, self.systs, self.systs)
+        except AttributeError:
+            return "Top(%f, %f, %f, %f, %f, %i, %i, %i, %i)"%(self.pt, self.eta, self.phi, self.mass, self.disc, self.type, self.j1Idx, self.j2Idx, self.j3Idx, self.genMatch)
 
 class TopTaggerResult:
     def __init__(self, results, sfAndSyst=None):
@@ -31,17 +35,16 @@ class TopTaggerResult:
         if sfAndSyst:
             self.sfVals = sfAndSyst[0]
             self.systVals = sfAndSyst[1]
-            self.systColReorg()
 
     def __len__(self):
         return self.floatVals.shape[0]
 
     def __iter__(self):
         try:
-            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.sfCol(), self.systs):
+            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.genMatchCol(), self.sfCol(), self.systCol()):
                 yield Top(*variables)
         except AttributeError:
-            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol()):
+            for variables in zip(self.ptCol(), self.etaCol(), self.phiCol(), self.massCol(), self.discCol(), self.typeCol(), self.j1IdxCol(), self.j2IdxCol(), self.j3IdxCol(), self.genMatchCol()):
                 yield Top(*variables)            
 
     def ptCol(self):
@@ -71,17 +74,14 @@ class TopTaggerResult:
     def j3IdxCol(self):
         return self.intVals[:, 3]
 
+    def genMatchCol(self):
+        return self.intVals[:, 4]
+
     def sfCol(self):
         return self.sfVals
 
-    def systCol(self, systName):
-        return self.systVals[systName]
-
-    def systColReorg(self):
-        keys = self.systVals.keys()
-        values = self.systVals.values()
-
-        self.systs = [dict(zip(keys, v)) for v in zip(*values)]
+    def systCol(self):
+        return self.systVals
 
 class TopTagger:
 

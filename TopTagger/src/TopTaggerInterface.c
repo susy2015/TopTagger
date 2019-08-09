@@ -62,9 +62,11 @@ static ttPython::Py_buffer_wrapper<TLorentzVector> createLorentzP4(PyObject* lor
 
 static int TopTaggerInterface_makeGenInfo(
     std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>>& genInfo,
+    std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>>& tempTLVBuffers,
     PyObject* pArgTuple)
 {
-    //number of variables
+    //number of variables which are not stored in supplamental dictionaries
+    const unsigned int NTLVVAR = 1;
     int nGenPart;
 
     PyObject *pGenPart, *pPdgId, *pStatusFlag, *pGenPartIdxMother;
@@ -74,7 +76,11 @@ static int TopTaggerInterface_makeGenInfo(
     }
 
     //Prepare std::vector<TLorentzVector> for jets and subjets lorentz vectors and subjet linking 
-    auto genPartLV = createLorentzP4(pGenPart);
+    //Prepare std::vector<TLorentzVector> for jets lorentz vectors
+    //reserve space for the vector to stop reallocations during emplacing
+    tempTLVBuffers.reserve(NTLVVAR);
+    tempTLVBuffers.emplace_back(createLorentzP4(pGenPart));
+    auto& genPartLV = tempTLVBuffers.back();
 
     ttPython::Py_buffer_wrapper<Int_t> pdgId(pPdgId, nGenPart);
     ttPython::Py_buffer_wrapper<Int_t> statusFlag(pStatusFlag, nGenPart);
@@ -441,7 +447,8 @@ extern "C"
 
         //prepare gen matching info
         std::unique_ptr<std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>>> genInfo;
-        if(pGenInputs && TopTaggerInterface_makeGenInfo(genInfo, pGenInputs))
+        std::vector<ttPython::Py_buffer_wrapper<TLorentzVector>> tempTLVBuffers;
+        if(pGenInputs && TopTaggerInterface_makeGenInfo(genInfo, tempTLVBuffers, pGenInputs))
         {
             //Status is not 0, there was an error, PyErr_SetString is called in function 
             Py_DECREF(ptt);
@@ -584,7 +591,7 @@ extern "C"
 
             //create numpy arrays for passing top data to python
             const npy_intp NVARSFLOAT = 5;
-            const npy_intp NVARSINT = 4;
+            const npy_intp NVARSINT = 5;
             const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
     
             npy_intp floatsizearray[] = {NTOPS, NVARSFLOAT};
@@ -614,6 +621,9 @@ extern "C"
 
                 if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
+
+                //get gen matching information 
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop]->getBestGenTopMatch() != nullptr);
             }
 
             Py_DECREF(ptt);
@@ -669,32 +679,35 @@ extern "C"
             PyArrayObject* sfArrayFloat = reinterpret_cast<PyArrayObject*>(PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT));
 
             //create dictionary of np arrays 
-            PyObject* pSystDict = PyDict_New();
+            PyObject* pSystList = PyList_New(0);
+
+            //Fill SF and syst data if it is avaliable and tops exist 
             if(NTOPS > 0)
             {
-                for(const auto& systPair : tops.back()->getAllSystematicUncertainties())
+                //fill SF and syst arrays in dictionary 
+                for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
                 {
-                    PyObject* systArrayFloat = PyArray_SimpleNew(1, floatsizearray, NPY_FLOAT);
-                    PyDict_SetItemString(pSystDict, systPair.first.c_str(), systArrayFloat);
-                }
-            }
-
-            //fill SF and syst arrays in dictionary 
-            for(unsigned int iTop = 0; iTop < tops.size(); ++iTop)
-            {
-                //assign scale factor
-                *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
+                    //assign scale factor
+                    *static_cast<npy_float*>(PyArray_GETPTR1(sfArrayFloat, iTop)) = tops[iTop]->getMCScaleFactor();
                 
-                for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
-                {
-                    PyArrayObject* systArray = reinterpret_cast<PyArrayObject*>(PyDict_GetItemString(pSystDict, systPair.first.c_str()));
-                    *static_cast<npy_float*>(PyArray_GETPTR1(systArray, iTop)) = systPair.second;
+                    //create dictionary to hold systematics 
+                    PyObject* pSystDict = PyDict_New();
+                    for(const auto& systPair : tops[iTop]->getAllSystematicUncertainties())
+                    {
+                        PyObject* pFloat = PyFloat_FromDouble(systPair.second);
+                        PyDict_SetItemString(pSystDict, systPair.first.c_str(), pFloat);
+                        Py_DECREF(pFloat);
+                    }
+                    
+                    //put the systematic dictionary for this top into the list
+                    PyList_Append(pSystList, pSystDict);
+                    Py_DECREF(pSystDict);
                 }
             }
             
             Py_DECREF(ptt);
             
-            return Py_BuildValue("NN", sfArrayFloat, pSystDict);
+            return Py_BuildValue("NN", sfArrayFloat, pSystList);
         }
         catch(const TTException& e)
         {
@@ -741,7 +754,7 @@ extern "C"
 
             //create numpy arrays for passing top data to python
             const npy_intp NVARSFLOAT = 5;
-            const npy_intp NVARSINT = 4;
+            const npy_intp NVARSINT = 5;
             const npy_intp NTOPS = static_cast<npy_intp>(tops.size());
     
             npy_intp floatsizearray[] = {NTOPS, NVARSFLOAT};
@@ -771,6 +784,9 @@ extern "C"
 
                 if(topConstituents.size() > 2) *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = static_cast<int>(topConstituents[2]->getIndex());
                 else                           *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 3)) = -1;
+
+                //get gen matching information 
+                *static_cast<npy_int*>(PyArray_GETPTR2(topArrayInt, iTop, 4)) = static_cast<int>(tops[iTop].getBestGenTopMatch() != nullptr);
             }
 
             Py_DECREF(ptt);
