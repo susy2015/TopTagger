@@ -187,7 +187,7 @@ MVAFILES=
 
 if [ -f TopTagger.cfg ]
 then
-    MVAFILES=$(grep "modelFile" TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
+    MVAFILES=$(grep -e "modelFile" -e "inputFile"  TopTagger.cfg | sed 's/[^"]*"\([^"]*\)"/\1/')
     MISSING=
     if [[ ! -z ${MVAFILES// } ]]
     then

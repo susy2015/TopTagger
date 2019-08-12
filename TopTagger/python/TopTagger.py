@@ -132,7 +132,7 @@ class TopTagger:
                 return TopTaggerResult(results, sfAndSyst)
         return TopTaggerResult(results)
 
-    def runFromNanoAOD(self, event, isFirstEvent = False):
+    def runFromNanoAOD(self, event, isFirstEvent = False, saveSFAndSyst = False):
         #This is a hack for the nanoAOD postprocessor to force it to read all necessary variables before passing them to C because each new branch accessed causes all branches to be reallocated 
         nHackLoop = 1
         if isFirstEvent:
@@ -188,7 +188,7 @@ class TopTagger:
 
         
         if isMC:
-            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs, saveSFAndSyst = True)
+            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs, saveSFAndSyst = saveSFAndSyst)
         else:
             results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
 

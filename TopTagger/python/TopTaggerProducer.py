@@ -127,40 +127,29 @@ class TopTaggerProducer(Module):
             nJets = event.nJet
             jetInputs = (getattr(event, self.AK4JetInputs[0]), getattr(event, self.AK4JetInputs[1]), getattr(event, self.AK4JetInputs[2]), getattr(event, self.AK4JetInputs[3]), nJets)
 
+            inputDict = {}
+
             if self.doLepCleaning:
                 nElec = event.nElectron
                 nMuon = event.nMuon
-                ak4Inputs = (nJets, jetInputs, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
+                inputDict["ak4Inputs"] = (nJets, jetInputs, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables, event.Jet_electronIdx1, event.Jet_muonIdx1, nElec, (event.Electron_pt, event.Electron_eta, event.Electron_phi, event.Electron_mass, nElec), event.Electron_vidNestedWPBitmap, event.Electron_miniPFRelIso_all, nMuon, (event.Muon_pt, event.Muon_eta, event.Muon_phi, event.Muon_mass, nMuon), None, event.Muon_miniPFRelIso_all)
             else:
-                ak4Inputs = (nJets, jetInputs, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
+                inputDict["ak4Inputs"] = (nJets, jetInputs, event.Jet_btagCSVV2, supplementaryFloatVariables, supplementaryIntVariables)
             
             if self.useAK8:
                 nFatJet = event.nFatJet
                 nSubJet = event.nSubJet
-                ak8Inputs = (nFatJet, (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, nFatJet), event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, nSubJet, (event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, nSubJet), event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
-            else:
-                ak8Inputs = None
+                inputDict["ak8Inputs"] = (nFatJet, (event.FatJet_pt, event.FatJet_eta, event.FatJet_phi, event.FatJet_mass, nFatJet), event.FatJet_msoftdrop, event.FatJet_deepTag_TvsQCD, event.FatJet_deepTag_WvsQCD, nSubJet, (event.SubJet_pt, event.SubJet_eta, event.SubJet_phi, event.SubJet_mass, nSubJet), event.FatJet_subJetIdx1, event.FatJet_subJetIdx2)
 
             if not self.recalculateFromRawInputs:
                 nResCand = event.nResolvedTopCandidate
-                resTopInputs = (nResCand, (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, nResCand), event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
-            else:
-                resTopInputs = None
+                inputDict["resTopInputs"] = (nResCand, (event.ResolvedTopCandidate_pt, event.ResolvedTopCandidate_eta, event.ResolvedTopCandidate_phi, event.ResolvedTopCandidate_mass, nResCand), event.ResolvedTopCandidate_discriminator, event.ResolvedTopCandidate_j1Idx, event.ResolvedTopCandidate_j2Idx, event.ResolvedTopCandidate_j3Idx)
 
             if self.isMC:
                 nGenPart = event.nGenPart
-                genInputs = (nGenPart, (event.GenPart_pt, event.GenPart_eta, event.GenPart_phi, event.GenPart_mass, nGenPart), event.GenPart_pdgId, event.GenPart_statusFlags, event.GenPart_genPartIdxMother)
-            else:
-                genInputs = None
-        
-        if ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
-        elif ak8Inputs and not resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, ak8Inputs=ak8Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
-        elif not ak8Inputs and resTopInputs:
-            return self.tt.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
-        else:
-            return self.tt.run(ak4Inputs = ak4Inputs, saveCandidates=self.saveCandidates, genInputs=genInputs, saveSFAndSyst=self.saveSFAndSyst)
+                inputDict["genInputs"] = (nGenPart, (event.GenPart_pt, event.GenPart_eta, event.GenPart_phi, event.GenPart_mass, nGenPart), event.GenPart_pdgId, event.GenPart_statusFlags, event.GenPart_genPartIdxMother)
+
+        return self.tt.run(saveSFAndSyst=self.saveSFAndSyst, **inputDict)
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
@@ -199,7 +188,7 @@ class TopTaggerProducer(Module):
                         reorgSyst[syst].append(topSysts[syst])
                     except KeyError:
                         reorgSyst[syst].append(0.0)
-                        
+
             self.out.fillBranch("ResolvedTop%s_sf"%self.suffixResolved, ttr.sfCol()[resolvedFilter])
             for syst in self.systToSave:
                 self.out.fillBranch("ResolvedTop%s_syst_%s"%(self.suffixResolved, syst), reorgSyst[syst])
