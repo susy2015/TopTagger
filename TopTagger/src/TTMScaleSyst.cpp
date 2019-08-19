@@ -28,6 +28,10 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
         THROW_TTEXCEPTION("Top flavor \"" + topFlavor_ + "\" is not supported!");
     }
 
+    std::string inputFileFullPath;
+    if(workingDirectory_.size()) inputFileFullPath = workingDirectory_ + "/" + inputFileName;
+    else                         inputFileFullPath = inputFileName;
+
     //Get histogram names and variables for scale factor and systematic evaluation
     std::vector<std::pair<std::string, std::string>> systematicNames;
 
@@ -35,12 +39,12 @@ void TTMScaleSyst::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     TH1::AddDirectory(false);
 
     //Get the necessary and avaliable histograms from the input root file
-    std::unique_ptr<TFile> file(TFile::Open(inputFileName.c_str()));
+    std::unique_ptr<TFile> file(TFile::Open(inputFileFullPath.c_str()));
 
     //Check that the file pointer is valid
     if(!file.get())
     {
-        THROW_TTEXCEPTION("File \"" + inputFileName + "\" is not valid");
+        THROW_TTEXCEPTION("File \"" + inputFileFullPath + "\" is not valid");
     }
 
     //Get scale factor histograms 
