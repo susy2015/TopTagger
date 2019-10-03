@@ -49,7 +49,7 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
             if(passDeepAK8WReqs(constituents[i])) 
             {
                 TopObject topCand({&constituents[i]}, TopObject::MERGED_W);
-                topCand.setDiscriminator(constituents[i].getTopDisc());
+                topCand.setDiscriminator(constituents[i].getWDisc());
 
                 topCandidates.push_back(topCand);
             }
