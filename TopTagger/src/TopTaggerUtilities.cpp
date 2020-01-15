@@ -644,7 +644,7 @@ namespace ttUtility
             {
                 if(j_m_lab_[i] >= 0)       *(basePtr_ + j_m_lab_[i] + len_*iCand)       = top_constituents[i]->p().M();
                 if(j_CSV_lab_[i] >= 0)     *(basePtr_ + j_CSV_lab_[i] + len_*iCand)     = top_constituents[i]->getBTagDisc();
-                if(j_QGL_[i] >= 0)          *(basePtr_ + j_QGL_lab_[i] + len_*iCand)      = relu(top_constituents[i]->getExtraVar("qgLikelihood"));
+                if(j_QGL_lab_[i] >= 0)      *(basePtr_ + j_QGL_lab_[i] + len_*iCand)      = relu(top_constituents[i]->getExtraVar("qgLikelihood"));
                 if(j_qgPtD_lab_[i] >= 0)    *(basePtr_ + j_qgPtD_lab_[i] + len_*iCand)    = relu(top_constituents[i]->getExtraVar("qgPtD"));
                 if(j_qgAxis1_lab_[i] >= 0)  *(basePtr_ + j_qgAxis1_lab_[i] + len_*iCand)  = relu(top_constituents[i]->getExtraVar("qgAxis1"));
                 if(j_qgAxis2_lab_[i] >= 0)  *(basePtr_ + j_qgAxis2_lab_[i] + len_*iCand)  = relu(top_constituents[i]->getExtraVar("qgAxis2"));
