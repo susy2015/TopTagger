@@ -13,45 +13,45 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
         if(usedConsts.count(constituent) > 0)
         {
             //First return true if constituent is found (this covers all AK4 and most AK8 jets)
-            printf("In %s: return true 1\n", __func__);
+            //printf("In %s: return true 1\n", __func__);
             return true;
         }
-        else if(constituent->getType() == Constituent::AK8JET)
-        {
-            //If the constituent is AK8 we will also check its subjets are not used
-            if(constituent->getSubjets().size() <= 1)
-            {
-                // If this jet has only one subjet, use matching to the overall AK8 jet instead 
-                for(const auto& usedConstituent : usedConsts)
-                {
-                    if(ROOT::Math::VectorUtil::DeltaR(constituent->p(), usedConstituent->p()) < dRMaxAK8)
-                    {
-                        //we found a match
-                        printf("In %s: return true 2; dR=%f, dRMaxAK8=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(constituent->p(), usedConstituent->p()), dRMaxAK8);
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                for(const auto& subjet : constituent->getSubjets())
-                {
-                    for(const auto& usedConstituent : usedConsts)
-                    {
-                        if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()) < dRMax)
-                        {
-                            //we found a match
-                            printf("In %s: return true 3; dR=%f, dRMax=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()), dRMax);
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
+        //else if(constituent->getType() == Constituent::AK8JET)
+        //{
+        //    //If the constituent is AK8 we will also check its subjets are not used
+        //    if(constituent->getSubjets().size() <= 1)
+        //    {
+        //        // If this jet has only one subjet, use matching to the overall AK8 jet instead 
+        //        for(const auto& usedConstituent : usedConsts)
+        //        {
+        //            if(ROOT::Math::VectorUtil::DeltaR(constituent->p(), usedConstituent->p()) < dRMaxAK8)
+        //            {
+        //                //we found a match
+        //                //printf("In %s: return true 2; dR=%f, dRMaxAK8=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(constituent->p(), usedConstituent->p()), dRMaxAK8);
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for(const auto& subjet : constituent->getSubjets())
+        //        {
+        //            for(const auto& usedConstituent : usedConsts)
+        //            {
+        //                if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()) < dRMax)
+        //                {
+        //                    //we found a match
+        //                    //printf("In %s: return true 3; dR=%f, dRMax=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()), dRMax);
+        //                    return true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     //if nothing is found then we have an unused jet
-    printf("In %s: return false 1\n", __func__);
+    //printf("In %s: return false 1\n", __func__);
     return false;
 }
 

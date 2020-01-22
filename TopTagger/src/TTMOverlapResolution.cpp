@@ -16,15 +16,16 @@ void TTMOverlapResolution::getParameters(const cfg::CfgDocument* cfgDoc, const s
     cfg::Context commonCxt("Common");
     cfg::Context localCxt(localContextName);
 
-    mt_           = cfgDoc->get("mt",           commonCxt, -999.9);
-    maxTopEta_    = cfgDoc->get("maxTopEta",    commonCxt, -999.9);
-    dRMatch_      = cfgDoc->get("dRMatch",      commonCxt, -999.9);
-    dRMatchAK8_   = cfgDoc->get("dRMatchAK8",   commonCxt, 0.8);
+    mt_                 = cfgDoc->get("mt",                 commonCxt, -999.9);
+    maxTopEta_          = cfgDoc->get("maxTopEta",          commonCxt, -999.9);
+    dRMatch_            = cfgDoc->get("dRMatch",            commonCxt, -999.9);
+    dRMatchAK8_         = cfgDoc->get("dRMatchAK8",         commonCxt, 0.8);
 
-    cvsThreshold_  = cfgDoc->get("cvsThreshold",  localCxt,  -999.9);
-    type_          = static_cast<TopObject::Type>(cfgDoc->get("NConstituents", localCxt,  TopObject::ANY));
-    sortMethod_    = cfgDoc->get("sortMethod",    localCxt,  "EMPTY");
-    markUsed_      = cfgDoc->get("markUsed",      localCxt,  true);
+    cvsThreshold_       = cfgDoc->get("cvsThreshold",       localCxt,  -999.9);
+    type_               = static_cast<TopObject::Type>(cfgDoc->get("NConstituents", localCxt,  TopObject::ANY));
+    sortMethod_         = cfgDoc->get("sortMethod",         localCxt,  "EMPTY");
+    markUsed_           = cfgDoc->get("markUsed",           localCxt,  true);
+    doOverlapRemoval_   = cfgDoc->get("doOverlapRemoval",   localCxt,  true);
 
     //select the approperiate sorting function 
     doSort_ = true;  //sort true unless option "none" is selected
@@ -149,9 +150,9 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
             //Check if the candidates have been used in another top
             bool overlaps = constituentsAreUsed(jets, usedJets, dRMatch_, dRMatchAK8_);
-            printf("In %s: top (pt=%f, eta=%f, phi=%f, mass=%f) overlaps=%d\n", __func__, (*iTop)->p().Pt(), (*iTop)->p().Eta(), (*iTop)->p().Phi(), (*iTop)->p().M(), overlaps);
+            //printf("In %s: top (pt=%f, eta=%f, phi=%f, mass=%f) overlaps=%d\n", __func__, (*iTop)->p().Pt(), (*iTop)->p().Eta(), (*iTop)->p().Phi(), (*iTop)->p().M(), overlaps);
             //Prune top from final top collection if it fails the following requirements
-            if(overlaps || !passTopEta)
+            if((doOverlapRemoval_ && overlaps) || !passTopEta)
             {
                 //This is inefficient and dumb
                 iTop = tops.erase(iTop);
