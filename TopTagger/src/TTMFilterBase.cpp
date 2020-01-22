@@ -41,7 +41,7 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
                         if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()) < dRMax)
                         {
                             //we found a match
-                            printf("In %s: return true 3; dR=%f, dRMaxAK8=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()), dRMax);
+                            printf("In %s: return true 3; dR=%f, dRMax=%f\n", __func__, ROOT::Math::VectorUtil::DeltaR(subjet.p(), usedConstituent->p()), dRMax);
                             return true;
                         }
                     }
