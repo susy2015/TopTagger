@@ -33,11 +33,6 @@ void TTMConstituentReqs::getParameters(const cfg::CfgDocument* cfgDoc, const std
     minAK8WPt_        = cfgDoc->get("minAK8WPt",        localCxt, -999.9);
     minAK4WPt_        = cfgDoc->get("minAK4WPt",        localCxt, -999.9);
     
-    // testing
-    std::cout << "In " << __func__ << ": minAK8WMass_ = " << minAK8WMass_ << std::endl;
-    std::cout << "In " << __func__ << ": maxAK8WMass_ = " << maxAK8WMass_ << std::endl;
-    std::cout << "In " << __func__ << ": minAK8TopMass_ = " << minAK8TopMass_ << std::endl;
-    std::cout << "In " << __func__ << ": maxAK8TopMass_ = " << maxAK8TopMass_ << std::endl;
     //trijet parameters
 }
 
