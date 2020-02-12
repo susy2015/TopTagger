@@ -4,7 +4,7 @@ language: cpp
 
 env:
   global:
-  - DOCKER_CONTAINER: cmssw/slc6-base:latest
+  - DOCKER_CONTAINER: cmssw/slc6:latest
   - GH_REPO_NAME: TopTagger
   - GH_ORG_NAME: susy2015
   - DOXYFILE: $TRAVIS_BUILD_DIR/.Doxyfile
