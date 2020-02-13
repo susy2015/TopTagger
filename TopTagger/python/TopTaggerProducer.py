@@ -41,6 +41,8 @@ class TopTaggerProducer(Module):
 
         if self.saveCandidates:
             self.suffixResolved = "Candidate" + self.suffix
+        else:
+            self.suffixResolved = self.suffix
 
     def beginJob(self):
         pass
@@ -51,33 +53,33 @@ class TopTaggerProducer(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.isFirstEventOfFile = True
         self.out = wrappedOutputTree
-        self.out.branch("ResolvedTop%s_pt"%self.suffixResolved, "F",            lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
-        self.out.branch("ResolvedTop%s_eta"%self.suffixResolved, "F",           lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
-        self.out.branch("ResolvedTop%s_phi"%self.suffixResolved, "F",           lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
-        self.out.branch("ResolvedTop%s_mass"%self.suffixResolved, "F",          lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
-        self.out.branch("ResolvedTop%s_discriminator"%self.suffixResolved, "F", lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
+        self.out.branch("ResolvedTop%s_pt"%self.suffixResolved, "F",            lenVar="nResolvedTop%s"%self.suffixResolved)
+        self.out.branch("ResolvedTop%s_eta"%self.suffixResolved, "F",           lenVar="nResolvedTop%s"%self.suffixResolved)
+        self.out.branch("ResolvedTop%s_phi"%self.suffixResolved, "F",           lenVar="nResolvedTop%s"%self.suffixResolved)
+        self.out.branch("ResolvedTop%s_mass"%self.suffixResolved, "F",          lenVar="nResolvedTop%s"%self.suffixResolved)
+        self.out.branch("ResolvedTop%s_discriminator"%self.suffixResolved, "F", lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_j1Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_j2Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_j3Idx"%self.suffixResolved, "I",         lenVar="nResolvedTop%s"%self.suffixResolved)
         self.out.branch("ResolvedTop%s_genMatch"%self.suffixResolved, "O",      lenVar="nResolvedTop%s"%self.suffixResolved)
 
         if self.saveSFAndSyst:
-            self.out.branch("ResolvedTop%s_sf"%self.suffixResolved, "F",            lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
+            self.out.branch("ResolvedTop%s_sf"%self.suffixResolved, "F",            lenVar="nResolvedTop%s"%self.suffixResolved)
             for syst in self.systToSave:
-                self.out.branch("ResolvedTop%s_syst_%s"%(self.suffixResolved, syst), "F",            lenVar="nResolvedTop%s"%self.suffixResolved, limitedPrecision=12)
+                self.out.branch("ResolvedTop%s_syst_%s"%(self.suffixResolved, syst), "F",            lenVar="nResolvedTop%s"%self.suffixResolved)
 
         if self.saveAK8:
-            self.out.branch("MergedTop%s_pt"%self.suffix, "F",              lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedTop%s_eta"%self.suffix, "F",             lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedTop%s_phi"%self.suffix, "F",             lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedTop%s_mass"%self.suffix, "F",            lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedTop%s_discriminator"%self.suffix, "F",   lenVar="nMergedTop%s"%self.suffix, limitedPrecision=12)
+            self.out.branch("MergedTop%s_pt"%self.suffix, "F",              lenVar="nMergedTop%s"%self.suffix)
+            self.out.branch("MergedTop%s_eta"%self.suffix, "F",             lenVar="nMergedTop%s"%self.suffix)
+            self.out.branch("MergedTop%s_phi"%self.suffix, "F",             lenVar="nMergedTop%s"%self.suffix)
+            self.out.branch("MergedTop%s_mass"%self.suffix, "F",            lenVar="nMergedTop%s"%self.suffix)
+            self.out.branch("MergedTop%s_discriminator"%self.suffix, "F",   lenVar="nMergedTop%s"%self.suffix)
     
-            self.out.branch("MergedW%s_pt"%self.suffix, "F",            lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedW%s_eta"%self.suffix, "F",           lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedW%s_phi"%self.suffix, "F",           lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedW%s_mass"%self.suffix, "F",          lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
-            self.out.branch("MergedW%s_discriminator"%self.suffix, "F", lenVar="nMergedW%s"%self.suffix, limitedPrecision=12)
+            self.out.branch("MergedW%s_pt"%self.suffix, "F",            lenVar="nMergedW%s"%self.suffix)
+            self.out.branch("MergedW%s_eta"%self.suffix, "F",           lenVar="nMergedW%s"%self.suffix)
+            self.out.branch("MergedW%s_phi"%self.suffix, "F",           lenVar="nMergedW%s"%self.suffix)
+            self.out.branch("MergedW%s_mass"%self.suffix, "F",          lenVar="nMergedW%s"%self.suffix)
+            self.out.branch("MergedW%s_discriminator"%self.suffix, "F", lenVar="nMergedW%s"%self.suffix)
             
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):

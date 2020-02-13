@@ -719,14 +719,14 @@ namespace ttUtility
     }
 
     template<typename TLVCONTAINERTYPE = std::vector<TLorentzVector>, typename INTCONTAINERTYPE = std::vector<int> >
-    std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE& genDecayLVec, const INTCONTAINERTYPE& genDecayPdgIdVec, const INTCONTAINERTYPE& genDecayStatFlag, const INTCONTAINERTYPE& genDecayMomIdxVec)
+    std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> GetTopdauGenLVecFromNano(const TLVCONTAINERTYPE& genDecayLVec, const INTCONTAINERTYPE& genDecayPdgIdVec, const INTCONTAINERTYPE& genDecayStatFlag, const INTCONTAINERTYPE& genDecayMomIdxVec, const int targedId = 6, const unsigned int targetDaughters = 3)
     {
         std::pair<std::vector<TLorentzVector>, std::vector<std::vector<const TLorentzVector*>>> returnVal;
         for(unsigned iTop=0; iTop < genDecayLVec.size(); ++iTop)
         {
             int pdgId = genDecayPdgIdVec[iTop];
             int statFlag = genDecayStatFlag[iTop]; //statFlag bits 0x2100 mean last copy and from hard process                                                                                                                                
-            if(abs(pdgId) == 6 && ((statFlag & 0x2100) == 0x2100))
+            if(abs(pdgId) == targedId && ((statFlag & 0x2100) == 0x2100))
             {
                 //This is a top
                 //Search for daughters of this gen particle
@@ -746,7 +746,7 @@ namespace ttUtility
                     }
                 }
 
-                if(daughters.size() >= 3)
+                if(daughters.size() >= targetDaughters)
                 {
                     //hadronic top found 
                     returnVal.first.push_back(genDecayLVec[iTop]);

@@ -5,11 +5,17 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #ifdef SHOTTOPTAGGER_DO_OPENCV
 #include "opencv/cv.h"
 #include "opencv/ml.h"
 #endif
+
+namespace ttUtility
+{
+    class MVAInputCalculator;
+}
 
 /**
  *This module implements an interface to the OpenCV randomforest package for filtering top candidates.  This module can either pass entries directly into the final top list, or filter entries out of the final top list if they do not pass the selection criteria. 
@@ -33,6 +39,10 @@ private:
     //cv::Ptr is the opencv implementation of a smart pointer
     cv::Ptr<cv::ml::RTrees> treePtr_;
     std::vector<std::string> vars_;
+
+    //variable calclator
+    std::unique_ptr<ttUtility::MVAInputCalculator> varCalculator_; 
+    std::vector<float> values_;
 
 #endif
 
