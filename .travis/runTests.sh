@@ -10,7 +10,7 @@ echo "UID" $(id -u)
 echo "GID" $(id -g)
 pwd
 ls -la
-cd $TRAVIS_BUILD_DIR/..
+cd /home/cmsuser/
 pwd
 ls -la
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        

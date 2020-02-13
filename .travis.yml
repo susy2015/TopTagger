@@ -28,7 +28,7 @@ script:
 - pwd
 - ls -la
 - ls -la ..
-- sudo docker run -it -P --device /dev/fuse --cap-add SYS_ADMIN -e CVMFS_MOUNTS="cms.cern.ch oasis.opensciencegrid.org" -e MY_UID=$(id -u) -e MY_GID=$(id -g) -v $TRAVIS_BUILD_DIR/..:$TRAVIS_BUILD_DIR/.. $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR 
+- sudo docker run -it -P --device /dev/fuse --cap-add SYS_ADMIN -e CVMFS_MOUNTS="cms.cern.ch oasis.opensciencegrid.org" -e MY_UID=$(id -u) -e MY_GID=$(id -g) -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR 
 
 after_success:
 - if [ "$TRAVIS_BRANCH" = "$TARGET_BRANCH" ] || [ ! -z $TRAVIS_TAG ]; then if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sudo apt-get install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz; fi; fi
