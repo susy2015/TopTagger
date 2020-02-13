@@ -14,7 +14,6 @@ cd /home/cmsuser/
 pwd
 ls -la
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        
-export SCRAM_ARCH=slc6_amd64_gcc630
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git/                       
 source $VO_CMS_SW_DIR/cmsset_default.sh 
 scramv1 project CMSSW $CMSSW_VERSION
