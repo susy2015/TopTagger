@@ -63,6 +63,14 @@ void TTMOpenCVMVA::getParameters(const cfg::CfgDocument* cfgDoc, const std::stri
     {
         THROW_TTEXCEPTION("Incorrect number of variables specified!!! " + std::to_string(treePtr_->getVarCount()) + "expected " + std::to_string(vars_.size()) + " found.");
     }
+
+    //load variables
+    varCalculator_.reset(new ttUtility::TrijetInputCalculator());
+    //map variables
+    varCalculator_->mapVars(vars_);
+    values_.resize(vars_.size());
+    varCalculator_->setPtr(values_.data());
+
 #else
     //Mark variables unused to suppress warnings
     (void)cfgDoc;
@@ -86,28 +94,31 @@ void TTMOpenCVMVA::run(TopTaggerResults& ttResults)
         {
             //Prepare data from top candidate (this code is shared with training tuple producer)
             //Perhaps one day the intermediate map can be bypassed ...
-            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
+//            std::map<std::string, double> varMap = ttUtility::createMVAInputs(topCand, csvThreshold_);
 
             //Construct opencv data matrix for prediction
             cv::Mat inputData(vars_.size(), 1, 5); //the last 5 is for CV_32F var type
 
-            //populate opencv data matrix based on desired input variables 
-            for(unsigned int i = 0; i < vars_.size(); ++i)
+            if(varCalculator_->calculateVars(topCand, 0))
             {
-                inputData.at<float>(i, 0) = varMap[vars_[i]];
-            }
+                //populate opencv data matrix based on desired input variables 
+                for(unsigned int i = 0; i < values_.size(); ++i)
+                {
+                    inputData.at<float>(i, 0) = values_[i];
+                }
+            
+                //predict value
+                double discriminator = treePtr_->predict(inputData);
+                topCand.setDiscriminator(discriminator);
 
-            //predict value
-            double discriminator = treePtr_->predict(inputData);
-            topCand.setDiscriminator(discriminator);
+                //Check number of b-tagged jets in the top
+                bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
 
-            //Check number of b-tagged jets in the top
-            bool passBrequirements = maxNbInTop_ < 0 || topCand.getNBConstituents(csvThreshold_, bEtaCut_) <= maxNbInTop_;
-
-            //place in final top list if it passes the threshold
-            if(discriminator > discriminator_ && passBrequirements)
-            {
-                tops.push_back(&topCand);
+                //place in final top list if it passes the threshold
+                if(discriminator > discriminator_ && passBrequirements)
+                {
+                    tops.push_back(&topCand);
+                }
             }
         }
     }

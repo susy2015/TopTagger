@@ -4,7 +4,7 @@ language: cpp
 
 env:
   global:
-  - DOCKER_CONTAINER: cmssw/slc6-base:latest
+  - DOCKER_CONTAINER: aperloff/cms-cvmfs-docker:latest
   - GH_REPO_NAME: TopTagger
   - GH_ORG_NAME: susy2015
   - DOXYFILE: $TRAVIS_BUILD_DIR/.Doxyfile
@@ -16,18 +16,6 @@ branches:
   - /.*/
 
 before_install:
-- sudo apt-get -qq update
-- sudo apt-get install -qq autofs attr gdb git uuid-dev uuid fuse
-- wget --no-check-certificate https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
-- sudo dpkg -i cvmfs-release-latest_all.deb
-- sudo apt-get update
-- sudo apt-get install -qq cvmfs cvmfs-config-default
-- sudo cvmfs_config setup
-- sudo echo "CVMFS_HTTP_PROXY=\"DIRECT\"" | sudo tee /etc/cvmfs/default.local > /dev/null
-- sudo echo CVMFS_REPOSITORIES=cms.cern.ch | sudo tee -a /etc/cvmfs/default.local > /dev/null
-- sudo service autofs restart
-- cvmfs_config probe
-- sudo cvmfs_config chksetup
 - sudo docker pull $DOCKER_CONTAINER
 
 compiler:
@@ -35,7 +23,12 @@ compiler:
 
 script:
 - chmod +x $TRAVIS_BUILD_DIR/.travis/runTests.sh
-- sudo docker run -v /cvmfs:/cvmfs -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR
+- echo "UID" $(id -u)
+- echo "GID" $(id -g)
+- pwd
+- ls -la
+- ls -la ..
+- sudo docker run -it -P --device /dev/fuse --cap-add SYS_ADMIN -e CVMFS_MOUNTS="cms.cern.ch oasis.opensciencegrid.org" -e MY_UID=$(id -u) -e MY_GID=$(id -g) -v $TRAVIS_BUILD_DIR:$TRAVIS_BUILD_DIR $DOCKER_CONTAINER $TRAVIS_BUILD_DIR/.travis/runTests.sh $TRAVIS_BUILD_DIR 
 
 after_success:
 - if [ "$TRAVIS_BRANCH" = "$TARGET_BRANCH" ] || [ ! -z $TRAVIS_TAG ]; then if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sudo apt-get install doxygen doxygen-doc doxygen-latex doxygen-gui graphviz; fi; fi
