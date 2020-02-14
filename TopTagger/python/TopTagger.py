@@ -132,7 +132,7 @@ class TopTagger:
                 return TopTaggerResult(results, sfAndSyst)
         return TopTaggerResult(results)
 
-    def runFromNanoAOD(self, event, isFirstEvent = False, saveSFAndSyst = False):
+    def runFromNanoAOD(self, event, isFirstEvent = False, saveSFAndSyst = False, saveCandidates = False):
         #This is a hack for the nanoAOD postprocessor to force it to read all necessary variables before passing them to C because each new branch accessed causes all branches to be reallocated 
         nHackLoop = 1
         if isFirstEvent:
@@ -188,9 +188,9 @@ class TopTagger:
 
         
         if isMC:
-            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs, saveSFAndSyst = saveSFAndSyst)
+            results = self.run(ak4Inputs = ak4Inputs, saveCandidates=saveCandidates, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs, genInputs=genInputs, saveSFAndSyst = saveSFAndSyst)
         else:
-            results = self.run(ak4Inputs = ak4Inputs, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
+            results = self.run(ak4Inputs = ak4Inputs, saveCandidates=saveCandidates, resolvedTopInputs=resTopInputs, ak8Inputs=ak8Inputs)
 
         return results
 
@@ -198,6 +198,8 @@ class TopTagger:
 if __name__ == "__main__":
     import ROOT
     import optparse
+    import uproot as up
+    import numpy as np
 
     def getTopsFromExampleFile(tt, event):
         supplementaryFloatVariables = {
@@ -239,31 +241,44 @@ if __name__ == "__main__":
     parser = optparse.OptionParser()
 
     #Add command line options 
-    parser.add_option ('-f', "--file",      dest='inputFile',  action='store',                          type=str, help="Input file")
-    parser.add_option ('-b', "--tree",      dest='treeName',   action='store', default="Events",                  help="Name of TTree (Default: Events)")
-    parser.add_option ('-c', "--taggerCfg", dest='taggerCfg',  action='store', default="TopTagger.cfg",           help="Name of Tagger config file name (Default: TopTagger.cfg)")
-    parser.add_option ('-w', "--workDir",   dest='workDir',    action='store', default="",                        help="orking directory for top tagger config (usually where the cfg is located) (Default: .)")
-    parser.add_option ('-n', "--nEvts",     dest='nEvts',      action='store', default=-1,              type=int, help="Number of events to run over (Default: all events)")
-    parser.add_option ('-e', "--example",   dest='example',    action='store_true',                               help="Switch to read from exmaple file using std::vectors (Default: False")
+    parser.add_option ('-f', "--file",           dest='inputFile',  action='store',                          type=str, help="Input file")
+    parser.add_option ('-b', "--tree",           dest='treeName',   action='store', default="Events",                  help="Name of TTree (Default: Events)")
+    parser.add_option ('-c', "--taggerCfg",      dest='taggerCfg',  action='store', default="TopTagger.cfg",           help="Name of Tagger config file name (Default: TopTagger.cfg)")
+    parser.add_option ('-w', "--workDir",        dest='workDir',    action='store', default="",                        help="orking directory for top tagger config (usually where the cfg is located) (Default: .)")
+    parser.add_option ('-n', "--nEvts",          dest='nEvts',      action='store', default=-1,              type=int, help="Number of events to run over (Default: all events)")
+    parser.add_option ('-e', "--example",        dest='example',    action='store_true',                               help="Switch to read from exmaple file using std::vectors (Default: False")
+    parser.add_option ('-s', "--selectEvents",   dest='selEvents',  action='store', default=None,            type=str, help="Run only over the selected event numbers (comma seperated list)")
+    parser.add_option ('-v', "--eventBranch",    dest='evtBranch',  action='store', default="event",         type=str, help="Name of event number branch (Default: event")
+    parser.add_option ('-d', "--saveCandidates", dest='saveCands',  action='store_true',                               help="Save Top/W candidates instead of final tops")
 
 
     options, args = parser.parse_args()
 
     f = ROOT.TFile.Open(options.inputFile)
 
-    tree = f.Get(options.treeName)
+    event = f.Get(options.treeName)
 
     tt = TopTagger(options.taggerCfg, options.workDir)
 
-    for iEvt, event in enumerate(tree):
+    eventList = []
+    if options.selEvents:
+        with up.open(options.inputFile) as f_up:
+            eventNums = np.array([int(s) for s in options.selEvents.split(",")])
+            events = f_up[options.treeName][options.evtBranch].array()
+            for evtNum in eventNums:
+                eventList.extend(np.where(events == evtNum))
+
+    for iEvt in eventList if len(eventList) else xrange(event.GetEntries()):
         if (options.nEvts > 0) and (iEvt + 1 > options.nEvts): break
 
-        print "Event #:", iEvt + 1
-    
+        event.GetEntry(iEvt)
+
+        print "Event #:", event.event
+
         if options.example:
             tops = getTopsFromExampleFile(tt, event)
         else:
-            tops = tt.runFromNanoAOD(event)
+            tops = tt.runFromNanoAOD(event, saveCandidates=options.saveCands)
 
         print "\tN tops:", len(tops)
 
