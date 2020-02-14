@@ -273,7 +273,11 @@ if __name__ == "__main__":
 
         event.GetEntry(iEvt)
 
-        print "Event #:", event.event
+        try:
+            evtNum = getattr(event, options.evtBranch)
+            print "Event #:", evtNum
+        except AttributeError:
+            print "Event #:", iEvt
 
         if options.example:
             tops = getTopsFromExampleFile(tt, event)
