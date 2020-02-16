@@ -38,7 +38,7 @@ private:
     bool doDijet_;
 
     //trijet variables
-    double minTopCandMass_, maxTopCandMass_, dRMaxTrijet_, minTrijetAK4JetPt_, midTrijetAK4JetPt_, maxTrijetAK4JetPt_;
+    double minTopCandMass_, maxTopCandMass_, dRMaxTrijet_, minTrijetAK4JetPt_, midTrijetAK4JetPt_, maxTrijetAK4JetPt_, maxTrijetPt_;
     bool doTrijet_;
     int nbSeed_;
 

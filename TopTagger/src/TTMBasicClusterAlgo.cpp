@@ -30,6 +30,7 @@ void TTMBasicClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const st
     minTrijetAK4JetPt_  = cfgDoc->get("minTrijetAK4JetPt", localCxt, -999.0);
     midTrijetAK4JetPt_  = cfgDoc->get("midTrijetAK4JetPt", localCxt, -999.0);
     maxTrijetAK4JetPt_  = cfgDoc->get("maxTrijetAK4JetPt", localCxt, -999.0);
+    maxTrijetPt_        = cfgDoc->get("maxTrijetPt",       localCxt, -999.0);
 
     //get vars for TTMConstituentReqs
     TTMConstituentReqs::getParameters(cfgDoc, localContextName);
@@ -161,8 +162,9 @@ void TTMBasicClusterAlgo::fillTriplet(const Constituent* const c1, const Constit
     //mass window on the top candidate mass
     double m123 = topCand.p().M();
     bool passMassWindow = (minTopCandMass_ < m123) && (m123 < maxTopCandMass_);
+    bool passMaxPt = (maxTrijetPt_ < 0.0) || topCand.p().Pt() < maxTrijetPt_;
 
-    if(topCand.getDRmax() < dRMaxTrijet_ && passMassWindow)
+    if(topCand.getDRmax() < dRMaxTrijet_ && passMassWindow && passMaxPt)
     {
         topCandidates.push_back(topCand);
     }
