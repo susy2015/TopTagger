@@ -6,15 +6,8 @@ CMSSW_VERSION=CMSSW_10_2_9
 set -ex
 
 TRAVIS_BUILD_DIR=$1
-echo "UID" $(id -u)
-echo "GID" $(id -g)
-pwd
-ls -la
 cd /home/cmsuser/
-pwd
-ls -la
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch                                        
-export SCRAM_ARCH=slc6_amd64_gcc630
 export CMSSW_GIT_REFERENCE=/cvmfs/cms.cern.ch/cmssw.git/                       
 source $VO_CMS_SW_DIR/cmsset_default.sh 
 scramv1 project CMSSW $CMSSW_VERSION
