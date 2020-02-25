@@ -8,12 +8,18 @@
 
 bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& constituents, const std::set<const Constituent*>& usedConsts, const double dRMax, const double dRMaxAK8) const
 {
+    // loop over set of used constituents for testing
+    printf("List of used constituents:\n");
+    for(const auto& usedConstituent : usedConsts)
+    {
+        printf(" - used constituent: (pt=%.5lf, eta=%.5lf, phi=%.5lf, mass=%.5lf)\n", usedConstituent->p().Pt(), usedConstituent->p().Eta(), usedConstituent->p().Phi(), usedConstituent->p().M());
+    }
     for(const auto& constituent : constituents)
     {
         if(usedConsts.count(constituent) > 0)
         {
             //First return true if constituent is found (this covers all AK4 and most AK8 jets)
-            printf("In %s: constituent already used: ((pt=%.5lf, eta=%.5lf, phi=%.5lf, mass=%.5lf))\n", __func__, constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi(), constituent->p().M());
+            printf("In %s: constituent already used: (pt=%.5lf, eta=%.5lf, phi=%.5lf, mass=%.5lf)\n", __func__, constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi(), constituent->p().M());
             printf("In %s: return true\n", __func__);
             return true;
         }
