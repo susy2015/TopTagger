@@ -8,29 +8,11 @@
 
 bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& constituents, const std::set<const Constituent*>& usedConsts, const double dRMax, const double dRMaxAK8) const
 {
-    bool verbose = false;
-    // loop over set of used constituents for testing
-    if (verbose)
-    {
-        printf("List of used constituents:\n");
-    }
-    for(const auto& usedConstituent : usedConsts)
-    {
-        if (verbose)
-        {
-            printf(" - used constituent: (pt=%.5lf, eta=%.5lf, phi=%.5lf, mass=%.5lf), type=%d\n", usedConstituent->p().Pt(), usedConstituent->p().Eta(), usedConstituent->p().Phi(), usedConstituent->p().M(), usedConstituent->getType());
-        }
-    }
     for(const auto& constituent : constituents)
     {
         if(usedConsts.count(constituent) > 0)
         {
             //First return true if constituent is found (this covers all AK4 and most AK8 jets)
-            if (verbose)
-            {
-                printf("In %s: constituent already used: (pt=%.5lf, eta=%.5lf, phi=%.5lf, mass=%.5lf), type=%d\n", __func__, constituent->p().Pt(), constituent->p().Eta(), constituent->p().Phi(), constituent->p().M(), constituent->getType());
-                printf("In %s: return true\n", __func__);
-            }
             return true;
         }
         //else if(constituent->getType() == Constituent::AK8JET)
@@ -68,10 +50,6 @@ bool TTMFilterBase::constituentsAreUsed(const std::vector<const Constituent*>& c
     }
 
     //if nothing is found then we have an unused jet
-    if (verbose)
-    {
-        printf("In %s: return false\n", __func__);
-    }
     return false;
 }
 

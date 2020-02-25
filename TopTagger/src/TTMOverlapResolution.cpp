@@ -150,7 +150,6 @@ void TTMOverlapResolution::run(TopTaggerResults& ttResults)
 
             //Check if the candidates have been used in another top
             bool overlaps = constituentsAreUsed(jets, usedJets, dRMatch_, dRMatchAK8_);
-            //printf("In %s: top (pt=%f, eta=%f, phi=%f, mass=%f), type=%d, overlaps=%d\n", __func__, (*iTop)->p().Pt(), (*iTop)->p().Eta(), (*iTop)->p().Phi(), (*iTop)->p().M(), (*iTop)->getType(), overlaps);
             //Prune top from final top collection if it fails the following requirements
             if((doOverlapRemoval_ && overlaps) || !passTopEta)
             {
