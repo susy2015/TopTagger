@@ -66,7 +66,7 @@ void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>&
                 //If there is one or fewer subjets, instead match to the overall AK8 jet
                 for(const auto& matchConst : allConstituents) 
                 {
-                    if(ROOT::Math::VectorUtil::DeltaR(constituent->p(), matchConst.p()) < dRMaxAK8)
+                    if(matchConst.getType() == Constituent::AK4JET && ROOT::Math::VectorUtil::DeltaR(constituent->p(), matchConst.p()) < dRMaxAK8)
                     {
                         usedConstituents.insert(&matchConst);
                     }
@@ -78,7 +78,7 @@ void TTMFilterBase::markConstituentsUsed(const std::vector<const Constituent *>&
                 {
                     for(const auto& matchConst : allConstituents) 
                     {
-                        if(ROOT::Math::VectorUtil::DeltaR(subjet.p(), matchConst.p()) < dRMax)
+                        if(matchConst.getType() == Constituent::AK4JET && ROOT::Math::VectorUtil::DeltaR(subjet.p(), matchConst.p()) < dRMax)
                         {
                             usedConstituents.insert(&matchConst);
                         }
