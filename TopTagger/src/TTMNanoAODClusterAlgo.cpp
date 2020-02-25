@@ -48,6 +48,7 @@ void TTMNanoAODClusterAlgo::run(TopTaggerResults& ttResults)
             //Only use AK8 W here 
             if(passDeepAK8WReqs(constituents[i])) 
             {
+                printf("I found a W boson\n");
                 TopObject topCand({&constituents[i]}, TopObject::MERGED_W);
                 topCand.setDiscriminator(constituents[i].getWDisc());
 
