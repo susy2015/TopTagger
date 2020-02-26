@@ -87,8 +87,8 @@ bool TTMConstituentReqs::passDeepAK8WReqs(const Constituent& constituent) const
     if(constituent.getType() != Constituent::AK8JET) return false;
 
     return float(constituent.p().Pt()) > minAK8WPt_ &&
-           float(constituent.getSoftDropMass()) > minAK8WMass_  && 
-           float(constituent.getSoftDropMass()) < maxAK8WMass_ &&
+           float(constituent.getSoftDropMass()) >= minAK8WMass_  && 
+           float(constituent.getSoftDropMass()) <  maxAK8WMass_ &&
            float(constituent.getWDisc()) > deepAK8WDisc_;
 }
 
@@ -98,8 +98,8 @@ bool TTMConstituentReqs::passDeepAK8TopReqs(const Constituent& constituent) cons
     if(constituent.getType() != Constituent::AK8JET) return false;
 
     return float(constituent.p().Pt()) > minAK8TopPt_ &&
-           float(constituent.getSoftDropMass()) > minAK8TopMass_  && 
-           float(constituent.getSoftDropMass()) < maxAK8TopMass_ &&
+           float(constituent.getSoftDropMass()) >= minAK8TopMass_  && 
+           float(constituent.getSoftDropMass()) <  maxAK8TopMass_ &&
            float(constituent.getTopDisc()) > deepAK8TopDisc_;
 }
 
