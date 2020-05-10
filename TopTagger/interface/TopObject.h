@@ -10,7 +10,7 @@
 #include "TLorentzVector.h"
 
 #include "TopTagger/TopTagger/interface/Constituent.h"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 /** 
  *  Container class which represents a top candidate or final selected top object.  

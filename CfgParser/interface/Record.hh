@@ -1,7 +1,7 @@
 #ifndef Record_hh_included
 #define Record_hh_included 1
 
-#include "TopTagger/CfgParser/include/Context.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
 #include <map>
 #include <vector>
 #include <set>

@@ -1,9 +1,9 @@
 #include "TopTagger/TopTagger/interface/TTMFinalSort.h"
 
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
-#include "TopTagger/CfgParser/include/Context.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
+#include "TopTagger/CfgParser/interface/TTException.h"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 
 #include <algorithm>
 #include <vector>

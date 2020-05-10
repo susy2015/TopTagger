@@ -1,9 +1,9 @@
-#include "TopTagger/CfgParser/include/Record.hh"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Record.hh"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
-#include "TopTagger/CfgParser/include/Scanner.h"
-#include "TopTagger/CfgParser/include/Parser.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
+#include "TopTagger/CfgParser/interface/Scanner.h"
+#include "TopTagger/CfgParser/interface/Parser.h"
 
 namespace cfg {
 

@@ -3,7 +3,7 @@
 
 #include "Defs.h"
 
-#include "TopTagger/CfgParser/include/Scanner.h"
+#include "TopTagger/CfgParser/interface/Scanner.h"
 
 namespace hcalcfg {
 

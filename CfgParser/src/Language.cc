@@ -1,7 +1,7 @@
-#include "TopTagger/CfgParser/include/Language.hh"
+#include "TopTagger/CfgParser/interface/Language.hh"
 #include <stdlib.h>
 //#include "hcal/exception/CfgLanguageException.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 namespace cfg {
 

@@ -4,10 +4,10 @@
 #include "TopTagger/TopTagger/interface/TTModule.h"
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 
-#include "TopTagger/CfgParser/include/TTException.h"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
-#include "TopTagger/CfgParser/include/Record.hh"
-#include "TopTagger/CfgParser/include/Context.hh"
+#include "TopTagger/CfgParser/interface/TTException.h"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Record.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
 
 TopTagger::TopTagger() : topTaggerResults_(nullptr), verbosity_(1), reThrow_(true), workingDirectory_()
 {

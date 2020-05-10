@@ -1,8 +1,8 @@
 #include "TopTagger/TopTagger/interface/TTMLazyClusterAlgo.h"
 
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
-#include "TopTagger/CfgParser/include/Context.hh"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 
 void TTMLazyClusterAlgo::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {

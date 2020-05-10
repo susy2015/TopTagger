@@ -12,7 +12,7 @@
 #include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
 
 //this include is necessary to handle exceptions thrown by the top tagger code
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 int main()
 {

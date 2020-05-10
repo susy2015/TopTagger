@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include "TopTagger/CfgParser/include/Parameter.hh"
+#include "TopTagger/CfgParser/interface/Parameter.hh"
 //#include "log4cplus/logger.h"
 
 namespace cfg {

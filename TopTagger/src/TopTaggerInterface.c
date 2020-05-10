@@ -14,7 +14,7 @@
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
 #include "TopTagger/TopTagger/interface/TopTaggerPython.h"
 #include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 /// Destructor function for TopTagger object cleanup 
 static void TopTaggerInterface_cleanup(PyObject *ptt)
