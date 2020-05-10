@@ -1,8 +1,8 @@
 #ifndef Parameter_hh_included
 #define Parameter_hh_included 1
 
-#include "TopTagger/CfgParser/include/Language.hh"
-#include "TopTagger/CfgParser/include/Condition.hh"
+#include "TopTagger/CfgParser/interface/Language.hh"
+#include "TopTagger/CfgParser/interface/Condition.hh"
 #include <set>
 
 namespace cfg

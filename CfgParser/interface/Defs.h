@@ -1,10 +1,10 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "TopTagger/CfgParser/include/Scanner.h"
-#include "TopTagger/CfgParser/include/Language.hh"
-#include "TopTagger/CfgParser/include/Condition.hh"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Scanner.h"
+#include "TopTagger/CfgParser/interface/Language.hh"
+#include "TopTagger/CfgParser/interface/Condition.hh"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 //#include "log4cplus/logger.h"
 //#include "log4cplus/loggingmacros.h"
 

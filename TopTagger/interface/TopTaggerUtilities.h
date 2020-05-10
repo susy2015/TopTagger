@@ -12,7 +12,7 @@ class TopObject;
 class TopTaggerResults;
 
 #include "TopTagger/TopTagger/interface/Constituent.h"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 #include "TF1.h"
 #include "TFile.h"

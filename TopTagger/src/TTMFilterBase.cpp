@@ -1,8 +1,8 @@
 #include "TopTagger/TopTagger/interface/TTMFilterBase.h"
 
 #include "TopTagger/TopTagger/interface/Constituent.h"
-#include "TopTagger/CfgParser/include/Context.hh"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 
 #include "Math/VectorUtil.h"
 

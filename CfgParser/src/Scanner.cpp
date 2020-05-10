@@ -1,7 +1,7 @@
 #include <memory.h>
 #include <string.h>
 #include <string>
-#include "TopTagger/CfgParser/include/Scanner.h"
+#include "TopTagger/CfgParser/interface/Scanner.h"
 
 namespace hcalcfg {
 

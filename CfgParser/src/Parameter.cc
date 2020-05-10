@@ -1,6 +1,6 @@
-#include "TopTagger/CfgParser/include/Parameter.hh"
+#include "TopTagger/CfgParser/interface/Parameter.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 //#include <iostream>
 #include <string>
 

@@ -1,6 +1,6 @@
-#include "TopTagger/CfgParser/include/Context.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 #include <ctype.h>
 
 namespace cfg {

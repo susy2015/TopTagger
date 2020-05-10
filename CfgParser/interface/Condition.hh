@@ -4,8 +4,8 @@
 #include <vector>
 #include <memory>
 #include <set>
-#include "TopTagger/CfgParser/include/Language.hh"
-#include "TopTagger/CfgParser/include/Context.hh"
+#include "TopTagger/CfgParser/interface/Language.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
 
 namespace cfg {
  
