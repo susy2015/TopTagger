@@ -1,7 +1,7 @@
 #ifndef Context_hh_included
 #define Context_hh_included 1
 
-#include "TopTagger/CfgParser/include/Language.hh"
+#include "TopTagger/CfgParser/interface/Language.hh"
 #include <map>
 
 namespace cfg {

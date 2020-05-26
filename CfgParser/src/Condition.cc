@@ -1,6 +1,6 @@
-#include "TopTagger/CfgParser/include/Condition.hh"
+#include "TopTagger/CfgParser/interface/Condition.hh"
 //#include "hcal/exception/CfgLanguageException.hh"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 #include <sstream>
 
 std::ostream& operator<<(std::ostream& o, const cfg::ConditionChain& c) {

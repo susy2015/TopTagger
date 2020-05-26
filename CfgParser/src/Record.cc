@@ -1,4 +1,4 @@
-#include "TopTagger/CfgParser/include/Record.hh"
+#include "TopTagger/CfgParser/interface/Record.hh"
 
 namespace cfg {
 

@@ -1,8 +1,8 @@
 #include "TopTagger/TopTagger/interface/TTMRemainingSystem.h"
 
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
-#include "TopTagger/CfgParser/include/Context.hh"
-#include "TopTagger/CfgParser/include/CfgDocument.hh"
+#include "TopTagger/CfgParser/interface/Context.hh"
+#include "TopTagger/CfgParser/interface/CfgDocument.hh"
 
 void TTMRemainingSystem::getParameters(const cfg::CfgDocument* cfgDoc, const std::string& localContextName)
 {

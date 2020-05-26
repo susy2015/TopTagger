@@ -1,4 +1,4 @@
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 
 #include <iostream>
 
