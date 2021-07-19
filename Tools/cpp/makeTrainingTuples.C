@@ -7,7 +7,7 @@
 #include "TopTagger/TopTagger/interface/TopTagger.h"
 #include "TopTagger/TopTagger/interface/TopTaggerUtilities.h"
 #include "TopTagger/TopTagger/interface/TopTaggerResults.h"
-#include "TopTagger/CfgParser/include/TTException.h"
+#include "TopTagger/CfgParser/interface/TTException.h"
 #include "TaggerUtility.h"
 #include "PlotUtility.h"
 
